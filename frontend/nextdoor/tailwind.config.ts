@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import forms from "@tailwindcss/forms";
+import daisyui from "daisyui";
 
 const config: Config = {
   content: [
@@ -14,6 +16,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  //base layer와 utilities layerㅇ와 components layer를 확장하는 역할
+  plugins: [forms, daisyui],
 };
 export default config;
