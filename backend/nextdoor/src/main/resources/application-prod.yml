@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: nextdoor
+
+  transaction:
+    default-timeout: 100
+
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      idle-timeout: 600000
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+    defer-datasource-initialization: true
+
+server:
+  port: 8081
