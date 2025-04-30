@@ -12,16 +12,12 @@ public class RentalMapper {
     public UploadBeforeImageCommand toCommand(Long rentalId, UploadBeforeImageRequest request) {
         return new UploadBeforeImageCommand(
                 rentalId,
-                request.getFile(),
-                request.getType()
+                request.getFile()
         );
     }
 
     public UploadBeforeImageResponse toResponse(UploadBeforeImageResult result) {
         return UploadBeforeImageResponse.builder()
-                .photoId(result.getPhotoId())
-                .photoId(result.getPhotoId())
-                .type(result.getType())
                 .imageUrl(result.getImageUrl())
                 .uploadedAt(result.getUploadedAt())
                 .build();

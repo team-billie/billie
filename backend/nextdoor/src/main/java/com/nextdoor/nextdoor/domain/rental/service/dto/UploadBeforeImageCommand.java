@@ -12,5 +12,4 @@ public class UploadBeforeImageCommand {
 
     private Long rentalId;
     private MultipartFile file;
-    private String type;
 }

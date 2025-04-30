@@ -11,5 +11,4 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadBeforeImageRequest {
 
     private MultipartFile file;
-    private String type;
 }

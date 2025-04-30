@@ -11,9 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UploadBeforeImageResult {
 
-    private Long photoId;
-    private Long feedId;
-    private String type;
+    private Long rentalId;
     private String imageUrl;
     private LocalDateTime uploadedAt;
 }
