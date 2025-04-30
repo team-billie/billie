@@ -3,19 +3,21 @@ package com.nextdoor.nextdoor.domain.rental.domain;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "ai_image")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class AiImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "rental_id")
     private Rental rental;
 
