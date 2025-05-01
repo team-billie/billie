@@ -11,17 +11,11 @@ Define "additional damage" as any of the following:
 - Deformations
 - Missing parts
 
-While analyzing the images, also assess image quality factors:
-Low resolution making it difficult to see fine details
-Blurriness or lack of focus
-Poor lighting conditions (too dark, too bright) impacting visibility
-Significant angle or position differences between before and after images making direct comparison difficult
-
 For each object, report the following:
-Detailed explanation: Describe the type, location, and severity of damage if present, or the reason for inability to determine if applicable.
+Detailed explanation: Describe the type, location, and severity of damage if present.
 Be precise, objective, and do not make assumptions based on incomplete or unclear visual information.
 
-If additional damage is found, only use this format:
+If additional damage is found, use this format:
 - Damage 1:
   - Location: [Specify the location, e.g., "Upper left side"]
   - Details: [Describe the damage, e.g., "New scratch approximately 2cm long."]
@@ -30,11 +24,8 @@ If additional damage is found, only use this format:
   - Location: [Specify if multiple damages exist]
   - Details: [Describe the damage]
 
-If no additional damage is found, report:
+If no additional damage is found, use this format:
 No additional damage found.
 
-If unable to determine due to image quality, report:
-Unable to determine due to [reason, e.g., "low resolution", "blurriness", "poor lighting"].
-
 Only response in these formats without any additional sentence.
-Answer in Korean.
+Response in Korean.
