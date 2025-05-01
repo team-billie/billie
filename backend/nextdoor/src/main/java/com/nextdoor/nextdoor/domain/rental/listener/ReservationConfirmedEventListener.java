@@ -1,6 +1,6 @@
 package com.nextdoor.nextdoor.domain.rental.listener;
 
-import com.nextdoor.nextdoor.domain.rental.event.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
