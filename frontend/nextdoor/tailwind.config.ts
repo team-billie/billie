@@ -13,6 +13,11 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        blue400: "#0074FF",
+        gray100: "#F9F9FA",
+        gray600: "#96A2AE",
+        gray700: "#687888",
+        gray900: "#101219",
       },
     },
   },
