@@ -1,9 +1,10 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
-import com.nextdoor.nextdoor.domain.rental.event.ReservationConfirmedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.UploadImageEvent;
+import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
+import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.S3UploadResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageResult;
@@ -39,6 +40,26 @@ public class RentalServiceImpl implements RentalService {
         rental.saveAiImage(imageUploadResult.getUrl(), command.getFile().getContentType());
         LocalDateTime uploadedAt = LocalDateTime.now();
 
-        return new UploadBeforeImageResult(rental.getRentalId(), imageUploadResult.getUrl(), uploadedAt);
+        return UploadBeforeImageResult.builder()
+                .rentalId(rental.getRentalId())
+                .imageUrl(imageUploadResult.getUrl())
+                .uploadedAt(uploadedAt)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void requestRemittance(RequestRemittanceCommand command) {
+        Rental rental = rentalRepository.findByRentalId(command.getRentalId())
+                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+
+        rental.requestRemittance(command.getRemittanceAmount());
+
+        //TODO : renterId에 대한 회원 검증, amount 값 범위 검증 고려
+        eventPublisher.publishEvent(RequestRemittanceNotificationEvent.builder()
+                .rentalId(command.getRentalId())
+                .renterId(command.getRenterId())
+                .amount(command.getRemittanceAmount())
+                .build());
     }
 }
