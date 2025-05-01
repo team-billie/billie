@@ -1,25 +1,26 @@
 package com.nextdoor.nextdoor.domain.rental.mapper;
 
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemittanceRequest;
-import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadBeforeImageRequest;
-import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadBeforeImageResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageResult;
+import com.nextdoor.nextdoor.domain.rental.service.dto.UploadImageCommand;
+import com.nextdoor.nextdoor.domain.rental.service.dto.UploadImageResult;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RentalMapper {
 
-    public UploadBeforeImageCommand toCommand(Long rentalId, UploadBeforeImageRequest request) {
-        return new UploadBeforeImageCommand(
+    public UploadImageCommand toUploadImageCommand(Long rentalId, UploadImageRequest request) {
+        return new UploadImageCommand(
                 rentalId,
                 request.getFile()
         );
     }
 
-    public UploadBeforeImageResponse toResponse(UploadBeforeImageResult result) {
-        return UploadBeforeImageResponse.builder()
+    public UploadImageResponse toUploadImageResponse(UploadImageResult result) {
+        return UploadImageResponse.builder()
+                .rentalId(result.getRentalId())
                 .imageUrl(result.getImageUrl())
                 .uploadedAt(result.getUploadedAt())
                 .build();
@@ -33,3 +34,5 @@ public class RentalMapper {
         );
     }
 }
+
+
