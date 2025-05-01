@@ -1,13 +1,17 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
+import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
 public class Rental {
 
     @Id
@@ -25,6 +29,21 @@ public class Rental {
 
     @Column(name = "damage_analysis")
     private String damageAnalysis;
+
+    @Builder
+    public Rental(List<AiImage> aiImages, Long reservationId, String rentalStatus, String damageAnalysis) {
+        this.aiImages = aiImages;
+        this.reservationId = reservationId;
+        this.rentalStatus = rentalStatus;
+        this.damageAnalysis = damageAnalysis;
+    }
+
+    public static Rental createFromReservation(Long reservationId) {
+        Rental r = new Rental();
+        r.reservationId = reservationId;
+        r.rentalStatus = RentalStatus.PAYMENT_PENDING.name();
+        return r;
+    }
 
     public void saveAiImage(String imageUrl, String mimeType) {
         validateNotBlank(imageUrl, "imageUrl");
