@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
+import com.nextdoor.nextdoor.domain.rental.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.UploadImageEvent;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.S3UploadResult;
@@ -20,6 +21,12 @@ public class RentalServiceImpl implements RentalService {
     private final RentalRepository rentalRepository;
     private final S3ImageUploadService s3ImageUploadService;
     private final ApplicationEventPublisher eventPublisher;
+
+    @Override
+    public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
+        Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
+        rentalRepository.save(createdRental);
+    }
 
     @Override
     @Transactional

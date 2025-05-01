@@ -1,10 +1,13 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
+import com.nextdoor.nextdoor.domain.rental.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageResult;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface RentalService {
+
+    void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent);
     UploadBeforeImageResult registerBeforePhoto(UploadBeforeImageCommand command);
 }
