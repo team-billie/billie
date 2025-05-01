@@ -1,13 +1,16 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
 import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -21,7 +24,7 @@ public class Rental {
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AiImage> aiImages = new ArrayList<>();
 
-    @Column(name = "reservation_id", nullable = false)
+    @Column(name="reservation_id", nullable=false, updatable=false, insertable=false)
     private Long reservationId;
 
     @Column(name = "rental_status", nullable = false)
@@ -41,8 +44,24 @@ public class Rental {
     public static Rental createFromReservation(Long reservationId) {
         Rental r = new Rental();
         r.reservationId = reservationId;
-        r.rentalStatus = RentalStatus.PAYMENT_PENDING.name();
+        r.rentalStatus = RentalStatus.CREATED.name();
         return r;
+    }
+
+    public void requestRemittance(BigDecimal amount) {
+        validateRemittancePendingState();
+        validateAmount(amount);
+        this.rentalStatus = RentalStatus.REMITTANCE_REQUESTED.name();
+    }
+
+    public void validateRemittancePendingState() {
+        if (!Objects.equals(this.rentalStatus, RentalStatus.REMITTANCE_REQUESTED.name())) {
+            throw new IllegalStateException("송금 대기 상태가 아닙니다.");
+        }
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        //TODO : 금액 범위 검증
     }
 
     public void saveAiImage(String imageUrl, String mimeType) {
