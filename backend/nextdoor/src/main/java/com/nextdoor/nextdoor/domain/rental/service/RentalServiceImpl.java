@@ -4,10 +4,10 @@ import com.nextdoor.nextdoor.domain.rental.domain.Rental;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
-import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.S3UploadResult;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageResult;
+import com.nextdoor.nextdoor.domain.rental.service.dto.*;
+import com.nextdoor.nextdoor.domain.rental.strategy.AfterImageStatusStrategy;
+import com.nextdoor.nextdoor.domain.rental.strategy.BeforeImageStatusStrategy;
+import com.nextdoor.nextdoor.domain.rental.strategy.RentalStatusStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -31,20 +31,8 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
-    public UploadBeforeImageResult registerBeforePhoto(UploadBeforeImageCommand command) {
-        Rental rental = this.rentalRepository.findByRentalId(command.getRentalId())
-                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
-
-        //TODO : s3 업로드 구현체, 업로드 예외 처리
-        S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), "rentals/" + rental.getRentalId() + "/before");
-        rental.saveAiImage(imageUploadResult.getUrl(), command.getFile().getContentType());
-        LocalDateTime uploadedAt = LocalDateTime.now();
-
-        return UploadBeforeImageResult.builder()
-                .rentalId(rental.getRentalId())
-                .imageUrl(imageUploadResult.getUrl())
-                .uploadedAt(uploadedAt)
-                .build();
+    public UploadImageResult registerBeforePhoto(UploadImageCommand command) {
+        return processRentalImage(command, new BeforeImageStatusStrategy());
     }
 
     @Override
@@ -61,5 +49,27 @@ public class RentalServiceImpl implements RentalService {
                 .renterId(command.getRenterId())
                 .amount(command.getRemittanceAmount())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public UploadImageResult registerAfterPhoto(UploadImageCommand command) {
+       return processRentalImage(command, new AfterImageStatusStrategy());
+    }
+
+    private UploadImageResult processRentalImage(UploadImageCommand command, RentalStatusStrategy rentalStatusStrategy) {
+        Rental rental = this.rentalRepository.findByRentalId(command.getRentalId())
+                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+
+        //TODO : s3 업로드 구현체, 업로드 예외 처리
+        S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), "rentals/" + rental.getRentalId() + "/after");
+        rentalStatusStrategy.updateRentalStatus(rental ,imageUploadResult.getUrl(), command.getFile().getContentType());
+        LocalDateTime uploadedAt = LocalDateTime.now();
+
+        return UploadImageResult.builder()
+                .rentalId(rental.getRentalId())
+                .imageUrl(imageUploadResult.getUrl())
+                .uploadedAt(uploadedAt)
+                .build();
     }
 }
