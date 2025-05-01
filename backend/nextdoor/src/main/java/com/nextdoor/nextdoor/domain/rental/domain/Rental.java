@@ -64,7 +64,7 @@ public class Rental {
         //TODO : 금액 범위 검증
     }
 
-    public void saveAiImage(String imageUrl, String mimeType) {
+    public void saveAiImage(String imageUrl, String type, String mimeType) {
         validateNotBlank(imageUrl, "imageUrl");
         validateNotBlank(mimeType, "mimeType");
         validateStatusForAdd();
@@ -73,6 +73,7 @@ public class Rental {
 
         AiImage aiImage = AiImage.builder()
                 .rental(this)
+                .type(type)
                 .imageUrl(imageUrl)
                 .mimeType(mimeType)
                 .build();

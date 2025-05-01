@@ -21,6 +21,9 @@ public class AiImage {
     @JoinColumn(name = "rental_id")
     private Rental rental;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
@@ -28,8 +31,9 @@ public class AiImage {
     private String mimeType;
 
     @Builder
-    public AiImage(Rental rental, String imageUrl, String mimeType) {
+    public AiImage(Rental rental, String type, String imageUrl, String mimeType) {
         this.rental = rental;
+        this.type = type;
         this.imageUrl = imageUrl;
         this.mimeType = mimeType;
     }
