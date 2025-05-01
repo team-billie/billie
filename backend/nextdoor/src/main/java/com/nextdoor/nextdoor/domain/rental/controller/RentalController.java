@@ -1,9 +1,11 @@
 package com.nextdoor.nextdoor.domain.rental.controller;
 
+import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemittanceRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadBeforeImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadBeforeImageResponse;
 import com.nextdoor.nextdoor.domain.rental.mapper.RentalMapper;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
+import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageResult;
 import jakarta.validation.Valid;
@@ -26,5 +28,14 @@ public class RentalController {
         UploadBeforeImageResponse response = rentalMapper.toResponse(result);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{rentalId}/request-remittance")
+    public ResponseEntity<Void> requestPayments(@PathVariable Long rentalId,
+                                                @RequestBody RequestRemittanceRequest request) {
+        RequestRemittanceCommand command = rentalMapper.toCommand(rentalId, request);
+        rentalService.requestRemittance(command);
+
+        return ResponseEntity.ok().build();
     }
 }
