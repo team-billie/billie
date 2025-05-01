@@ -1,17 +1,18 @@
-package com.nextdoor.nextdoor.domain.rental.controller.dto.response;
+package com.nextdoor.nextdoor.domain.rental.service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Builder
-public class UploadBeforeImageResponse {
+@AllArgsConstructor
+public class UploadImageResult {
 
     private Long rentalId;
+    private String type;
     private String imageUrl;
     private LocalDateTime uploadedAt;
 }
