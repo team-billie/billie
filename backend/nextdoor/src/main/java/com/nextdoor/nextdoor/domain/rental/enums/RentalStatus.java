@@ -1,7 +1,8 @@
 package com.nextdoor.nextdoor.domain.rental.enums;
 
 public enum  RentalStatus {
-    PAYMENT_PENDING,
+    CREATED,
+    REMITTANCE_REQUESTED,
     ACTIVE,
     COMPLETED,
     CANCELLED
