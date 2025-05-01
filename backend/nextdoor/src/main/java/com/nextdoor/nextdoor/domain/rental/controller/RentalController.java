@@ -1,19 +1,20 @@
 package com.nextdoor.nextdoor.domain.rental.controller;
 
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemittanceRequest;
-import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadBeforeImageRequest;
-import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadBeforeImageResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.mapper.RentalMapper;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
 import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadBeforeImageResult;
+import com.nextdoor.nextdoor.domain.rental.service.dto.UploadImageCommand;
+import com.nextdoor.nextdoor.domain.rental.service.dto.UploadImageResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/api/v1/rentals")
+@RestController
+@RequestMapping("/api/v1/rentals")
 @RequiredArgsConstructor
 public class RentalController {
 
@@ -21,11 +22,11 @@ public class RentalController {
     private final RentalMapper rentalMapper;
 
     @PostMapping("/{rentalId}/before/photos")
-    ResponseEntity<UploadBeforeImageResponse> registerBeforePhoto(@PathVariable Long rentalId,
-                                                                  @Valid @ModelAttribute UploadBeforeImageRequest request) {
-        UploadBeforeImageCommand command = rentalMapper.toCommand(rentalId, request);
-        UploadBeforeImageResult result = rentalService.registerBeforePhoto(command);
-        UploadBeforeImageResponse response = rentalMapper.toResponse(result);
+    ResponseEntity<UploadImageResponse> registerBeforePhoto(@PathVariable Long rentalId,
+                                                            @Valid @RequestPart UploadImageRequest request) {
+        UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
+        UploadImageResult result = rentalService.registerBeforePhoto(command);
+        UploadImageResponse response = rentalMapper.toUploadImageResponse(result);
 
         return ResponseEntity.ok(response);
     }
@@ -37,5 +38,15 @@ public class RentalController {
         rentalService.requestRemittance(command);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{rentalId}/after/photos")
+    ResponseEntity<UploadImageResponse> registerAfterPhoto(@PathVariable Long rentalId,
+                                                           @Valid @RequestPart UploadImageRequest request) {
+        UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
+        UploadImageResult result = rentalService.registerAfterPhoto(command);
+        UploadImageResponse response = rentalMapper.toUploadImageResponse(result);
+
+        return ResponseEntity.ok(response);
     }
 }
