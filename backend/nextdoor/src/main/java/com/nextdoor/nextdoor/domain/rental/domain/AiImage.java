@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
+import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +22,9 @@ public class AiImage {
     @JoinColumn(name = "rental_id")
     private Rental rental;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private String type;
+    private AiImageType type;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
@@ -31,7 +33,7 @@ public class AiImage {
     private String mimeType;
 
     @Builder
-    public AiImage(Rental rental, String type, String imageUrl, String mimeType) {
+    public AiImage(Rental rental, AiImageType type, String imageUrl, String mimeType) {
         this.rental = rental;
         this.type = type;
         this.imageUrl = imageUrl;
