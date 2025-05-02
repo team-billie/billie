@@ -10,3 +10,7 @@
 
 @layer components {
 }
+
+.btn-1 {
+  @apply p-1 px-2 border-2 rounded-full text-sm;
+}

@@ -27,6 +27,9 @@ const config: Config = {
         gray800: "#3F4854",
         gray900: "#101219",
       },
+      backgroundImage: {
+        bluegradient: "linear-gradient(to right,#66A3FF,#A8CCFF)",
+      },
     },
   },
   //base layer와 utilities layerㅇ와 components layer를 확장하는 역할

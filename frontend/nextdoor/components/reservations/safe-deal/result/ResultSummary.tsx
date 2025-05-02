@@ -13,7 +13,7 @@ export default function ResultSummary() {
       </div>
 
       {/* 결과 카드 */}
-      <div className="flex-1 bg-gray100 rounded-xl p-6 flex flex-col gap-6 shadow-sm">
+      <div className="flex-1 bg-gray200 rounded-xl p-6 flex flex-col gap-6 shadow-sm">
         <div>
           <h2 className="text-blue400 text-2xl font-semibold">분석 결과</h2>
         </div>
