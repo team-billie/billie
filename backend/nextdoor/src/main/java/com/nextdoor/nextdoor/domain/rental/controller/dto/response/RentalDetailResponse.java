@@ -17,11 +17,13 @@ public class RentalDetailResponse {
     private Long reservationId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private BigDecimal rentalFee;
+    private BigDecimal rentalFee; //Per Day
     private BigDecimal deposit;
     private String reservationStatus;
     private Long ownerId;
     private Long renterId;
     private Long rentalId;
     private String rentalStatus;
+    private String title;
+    private String productImageUrl;
 }
