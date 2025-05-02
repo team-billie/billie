@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
+import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
-import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,14 +27,15 @@ public class Rental {
     @Column(name="reservation_id", nullable=false, updatable=false, insertable=false)
     private Long reservationId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "rental_status", nullable = false)
-    private String rentalStatus;
+    private RentalStatus rentalStatus;
 
     @Column(name = "damage_analysis")
     private String damageAnalysis;
 
     @Builder
-    public Rental(List<AiImage> aiImages, Long reservationId, String rentalStatus, String damageAnalysis) {
+    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, String damageAnalysis) {
         this.aiImages = aiImages;
         this.reservationId = reservationId;
         this.rentalStatus = rentalStatus;
@@ -44,14 +45,14 @@ public class Rental {
     public static Rental createFromReservation(Long reservationId) {
         Rental r = new Rental();
         r.reservationId = reservationId;
-        r.rentalStatus = RentalStatus.CREATED.name();
+        r.rentalStatus = RentalStatus.CREATED;
         return r;
     }
 
     public void requestRemittance(BigDecimal amount) {
         validateRemittancePendingState();
         validateAmount(amount);
-        this.rentalStatus = RentalStatus.REMITTANCE_REQUESTED.name();
+        this.rentalStatus = RentalStatus.REMITTANCE_REQUESTED;
     }
 
     public void validateRemittancePendingState() {
@@ -64,20 +65,23 @@ public class Rental {
         //TODO : 금액 범위 검증
     }
 
-    public void saveAiImage(String imageUrl, String type, String mimeType) {
+    public void saveAiImage(AiImageType imageType, String imageUrl, String mimeType) {
         validateNotBlank(imageUrl, "imageUrl");
         validateNotBlank(mimeType, "mimeType");
-        validateStatusForAdd();
         validateQuantityLimit();
         validateNoDuplicate(imageUrl);
 
         AiImage aiImage = AiImage.builder()
                 .rental(this)
-                .type(type)
+                .type(imageType)
                 .imageUrl(imageUrl)
                 .mimeType(mimeType)
                 .build();
         aiImages.add(aiImage);
+    }
+
+    public void updateStatus(RentalStatus rentalStatus){
+        this.rentalStatus = rentalStatus;
     }
 
     private void validateNotBlank(String value, String fieldName) {
@@ -86,8 +90,8 @@ public class Rental {
         }
     }
 
-    private void validateStatusForAdd() {
-        if (!"PAYMENT_PENDING".equals(this.rentalStatus)) {
+    private void validateStatusForAddImage() {
+        if (!RentalStatus.REMITTANCE_REQUESTED.equals(this.rentalStatus)) {
             throw new IllegalStateException(
                     "현재 상태(" + this.rentalStatus + ")에서는 Before 이미지 등록이 불가합니다."
             );
