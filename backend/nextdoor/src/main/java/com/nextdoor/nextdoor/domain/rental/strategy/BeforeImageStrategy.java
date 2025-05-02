@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component;
 public class BeforeImageStrategy implements RentalImageStrategy {
 
     @Override
-    public void updateRentalStatus(Rental rental, String imageUrl, String mimeType) {
+    public void updateRentalImage(Rental rental, String imageUrl, String mimeType) {
+        validateImageUploadAllowed(rental);
         rental.saveAiImage(getImageType(), imageUrl, mimeType);
         rental.updateStatus(getTargetStatus());
     }
@@ -30,7 +31,9 @@ public class BeforeImageStrategy implements RentalImageStrategy {
     }
 
     @Override
-    public boolean canRegisterImage(RentalStatus currentStatus) {
-        return currentStatus == RentalStatus.CREATED;
+    public void validateImageUploadAllowed(Rental rental) {
+        if(rental.getRentalStatus() == RentalStatus.CREATED){
+            throw new IllegalArgumentException("대여 이미지 업로드 불가능.");
+        }
     }
 }
