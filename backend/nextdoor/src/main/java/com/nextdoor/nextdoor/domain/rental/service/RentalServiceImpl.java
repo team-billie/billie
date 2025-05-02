@@ -85,8 +85,7 @@ public class RentalServiceImpl implements RentalService {
 
         String path = strategy.createImagePath(String.valueOf(rental.getRentalId()));
         S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), path);
-        rental.saveAiImage(strategy.getImageType(), imageUploadResult.getUrl(), command.getFile().getContentType());
-        rental.updateStatus(strategy.getTargetStatus());
+        strategy.updateRentalImage(rental, imageUploadResult.getUrl(), command.getFile().getContentType());
 
         LocalDateTime uploadedAt = LocalDateTime.now();
         return UploadImageResult.builder()
