@@ -7,9 +7,11 @@ import com.google.cloud.vertexai.generativeai.GenerativeModel;
 import com.google.cloud.vertexai.generativeai.PartMaker;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.InspectDamageRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDamageResponseDto;
+import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.AiImageDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class GeminiAnalysisService implements AiAnalysisService {
+
+    private final ApplicationEventPublisher eventPublisher;
 
     private final GenerativeModel generativeModel;
     private final Part promptPart;
@@ -33,7 +37,9 @@ public class GeminiAnalysisService implements AiAnalysisService {
         } catch (IOException e) {
             throw new ExternalApiException(e);
         }
-        return new InspectDamageResponseDto(response.getCandidates(0).getContent().getParts(0).getText());
+        String damageAnalysis = response.getCandidates(0).getContent().getParts(0).getText();
+        eventPublisher.publishEvent(new AiAnalysisCompletedEvent(inspectDamageRequestDto.getRentalId(), damageAnalysis));
+        return new InspectDamageResponseDto(damageAnalysis);
     }
 
     private Content createContent(List<AiImageDto> aiImages) {
