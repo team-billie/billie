@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RentalRepository extends JpaRepository<Rental, Long> {
+public interface RentalRepository extends JpaRepository<Rental, Long>, RentalCustomRepository {
+
     Optional<Rental> findByRentalId(Long rentalId);
+    Optional<Rental> findByReservationId(Long reservationId);
 }

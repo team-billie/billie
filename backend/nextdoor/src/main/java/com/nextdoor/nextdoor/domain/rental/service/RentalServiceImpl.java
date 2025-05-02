@@ -2,15 +2,14 @@ package com.nextdoor.nextdoor.domain.rental.service;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
 import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
+import com.nextdoor.nextdoor.domain.rental.enums.Role;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
-import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.S3UploadResult;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadImageCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.UploadImageResult;
+import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import com.nextdoor.nextdoor.domain.rental.strategy.RentalImageStrategy;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +23,22 @@ public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
     private final S3ImageUploadService s3ImageUploadService;
+    private final ReservationService reservationService;
+    private final FeedService feedService;
     private final Map<AiImageType, RentalImageStrategy> rentalImageStrategies;
     private final ApplicationEventPublisher eventPublisher;
 
     public RentalServiceImpl(
             RentalRepository rentalRepository,
             S3ImageUploadService s3ImageUploadService,
+            ReservationService reservationService,
+            FeedService feedService,
             List<RentalImageStrategy> strategyList,
             ApplicationEventPublisher eventPublisher) {
         this.rentalRepository = rentalRepository;
         this.s3ImageUploadService = s3ImageUploadService;
-
+        this.reservationService = reservationService;
+        this.feedService = feedService;
 
         this.rentalImageStrategies = strategyList.stream()
                 .collect(Collectors.toMap(
@@ -93,5 +97,27 @@ public class RentalServiceImpl implements RentalService {
                 .imageUrl(imageUploadResult.getUrl())
                 .uploadedAt(uploadedAt)
                 .build();
+    }
+
+    @Override
+    public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
+        ReservationDto reservationDto = new ReservationDto();
+
+        if(command.getUserRole().equals(Role.OWNER.name())) {
+            reservationDto = reservationService.getReservationByOwnerId(command.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("예약 정보가 존재하지 않습니다."));
+        }else if(command.getUserRole().equals(Role.RENTER.name())) {
+            reservationDto = reservationService.getReservationByRenterId(command.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("예약 정보가 존재하지 않습니다."));
+        }
+
+        Rental rental = rentalRepository.findByReservationId(reservationDto.getReservationId())
+                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+
+        FeedDto feedDto = new FeedDto();
+        feedDto = feedService.getFeedById(reservationDto.getFeedId())
+                .orElseThrow(() -> new IllegalArgumentException("게시물 정보가 존재하지 않습니다"));
+
+        return null;
     }
 }
