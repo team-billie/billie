@@ -3,6 +3,11 @@ import "./globals.css";
 
 export const viewport = {
   themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  shrinkToFit: "no",
+  viewportFit: "cover",
 };
 
 
@@ -13,8 +18,6 @@ export const metadata: Metadata = {
   },
   description: "필요한 물건을 주위에서 빌려보세요",
   manifest: "/manifest.json",
-  viewport:
-    "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
 };
 
 export default function RootLayout({
