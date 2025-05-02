@@ -1,0 +1,43 @@
+{
+    "name": "옆집물건", 
+    "short_name": "옆집물건", 
+    "description": "원하는 물건을 언제든지 안전하게 대여해보세요.",
+    "theme_color": "#2470FF", 
+    "background_color": "#FFFFFF", 
+    "display": "standalone", 
+    "orientation": "portrait", 
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+      {
+        "src": "/icons/icon48.png",
+        "sizes": "48x48",
+        "type": "image/png"
+      },
+      {
+        "src": "/icons/icon72.png",
+        "sizes": "72x72",
+        "type": "image/png"
+      },
+      {
+        "src": "/icons/icon96.png",
+        "sizes": "96x96",
+        "type": "image/png"
+      },
+      {
+        "src": "/icons/icon144.png",
+        "sizes": "144x144",
+        "type": "image/png"
+      },
+      {
+        "src": "/icons/icon192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/icons/icon512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
