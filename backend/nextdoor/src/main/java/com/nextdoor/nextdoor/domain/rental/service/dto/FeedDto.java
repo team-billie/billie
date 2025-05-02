@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 public class FeedDto {
 
+    private Long id;
     private String title;
     private String productImageUrl;
 }
