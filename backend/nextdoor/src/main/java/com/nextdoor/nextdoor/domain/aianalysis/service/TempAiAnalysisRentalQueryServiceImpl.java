@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AiAnalysisRentalQueryServiceImpl implements AiAnalysisRentalQueryService {
+public class TempAiAnalysisRentalQueryServiceImpl implements AiAnalysisRentalQueryService {
 
     @Override
     public List<AiImageDto> findByRentalId(Long id) {
