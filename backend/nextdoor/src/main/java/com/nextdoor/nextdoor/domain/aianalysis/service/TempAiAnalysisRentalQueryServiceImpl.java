@@ -9,7 +9,7 @@ import java.util.List;
 public class TempAiAnalysisRentalQueryServiceImpl implements AiAnalysisRentalQueryService {
 
     @Override
-    public List<AiImageDto> findByRentalId(Long id) {
+    public List<AiImageDto> findAllAiImageByRentalId(Long id) {
         return List.of(
                 AiImageDto.builder()
                         .rentalId(id)

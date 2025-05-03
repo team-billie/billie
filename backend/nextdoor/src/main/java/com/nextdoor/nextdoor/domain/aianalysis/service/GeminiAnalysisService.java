@@ -30,7 +30,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     @Override
     public InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto) {
-        List<AiImageDto> aiImages = aiAnalysisRentalQueryService.findByRentalId(inspectDamageRequestDto.getRentalId());
+        List<AiImageDto> aiImages = aiAnalysisRentalQueryService.findAllAiImageByRentalId(inspectDamageRequestDto.getRentalId());
         GenerateContentResponse response;
         try {
             response = generativeModel.generateContent(createContent(aiImages));

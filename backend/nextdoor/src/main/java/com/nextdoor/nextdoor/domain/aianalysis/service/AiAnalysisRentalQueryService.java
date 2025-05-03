@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface AiAnalysisRentalQueryService {
 
-    List<AiImageDto> findByRentalId(Long id);
+    List<AiImageDto> findAllAiImageByRentalId(Long id);
 }
