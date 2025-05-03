@@ -1,10 +1,8 @@
 package com.nextdoor.nextdoor.domain.aianalysis.service;
 
-import com.nextdoor.nextdoor.domain.aianalysis.service.dto.AiImageDto;
-
-import java.util.List;
+import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 
 public interface AiAnalysisRentalQueryService {
 
-    List<AiImageDto> findAllAiImageByRentalId(Long id);
+    RentalDto findById(Long id);
 }
