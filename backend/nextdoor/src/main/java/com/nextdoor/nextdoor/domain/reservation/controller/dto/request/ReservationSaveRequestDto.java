@@ -1,6 +1,5 @@
 package com.nextdoor.nextdoor.domain.reservation.controller.dto.request;
 
-import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
@@ -17,10 +16,4 @@ public class ReservationSaveRequestDto {
 
     @NotNull
     private LocalDate endDate;
-
-    public Reservation toEntity() {
-        return Reservation.builder()
-                .
-                .build()
-    }
 }
