@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.rental.service;
+package com.nextdoor.nextdoor.domain.rental.port;
 
 import com.nextdoor.nextdoor.domain.rental.service.dto.S3UploadResult;
 import org.springframework.stereotype.Service;

@@ -1,10 +1,9 @@
-package com.nextdoor.nextdoor.domain.rental.service;
+package com.nextdoor.nextdoor.domain.rental.port;
 
 import com.nextdoor.nextdoor.domain.rental.service.dto.FeedDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public interface FeedService {
