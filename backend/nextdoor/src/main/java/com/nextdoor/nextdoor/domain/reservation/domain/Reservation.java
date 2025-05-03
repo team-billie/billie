@@ -45,4 +45,20 @@ public class Reservation {
 
     @NotNull
     private Long feedId;
+
+    public void updateStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void updateRentalFee(Long rentalFee) {
+        this.rentalFee = rentalFee;
+    }
+
+    public void updateDeposit(Long deposit) {
+        this.deposit = deposit;
+    }
 }
