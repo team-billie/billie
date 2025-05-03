@@ -1,17 +1,21 @@
 package com.nextdoor.nextdoor.domain.reservation.service;
 
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationSaveRequestDto;
+import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationUpdateRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
+import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationFeedQueryService reservationFeedQueryService;
@@ -34,5 +38,18 @@ public class ReservationServiceImpl implements ReservationService {
                 .feedId(feed.getFeedId())
                 .build());
         return ReservationResponseDto.from(reservation, feed, owner);
+    }
+
+    @Override
+    public ReservationResponseDto updateReservation(Long loginUserId, Long reservationId, ReservationUpdateRequestDto reservationUpdateRequestDto) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        reservation.updateStartDate(reservationUpdateRequestDto.getStartDate());
+        reservation.updateEndDate(reservationUpdateRequestDto.getEndDate());
+        reservation.updateRentalFee(reservationUpdateRequestDto.getRentalFee());
+        reservation.updateDeposit(reservationUpdateRequestDto.getDeposit());
+        return ReservationResponseDto.from(
+                reservation,
+                reservationFeedQueryService.findById(reservation.getFeedId()),
+                reservationMemberQueryService.findById(reservation.getOwnerId()));
     }
 }
