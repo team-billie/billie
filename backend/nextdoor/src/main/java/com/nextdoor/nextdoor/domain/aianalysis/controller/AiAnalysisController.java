@@ -18,7 +18,10 @@ public class AiAnalysisController {
     private final AiAnalysisService aiAnalysisService;
 
     @PostMapping
-    public ResponseEntity<InspectDamageResponseDto> inspectDamage(@RequestBody InspectDamageRequestDto inspectDamageRequestDto) {
-        return ResponseEntity.ok(aiAnalysisService.inspectDamage(inspectDamageRequestDto));
+    public ResponseEntity<InspectDamageResponseDto> inspectDamage(
+            Long loginUserId,
+            @RequestBody InspectDamageRequestDto inspectDamageRequestDto
+    ) {
+        return ResponseEntity.ok(aiAnalysisService.inspectDamage(loginUserId, inspectDamageRequestDto));
     }
 }

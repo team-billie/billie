@@ -29,7 +29,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final AiAnalysisRentalQueryService aiAnalysisRentalQueryService;
 
     @Override
-    public InspectDamageResponseDto inspectDamage(InspectDamageRequestDto inspectDamageRequestDto) {
+    public InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto) {
         List<AiImageDto> aiImages = aiAnalysisRentalQueryService.findByRentalId(inspectDamageRequestDto.getRentalId());
         GenerateContentResponse response;
         try {
