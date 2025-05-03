@@ -27,7 +27,8 @@ public class ReservationController {
             HttpServletRequest request,
             @RequestBody ReservationSaveRequestDto reservationSaveRequestDto
     ) {
-        ReservationResponseDto reservationResponseDto = reservationService.createReservation(reservationSaveRequestDto);
+        Long loginUserId = 1L;
+        ReservationResponseDto reservationResponseDto = reservationService.createReservation(loginUserId, reservationSaveRequestDto);
         return ResponseEntity.created(URI.create(request.getRequestURI())).body(reservationResponseDto);
     }
 }
