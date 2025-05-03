@@ -5,5 +5,5 @@ import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.Reservat
 
 public interface ReservationService {
 
-    ReservationResponseDto createReservation(ReservationSaveRequestDto reservationSaveRequestDto);
+    ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto);
 }
