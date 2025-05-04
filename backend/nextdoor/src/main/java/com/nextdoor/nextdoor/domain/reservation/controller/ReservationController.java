@@ -38,6 +38,6 @@ public class ReservationController {
     ) {
         Long loginUserId = 1L;
         ReservationResponseDto reservationResponseDto = reservationService.updateReservation(loginUserId, reservationId, reservationUpdateRequestDto);
-        return ResponseEntity.created(URI.create(request.getRequestURI())).body(reservationResponseDto);
+        return ResponseEntity.ok(reservationResponseDto);
     }
 }
