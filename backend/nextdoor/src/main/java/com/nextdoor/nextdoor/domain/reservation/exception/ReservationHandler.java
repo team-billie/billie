@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.aianalysis.exception;
+package com.nextdoor.nextdoor.domain.reservation.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -8,24 +8,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class AiAnalysisHandler {
+public class ReservationHandler {
 
     @ExceptionHandler({
-            DamageAnalysisPresentException.class
+            NoSuchReservationException.class
     })
-    public ResponseEntity<ErrorResponseDto> handleDamageAnalysisException(DamageAnalysisPresentException e, HttpServletRequest request) {
-        log.error(e.getMessage(), e);
-        return ResponseEntity.badRequest().body(new ErrorResponseDto(
-                e.getErrorCode(),
-                e.getMessage(),
-                request.getRequestURI()
-        ));
-    }
-
-    @ExceptionHandler({
-            ExternalApiException.class
-    })
-    public ResponseEntity<ErrorResponseDto> handleExternalApiException(ExternalApiException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleExternalApiException(NoSuchReservationException e, HttpServletRequest request) {
         log.error(e.getMessage(), e);
         return ResponseEntity.internalServerError().body(new ErrorResponseDto(
                 e.getErrorCode(),
