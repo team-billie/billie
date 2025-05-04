@@ -11,6 +11,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AiAnalysisHandler {
 
     @ExceptionHandler({
+            DamageAnalysisPresentException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleDamageAnalysisException(DamageAnalysisPresentException e, HttpServletRequest request) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.badRequest().body(new ErrorResponseDto(
+                e.getErrorCode(),
+                e.getMessage(),
+                request.getRequestURI()
+        ));
+    }
+
+    @ExceptionHandler({
             ExternalApiException.class
     })
     public ResponseEntity<ErrorResponseDto> handleExternalApiException(ExternalApiException e, HttpServletRequest request) {

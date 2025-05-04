@@ -5,5 +5,5 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDa
 
 public interface AiAnalysisService {
 
-    InspectDamageResponseDto inspectDamage(InspectDamageRequestDto inspectDamageRequestDto);
+    InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto);
 }

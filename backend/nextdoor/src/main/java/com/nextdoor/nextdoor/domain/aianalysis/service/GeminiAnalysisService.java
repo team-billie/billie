@@ -8,8 +8,9 @@ import com.google.cloud.vertexai.generativeai.PartMaker;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.InspectDamageRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDamageResponseDto;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
+import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
-import com.nextdoor.nextdoor.domain.aianalysis.service.dto.AiImageDto;
+import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,12 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final AiAnalysisRentalQueryService aiAnalysisRentalQueryService;
 
     @Override
-    public InspectDamageResponseDto inspectDamage(InspectDamageRequestDto inspectDamageRequestDto) {
-        List<AiImageDto> aiImages = aiAnalysisRentalQueryService.findByRentalId(inspectDamageRequestDto.getRentalId());
+    public InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto) {
+        RentalDto rental = aiAnalysisRentalQueryService.findById(inspectDamageRequestDto.getRentalId());
+        if (rental.getDamageAnalysis() != null) {
+            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
+        }
+        List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
         GenerateContentResponse response;
         try {
             response = generativeModel.generateContent(createContent(aiImages));
@@ -42,13 +47,13 @@ public class GeminiAnalysisService implements AiAnalysisService {
         return new InspectDamageResponseDto(damageAnalysis);
     }
 
-    private Content createContent(List<AiImageDto> aiImages) {
+    private Content createContent(List<RentalDto.AiImageDto> aiImages) {
         List<Part> beforeImageParts = aiImages.stream()
-                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageDto.Type.BEFORE))
+                .filter(aiImageDto -> aiImageDto.getType().equals(RentalDto.AiImageDto.Type.BEFORE))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
         List<Part> afterImageParts = aiImages.stream()
-                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageDto.Type.AFTER))
+                .filter(aiImageDto -> aiImageDto.getType().equals(RentalDto.AiImageDto.Type.AFTER))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
         return Content.newBuilder()
