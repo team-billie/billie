@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
-export default function ProductRegisterAiToggle() {
-  const [isAiToggle, setIsAiToggle] = useState(false);
+import { useState, useEffect } from "react";
 
+interface ProductRegisterAiToggleProps {
+  isAiToggle: boolean;
+  toggleSwitch: () => void;
+}
 
-  const toggleSwitch = () => {
-    setIsAiToggle(!isAiToggle);
-  };
-
+export default function ProductRegisterAiToggle({ 
+  isAiToggle = false, 
+  toggleSwitch 
+}: ProductRegisterAiToggleProps) {
   return (
     <div className="bg-blue-300 rounded-full flex items-center justify-between p-3 my-4 mx-4">
       <div className="flex items-center gap-2">
@@ -20,7 +22,6 @@ export default function ProductRegisterAiToggle() {
         aria-pressed={isAiToggle} 
         aria-label={`AI 작성 ${isAiToggle ? "사용 중" : "사용 안함"}`}
       >
-      
         <span
           className={`${
             isAiToggle ? "bg-blue-500" : "bg-gray-200" 
