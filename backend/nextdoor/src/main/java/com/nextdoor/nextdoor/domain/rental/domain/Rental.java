@@ -63,6 +63,14 @@ public class Rental {
         }
     }
 
+    public void processDepositCompletion(){
+        if(rentalStatus != RentalStatus.DEPOSIT_REQUESTED){
+            throw new IllegalStateException("보증금을 처리할 수 있는 상태가 아닙니다");
+        }
+
+        rentalStatus = RentalStatus.RENTAL_COMPLETED;
+    }
+
     public void validateRemittancePendingState() {
         if (!Objects.equals(this.rentalStatus, RentalStatus.REMITTANCE_REQUESTED.name())) {
             throw new IllegalStateException("송금 대기 상태가 아닙니다.");
