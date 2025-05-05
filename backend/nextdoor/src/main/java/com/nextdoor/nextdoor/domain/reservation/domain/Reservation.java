@@ -61,4 +61,8 @@ public class Reservation {
     public void updateDeposit(Long deposit) {
         this.deposit = deposit;
     }
+
+    public void updateStatus(ReservationStatus status) {
+        this.status = status;
+    }
 }
