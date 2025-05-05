@@ -3,6 +3,7 @@ package com.nextdoor.nextdoor.domain.rental.controller;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemittanceRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.mapper.RentalMapper;
@@ -65,6 +66,14 @@ public class RentalController {
         UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
         UploadImageResult result = rentalService.registerAfterPhoto(command);
         UploadImageResponse response = rentalMapper.toUploadImageResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{rentalId}/ai-analysis")
+    ResponseEntity<AiAnalysisResponse> getAiAnalysis(@PathVariable Long rentalId){
+        AiAnalysisResult result = rentalService.getAiAnalysis(rentalId);
+        AiAnalysisResponse response = rentalMapper.toResponse(result);
 
         return ResponseEntity.ok(response);
     }
