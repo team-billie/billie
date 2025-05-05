@@ -1,5 +1,8 @@
 package com.nextdoor.nextdoor.domain.reservation.exception;
 
+import lombok.Getter;
+
+@Getter
 public class NoSuchReservationException extends BaseCustomException {
 
     private final String errorCode = "NO_SUCH_RESERVATION";
@@ -18,10 +21,5 @@ public class NoSuchReservationException extends BaseCustomException {
 
     public NoSuchReservationException(Throwable cause) {
         super(cause);
-    }
-
-    @Override
-    public String getErrorCode() {
-        return errorCode;
     }
 }

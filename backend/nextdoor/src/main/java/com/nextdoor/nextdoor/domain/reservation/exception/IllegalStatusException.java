@@ -1,5 +1,8 @@
 package com.nextdoor.nextdoor.domain.reservation.exception;
 
+import lombok.Getter;
+
+@Getter
 public class IllegalStatusException extends BaseCustomException {
 
     private final String errorCode = "ILLEGAL_STATUS";
@@ -18,10 +21,5 @@ public class IllegalStatusException extends BaseCustomException {
 
     public IllegalStatusException(Throwable cause) {
         super(cause);
-    }
-
-    @Override
-    public String getErrorCode() {
-        return errorCode;
     }
 }
