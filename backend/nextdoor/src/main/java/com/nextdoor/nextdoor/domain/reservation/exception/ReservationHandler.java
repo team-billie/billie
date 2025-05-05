@@ -17,7 +17,7 @@ public class ReservationHandler {
             IllegalStatusException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequestException(BaseCustomException e, HttpServletRequest request) {
-        return logAndHandleException(HttpStatus.BAD_REQUEST, e, e.getErrorCode(), e.getMessage(), request);
+        return logAndHandleException(HttpStatus.BAD_REQUEST, e, request);
     }
 
     @ExceptionHandler({
@@ -32,6 +32,14 @@ public class ReservationHandler {
     })
     public ResponseEntity<ErrorResponseDto> handleException(Exception e, HttpServletRequest request) {
         return logAndHandleException(HttpStatus.INTERNAL_SERVER_ERROR, e, "UNKNOWN", "알 수 없는 에러", request);
+    }
+
+    private ResponseEntity<ErrorResponseDto> logAndHandleException(
+            HttpStatus httpStatus,
+            BaseCustomException e,
+            HttpServletRequest request
+    ) {
+        return logAndHandleException(httpStatus, e, e.getErrorCode(), e.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponseDto> logAndHandleException(
