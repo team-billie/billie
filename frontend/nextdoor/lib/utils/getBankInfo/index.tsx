@@ -1,10 +1,5 @@
 export const bankList = [
     {
-      bankCode: '001',
-      bankName: '한국은행',
-      image: '/images/banks/korea.png',
-    },
-    {
       bankCode: '002',
       bankName: '산업은행',
       image: '/images/banks/kdb.png',
