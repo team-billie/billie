@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
+import com.nextdoor.nextdoor.query.dto.ReservationQueryDto;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public class ReservationResponseDto {
     private LocalDate endDate;
     private Long rentalFee;
     private Long deposit;
-    private ReservationStatus status;
+    private String status;
     private String ownerName;
     private String ownerProfileImageUrl;
 
@@ -31,9 +32,24 @@ public class ReservationResponseDto {
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();
         response.deposit = reservation.getDeposit();
-        response.status = reservation.getStatus();
+        response.status = reservation.getStatus().name();
         response.ownerName = owner.getName();
         response.ownerProfileImageUrl = owner.getProfileImageUrl();
+        return response;
+    }
+
+    public static ReservationResponseDto from(ReservationQueryDto reservation) {
+        ReservationResponseDto response = new ReservationResponseDto();
+        response.reservationId = reservation.getReservationId();
+        response.feedTitle = reservation.getFeedTitle();
+        response.feedProductImage = reservation.getFeedProductImage();
+        response.startDate = reservation.getStartDate();
+        response.endDate = reservation.getEndDate();
+        response.rentalFee = reservation.getRentalFee();
+        response.deposit = reservation.getDeposit();
+        response.status = reservation.getStatus();
+        response.ownerName = reservation.getOwnerName();
+        response.ownerProfileImageUrl = reservation.getOwnerProfileImageUrl();
         return response;
     }
 }
