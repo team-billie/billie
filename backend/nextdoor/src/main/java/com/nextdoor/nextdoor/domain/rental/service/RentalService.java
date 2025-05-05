@@ -15,4 +15,5 @@ public interface RentalService {
     UploadImageResult registerAfterPhoto(UploadImageCommand command);
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
+    AiAnalysisResult getAiAnalysis(Long rentalId);
 }

@@ -8,6 +8,7 @@ import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
+import com.nextdoor.nextdoor.domain.rental.port.AiAnalysisQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.ReservationService;
 import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadService;
@@ -30,6 +31,7 @@ public class RentalServiceImpl implements RentalService {
     private final RentalRepository rentalRepository;
     private final S3ImageUploadService s3ImageUploadService;
     private final ReservationService reservationService;
+    private final AiAnalysisQueryPort aiAnalysisQueryPort;
     private final RentalQueryPort rentalQueryPort;
     private final RentalScheduleService rentalScheduleService;
     private final Map<AiImageType, RentalImageStrategy> rentalImageStrategies;
@@ -41,7 +43,7 @@ public class RentalServiceImpl implements RentalService {
             RentalQueryPort rentalQueryPort,
             RentalScheduleService rentalScheduleService,
             List<RentalImageStrategy> strategyList,
-            ApplicationEventPublisher eventPublisher, ReservationService reservationService) {
+            ApplicationEventPublisher eventPublisher, ReservationService reservationService, AiAnalysisQueryPort aiAnalysisQueryPort) {
         this.rentalRepository = rentalRepository;
         this.s3ImageUploadService = s3ImageUploadService;
         this.rentalQueryPort = rentalQueryPort;
@@ -55,6 +57,7 @@ public class RentalServiceImpl implements RentalService {
 
         this.eventPublisher = eventPublisher;
         this.reservationService = reservationService;
+        this.aiAnalysisQueryPort = aiAnalysisQueryPort;
     }
 
     @Override
@@ -139,5 +142,13 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
 
         rental.processDepositCompletion();
+    }
+
+    @Override
+    public AiAnalysisResult getAiAnalysis(Long rentalId) {
+        rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+
+        return aiAnalysisQueryPort.getAiAnalysisResult(rentalId);
     }
 }
