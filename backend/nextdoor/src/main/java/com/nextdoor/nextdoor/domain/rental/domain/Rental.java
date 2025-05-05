@@ -55,6 +55,14 @@ public class Rental {
         this.rentalStatus = RentalStatus.REMITTANCE_REQUESTED;
     }
 
+    public void processAfterImageRegistration(BigDecimal depositAmount) {
+        if (depositAmount != null && depositAmount.compareTo(BigDecimal.ZERO) > 0) {
+            updateStatus(RentalStatus.AFTER_PHOTO_REGISTERED);
+        } else {
+            updateStatus(RentalStatus.RENTAL_COMPLETED);
+        }
+    }
+
     public void validateRemittancePendingState() {
         if (!Objects.equals(this.rentalStatus, RentalStatus.REMITTANCE_REQUESTED.name())) {
             throw new IllegalStateException("송금 대기 상태가 아닙니다.");
