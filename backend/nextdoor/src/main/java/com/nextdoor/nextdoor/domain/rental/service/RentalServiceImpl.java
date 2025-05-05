@@ -2,9 +2,14 @@ package com.nextdoor.nextdoor.domain.rental.service;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
 import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
+import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
+import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
+import com.nextdoor.nextdoor.domain.rental.port.ReservationService;
 import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadService;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
@@ -24,7 +29,9 @@ public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
     private final S3ImageUploadService s3ImageUploadService;
+    private final ReservationService reservationService;
     private final RentalQueryPort rentalQueryPort;
+    private final RentalScheduleService rentalScheduleService;
     private final Map<AiImageType, RentalImageStrategy> rentalImageStrategies;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -32,11 +39,13 @@ public class RentalServiceImpl implements RentalService {
             RentalRepository rentalRepository,
             S3ImageUploadService s3ImageUploadService,
             RentalQueryPort rentalQueryPort,
+            RentalScheduleService rentalScheduleService,
             List<RentalImageStrategy> strategyList,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher, ReservationService reservationService) {
         this.rentalRepository = rentalRepository;
         this.s3ImageUploadService = s3ImageUploadService;
         this.rentalQueryPort = rentalQueryPort;
+        this.rentalScheduleService = rentalScheduleService;
 
         this.rentalImageStrategies = strategyList.stream()
                 .collect(Collectors.toMap(
@@ -45,12 +54,14 @@ public class RentalServiceImpl implements RentalService {
                 ));
 
         this.eventPublisher = eventPublisher;
+        this.reservationService = reservationService;
     }
 
     @Override
     public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
+        rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
     }
 
     @Override
@@ -78,7 +89,26 @@ public class RentalServiceImpl implements RentalService {
     @Override
     @Transactional
     public UploadImageResult registerAfterPhoto(UploadImageCommand command) {
-       return processRentalImage(command, rentalImageStrategies.get(AiImageType.AFTER));
+        UploadImageResult result = processRentalImage(command, rentalImageStrategies.get(AiImageType.AFTER));
+
+        Rental rental = rentalRepository.findByRentalId(command.getRentalId())
+                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+
+        ReservationDto reservationDto = reservationService.getReservationByRentalId(rental.getRentalId());
+
+        rental.processAfterImageRegistration(reservationDto.getDeposit());
+
+        if(rental.getRentalStatus().equals(RentalStatus.AFTER_PHOTO_REGISTERED)){
+            eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
+                    .rentalId(rental.getRentalId())
+                    .build());
+        } else if(rental.getRentalStatus().equals(RentalStatus.RENTAL_COMPLETED)){
+            eventPublisher.publishEvent(RentalCompletedEvent.builder()
+                    .rentalId(rental.getRentalId())
+                    .build());
+        }
+
+        return result;
     }
 
     private UploadImageResult processRentalImage(UploadImageCommand command, RentalImageStrategy strategy) {
