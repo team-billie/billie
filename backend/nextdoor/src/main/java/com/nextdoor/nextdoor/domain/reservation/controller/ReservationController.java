@@ -1,17 +1,21 @@
 package com.nextdoor.nextdoor.domain.reservation.controller;
 
+import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationRetrieveRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationSaveRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationStatusUpdateRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationUpdateRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
+import com.nextdoor.nextdoor.domain.reservation.service.ReservationQueryService;
 import com.nextdoor.nextdoor.domain.reservation.service.ReservationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -20,6 +24,7 @@ import java.net.URI;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationQueryService reservationQueryService;
 
     @PostMapping
     public ResponseEntity<ReservationResponseDto> createReservation(
@@ -59,5 +64,13 @@ public class ReservationController {
         Long loginUserId = 1L;
         reservationService.deleteReservation(loginUserId, reservationId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/sent")
+    public ResponseEntity<List<ReservationResponseDto>> retrieveSentReservations(
+            @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
+    ) {
+        Long loginUserId = 1L;
+        return ResponseEntity.ok(reservationQueryService.retrieveSentReservations(loginUserId, reservationRetrieveRequestDto));
     }
 }
