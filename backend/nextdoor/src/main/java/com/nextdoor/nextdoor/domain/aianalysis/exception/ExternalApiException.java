@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.aianalysis.exception;
 import lombok.Getter;
 
 @Getter
-public class ExternalApiException extends RuntimeException {
+public class ExternalApiException extends BaseCustomException {
 
     private final String errorCode = "AI_EXTERNAL_API";
 

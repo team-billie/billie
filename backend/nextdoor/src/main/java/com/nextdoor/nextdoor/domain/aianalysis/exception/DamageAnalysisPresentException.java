@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.aianalysis.exception;
 import lombok.Getter;
 
 @Getter
-public class DamageAnalysisPresentException extends RuntimeException {
+public class DamageAnalysisPresentException extends BaseCustomException {
 
     private final String errorCode = "DAMAGE_ANALYSIS_PRESENT";
 
