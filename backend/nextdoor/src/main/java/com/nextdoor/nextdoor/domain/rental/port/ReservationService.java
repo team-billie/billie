@@ -9,6 +9,7 @@ import java.util.List;
 @Service
 public interface ReservationService {
 
+    ReservationDto getReservationByRentalId(Long rentalId);
     List<ReservationDto> getReservationsByOwnerId(Long ownerId, Pageable pageable);
     List<ReservationDto> getReservationsByRenterId(Long renterId, Pageable pageable);
     long countReservations(Long userId, String userRole);

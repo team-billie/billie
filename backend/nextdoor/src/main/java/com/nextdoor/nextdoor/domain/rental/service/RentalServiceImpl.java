@@ -131,4 +131,13 @@ public class RentalServiceImpl implements RentalService {
     public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
         return rentalQueryPort.searchRentals(command);
     }
+
+    @Override
+    @Transactional
+    public void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent) {
+        Rental rental = rentalRepository.findByRentalId(depositCompletedEvent.getRentalId())
+                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+
+        rental.processDepositCompletion();
+    }
 }

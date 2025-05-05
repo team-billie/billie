@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
+import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import org.springframework.data.domain.Page;
@@ -13,4 +14,5 @@ public interface RentalService {
     void requestRemittance(RequestRemittanceCommand command);
     UploadImageResult registerAfterPhoto(UploadImageCommand command);
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
+    void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
 }
