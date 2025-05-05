@@ -6,6 +6,7 @@ import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.Reservati
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
+import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedException;
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
@@ -61,6 +62,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalStatusException("잘못된 status입니다.");
         }
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateNotConfirmed(reservation);
         reservation.updateStatus(reservationStatusUpdateRequestDto.getStatus());
         return ReservationResponseDto.from(
                 reservation,
@@ -70,6 +72,14 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public void deleteReservation(Long loginUserid, Long reservationId) {
-        reservationRepository.deleteById(reservationId);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateNotConfirmed(reservation);
+        reservationRepository.delete(reservation);
+    }
+
+    private void validateNotConfirmed(Reservation reservation) {
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            throw new AlreadyConfirmedException("이미 확정된 예약입니다.");
+        }
     }
 }
