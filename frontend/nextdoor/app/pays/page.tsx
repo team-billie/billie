@@ -1,3 +1,7 @@
+import SelectBankModal from "@/components/pays/SelectBankModal";
+
 export default function PayPage() {
-    return <div>PayPage</div>;
+    return <div>
+      <SelectBankModal/>
+    </div>;
   }
