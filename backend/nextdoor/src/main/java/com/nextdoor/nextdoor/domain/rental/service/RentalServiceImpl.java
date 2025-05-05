@@ -8,6 +8,7 @@ import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
+import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.port.AiAnalysisQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.ReservationService;
@@ -77,7 +78,7 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     public void requestRemittance(RequestRemittanceCommand command) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
-                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.requestRemittance(command.getRemittanceAmount());
 
@@ -95,7 +96,7 @@ public class RentalServiceImpl implements RentalService {
         UploadImageResult result = processRentalImage(command, rentalImageStrategies.get(AiImageType.AFTER));
 
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
-                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         ReservationDto reservationDto = reservationService.getReservationByRentalId(rental.getRentalId());
 
@@ -116,7 +117,7 @@ public class RentalServiceImpl implements RentalService {
 
     private UploadImageResult processRentalImage(UploadImageCommand command, RentalImageStrategy strategy) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
-                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         String path = strategy.createImagePath(String.valueOf(rental.getRentalId()));
         S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), path);
@@ -139,7 +140,7 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     public void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent) {
         Rental rental = rentalRepository.findByRentalId(depositCompletedEvent.getRentalId())
-                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.processDepositCompletion();
     }
@@ -147,7 +148,7 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public AiAnalysisResult getAiAnalysis(Long rentalId) {
         rentalRepository.findByRentalId(rentalId)
-                .orElseThrow(() -> new IllegalArgumentException("대여 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         return aiAnalysisQueryPort.getAiAnalysisResult(rentalId);
     }

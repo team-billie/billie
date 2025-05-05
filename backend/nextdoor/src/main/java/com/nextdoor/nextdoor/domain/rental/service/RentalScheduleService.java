@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
+import com.nextdoor.nextdoor.domain.rental.exception.RentalScheduleException;
 import com.nextdoor.nextdoor.domain.rental.job.RentalEndJob;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
@@ -27,7 +28,7 @@ public class RentalScheduleService {
 
             scheduler.scheduleJob(endJob, endTrigger);
         } catch (SchedulerException e) {
-            throw new IllegalArgumentException("대여 종료 스케줄 생성 실패");
+            throw new RentalScheduleException("대여 종료 스케줄 생성 실패", e);
         }
     }
 }
