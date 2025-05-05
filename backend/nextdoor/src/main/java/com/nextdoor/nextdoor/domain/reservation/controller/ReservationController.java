@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.reservation.controller;
 
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationSaveRequestDto;
+import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationStatusUpdateRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationUpdateRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.service.ReservationService;
@@ -38,6 +39,25 @@ public class ReservationController {
     ) {
         Long loginUserId = 1L;
         ReservationResponseDto reservationResponseDto = reservationService.updateReservation(loginUserId, reservationId, reservationUpdateRequestDto);
-        return ResponseEntity.created(URI.create(request.getRequestURI())).body(reservationResponseDto);
+        return ResponseEntity.ok(reservationResponseDto);
+    }
+
+    @PatchMapping("/{reservationId}/status")
+    public ResponseEntity<ReservationResponseDto> updateReservationStatus(
+            @PathVariable Long reservationId,
+            @RequestBody ReservationStatusUpdateRequestDto reservationStatusUpdateRequestDto
+    ) {
+        Long loginUserId = 1L;
+        ReservationResponseDto reservationResponseDto = reservationService.updateReservationStatus(loginUserId, reservationId, reservationStatusUpdateRequestDto);
+        return ResponseEntity.ok(reservationResponseDto);
+    }
+
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<ReservationResponseDto> deleteReservation(
+            @PathVariable Long reservationId
+    ) {
+        Long loginUserId = 1L;
+        reservationService.deleteReservation(loginUserId, reservationId);
+        return ResponseEntity.noContent().build();
     }
 }
