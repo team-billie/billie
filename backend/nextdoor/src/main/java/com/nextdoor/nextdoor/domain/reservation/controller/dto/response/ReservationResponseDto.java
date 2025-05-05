@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Getter
 public class ReservationResponseDto {
 
+    private Long reservationId;
     private String feedTitle;
     private String feedProductImage;
     private LocalDate startDate;
@@ -23,6 +24,7 @@ public class ReservationResponseDto {
 
     public static ReservationResponseDto from(Reservation reservation, FeedDto feed, MemberDto owner) {
         ReservationResponseDto response = new ReservationResponseDto();
+        response.reservationId = reservation.getId();
         response.feedTitle = feed.getTitle();
         response.feedProductImage = feed.getProductImage();
         response.startDate = reservation.getStartDate();
