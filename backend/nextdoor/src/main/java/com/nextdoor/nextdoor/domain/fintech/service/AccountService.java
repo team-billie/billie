@@ -19,7 +19,7 @@ public class AccountService {
     private final AccountRepository repo;
     private final FintechUserRepository userRepo;
 
-    // 계좌 생성
+    //계좌 생성
     public Mono<Account> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
         return client.createAccount(apiKey, userKey, accountTypeUniqueNo)
                 .flatMap(resp -> {
@@ -39,11 +39,16 @@ public class AccountService {
                 });
     }
 
-    // 계좌 입금(충전하기)
+    //계좌 입금(충전하기)
     public Mono<Void> deposit(String apiKey, String userKey, String accountNumber, int amount) {
         return client.deposit(apiKey, userKey, accountNumber, amount)
                 .then();
     }
 
+    //계좌 이체
+    public Mono<Void> transfer(String apiKey, String userKey, String fromAccount, String toAccount, int amount) {
+        return client.transfer(apiKey, userKey, fromAccount, toAccount, amount)
+                .then();
+    }
 
 }
