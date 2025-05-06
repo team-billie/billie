@@ -19,12 +19,20 @@ public class DepositService {
     private final DepositRepository repo;
 
     // 보증금 보관(홀딩)
-    public Mono<Deposit> holdDeposit(String apiKey, String userKey, Long rentalId, Long accountId, int amount) {
-        return client.withdraw(apiKey, userKey, accountId.toString(), amount)
+    public Mono<Deposit> holdDeposit(
+            String userKey,
+            Long rentalId,
+            String accountNo,
+            int amount
+    ) {
+        // summary는 따로 없으니 null
+        return client.withdrawAccount(userKey, accountNo, amount, null)
                 .map(resp -> {
                     Deposit d = Deposit.builder()
                             .rentalId(rentalId)
-                            .accountId(accountId)
+                            .accountId(repo // accountNo→ID 매핑이 필요합니다.
+                                    .findByAccountNumber(accountNo)
+                                    .orElseThrow(() -> new RuntimeException("계좌 없음")).getId())
                             .amount(amount)
                             .status(DepositStatus.HELD)
                             .heldAt(LocalDateTime.now())
