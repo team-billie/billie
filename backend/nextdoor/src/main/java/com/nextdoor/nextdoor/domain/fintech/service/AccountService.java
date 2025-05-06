@@ -20,8 +20,8 @@ public class AccountService {
     private final FintechUserRepository userRepo;
 
     //계좌 생성
-    public Mono<Account> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
-        return client.createAccount(apiKey, userKey, accountTypeUniqueNo)
+    public Mono<Account> createAccount(String userKey, String accountTypeUniqueNo) {
+        return client.createAccount(userKey, accountTypeUniqueNo)
                 .map(resp -> {
                     // 응답에서 계좌 정보 꺼내기
                     String accountNumber = (String) resp.get("accountNumber");

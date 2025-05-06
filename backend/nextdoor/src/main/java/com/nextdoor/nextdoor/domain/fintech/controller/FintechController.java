@@ -34,7 +34,6 @@ public class FintechController {
     @PostMapping("/accounts")
     public Mono<ResponseEntity<Account>> createAccount(@RequestBody CreateAccountRequestDto req) {
         return accountService.createAccount(
-                        req.getApiKey(),
                         req.getUserKey(),
                         req.getAccountTypeUniqueNo()
                 )
