@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -16,12 +17,14 @@ public class FintechUserService {
     private final FintechUserRepository repo;
 
     // 계정 생성
-    public Mono<FintechUser> createUser(String apiKey, String email) {
-        return client.createUser(apiKey, email)
-                // userKey를 받아서 JPA 저장 → Mono<FintechUser> 반환
-                .map(userKey -> {
-                    FintechUser u = new FintechUser(userKey, email, LocalDateTime.now());
-                    return repo.save(u);
+    public Mono<Map<String,Object>> createUser(String apiKey, String userId) {
+        return client.createUser(apiKey, userId)
+                .map(ssafyResp -> {
+                    // SSAFY가 준 userKey 꺼내서 DB에 저장
+                    String userKey = ssafyResp.get("userKey").toString();
+                    FintechUser u = new FintechUser(userKey, userId, LocalDateTime.now());
+                    repo.save(u);  // 블로킹 저장
+                    return ssafyResp;  // 원본 Map 그대로 리턴
                 });
     }
 }

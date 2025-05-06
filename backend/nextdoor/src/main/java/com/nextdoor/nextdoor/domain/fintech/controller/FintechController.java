@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/fintech")
@@ -20,12 +22,12 @@ public class FintechController {
 
     //계정 생성
     @PostMapping("/users")
-    public Mono<ResponseEntity<FintechUser>> createUser(
-            @RequestBody CreateUserRequestDto req) {
+    public Mono<ResponseEntity<Map<String,Object>>> createUser(
+            @RequestBody CreateUserRequestDto req
+    ) {
         return userService.createUser(req.getApiKey(), req.getUserId())
                 .map(ResponseEntity::ok)
-                // SSAFY 에러가 터지면 그대로 500으로 내려갑니다.
-                .doOnError(e -> log.error("가입 실패", e));
+                .doOnError(e -> log.error("회원가입 오류", e));
     }
 
     //계좌 생성

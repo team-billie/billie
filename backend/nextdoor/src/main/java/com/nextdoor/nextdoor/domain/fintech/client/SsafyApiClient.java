@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.fintech.client;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -40,37 +41,27 @@ public class SsafyApiClient {
     }
 
     //계정 생성
-    public Mono<String> createUser(String apiKey, String userId) {
-        Map<String,Object> body = new HashMap<>();
-        body.put("Header", buildHeader("member", apiKey, null));
-        body.put("userId", userId);
+    public Mono<Map<String, Object>> createUser(String apiKey, String userId) {
+        Map<String,Object> body = Map.of(
+                "apiKey", apiKey,
+                "userId", userId
+        );
 
         return webClient.post()
                 .uri("/member")
                 .bodyValue(body)
                 .exchangeToMono(resp -> {
                     if (resp.statusCode().is2xxSuccessful()) {
-                        // 성공 시 Map으로 파싱 후 userKey만 꺼내기
-                        return resp.bodyToMono(Map.class)
-                                .map(m -> m.get("userKey").toString());
+                        // 성공 시 {"userId":..., "userName":..., "institutionCode":...,"userKey":...,"created":...,"modified":...}
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {});
                     } else {
-                        // 에러 시 raw body까지 읽어서 던져 버리기
                         return resp.bodyToMono(String.class)
                                 .flatMap(raw -> Mono.error(
-                                        new RuntimeException("SSAFY [" +
-                                                resp.statusCode() +
-                                                "] : " + raw)));
+                                        new RuntimeException("SSAFY 회원가입 실패 [" +
+                                                resp.statusCode() + "] : " + raw)
+                                ));
                     }
                 });
-//        Map<String,Object> body = Map.of(
-//                "apiKey",  apiKey,
-//                "userId",   email
-//        );
-//        return webClient.post()
-//                .uri("/member")
-//                .bodyValue(body)
-//                .retrieve().bodyToMono(Map.class)
-//                .map(m -> m.get("userKey").toString());
     }
 
     //계좌 생성
