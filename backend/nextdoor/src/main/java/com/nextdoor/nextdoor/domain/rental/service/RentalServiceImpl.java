@@ -8,6 +8,7 @@ import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
+import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.port.AiAnalysisQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
@@ -80,9 +81,13 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
+        ReservationDto reservationDto = reservationService.getReservationByRentalId(rental.getRentalId());
+        if (!reservationDto.getRenterId().equals(command.getRenterId())) {
+            throw new InvalidRenterIdException("요청한 대여자 ID가 실제 대여자 ID와 일치하지 않습니다.");
+        }
+
         rental.requestRemittance(command.getRemittanceAmount());
 
-        //TODO : renterId에 대한 회원 검증, amount 값 범위 검증 고려
         eventPublisher.publishEvent(RequestRemittanceNotificationEvent.builder()
                 .rentalId(command.getRentalId())
                 .renterId(command.getRenterId())

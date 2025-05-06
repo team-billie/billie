@@ -29,7 +29,7 @@ public class RentalController {
     @GetMapping
     public ResponseEntity<Page<RentalDetailResponse>> getMyRentals(
             Long userId,
-            @ModelAttribute RetrieveRentalsRequest retrieveRentalsRequest,
+            @Valid @ModelAttribute RetrieveRentalsRequest retrieveRentalsRequest,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
@@ -53,7 +53,7 @@ public class RentalController {
 
     @PostMapping("/{rentalId}/request-remittance")
     public ResponseEntity<Void> requestPayments(@PathVariable Long rentalId,
-                                                @RequestBody RequestRemittanceRequest request) {
+                                                @Valid @RequestBody RequestRemittanceRequest request) {
         RequestRemittanceCommand command = rentalMapper.toCommand(rentalId, request);
         rentalService.requestRemittance(command);
 

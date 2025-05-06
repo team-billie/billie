@@ -15,6 +15,8 @@ public class RentalExceptionHandler {
     @ExceptionHandler({
             NoSuchRentalException.class,
             InvalidRentalStatusException.class,
+            InvalidRenterIdException.class,
+            InvalidAmountException.class,
             RentalImageUploadException.class,
             RentalScheduleException.class
     })

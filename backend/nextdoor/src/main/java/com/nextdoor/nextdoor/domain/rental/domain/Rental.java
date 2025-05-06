@@ -2,6 +2,7 @@ package com.nextdoor.nextdoor.domain.rental.domain;
 
 import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.exception.InvalidAmountException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -78,7 +79,13 @@ public class Rental {
     }
 
     private void validateAmount(BigDecimal amount) {
-        //TODO : 금액 범위 검증
+        if (amount == null) {
+            throw new InvalidAmountException("송금 금액은 필수입니다.");
+        }
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("송금 금액은 0보다 커야 합니다.");
+        }
     }
 
     public void saveAiImage(AiImageType imageType, String imageUrl, String mimeType) {
