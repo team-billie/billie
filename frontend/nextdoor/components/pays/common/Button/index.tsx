@@ -8,7 +8,7 @@ export default function Button({txt, state}: ButtonProps) {
     <button type="submit" className="w-full">
         <div className={`
         ${state ? "bg-blue400 text-white" : "bg-gray400 text-gray600" }
-        text-center m-4 py-4 font-bold rounded-lg`}>
+        text-center py-4 font-bold rounded-lg`}>
         {txt}
         </div>
     </button>

@@ -1,7 +1,8 @@
-import SelectBankModal from "@/components/pays/SelectBankModal";
+import SelectBankModal from "@/components/pays/modals/SelectBankModal";
+import PaymentModal from "@/components/pays/modals/PaymentModal";
 
 export default function PayPage() {
     return <div>
-      <SelectBankModal/>
+      <PaymentModal/>
     </div>;
   }

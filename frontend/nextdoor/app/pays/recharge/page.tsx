@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react"
-import Header from "@/components/pays/Header";
-import Button from "@/components/pays/Button";
+import Header from "@/components/pays/common/Header";
+import Button from "@/components/pays/common/Button";
 
 export default function RechargePage() {
     return (
@@ -27,7 +27,7 @@ export default function RechargePage() {
             <div className="border border-gray300 px-3 py-1 rounded-2xl" >+10만원</div>
         </div>
 
-        <div className="w-full flex-1 flex flex-col justify-end">
+        <div className="p-4 w-full flex-1 flex items-end">
             <Button txt="충전하기" state={true}/>
         </div>
     </div>
