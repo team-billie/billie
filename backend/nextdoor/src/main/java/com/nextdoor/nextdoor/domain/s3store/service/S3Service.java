@@ -10,6 +10,7 @@ import com.nextdoor.nextdoor.domain.s3store.domain.FileMetadata;
 import com.nextdoor.nextdoor.domain.s3store.dto.FileDeleteRequestDto;
 import com.nextdoor.nextdoor.domain.s3store.dto.FileUploadRequestDto;
 import com.nextdoor.nextdoor.domain.s3store.dto.FileUploadResponseDto;
+import com.nextdoor.nextdoor.domain.s3store.exception.S3Exception;
 import com.nextdoor.nextdoor.domain.s3store.repository.FileMetadataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
