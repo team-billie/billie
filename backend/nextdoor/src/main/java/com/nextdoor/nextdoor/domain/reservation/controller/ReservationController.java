@@ -73,4 +73,12 @@ public class ReservationController {
         Long loginUserId = 1L;
         return ResponseEntity.ok(reservationQueryService.retrieveSentReservations(loginUserId, reservationRetrieveRequestDto));
     }
+
+    @GetMapping("/received")
+    public ResponseEntity<List<ReservationResponseDto>> retrieveReceivedReservations(
+            @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
+    ) {
+        Long loginUserId = 1L;
+        return ResponseEntity.ok(reservationQueryService.retrieveReceivedReservations(loginUserId, reservationRetrieveRequestDto));
+    }
 }
