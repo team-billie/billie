@@ -60,6 +60,7 @@ public class FintechController {
     ) {
         return accountService.inquireAccountList(req.getUserKey())
                 .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("계좌 목록 조회 오류", e))
                 .onErrorResume(SsafyApiException.class, ex ->
                         Mono.just(ResponseEntity
                                 .status(ex.getStatus())
