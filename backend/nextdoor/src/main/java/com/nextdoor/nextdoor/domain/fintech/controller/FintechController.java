@@ -71,14 +71,23 @@ public class FintechController {
 
     //계좌 입금
     @PostMapping("/accounts/deposit")
-    public Mono<ResponseEntity<Void>> deposit(@RequestBody AccountActionRequestDto req) {
-        return accountService.deposit(
-                        req.getApiKey(),
+    public Mono<ResponseEntity<Map<String,Object>>> depositAccount(
+            @RequestBody AccountDepositRequestDto req
+    ) {
+        return accountService.depositAccount(
                         req.getUserKey(),
-                        req.getAccountNumber(),
-                        req.getAmount()
+                        req.getAccountNo(),
+                        req.getTransactionBalance(),
+                        req.getTransactionSummary()
                 )
-                .thenReturn(ResponseEntity.ok().<Void>build());
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("계좌 입금 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(ex.getErrorBody())
+                        )
+                );
     }
 
     //계좌 이체
