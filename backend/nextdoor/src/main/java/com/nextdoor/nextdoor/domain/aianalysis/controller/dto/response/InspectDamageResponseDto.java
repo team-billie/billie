@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class InspectDamageResponseDto {
 
-    private String result;
+    private String damageAnalysis;
 }
