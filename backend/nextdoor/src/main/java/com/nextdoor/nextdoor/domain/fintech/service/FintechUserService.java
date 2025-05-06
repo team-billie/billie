@@ -17,8 +17,8 @@ public class FintechUserService {
     private final FintechUserRepository repo;
 
     // 계정 생성
-    public Mono<Map<String,Object>> createUser(String apiKey, String userId) {
-        return client.createUser(apiKey, userId)
+    public Mono<Map<String,Object>> createUser(String userId) {
+        return client.createUser(userId)
                 .map(ssafyResp -> {
                     // SSAFY가 준 userKey 꺼내서 DB에 저장
                     String userKey = ssafyResp.get("userKey").toString();

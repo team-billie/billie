@@ -4,6 +4,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,10 +17,16 @@ import java.util.UUID;
 @Component
 public class SsafyApiClient {
     // Webflux에 WebClient를 활용하여 SSAFY API 호출
-    private final WebClient webClient = WebClient.builder()
-            .baseUrl("https://finopenapi.ssafy.io/ssafy/api/v1")
-            .defaultHeader("Content-Type", "application/json")
-            .build();
+    private final WebClient webClient;
+    private final String apiKey;
+
+    public SsafyApiClient(@Value("${custom.fintech.apiKey}") String apiKey) {
+        this.apiKey = apiKey;
+        this.webClient = WebClient.builder()
+                .baseUrl("https://finopenapi.ssafy.io/ssafy/api/v1")
+                .defaultHeader("Content-Type", "application/json")
+                .build();
+    }
 
     // ssafy api 공통 Header 필드 추가하는 build
     private Map<String,Object> buildHeader(String apiName, String apiKey, String userKey) {
@@ -41,7 +48,7 @@ public class SsafyApiClient {
     }
 
     //계정 생성
-    public Mono<Map<String, Object>> createUser(String apiKey, String userId) {
+    public Mono<Map<String, Object>> createUser(String userId) {
         Map<String,Object> body = Map.of(
                 "apiKey", apiKey,
                 "userId", userId

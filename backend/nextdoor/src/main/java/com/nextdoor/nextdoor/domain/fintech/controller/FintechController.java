@@ -25,7 +25,7 @@ public class FintechController {
     public Mono<ResponseEntity<Map<String,Object>>> createUser(
             @RequestBody CreateUserRequestDto req
     ) {
-        return userService.createUser(req.getApiKey(), req.getUserId())
+        return userService.createUser(req.getUserId())
                 .map(ResponseEntity::ok)
                 .doOnError(e -> log.error("회원가입 오류", e));
     }
