@@ -21,7 +21,7 @@ public class DepositService {
     // 보증금 보관(홀딩)
     public Mono<Deposit> holdDeposit(String apiKey, String userKey, Long rentalId, Long accountId, int amount) {
         return client.withdraw(apiKey, userKey, accountId.toString(), amount)
-                .flatMap(resp -> {
+                .map(resp -> {
                     Deposit d = Deposit.builder()
                             .rentalId(rentalId)
                             .accountId(accountId)
@@ -35,15 +35,17 @@ public class DepositService {
 
     //보증금 반환
     public Mono<Deposit> returnDeposit(String apiKey, String userKey, Long depositId) {
-        return repo.findById(depositId)
-                .flatMap(d -> client.deposit(apiKey, userKey, d.getAccountId().toString(), d.getAmount())
-                        .flatMap(resp -> {
-                                    d.setStatus(DepositStatus.RETURNED);
-                                    d.setReturnedAt(LocalDateTime.now());
-                                    return repo.save(d);
-                                }
-                        )
-                );
+        // 먼저 동기적으로 엔티티 조회
+        Deposit d = repo.findById(depositId)
+                .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
+
+        // 입금 API 호출 후 map으로 상태 변경 & 저장
+        return client.deposit(apiKey, userKey, d.getAccountId().toString(), d.getAmount())
+                .map(resp -> {
+                    d.setStatus(DepositStatus.RETURNED);
+                    d.setReturnedAt(LocalDateTime.now());
+                    return repo.save(d);
+                });
     }
 
 }
