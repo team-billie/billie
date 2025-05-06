@@ -45,4 +45,17 @@ public class FintechController {
                 )
                 .thenReturn(ResponseEntity.ok().<Void>build());
     }
+
+    //계좌 이체
+    @PostMapping("/accounts/transfer")
+    public Mono<ResponseEntity<Void>> transfer(@RequestBody TransferRequestDto req) {
+        return accountService.transfer(
+                        req.getApiKey(),
+                        req.getUserKey(),
+                        req.getFromAccount(),
+                        req.getToAccount(),
+                        req.getAmount()
+                )
+                .thenReturn(ResponseEntity.ok().<Void>build());
+    }
 }
