@@ -34,4 +34,15 @@ public class FintechController {
                 .map(ResponseEntity::ok);
     }
 
+    //계좌 입금
+    @PostMapping("/accounts/deposit")
+    public Mono<ResponseEntity<Void>> deposit(@RequestBody AccountActionRequestDto req) {
+        return accountService.deposit(
+                        req.getApiKey(),
+                        req.getUserKey(),
+                        req.getAccountNumber(),
+                        req.getAmount()
+                )
+                .thenReturn(ResponseEntity.ok().<Void>build());
+    }
 }
