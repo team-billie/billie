@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.fintech.controller;
 
+import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiException;
 import com.nextdoor.nextdoor.domain.fintech.dto.*;
 import com.nextdoor.nextdoor.domain.fintech.domain.*;
 import com.nextdoor.nextdoor.domain.fintech.service.*;
@@ -35,8 +36,17 @@ public class FintechController {
                 .map(ResponseEntity::ok)
                 .doOnError(e -> {
                     log.error("계좌 생성 오류", e);
+                }).onErrorResume(SsafyApiException.class, ex -> {
+                    // SSAFY가 준 원본 errorBody(Map)을 그대로 반환
+                    return Mono.just(
+                            ResponseEntity
+                                    .status(ex.getStatus())
+                                    .body(ex.getErrorBody())
+                    );
                 });
     }
+
+
 
     //계좌 입금
     @PostMapping("/accounts/deposit")
