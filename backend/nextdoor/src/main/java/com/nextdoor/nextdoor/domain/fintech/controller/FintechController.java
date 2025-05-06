@@ -157,12 +157,20 @@ public class FintechController {
 
     //보증금 반환
     @PostMapping("/deposits/return")
-    public Mono<ResponseEntity<Deposit>> returnDeposit(@RequestBody ReturnDepositRequestDto req) {
+    public Mono<ResponseEntity<Deposit>> returnDeposit(
+            @RequestBody ReturnDepositRequestDto req
+    ) {
         return depositService.returnDeposit(
-                        req.getApiKey(),
                         req.getUserKey(),
                         req.getDepositId()
                 )
-                .map(ResponseEntity::ok);
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("보증금 반환 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(null)
+                        )
+                );
     }
 }
