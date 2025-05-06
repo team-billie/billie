@@ -19,7 +19,7 @@ public class FintechController {
     //계정 생성
     @PostMapping("/users")
     public Mono<ResponseEntity<FintechUser>> createUser(@RequestBody CreateUserRequestDto req) {
-        return userService.createUser(req.getEmail(), req.getApiKey())
+        return userService.createUser(req.getApiKey(), req.getEmail())
                 .map(ResponseEntity::ok);
     }
 

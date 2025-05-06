@@ -40,16 +40,37 @@ public class SsafyApiClient {
     }
 
     //계정 생성
-    public Mono<String> createUser(String apiKey, String email) {
-        Map<String,Object> body = Map.of(
-                "Header",  buildHeader("member", apiKey, null),
-                "email",   email
-        );
+    public Mono<String> createUser(String apiKey, String userId) {
+        Map<String,Object> body = new HashMap<>();
+        body.put("Header", buildHeader("member", apiKey, null));
+        body.put("userId", userId);
+
         return webClient.post()
                 .uri("/member")
                 .bodyValue(body)
-                .retrieve().bodyToMono(Map.class)
-                .map(m -> m.get("userKey").toString());
+                .exchangeToMono(resp -> {
+                    if (resp.statusCode().is2xxSuccessful()) {
+                        // 성공 시 Map으로 파싱 후 userKey만 꺼내기
+                        return resp.bodyToMono(Map.class)
+                                .map(m -> m.get("userKey").toString());
+                    } else {
+                        // 에러 시 raw body까지 읽어서 던져 버리기
+                        return resp.bodyToMono(String.class)
+                                .flatMap(raw -> Mono.error(
+                                        new RuntimeException("SSAFY [" +
+                                                resp.statusCode() +
+                                                "] : " + raw)));
+                    }
+                });
+//        Map<String,Object> body = Map.of(
+//                "apiKey",  apiKey,
+//                "userId",   email
+//        );
+//        return webClient.post()
+//                .uri("/member")
+//                .bodyValue(body)
+//                .retrieve().bodyToMono(Map.class)
+//                .map(m -> m.get("userKey").toString());
     }
 
     //계좌 생성
