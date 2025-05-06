@@ -26,7 +26,15 @@ public class FintechController {
     public Mono<ResponseEntity<Map<String,Object>>> createUser(@RequestBody CreateUserRequestDto req) {
         return userService.createUser(req.getUserId())
                 .map(ResponseEntity::ok)
-                .doOnError(e -> log.error("계정 생성 오류", e));
+                .doOnError(e -> log.error("계정 생성 오류", e))
+                .onErrorResume(SsafyApiException.class, ex -> {
+                    // SSAFY가 준 원본 errorBody(Map)을 그대로 반환
+                    return Mono.just(
+                            ResponseEntity
+                                    .status(ex.getStatus())
+                                    .body(ex.getErrorBody())
+                    );
+                });
     }
 
     //계좌 생성
@@ -34,9 +42,8 @@ public class FintechController {
     public Mono<ResponseEntity<Map<String, Object>>> createAccount(@RequestBody CreateAccountRequestDto req) {
         return accountService.createAccount( req.getUserKey(), req.getAccountTypeUniqueNo())
                 .map(ResponseEntity::ok)
-                .doOnError(e -> {
-                    log.error("계좌 생성 오류", e);
-                }).onErrorResume(SsafyApiException.class, ex -> {
+                .doOnError(e -> log.error("계좌 생성 오류", e))
+                .onErrorResume(SsafyApiException.class, ex -> {
                     // SSAFY가 준 원본 errorBody(Map)을 그대로 반환
                     return Mono.just(
                             ResponseEntity

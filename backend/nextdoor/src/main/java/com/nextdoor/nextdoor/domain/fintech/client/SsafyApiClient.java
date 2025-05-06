@@ -71,11 +71,9 @@ public class SsafyApiClient {
                         // 성공 시 {"userId":..., "userName":..., "institutionCode":...,"userKey":...,"created":...,"modified":...}
                         return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {});
                     } else {
-                        return resp.bodyToMono(String.class)
-                                .flatMap(raw -> Mono.error(
-                                        new RuntimeException("SSAFY 회원가입 실패 [" +
-                                                resp.statusCode() + "] : " + raw)
-                                ));
+                        // SSAFY가 준 오류 JSON 전체(Map) 을 파싱해서 커스텀 익셉션으로 던짐
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {})
+                                .flatMap(err -> Mono.error(new SsafyApiException((HttpStatus) resp.statusCode(), err)));
                     }
                 });
     }
