@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//사용자의 이메일로 계정 생성 후 반환받은 userKey를 저장
 public class FintechUser {
     @Id
     private String userKey;
