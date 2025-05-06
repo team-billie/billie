@@ -51,4 +51,9 @@ public class AccountService {
                 .then();
     }
 
+    //계좌 출금(보증금 관련)
+    public Mono<Void> withdraw(String apiKey, String userKey, String accountNumber, int amount) {
+        return client.withdraw(apiKey, userKey, accountNumber, amount)
+                .then();
+    }
 }
