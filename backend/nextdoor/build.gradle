@@ -40,6 +40,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+<<<<<<< backend/nextdoor/build.gradle
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	implementation 'com.querydsl:querydsl-core:5.0.0'
 	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
@@ -49,6 +50,8 @@ dependencies {
 	implementation 'com.google.protobuf:protobuf-java:4.30.2'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+	implementation 'com.google.cloud:google-cloud-vertexai:1.20.1'
+	implementation 'com.google.protobuf:protobuf-java:4.30.2'
 }
 
 tasks.named('test') {
