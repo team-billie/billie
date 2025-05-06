@@ -16,12 +16,13 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     public List<ReservationResponseDto> retrieveSentReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
-        return reservationQueryPort.findSentReservations(loginUserId, null).stream()
+        return reservationQueryPort.findSentReservations(loginUserId, requestDto).stream()
                 .map(ReservationResponseDto::from).toList();
     }
 
     @Override
-    public List<ReservationResponseDto> retrieveReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto reservationRetrieveRequestDto) {
-        return List.of();
+    public List<ReservationResponseDto> retrieveReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
+        return reservationQueryPort.findReceivedReservations(loginUserId, requestDto).stream()
+                .map(ReservationResponseDto::from).toList();
     }
 }
