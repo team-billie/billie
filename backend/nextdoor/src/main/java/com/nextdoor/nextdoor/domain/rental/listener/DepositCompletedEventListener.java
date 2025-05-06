@@ -1,0 +1,31 @@
+package com.nextdoor.nextdoor.domain.rental.listener;
+
+import com.nextdoor.nextdoor.domain.rental.enums.RentalProcess;
+import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
+import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+@Component
+@RequiredArgsConstructor
+public class DepositCompletedEventListener {
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    @Async("asyncExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleDepositCompletedEvent(RentalCompletedEvent event) {
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + event.getRentalId() + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.RENTAL_COMPLETED.name())
+                        .detailStatus(RentalStatus.RENTAL_COMPLETED.name())
+                        .build()
+        );
+    }
+}
