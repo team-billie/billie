@@ -20,6 +20,7 @@ public class SsafyApiClient {
             .defaultHeader("Content-Type", "application/json")
             .build();
 
+    // ssafy api 공통 Header 필드 추가하는 build
     private Map<String,Object> buildHeader(String apiName, String apiKey, String userKey) {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String time = LocalTime.now().plusMinutes(5)
@@ -36,5 +37,17 @@ public class SsafyApiClient {
         header.put("apiKey", apiKey);
         header.put("userKey", userKey);
         return header;
+    }
+
+    //사용자 계정 생성
+    public Mono<Map> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
+        Map<String,Object> body = new HashMap<>();
+        body.put("Header", buildHeader("createDemandDepositAccount", apiKey, userKey));
+        body.put("accountTypeUniqueNo", accountTypeUniqueNo);
+        return webClient.post()
+                .uri("/edu/demandDeposit/createDemandDepositAccount")
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Map.class);
     }
 }
