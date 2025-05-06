@@ -39,6 +39,19 @@ public class SsafyApiClient {
         return header;
     }
 
+    //계정 생성
+    public Mono<String> createUser(String apiKey, String email) {
+        Map<String,Object> body = Map.of(
+                "Header",  buildHeader("member", apiKey, null),
+                "email",   email
+        );
+        return webClient.post()
+                .uri("/member")
+                .bodyValue(body)
+                .retrieve().bodyToMono(Map.class)
+                .map(m -> m.get("userKey").toString());
+    }
+
     //계좌 생성
     public Mono<Map> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
         Map<String,Object> body = new HashMap<>();
