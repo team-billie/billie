@@ -197,19 +197,36 @@ public class SsafyApiClient {
     }
 
     //계좌 출금(보증금을 대여에 묶어두기 위해)
-    public Mono<Map> withdraw(String apiKey, String userKey, String accountNumber, int amount) {
-        Map<String,Object> payload = new HashMap<>();
-        payload.put("accountNumber", accountNumber);
-        payload.put("amount", amount);
-
+    public Mono<Map<String,Object>> withdrawAccount(
+            String userKey,
+            String accountNo,
+            long transactionBalance,
+            String transactionSummary
+    ) {
         Map<String,Object> body = new HashMap<>();
-        body.put("Header", buildHeader("updateDemandDepositAccountWithdrawal", apiKey, userKey));
-        body.putAll(payload);
+        body.put("Header", buildHeader(
+                "updateDemandDepositAccountWithdrawal",
+                apiKey,
+                userKey
+        ));
+        body.put("accountNo", accountNo);
+        body.put("transactionBalance", transactionBalance);
+        if (transactionSummary != null) {
+            body.put("transactionSummary", transactionSummary);
+        }
 
         return webClient.post()
                 .uri("/edu/demandDeposit/updateDemandDepositAccountWithdrawal")
                 .bodyValue(body)
-                .retrieve()
-                .bodyToMono(Map.class);
+                .exchangeToMono(resp -> {
+                    if (resp.statusCode().is2xxSuccessful()) {
+                        // SSAFY가 내려준 JSON 그대로 Map 으로 파싱
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {});
+                    } else {
+                        // 오류일 땐 SSAFY error JSON(Map)으로 파싱 후 커스텀 익셉션
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {})
+                                .flatMap(err -> Mono.error(new SsafyApiException((HttpStatus) resp.statusCode(), err)));
+                    }
+                });
     }
 }
