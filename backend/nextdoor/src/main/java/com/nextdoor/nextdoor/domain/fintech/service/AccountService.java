@@ -20,28 +20,29 @@ public class AccountService {
     private final FintechUserRepository userRepo;
 
     //계좌 생성
-    public Mono<Account> createAccount(String userKey, String accountTypeUniqueNo) {
+    public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
         return client.createAccount(userKey, accountTypeUniqueNo)
                 .map(resp -> {
-                    // 응답에서 계좌 정보 꺼내기
-                    String accountNumber = (String) resp.get("accountNumber");
-                    String bankCode      = (String) resp.get("bankCode");
-                    String accountName   = (String) resp.get("accountName");
+                    // 1) SSAFY가 내려준 응답 그대로 resp(Map)을 리턴하기 전, DB에 persistence
+                    String acctNo   = (String) resp.get("accountNo");     // or "accountNumber" field 이름 확인
+                    String bankCode = (String) resp.get("bankCode");
+                    String acctName = (String) resp.get("accountName");
 
                     // JPA로 블로킹 조회/저장
                     FintechUser user = userRepo.findById(userKey)
                             .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-                    Account acct = Account.builder()
+                    Account a = Account.builder()
                             .user(user)
-                            .accountNumber(accountNumber)
+                            .accountNumber(acctNo)
                             .bankCode(bankCode)
-                            .accountName(accountName)
+                            .accountName(acctName)
                             .createdAt(LocalDateTime.now())
                             .build();
+                    repo.save(a);  // 블로킹 저장
 
-                    // repo.save는 Account 리턴 → map 안에서 바로 반환
-                    return repo.save(acct);
+                    // 2) 원본 SSAFY 응답 Map 그대로 리턴
+                    return resp;
                 });
     }
 

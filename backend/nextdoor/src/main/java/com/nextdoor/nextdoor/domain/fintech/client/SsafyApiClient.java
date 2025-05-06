@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class SsafyApiClient {
@@ -30,9 +31,17 @@ public class SsafyApiClient {
 
     // ssafy api 공통 Header 필드 추가하는 build
     private Map<String,Object> buildHeader(String apiName, String apiKey, String userKey) {
+        // 1) 오늘 날짜(YYYYMMDD)
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        // 2) 지금 시각 +5분(HHMMSS)
         String time = LocalTime.now().plusMinutes(5)
                 .format(DateTimeFormatter.ofPattern("HHmmss"));
+        // 3) 뒤에 붙일 6자리 숫자 난수
+        String random6 = String.format("%06d",
+                ThreadLocalRandom.current().nextInt(0, 1_000_000));
+        // 최종 20자리 숫자
+        String txnUniqueNo = date + time + random6;
+
         Map<String,Object> header = new HashMap<>();
         header.put("apiName", apiName);
         header.put("transmissionDate", date);
@@ -40,8 +49,7 @@ public class SsafyApiClient {
         header.put("institutionCode", "00100");
         header.put("fintechAppNo", "001");
         header.put("apiServiceCode", apiName);
-        header.put("institutionTransactionUniqueNo",
-                UUID.randomUUID().toString().replaceAll("-", "").substring(0,20));
+        header.put("institutionTransactionUniqueNo", txnUniqueNo);
         header.put("apiKey", apiKey);
         header.put("userKey", userKey);
         return header;
@@ -72,15 +80,26 @@ public class SsafyApiClient {
     }
 
     //계좌 생성
-    public Mono<Map> createAccount(String userKey, String accountTypeUniqueNo) {
+    public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
         Map<String,Object> body = new HashMap<>();
         body.put("Header", buildHeader("createDemandDepositAccount", apiKey, userKey));
         body.put("accountTypeUniqueNo", accountTypeUniqueNo);
+
         return webClient.post()
                 .uri("/edu/demandDeposit/createDemandDepositAccount")
                 .bodyValue(body)
-                .retrieve()
-                .bodyToMono(Map.class);
+                .exchangeToMono(resp -> {
+                    if (resp.statusCode().is2xxSuccessful()) {
+                        // 성공 시 Map 으로 파싱
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {});
+                    } else {
+                        // 실패 시 raw body 그대로 예외
+                        return resp.bodyToMono(String.class)
+                                .flatMap(raw -> Mono.error(new RuntimeException(
+                                        "SSAFY 계좌생성 실패 [" +
+                                                resp.statusCode() + "] : " + raw)));
+                    }
+                });
     }
 
     //계좌 입금(충전하기)

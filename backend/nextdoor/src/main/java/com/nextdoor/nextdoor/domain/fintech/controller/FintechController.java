@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/fintech")
+@RequestMapping("/api/v1/fintechs")
 @RequiredArgsConstructor
 public class FintechController {
     private final FintechUserService userService;
@@ -22,22 +22,20 @@ public class FintechController {
 
     //계정 생성
     @PostMapping("/users")
-    public Mono<ResponseEntity<Map<String,Object>>> createUser(
-            @RequestBody CreateUserRequestDto req
-    ) {
+    public Mono<ResponseEntity<Map<String,Object>>> createUser(@RequestBody CreateUserRequestDto req) {
         return userService.createUser(req.getUserId())
                 .map(ResponseEntity::ok)
-                .doOnError(e -> log.error("회원가입 오류", e));
+                .doOnError(e -> log.error("계정 생성 오류", e));
     }
 
     //계좌 생성
     @PostMapping("/accounts")
-    public Mono<ResponseEntity<Account>> createAccount(@RequestBody CreateAccountRequestDto req) {
-        return accountService.createAccount(
-                        req.getUserKey(),
-                        req.getAccountTypeUniqueNo()
-                )
-                .map(ResponseEntity::ok);
+    public Mono<ResponseEntity<Map<String, Object>>> createAccount(@RequestBody CreateAccountRequestDto req) {
+        return accountService.createAccount( req.getUserKey(), req.getAccountTypeUniqueNo())
+                .map(ResponseEntity::ok)
+                .doOnError(e -> {
+                    log.error("계좌 생성 오류", e);
+                });
     }
 
     //계좌 입금
