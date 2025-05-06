@@ -58,4 +58,16 @@ public class FintechController {
                 )
                 .thenReturn(ResponseEntity.ok().<Void>build());
     }
+
+    //계좌 출금
+    @PostMapping("/accounts/withdraw")
+    public Mono<ResponseEntity<Void>> withdraw(@RequestBody AccountActionRequestDto req) {
+        return accountService.withdraw(
+                        req.getApiKey(),
+                        req.getUserKey(),
+                        req.getAccountNumber(),
+                        req.getAmount()
+                )
+                .thenReturn(ResponseEntity.ok().<Void>build());
+    }
 }
