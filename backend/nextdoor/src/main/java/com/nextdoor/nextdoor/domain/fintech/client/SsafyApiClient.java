@@ -14,8 +14,27 @@ import java.util.UUID;
 
 @Component
 public class SsafyApiClient {
+    // Webflux에 WebClient를 활용하여 SSAFY API 호출
     private final WebClient webClient = WebClient.builder()
             .baseUrl("https://finopenapi.ssafy.io/ssafy/api/v1")
             .defaultHeader("Content-Type", "application/json")
             .build();
+
+    private Map<String,Object> buildHeader(String apiName, String apiKey, String userKey) {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String time = LocalTime.now().plusMinutes(5)
+                .format(DateTimeFormatter.ofPattern("HHmmss"));
+        Map<String,Object> header = new HashMap<>();
+        header.put("apiName", apiName);
+        header.put("transmissionDate", date);
+        header.put("transmissionTime", time);
+        header.put("institutionCode", "00100");
+        header.put("fintechAppNo", "001");
+        header.put("apiServiceCode", apiName);
+        header.put("institutionTransactionUniqueNo",
+                UUID.randomUUID().toString().replaceAll("-", "").substring(0,20));
+        header.put("apiKey", apiKey);
+        header.put("userKey", userKey);
+        return header;
+    }
 }
