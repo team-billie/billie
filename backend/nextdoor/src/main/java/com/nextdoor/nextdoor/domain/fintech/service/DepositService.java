@@ -18,6 +18,7 @@ public class DepositService {
     private final SsafyApiClient client;
     private final DepositRepository repo;
 
+    // 보증금 보관(홀딩)
     public Mono<Deposit> holdDeposit(String apiKey, String userKey, Long rentalId, Long accountId, int amount) {
         return client.withdraw(apiKey, userKey, accountId.toString(), amount)
                 .flatMap(resp -> {
@@ -31,5 +32,18 @@ public class DepositService {
                     return repo.save(d);
                 });
     }
-    
+
+    //보증금 반환
+    public Mono<Deposit> returnDeposit(String apiKey, String userKey, Long depositId) {
+        return repo.findById(depositId)
+                .flatMap(d -> client.deposit(apiKey, userKey, d.getAccountId().toString(), d.getAmount())
+                        .flatMap(resp -> {
+                                    d.setStatus(DepositStatus.RETURNED);
+                                    d.setReturnedAt(LocalDateTime.now());
+                                    return repo.save(d);
+                                }
+                        )
+                );
+    }
+
 }
