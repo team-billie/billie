@@ -22,22 +22,29 @@ public class AccountService {
     //계좌 생성
     public Mono<Account> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
         return client.createAccount(apiKey, userKey, accountTypeUniqueNo)
-                .flatMap(resp -> {
-                    Map<String,Object> map = resp;
+                .map(resp -> {
+                    // 응답에서 계좌 정보 꺼내기
+                    String accountNumber = (String) resp.get("accountNumber");
+                    String bankCode      = (String) resp.get("bankCode");
+                    String accountName   = (String) resp.get("accountName");
+
+                    // JPA로 블로킹 조회/저장
                     FintechUser user = userRepo.findById(userKey)
                             .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
                     Account acct = Account.builder()
                             .user(user)
-                            .accountNumber((String) map.get("accountNumber"))
-                            .bankCode((String) map.get("bankCode"))
-                            .accountName((String) map.get("accountName"))
+                            .accountNumber(accountNumber)
+                            .bankCode(bankCode)
+                            .accountName(accountName)
                             .createdAt(LocalDateTime.now())
                             .build();
 
+                    // repo.save는 Account 리턴 → map 안에서 바로 반환
                     return repo.save(acct);
                 });
     }
+
 
     //계좌 입금(충전하기)
     public Mono<Void> deposit(String apiKey, String userKey, String accountNumber, int amount) {
