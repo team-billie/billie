@@ -2,7 +2,7 @@ package com.nextdoor.nextdoor.domain.reservation.service;
 
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationRetrieveRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
-import com.nextdoor.nextdoor.query.repository.ReservationQueryPort;
+import com.nextdoor.nextdoor.domain.reservation.port.ReservationQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
