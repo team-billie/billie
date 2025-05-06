@@ -99,6 +99,30 @@ public class SsafyApiClient {
                 });
     }
 
+    //계좌 목록 조회
+    public Mono<Map<String,Object>> inquireAccountList(String userKey) {
+        Map<String,Object> body = new HashMap<>();
+        body.put("Header", buildHeader(
+                "inquireDemandDepositAccountList",
+                apiKey,
+                userKey
+        ));
+
+        return webClient.post()
+                .uri("/edu/demandDeposit/inquireDemandDepositAccountList")
+                .bodyValue(body)
+                .exchangeToMono(resp -> {
+                    if (resp.statusCode().is2xxSuccessful()) {
+                        // 성공 시 Map 으로 파싱
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {});
+                    } else {
+                        // SSAFY가 준 오류 JSON 전체(Map) 을 파싱해서 커스텀 익셉션으로 던짐
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {})
+                                .flatMap(err -> Mono.error(new SsafyApiException((HttpStatus) resp.statusCode(), err)));
+                    }
+                });
+    }
+
     //계좌 입금(충전하기)
     public Mono<Map> deposit(String apiKey, String userKey, String accountNumber, int amount) {
         Map<String,Object> payload = new HashMap<>();
