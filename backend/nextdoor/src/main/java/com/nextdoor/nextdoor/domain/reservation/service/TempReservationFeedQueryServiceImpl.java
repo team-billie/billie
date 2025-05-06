@@ -3,6 +3,8 @@ package com.nextdoor.nextdoor.domain.reservation.service;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class TempReservationFeedQueryServiceImpl implements ReservationFeedQueryService {
 
@@ -14,8 +16,8 @@ public class TempReservationFeedQueryServiceImpl implements ReservationFeedQuery
                 .authorId(1L)
                 .category("Temp category")
                 .content("Temp content")
-                .deposit(100000L)
-                .rentalFee(10000L)
+                .deposit(BigDecimal.valueOf(100000L))
+                .rentalFee(BigDecimal.valueOf(10000L))
                 .build();
     }
 }

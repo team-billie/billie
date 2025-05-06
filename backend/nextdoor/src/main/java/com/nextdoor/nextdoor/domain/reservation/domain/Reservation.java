@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,10 +27,10 @@ public class Reservation {
     private LocalDate endDate;
 
     @NotNull
-    private Long rentalFee;
+    private BigDecimal rentalFee;
 
     @NotNull
-    private Long deposit;
+    private BigDecimal deposit;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -54,11 +55,11 @@ public class Reservation {
         this.endDate = endDate;
     }
 
-    public void updateRentalFee(Long rentalFee) {
+    public void updateRentalFee(BigDecimal rentalFee) {
         this.rentalFee = rentalFee;
     }
 
-    public void updateDeposit(Long deposit) {
+    public void updateDeposit(BigDecimal deposit) {
         this.deposit = deposit;
     }
 
