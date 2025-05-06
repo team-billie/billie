@@ -1,6 +1,5 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
-import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

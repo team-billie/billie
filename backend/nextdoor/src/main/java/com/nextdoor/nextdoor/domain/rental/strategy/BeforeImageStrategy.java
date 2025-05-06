@@ -1,8 +1,8 @@
 package com.nextdoor.nextdoor.domain.rental.strategy;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
-import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
-import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidRentalStatusException;
 import org.springframework.stereotype.Component;
 

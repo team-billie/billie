@@ -3,7 +3,7 @@
 //import com.nextdoor.nextdoor.common.PersistenceAdapter;
 //import com.nextdoor.nextdoor.domain.rental.domain.QAiImage;
 //import com.nextdoor.nextdoor.domain.rental.domain.QRental;
-//import com.nextdoor.nextdoor.domain.rental.enums.RentalProcess;
+//import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 //import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
 //import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
 //import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
