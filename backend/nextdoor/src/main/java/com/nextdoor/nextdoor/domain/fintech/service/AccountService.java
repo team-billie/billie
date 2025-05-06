@@ -39,5 +39,11 @@ public class AccountService {
                 });
     }
 
+    // 계좌 입금(충전하기)
+    public Mono<Void> deposit(String apiKey, String userKey, String accountNumber, int amount) {
+        return client.deposit(apiKey, userKey, accountNumber, amount)
+                .then();
+    }
+
 
 }
