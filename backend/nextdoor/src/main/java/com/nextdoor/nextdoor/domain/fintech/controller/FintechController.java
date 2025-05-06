@@ -115,14 +115,23 @@ public class FintechController {
 
     //계좌 출금
     @PostMapping("/accounts/withdraw")
-    public Mono<ResponseEntity<Void>> withdraw(@RequestBody AccountActionRequestDto req) {
-        return accountService.withdraw(
-                        req.getApiKey(),
+    public Mono<ResponseEntity<Map<String,Object>>> withdrawAccount(
+            @RequestBody AccountWithdrawalRequestDto req
+    ) {
+        return accountService.withdrawAccount(
                         req.getUserKey(),
-                        req.getAccountNumber(),
-                        req.getAmount()
+                        req.getAccountNo(),
+                        req.getTransactionBalance(),
+                        req.getTransactionSummary()
                 )
-                .thenReturn(ResponseEntity.ok().<Void>build());
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("계좌 출금 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(ex.getErrorBody())
+                        )
+                );
     }
 
     //보증금 보관
