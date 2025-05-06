@@ -52,9 +52,11 @@ public class AccountService {
     }
 
     //계좌 입금(충전하기)
-    public Mono<Void> deposit(String apiKey, String userKey, String accountNumber, int amount) {
-        return client.deposit(apiKey, userKey, accountNumber, amount)
-                .then();
+    public Mono<Map<String,Object>> depositAccount(String userKey, String accountNo, long transactionBalance, String transactionSummary) {
+        return client.depositAccount(userKey, accountNo, transactionBalance, transactionSummary)
+                .map(resp -> {
+                    return resp; // 성공 시 DB에 Transaction 기록이 필요하면 여기서 repo.save(...) 등 추가
+                });
     }
 
     //계좌 이체
