@@ -8,4 +8,6 @@ import java.util.List;
 public interface ReservationQueryPort {
 
     List<ReservationQueryDto> findSentReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto);
+
+    List<ReservationQueryDto> findReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto);
 }

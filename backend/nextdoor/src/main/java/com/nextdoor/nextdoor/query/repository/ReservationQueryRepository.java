@@ -33,4 +33,21 @@ public class ReservationQueryRepository implements ReservationQueryPort {
         }
         return builder;
     }
+
+    @Override
+    public List<ReservationQueryDto> findReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
+        return jpaQueryFactory.select(qReservation)
+                .from(qReservation)
+                .where(createReceivedReservationCondition(loginUserId, requestDto))
+                .fetch()
+                .stream().map(ReservationQueryDto::from).toList();
+    }
+
+    private BooleanBuilder createReceivedReservationCondition(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
+        BooleanBuilder builder = new BooleanBuilder().and(qReservation.ownerId.eq(loginUserId));
+        if (requestDto.getStatus() != null) {
+            builder.and(qReservation.status.eq(requestDto.getStatus()));
+        }
+        return builder;
+    }
 }
