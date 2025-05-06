@@ -70,4 +70,17 @@ public class FintechController {
                 )
                 .thenReturn(ResponseEntity.ok().<Void>build());
     }
+
+    //보증금 보관
+    @PostMapping("/deposits/hold")
+    public Mono<ResponseEntity<Deposit>> holdDeposit(@RequestBody HoldDepositRequestDto req) {
+        return depositService.holdDeposit(
+                        req.getApiKey(),
+                        req.getUserKey(),
+                        req.getRentalId(),
+                        req.getAccountId(),
+                        req.getAmount()
+                )
+                .map(ResponseEntity::ok);
+    }
 }
