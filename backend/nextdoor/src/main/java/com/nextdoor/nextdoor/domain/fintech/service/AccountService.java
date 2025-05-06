@@ -1,0 +1,43 @@
+package com.nextdoor.nextdoor.domain.fintech.service;
+
+import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
+import com.nextdoor.nextdoor.domain.fintech.domain.Account;
+import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
+import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
+import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class AccountService {
+    private final SsafyApiClient client;
+    private final AccountRepository repo;
+    private final FintechUserRepository userRepo;
+
+    // 계좌 생성
+    public Mono<Account> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
+        return client.createAccount(apiKey, userKey, accountTypeUniqueNo)
+                .flatMap(resp -> {
+                    Map<String,Object> map = resp;
+                    FintechUser user = userRepo.findById(userKey)
+                            .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+                    Account acct = Account.builder()
+                            .user(user)
+                            .accountNumber((String) map.get("accountNumber"))
+                            .bankCode((String) map.get("bankCode"))
+                            .accountName((String) map.get("accountName"))
+                            .createdAt(LocalDateTime.now())
+                            .build();
+
+                    return repo.save(acct);
+                });
+    }
+
+
+}

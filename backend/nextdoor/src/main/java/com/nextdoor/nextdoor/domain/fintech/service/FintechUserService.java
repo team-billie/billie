@@ -15,6 +15,7 @@ public class FintechUserService {
     private final SsafyApiClient client;
     private final FintechUserRepository repo;
 
+    // 계정 생성
     public Mono<FintechUser> createUser(String email, String apiKey) {
         return client.createAccount(apiKey, null, null) // 사용자 가입 API가 따로 있을 경우 호출
                 .map(response -> {
