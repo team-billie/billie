@@ -85,4 +85,21 @@ public class SsafyApiClient {
                 .retrieve()
                 .bodyToMono(Map.class);
     }
+
+    //계좌 출금(보증금을 대여에 묶어두기 위해)
+    public Mono<Map> withdraw(String apiKey, String userKey, String accountNumber, int amount) {
+        Map<String,Object> payload = new HashMap<>();
+        payload.put("accountNumber", accountNumber);
+        payload.put("amount", amount);
+
+        Map<String,Object> body = new HashMap<>();
+        body.put("Header", buildHeader("updateDemandDepositAccountWithdrawal", apiKey, userKey));
+        body.putAll(payload);
+
+        return webClient.post()
+                .uri("/edu/demandDeposit/updateDemandDepositAccountWithdrawal")
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Map.class);
+    }
 }
