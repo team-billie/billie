@@ -39,7 +39,7 @@ public class SsafyApiClient {
         return header;
     }
 
-    //사용자 계정 생성
+    //계좌 생성
     public Mono<Map> createAccount(String apiKey, String userKey, String accountTypeUniqueNo) {
         Map<String,Object> body = new HashMap<>();
         body.put("Header", buildHeader("createDemandDepositAccount", apiKey, userKey));
