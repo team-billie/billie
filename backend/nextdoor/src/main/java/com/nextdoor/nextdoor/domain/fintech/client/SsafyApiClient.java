@@ -67,4 +67,22 @@ public class SsafyApiClient {
                 .retrieve()
                 .bodyToMono(Map.class);
     }
+
+    //계좌 이체
+    public Mono<Map> transfer(String apiKey, String userKey, String fromAccount, String toAccount, int amount) {
+        Map<String,Object> payload = new HashMap<>();
+        payload.put("fromAccountNumber", fromAccount);
+        payload.put("toAccountNumber", toAccount);
+        payload.put("amount", amount);
+
+        Map<String,Object> body = new HashMap<>();
+        body.put("Header", buildHeader("updateDemandDepositAccountTransfer", apiKey, userKey));
+        body.putAll(payload);
+
+        return webClient.post()
+                .uri("/edu/demandDeposit/updateDemandDepositAccountTransfer")
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Map.class);
+    }
 }
