@@ -60,9 +60,11 @@ public class AccountService {
     }
 
     //계좌 이체
-    public Mono<Void> transfer(String apiKey, String userKey, String fromAccount, String toAccount, int amount) {
-        return client.transfer(apiKey, userKey, fromAccount, toAccount, amount)
-                .then();
+    public Mono<Map<String,Object>> transferAccount(String userKey, String depositAccountNo, long transactionBalance, String withdrawalAccountNo, String depositTransactionSummary, String withdrawalTransactionSummary) {
+        return client.transferAccount( userKey, depositAccountNo, transactionBalance, withdrawalAccountNo, depositTransactionSummary, withdrawalTransactionSummary)
+                .map(resp -> {
+                    return resp;  // 필요시 DB 기록 로직 추가 (repo.save 등)
+                });
     }
 
     //계좌 출금(보증금 관련)
