@@ -23,5 +23,15 @@ public class FintechController {
                 .map(ResponseEntity::ok);
     }
 
+    //계좌 생성
+    @PostMapping("/accounts")
+    public Mono<ResponseEntity<Account>> createAccount(@RequestBody CreateAccountRequestDto req) {
+        return accountService.createAccount(
+                        req.getApiKey(),
+                        req.getUserKey(),
+                        req.getAccountTypeUniqueNo()
+                )
+                .map(ResponseEntity::ok);
+    }
 
 }
