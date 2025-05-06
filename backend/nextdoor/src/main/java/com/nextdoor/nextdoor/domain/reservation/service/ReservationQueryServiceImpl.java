@@ -19,4 +19,9 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservationQueryPort.findSentReservations(loginUserId, null).stream()
                 .map(ReservationResponseDto::from).toList();
     }
+
+    @Override
+    public List<ReservationResponseDto> retrieveReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto reservationRetrieveRequestDto) {
+        return List.of();
+    }
 }

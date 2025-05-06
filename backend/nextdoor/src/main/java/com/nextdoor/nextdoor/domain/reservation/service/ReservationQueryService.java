@@ -8,4 +8,6 @@ import java.util.List;
 public interface ReservationQueryService {
 
     List<ReservationResponseDto> retrieveSentReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto);
+
+    List<ReservationResponseDto> retrieveReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto reservationRetrieveRequestDto);
 }
