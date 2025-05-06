@@ -1,13 +1,11 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
-import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
-import com.nextdoor.nextdoor.domain.rental.enums.RentalProcess;
-import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidAmountException;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Rental {
 
     @Id
