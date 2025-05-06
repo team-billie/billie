@@ -46,6 +46,10 @@ public class AccountService {
                 });
     }
 
+    //계좌 목록 조회
+    public Mono<Map<String,Object>> inquireAccountList(String userKey) {
+        return client.inquireAccountList(userKey);
+    }
 
     //계좌 입금(충전하기)
     public Mono<Void> deposit(String apiKey, String userKey, String accountNumber, int amount) {
