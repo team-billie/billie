@@ -53,7 +53,20 @@ public class FintechController {
                 });
     }
 
-
+    //계좌 목록 조회
+    @PostMapping("/accounts/list")
+    public Mono<ResponseEntity<Map<String,Object>>> inquireAccountList(
+            @RequestBody InquireAccountListRequestDto req
+    ) {
+        return accountService.inquireAccountList(req.getUserKey())
+                .map(ResponseEntity::ok)
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(ex.getErrorBody())
+                        )
+                );
+    }
 
     //계좌 입금
     @PostMapping("/accounts/deposit")
