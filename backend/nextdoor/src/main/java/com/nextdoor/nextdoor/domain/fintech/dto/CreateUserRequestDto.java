@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateUserRequestDto {
-    private String email;
     private String apiKey;
+    private String userId;
 }

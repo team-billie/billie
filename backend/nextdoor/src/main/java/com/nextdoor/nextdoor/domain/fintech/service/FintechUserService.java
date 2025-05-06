@@ -18,21 +18,10 @@ public class FintechUserService {
     // 계정 생성
     public Mono<FintechUser> createUser(String apiKey, String email) {
         return client.createUser(apiKey, email)
+                // userKey를 받아서 JPA 저장 → Mono<FintechUser> 반환
                 .map(userKey -> {
-                    FintechUser user = new FintechUser(userKey, email, LocalDateTime.now());
-                    return repo.save(user);
+                    FintechUser u = new FintechUser(userKey, email, LocalDateTime.now());
+                    return repo.save(u);
                 });
     }
-//    public Mono<FintechUser> createUser(String email, String apiKey) {
-//        return client.createAccount(apiKey, null, null) // 사용자 가입 API가 따로 있을 경우 호출
-//                .map(response -> {
-//                    String userKey = (String) response.get("userKey");
-//                    return FintechUser.builder()
-//                            .userKey(userKey)
-//                            .email(email)
-//                            .createdAt(LocalDateTime.now())
-//                            .build();
-//                })
-//                .flatMap(repo::save);
-//    }
 }
