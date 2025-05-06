@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.fintech.client;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -93,11 +94,9 @@ public class SsafyApiClient {
                         // 성공 시 Map 으로 파싱
                         return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {});
                     } else {
-                        // 실패 시 raw body 그대로 예외
-                        return resp.bodyToMono(String.class)
-                                .flatMap(raw -> Mono.error(new RuntimeException(
-                                        "SSAFY 계좌생성 실패 [" +
-                                                resp.statusCode() + "] : " + raw)));
+                        // SSAFY가 준 오류 JSON 전체(Map) 을 파싱해서 커스텀 익셉션으로 던짐
+                        return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {})
+                                .flatMap(err -> Mono.error(new SsafyApiException((HttpStatus) resp.statusCode(), err)));
                     }
                 });
     }
