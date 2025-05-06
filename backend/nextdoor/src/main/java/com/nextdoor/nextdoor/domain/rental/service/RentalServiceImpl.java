@@ -18,6 +18,7 @@ import com.nextdoor.nextdoor.domain.rental.port.ReservationService;
 import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadService;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
@@ -37,27 +39,6 @@ public class RentalServiceImpl implements RentalService {
     private final RentalDomainService rentalDomainService;
     private final RentalImageDomainService rentalImageDomainService;
     private final ApplicationEventPublisher eventPublisher;
-
-    public RentalServiceImpl(
-            RentalRepository rentalRepository,
-            S3ImageUploadService s3ImageUploadService,
-            RentalQueryPort rentalQueryPort,
-            RentalScheduleService rentalScheduleService,
-            RentalDomainService rentalDomainService,
-            RentalImageDomainService rentalImageDomainService,
-            ApplicationEventPublisher eventPublisher, 
-            ReservationService reservationService, 
-            AiAnalysisQueryPort aiAnalysisQueryPort) {
-        this.rentalRepository = rentalRepository;
-        this.s3ImageUploadService = s3ImageUploadService;
-        this.rentalQueryPort = rentalQueryPort;
-        this.rentalScheduleService = rentalScheduleService;
-        this.rentalDomainService = rentalDomainService;
-        this.rentalImageDomainService = rentalImageDomainService;
-        this.eventPublisher = eventPublisher;
-        this.reservationService = reservationService;
-        this.aiAnalysisQueryPort = aiAnalysisQueryPort;
-    }
 
     @Override
     public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
