@@ -68,8 +68,11 @@ public class AccountService {
     }
 
     //계좌 출금(보증금 관련)
-    public Mono<Void> withdraw(String apiKey, String userKey, String accountNumber, int amount) {
-        return client.withdraw(apiKey, userKey, accountNumber, amount)
-                .then();
+    public Mono<Map<String,Object>> withdrawAccount(String userKey, String accountNo, long transactionBalance, String transactionSummary) {
+        return client.withdrawAccount(userKey, accountNo, transactionBalance, transactionSummary)
+                .map(resp -> {
+                    // 필요시 DB 기록 로직 추가 가능
+                    return resp;
+                });
     }
 }
