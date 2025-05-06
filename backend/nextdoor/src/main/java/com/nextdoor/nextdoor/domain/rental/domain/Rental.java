@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
 import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
+import com.nextdoor.nextdoor.domain.rental.enums.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidAmountException;
 import jakarta.persistence.*;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -32,14 +32,19 @@ public class Rental {
     @Column(name = "rental_status", nullable = false)
     private RentalStatus rentalStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rental_process", nullable = false)
+    private RentalProcess rentalProcess;
+
     @Column(name = "damage_analysis")
     private String damageAnalysis;
 
     @Builder
-    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, String damageAnalysis) {
+    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis) {
         this.aiImages = aiImages;
         this.reservationId = reservationId;
         this.rentalStatus = rentalStatus;
+        this.rentalProcess = rentalProcess != null ? rentalProcess : getRentalProcessForStatus(rentalStatus);
         this.damageAnalysis = damageAnalysis;
     }
 
@@ -47,13 +52,14 @@ public class Rental {
         Rental r = new Rental();
         r.reservationId = reservationId;
         r.rentalStatus = RentalStatus.CREATED;
+        r.rentalProcess = RentalProcess.BEFORE_RENTAL;
         return r;
     }
 
     public void requestRemittance(BigDecimal amount) {
         validateRemittancePendingState();
         validateAmount(amount);
-        this.rentalStatus = RentalStatus.REMITTANCE_REQUESTED;
+        updateStatus(RentalStatus.REMITTANCE_REQUESTED);
     }
 
     public void processAfterImageRegistration(BigDecimal depositAmount) {
@@ -69,11 +75,11 @@ public class Rental {
             throw new IllegalStateException("보증금을 처리할 수 있는 상태가 아닙니다");
         }
 
-        rentalStatus = RentalStatus.RENTAL_COMPLETED;
+        updateStatus(RentalStatus.RENTAL_COMPLETED);
     }
 
     public void validateRemittancePendingState() {
-        if (!Objects.equals(this.rentalStatus, RentalStatus.REMITTANCE_REQUESTED.name())) {
+        if (this.rentalStatus != RentalStatus.REMITTANCE_REQUESTED) {
             throw new IllegalStateException("송금 대기 상태가 아닙니다.");
         }
     }
@@ -105,6 +111,7 @@ public class Rental {
 
     public void updateStatus(RentalStatus rentalStatus){
         this.rentalStatus = rentalStatus;
+        this.rentalProcess = getRentalProcessForStatus(rentalStatus);
     }
 
     private void validateNotBlank(String value, String fieldName) {
@@ -132,6 +139,30 @@ public class Rental {
                 .anyMatch(img -> img.getImageUrl().equals(imageUrl));
         if (exists) {
             throw new IllegalArgumentException("이미 등록된 이미지 URL입니다: " + imageUrl);
+        }
+    }
+
+    private RentalProcess getRentalProcessForStatus(RentalStatus status) {
+        if (status == null) {
+            return RentalProcess.BEFORE_RENTAL;
+        }
+
+        switch (status) {
+            case CREATED:
+            case BEFORE_PHOTO_REGISTERED:
+            case REMITTANCE_REQUESTED:
+            case CANCELLED:
+                return RentalProcess.BEFORE_RENTAL;
+            case REMITTANCE_CONFIRMED:
+                return RentalProcess.RENTAL_IN_ACTIVE;
+            case RENTAL_PERIOD_ENDED:
+            case AFTER_PHOTO_REGISTERED:
+            case DEPOSIT_REQUESTED:
+                return RentalProcess.RETURNED;
+            case RENTAL_COMPLETED:
+                return RentalProcess.RENTAL_COMPLETED;
+            default:
+                return RentalProcess.BEFORE_RENTAL;
         }
     }
 }

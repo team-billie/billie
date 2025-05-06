@@ -11,11 +11,10 @@ import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEve
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
-import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
 import com.nextdoor.nextdoor.domain.rental.port.AiAnalysisQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
-import com.nextdoor.nextdoor.domain.rental.port.ReservationService;
-import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadService;
+import com.nextdoor.nextdoor.domain.rental.port.ReservationQueryPort;
+import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadPort;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +30,8 @@ import java.time.LocalDateTime;
 public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
-    private final S3ImageUploadService s3ImageUploadService;
-    private final ReservationService reservationService;
+    private final S3ImageUploadPort s3ImageUploadService;
+    private final ReservationQueryPort reservationService;
     private final AiAnalysisQueryPort aiAnalysisQueryPort;
     private final RentalQueryPort rentalQueryPort;
     private final RentalScheduleService rentalScheduleService;
@@ -135,7 +134,6 @@ public class RentalServiceImpl implements RentalService {
                 .uploadedAt(uploadedAt)
                 .build();
     }
-
 
     @Override
     public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {

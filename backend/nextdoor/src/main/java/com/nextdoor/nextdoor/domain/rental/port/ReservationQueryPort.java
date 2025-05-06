@@ -1,13 +1,13 @@
 package com.nextdoor.nextdoor.domain.rental.port;
 
+import com.nextdoor.nextdoor.common.OutboundPort;
 import com.nextdoor.nextdoor.domain.rental.service.dto.ReservationDto;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public interface ReservationService {
+@OutboundPort
+public interface ReservationQueryPort {
 
     ReservationDto getReservationByRentalId(Long rentalId);
     List<ReservationDto> getReservationsByOwnerId(Long ownerId, Pageable pageable);

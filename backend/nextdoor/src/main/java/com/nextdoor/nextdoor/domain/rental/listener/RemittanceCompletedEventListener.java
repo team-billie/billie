@@ -22,7 +22,7 @@ public class RemittanceCompletedEventListener {
     public void handleRemittanceCompletedEvent(RemittanceCompletedEvent remittanceCompletedEvent){
         messagingTemplate.convertAndSend("/topic/rental" + remittanceCompletedEvent.getRenterId() + "/status",
                 RentalStatusMessage.builder()
-                        .process(RentalProcess.RENTAL_IN_PROGRESS.name())
+                        .process(RentalProcess.RENTAL_IN_ACTIVE.name())
                         .detailStatus(RentalStatus.REMITTANCE_CONFIRMED.name())
                         .build()
         );
