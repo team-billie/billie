@@ -18,9 +18,10 @@ public class FintechUserService {
     // 계정 생성
     public Mono<FintechUser> createUser(String apiKey, String email) {
         return client.createUser(apiKey, email)
-                .flatMap(userKey -> repo.save(
-                        new FintechUser(userKey, email, LocalDateTime.now())
-                ));
+                .map(userKey -> {
+                    FintechUser user = new FintechUser(userKey, email, LocalDateTime.now());
+                    return repo.save(user);
+                });
     }
 //    public Mono<FintechUser> createUser(String email, String apiKey) {
 //        return client.createAccount(apiKey, null, null) // 사용자 가입 API가 따로 있을 경우 호출
