@@ -92,15 +92,25 @@ public class FintechController {
 
     //계좌 이체
     @PostMapping("/accounts/transfer")
-    public Mono<ResponseEntity<Void>> transfer(@RequestBody TransferRequestDto req) {
-        return accountService.transfer(
-                        req.getApiKey(),
+    public Mono<ResponseEntity<Map<String,Object>>> transferAccount(
+            @RequestBody AccountTransferRequestDto req
+    ) {
+        return accountService.transferAccount(
                         req.getUserKey(),
-                        req.getFromAccount(),
-                        req.getToAccount(),
-                        req.getAmount()
+                        req.getDepositAccountNo(),
+                        req.getTransactionBalance(),
+                        req.getWithdrawalAccountNo(),
+                        req.getDepositTransactionSummary(),
+                        req.getWithdrawalTransactionSummary()
                 )
-                .thenReturn(ResponseEntity.ok().<Void>build());
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("계좌 이체 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(ex.getErrorBody())
+                        )
+                );
     }
 
     //계좌 출금
