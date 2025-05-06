@@ -136,15 +136,23 @@ public class FintechController {
 
     //보증금 보관
     @PostMapping("/deposits/hold")
-    public Mono<ResponseEntity<Deposit>> holdDeposit(@RequestBody HoldDepositRequestDto req) {
+    public Mono<ResponseEntity<Deposit>> holdDeposit(
+            @RequestBody HoldDepositRequestDto req
+    ) {
         return depositService.holdDeposit(
-                        req.getApiKey(),
                         req.getUserKey(),
                         req.getRentalId(),
-                        req.getAccountId(),
+                        req.getAccountNo(),
                         req.getAmount()
                 )
-                .map(ResponseEntity::ok);
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("보증금 보관 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(null)
+                        )
+                );
     }
 
     //보증금 반환
