@@ -4,7 +4,7 @@
 interface ProductRegisterTextInputProps {
   value: string;
   onChange: (value: string) => void;
-  placeholder: string;
+  placeholder: string; // 입력창 안내 문구 
   multiline?: boolean;
   maxLength?: number;
 }
@@ -23,7 +23,6 @@ export default function ProductRegisterTextInput({
     onChange(e.target.value);
   };
 
-  // 다중 라인 모드인 경우 textarea 렌더링
   if (multiline) {
     return (
       <textarea
@@ -37,7 +36,6 @@ export default function ProductRegisterTextInput({
     );
   }
   
-  // 일반 텍스트 입력 필드 렌더링
   return (
     <input
       type="text"

@@ -45,9 +45,8 @@ export default function PostRegisterPage() {
   const [location, setLocation] = useState("");
   const [isAiMode, setIsAiMode] = useState(false);
 
-  // 상품 등록 제출 처리
   const handleSubmit = () => {
-    // 필수 입력값 검증
+    // 필수 입력값 
     if (!title) {
       alert("제목을 입력해주세요");
       return;
@@ -85,13 +84,12 @@ export default function PostRegisterPage() {
     
     console.log("상품 등록 데이터:", productData);
     
-    // 여기에 백엔드 API 연동 로직 추가 예정
-    // 예: submitProduct(productData);
+    // 여기에 백엔드 API 연동 로직 추가 예정이이임이미임임임ㅇㅁㅁ
     
-    // 임시 알림
+    // 임시 알림 --- 
     alert("상품 등록이 완료되었습니다!");
     
-    // 홈 페이지로 리다이렉트 (실제 구현시 사용)
+    // 실제 구현시 사용할꺼다 
     // router.push('/home');
   };
 
@@ -99,7 +97,7 @@ export default function PostRegisterPage() {
   const handleAiToggle = (value: boolean) => {
     setIsAiMode(value);
     
-    // AI 모드가 켜지면 자동 생성된 예시 데이터로 채우기 (실제로는 AI API 호출)
+    // AI 모드가 켜지면 더미로 채우기 임시임  (추후에 AI API 호출)
     if (value) {
       setTitle("삼성 노트북 갤럭시북3");
       setDescription("거의 새 제품이며 상태 좋습니다. 단기 대여 가능합니다. 배터리 성능 좋고 충전기 함께 대여됩니다.");

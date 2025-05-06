@@ -1,14 +1,7 @@
 // ProductRegisterPriceInput.tsx
 "use client";
 
-/**
- * 가격 입력 컴포넌트 - 숫자만 입력 가능
- * 
- * @param {string} value - 입력된 가격 값
- * @param {function} onChange - 값 변경 시 호출될 함수
- * @param {string} placeholder - 플레이스홀더 텍스트
- * @returns {JSX.Element} 가격 입력 컴포넌트
- */
+
 interface ProductRegisterPriceInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -27,7 +20,7 @@ export default function ProductRegisterPriceInput({
     onChange(numericValue);
   };
 
-  // 표시용 가격 포맷팅 (천 단위 콤마) - 선택적 기능
+  
   const formattedForDisplay = value ? 
     parseInt(value).toLocaleString('ko-KR') : 
     value;
@@ -43,10 +36,10 @@ export default function ProductRegisterPriceInput({
       <input
         type="text"
         inputMode="numeric" // 모바일에서 숫자 키패드 표시
-        pattern="[0-9]*" // 숫자만 입력 가능하도록 패턴 설정
+        pattern="[0-9]*" // 숫자만 입력 가능
         className="w-full pl-10 p-4 bg-gray-100 rounded-md text-gray-900"
         placeholder={placeholder}
-        value={value} // 또는 formattedForDisplay 사용 가능
+        value={value} 
         onChange={handleChange}
       />
     </div>

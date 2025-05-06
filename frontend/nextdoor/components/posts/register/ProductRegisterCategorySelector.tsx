@@ -21,7 +21,7 @@ export default function ProductRegisterCategorySelector({
   // 카테고리 선택 모달 상태
   const [showModal, setShowModal] = useState(false);
   
-  // 카테고리 목록 (실제 구현에서는 API로 가져올 수 있음)
+  // 카테고리 목록 - 더미
   const categories = [
     "디지털/가전", "스포츠/레저", "도서", "의류/잡화",
     "뷰티/미용", "가구/인테리어", "생활용품", "기타"
@@ -51,7 +51,7 @@ export default function ProductRegisterCategorySelector({
           {value || "카테고리 선택"}
         </span>
         
-        {/* 오른쪽 화살표 아이콘 */}
+        {/* 화살표 아이콘 */}
         <ChevronRight className="w-5 h-5 text-gray-400" aria-hidden="true" />
       </div>
       
