@@ -7,6 +7,7 @@ import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
 import com.nextdoor.nextdoor.query.dto.ReservationQueryDto;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -17,8 +18,8 @@ public class ReservationResponseDto {
     private String feedProductImage;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Long rentalFee;
-    private Long deposit;
+    private BigDecimal rentalFee;
+    private BigDecimal deposit;
     private String status;
     private String ownerName;
     private String ownerProfileImageUrl;

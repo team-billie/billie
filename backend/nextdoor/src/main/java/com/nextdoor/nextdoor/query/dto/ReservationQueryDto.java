@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Builder
@@ -13,8 +14,8 @@ public class ReservationQueryDto {
     private Long reservationId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Long rentalFee;
-    private Long deposit;
+    private BigDecimal rentalFee;
+    private BigDecimal deposit;
     private String status;
     private Long rentalId;
     private Long ownerId;
