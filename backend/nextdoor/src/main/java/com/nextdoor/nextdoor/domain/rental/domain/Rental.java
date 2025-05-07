@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,13 +38,20 @@ public class Rental {
     @Column(name = "damage_analysis")
     private String damageAnalysis;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "payment_account_number")
+    private String paymentAccountNumber;
+
     @Builder
-    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis) {
+    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis, LocalDateTime createdAt) {
         this.aiImages = aiImages;
         this.reservationId = reservationId;
         this.rentalStatus = rentalStatus;
         this.rentalProcess = rentalProcess != null ? rentalProcess : getRentalProcessForStatus(rentalStatus);
         this.damageAnalysis = damageAnalysis;
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
     }
 
     public static Rental createFromReservation(Long reservationId) {
@@ -51,6 +59,7 @@ public class Rental {
         r.reservationId = reservationId;
         r.rentalStatus = RentalStatus.CREATED;
         r.rentalProcess = RentalProcess.BEFORE_RENTAL;
+        r.createdAt = LocalDateTime.now();
         return r;
     }
 

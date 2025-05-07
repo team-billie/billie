@@ -19,11 +19,11 @@ public class SearchRentalResult {
     private LocalDateTime endDate;
     private BigDecimal rentalFee; //Per Day
     private BigDecimal deposit;
-    private String reservationStatus;
     private Long ownerId;
     private Long renterId;
     private Long rentalId;
+    private String rentalProcess;
     private String rentalStatus;
     private String title;
-    private String productImageUrl;
+    private String productImage;
 }

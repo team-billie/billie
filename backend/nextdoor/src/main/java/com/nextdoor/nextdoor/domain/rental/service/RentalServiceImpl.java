@@ -1,19 +1,19 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
+import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
-import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
-import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
-import com.nextdoor.nextdoor.domain.rental.port.AiAnalysisQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.ReservationQueryPort;
+import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadPort;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
@@ -31,8 +31,7 @@ public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
     private final S3ImageUploadPort s3ImageUploadService;
-    private final ReservationQueryPort reservationService;
-    private final AiAnalysisQueryPort aiAnalysisQueryPort;
+    private final ReservationQueryPort reservationQueryPort;
     private final RentalQueryPort rentalQueryPort;
     private final RentalScheduleService rentalScheduleService;
     private final RentalDomainService rentalDomainService;
@@ -80,7 +79,8 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        ReservationDto reservationDto = reservationService.getReservationByRentalId(rental.getRentalId());
+        ReservationDto reservationDto = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
 
         rentalDomainService.validateRentalForRemittance(rental, command.getRenterId(), reservationDto);
 
@@ -100,20 +100,21 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         String path = rentalImageDomainService.createImagePath(
-                String.valueOf(rental.getRentalId()), 
+                String.valueOf(rental.getRentalId()),
                 AiImageType.AFTER
         );
 
         S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), path);
 
         rentalImageDomainService.processRentalImage(
-                rental, 
-                imageUploadResult.getUrl(), 
+                rental,
+                imageUploadResult.getUrl(),
                 command.getFile().getContentType(),
                 AiImageType.AFTER
         );
 
-        ReservationDto reservationDto = reservationService.getReservationByRentalId(rental.getRentalId());
+        ReservationDto reservationDto = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
 
         rentalDomainService.processAfterImageRegistration(rental, reservationDto.getDeposit());
 
@@ -154,6 +155,7 @@ public class RentalServiceImpl implements RentalService {
         rentalRepository.findByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        return aiAnalysisQueryPort.getAiAnalysisResult(rentalId);
+        return rentalRepository.findRentalWithImagesByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여의 ai 분석 정보가 존재하지 않습니다."));
     }
 }

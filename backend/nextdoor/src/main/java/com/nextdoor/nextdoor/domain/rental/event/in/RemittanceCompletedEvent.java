@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class RemittanceCompletedEvent {
 
-    private Long renterId;
+    private Long rentalId;
 }
