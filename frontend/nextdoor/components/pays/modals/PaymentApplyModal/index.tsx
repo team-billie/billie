@@ -8,7 +8,7 @@ interface PaymentModalProps{
     charge: number;
 }
 
-export default function PaymentModal({charge}: PaymentModalProps){
+export default function PaymentApplyModal({charge}: PaymentModalProps){
     const [changeBtnClicked, setChangeBtnClicked] = useState(false)
     const [payCharge, setPayCharge] = useState(charge)
 

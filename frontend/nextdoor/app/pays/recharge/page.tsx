@@ -5,7 +5,7 @@ import Button from "@/components/pays/common/Button";
 export default function RechargePage() {
     return (
     <div className="flex flex-col min-h-screen">
-    <Header type="recharge" />
+    <Header txt="충전" />
     <div className="flex-1 flex flex-col items-center">
         <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
             <div className="flex gap-2 items-center justify-center">
