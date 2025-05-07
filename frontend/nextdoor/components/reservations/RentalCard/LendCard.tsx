@@ -5,6 +5,7 @@ import { start } from "repl";
 import ReservationActionBtn from "../manage/Button/ReservationActionBtn";
 import RentalPeriod from "./RentalPeriod";
 import RentalContent from "./RentalContent";
+import TimelineBar from "./TimelineBar";
 
 interface LendCardProps {
   title: string;
@@ -31,7 +32,7 @@ export default function LendCard({
       <RentalContent img={img} title={title} cost={cost} date={date} />
 
       {/* 상태 바 */}
-      <div>안심대여중</div>
+      <TimelineBar currentStep={3} />
     </div>
   );
 }
