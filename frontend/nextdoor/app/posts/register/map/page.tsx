@@ -1,13 +1,13 @@
-// app/location-select/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import KakaoMap from "@/components/posts/register/map/KakaoMap";
+import GoogleMapComponent from "@/components/posts/register/map/GoogleMap";
 
 export default function LocationSelectPage() {
   const router = useRouter();
   const [selectedAddress, setSelectedAddress] = useState<string>("");
+  const [showPopup, setShowPopup] = useState<boolean>(false);
   
   // 위치 선택 완료 처리
   const handleSelectLocation = () => {
@@ -18,6 +18,21 @@ export default function LocationSelectPage() {
     } else {
       alert('위치를 선택해주세요.');
     }
+  };
+  
+  // 주소가 선택되었을 때 팝업 표시
+  const handleAddressSelect = (address: string) => {
+    setSelectedAddress(address);
+    
+    // 팝업 표시
+    setShowPopup(true);
+    
+    // 3초 후 팝업 자동 숨김
+    const timer = setTimeout(() => {
+      setShowPopup(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
   };
   
   return (
@@ -33,7 +48,8 @@ export default function LocationSelectPage() {
             <path d="M15 19L8 12L15 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
-        <h1 className="text-lg font-medium">거래 희망 장소</h1>
+        
+        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-medium">거래 희망 장소</h1>
       </div>
       
       {/* 안내 텍스트 */}
@@ -45,12 +61,17 @@ export default function LocationSelectPage() {
       
       {/* 지도 */}
       <div className="flex-1 relative">
-        <KakaoMap onAddressSelect={setSelectedAddress} />
+        <GoogleMapComponent 
+          onAddressSelect={handleAddressSelect} 
+        />
         
-        {/* 위치 선택 안내 팝업 */}
+     
+        
+        {/* 선택된 주소 표시 */}
         {selectedAddress && (
-          <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-700 bg-opacity-70 text-white px-4 py-3 rounded-md">
-            <p>지도를 움직여서 선택해보세요.</p>
+          <div className="absolute bottom-20 left-4 right-4 bg-white p-3 rounded-md shadow-md">
+            <p className="text-gray-800 text-sm font-medium">선택한 장소:</p>
+            <p className="text-gray-600 text-sm truncate">{selectedAddress}</p>
           </div>
         )}
       </div>
@@ -58,8 +79,9 @@ export default function LocationSelectPage() {
       {/* 선택 완료 버튼 */}
       <div className="p-4 bg-white">
         <button 
-          className="w-full py-4 bg-blue-500 text-white rounded-full font-medium"
+          className={`w-full py-4 rounded-full font-medium ${selectedAddress ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500'}`}
           onClick={handleSelectLocation}
+          disabled={!selectedAddress}
         >
           선택 완료
         </button>
