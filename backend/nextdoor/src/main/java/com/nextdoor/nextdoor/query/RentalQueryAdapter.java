@@ -1,6 +1,6 @@
 package com.nextdoor.nextdoor.query;
 
-import com.nextdoor.nextdoor.common.PersistenceAdapter;
+import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
@@ -24,9 +24,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@PersistenceAdapter
+@Adapter
 @RequiredArgsConstructor
-public class RentalQueryRepository implements RentalQueryPort {
+public class RentalQueryAdapter implements RentalQueryPort {
 
     private final JPAQueryFactory queryFactory;
     private final QReservation reservation = QReservation.reservation;
@@ -52,15 +52,15 @@ public class RentalQueryRepository implements RentalQueryPort {
 
         List<SearchRentalResult> results = queryFactory
                 .select(Projections.constructor(SearchRentalResult.class,
-                        reservation.id,
+                        reservation.id.as("reservationId"),
                         reservation.startDate,
                         reservation.endDate,
                         reservation.rentalFee,
                         reservation.deposit,
-                        reservation.status,
                         reservation.ownerId,
                         reservation.renterId,
                         rental.rentalId,
+                        rental.rentalProcess,
                         rental.rentalStatus,
                         post.title,
                         post.productImage))
