@@ -1,4 +1,10 @@
-export const bankList = [
+export type BankDto = {
+    bankCode: string;
+    bankName: string;
+    image: string;
+}
+
+export const bankList: BankDto[] = [
     {
       bankCode: '002',
       bankName: '산업은행',
