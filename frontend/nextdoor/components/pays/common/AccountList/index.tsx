@@ -1,5 +1,6 @@
 import { bankList } from "@/lib/utils/getBankInfo";
 import { Plus } from "lucide-react"
+import Link from "next/link";
 
 interface AccountListProps {
     addBtn?: boolean;
@@ -25,10 +26,10 @@ export default function AccountList({ addBtn = false }: AccountListProps) {
                 </div>
             ))}
             {addBtn &&
-                <div className="flex flex items-center gap-2 p-4 border border-gray400 rounded-lg">
-                    <Plus className="w-6 h-6 p-1 bg-gray400 text-gray700 rounded-full" />
+                <Link href="/pays/addaccount" className="flex flex items-center gap-2 p-4 border border-blue200 rounded-lg">
+                    <Plus className="w-6 h-6 p-1 bg-blue200 text-blue400 rounded-full" />
                     <div className="text-lg font-bold">계좌 추가하기</div>
-                </div>}
+                </Link>}
         </div>
     );
 }
