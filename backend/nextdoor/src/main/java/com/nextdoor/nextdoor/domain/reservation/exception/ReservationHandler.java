@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ReservationHandler {
 
     @ExceptionHandler({
+            AlreadyConfirmedException.class,
             NoSuchReservationException.class,
             IllegalStatusException.class
     })

@@ -6,12 +6,15 @@ import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.Reservati
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
+import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedException;
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ReservationServiceImpl implements ReservationService {
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final ReservationFeedQueryService reservationFeedQueryService;
     private final ReservationMemberQueryService reservationMemberQueryService;
@@ -61,7 +66,9 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalStatusException("잘못된 status입니다.");
         }
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateNotConfirmed(reservation);
         reservation.updateStatus(reservationStatusUpdateRequestDto.getStatus());
+        applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId()));
         return ReservationResponseDto.from(
                 reservation,
                 reservationFeedQueryService.findById(reservation.getFeedId()),
@@ -70,6 +77,14 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public void deleteReservation(Long loginUserid, Long reservationId) {
-        reservationRepository.deleteById(reservationId);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateNotConfirmed(reservation);
+        reservationRepository.delete(reservation);
+    }
+
+    private void validateNotConfirmed(Reservation reservation) {
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            throw new AlreadyConfirmedException("이미 확정된 예약입니다.");
+        }
     }
 }
