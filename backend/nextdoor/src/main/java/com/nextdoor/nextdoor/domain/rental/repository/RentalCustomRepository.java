@@ -1,10 +1,10 @@
 package com.nextdoor.nextdoor.domain.rental.repository;
 
-import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
-import org.springframework.data.domain.Page;
+import com.nextdoor.nextdoor.domain.rental.service.dto.AiAnalysisResult;
+
+import java.util.Optional;
 
 public interface RentalCustomRepository {
 
-    Page<SearchRentalResult> searchRental(SearchRentalCommand command);
+    Optional<AiAnalysisResult> findRentalWithImagesByRentalId(Long rentalId);
 }

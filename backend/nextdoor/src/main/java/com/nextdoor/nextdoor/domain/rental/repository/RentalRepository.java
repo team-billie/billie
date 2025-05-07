@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface RentalRepository extends JpaRepository<Rental, Long>, RentalCustomRepository {
 
     Optional<Rental> findByRentalId(Long rentalId);
-
 }
