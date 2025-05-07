@@ -7,7 +7,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleGuestStart = () => {
-    router.push('/'); // 홈 페이지로 이동
+    router.push('/home'); // 홈 페이지로 이동
   };
 
   return (
