@@ -7,6 +7,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-public @interface PersistenceAdapter {
+public @interface Adapter {
     String value() default "";
 }
