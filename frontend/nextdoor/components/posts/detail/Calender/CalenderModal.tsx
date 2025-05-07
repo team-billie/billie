@@ -23,7 +23,6 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
   onDateSelect,
   onConfirm,
 }) => {
-  // Initialize with current date
   const today = new Date();
   const [currentViewMonth, setCurrentViewMonth] = useState<number>(
     today.getMonth()
@@ -32,7 +31,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
     today.getFullYear()
   );
 
-  // Go to previous month
+  // 이전 달 이동
   const goToPrevMonth = () => {
     if (currentViewMonth === 0) {
       setCurrentViewMonth(11);
@@ -42,7 +41,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
     }
   };
 
-  // Go to next month
+  // 다음 달 이동
   const goToNextMonth = () => {
     if (currentViewMonth === 11) {
       setCurrentViewMonth(0);
@@ -52,7 +51,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
     }
   };
 
-  // Check if previous month button should be disabled
+  //과거 달 이동 불가
   const isPrevMonthDisabled = () => {
     const today = new Date();
     const prevMonth = currentViewMonth === 0 ? 11 : currentViewMonth - 1;
@@ -65,12 +64,11 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
     );
   };
 
-  // Calculate selected days count and total price
+  // (이용료*일수) 가격 측정
   const selectedDaysCount = selectedDates.length;
   const dailyPrice = 20000;
   const totalPrice = selectedDaysCount * dailyPrice;
 
-  // Get instruction message based on selection status
   const getInstructionMessage = () => {
     if (!startDate) return "대여 시작일을 선택해주세요.";
     if (!endDate) return "대여 종료일을 선택해주세요.";

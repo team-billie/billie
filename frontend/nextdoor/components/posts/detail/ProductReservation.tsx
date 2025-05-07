@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
+import { createReservation } from "@/lib/api/reservations/request";
 
 export default function ProductReservation() {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
@@ -68,21 +69,27 @@ export default function ProductReservation() {
     }
   };
 
-  // Handle reservation confirmation
-  const handleConfirmReservation = () => {
-    const formatDate = (date: Date) => {
-      return `${date.getFullYear()}년 ${
-        date.getMonth() + 1
-      }월 ${date.getDate()}일`;
+  const handleConfirmReservation = async () => {
+    if (!startDate || !endDate) {
+      alert("시작일과 종료일을 선택해주세요.");
+      return;
+    }
+
+    const reservation = {
+      feedId: 1,
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
     };
 
-    if (selectedDates.length > 0) {
+    try {
+      const result = await createReservation(reservation);
+      console.log("예약 성공:", result);
       alert(
-        `${formatDate(selectedDates[0])}부터 ${formatDate(
-          selectedDates[selectedDates.length - 1]
-        )}까지 예약이 완료되었습니다.`
+        `${startDate.toLocaleDateString()}부터 ${endDate.toLocaleDateString()}까지 예약이 완료되었습니다.`
       );
       setShowCalendar(false);
+    } catch (e) {
+      console.log("예약 실패", e);
     }
   };
 
