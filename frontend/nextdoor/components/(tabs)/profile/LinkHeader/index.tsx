@@ -1,4 +1,4 @@
-import { DollarSign, Heart, Calendar} from "lucide-react";   
+import { DollarSign, Heart, Calendar, BookOpen, CalendarCheck } from "lucide-react";
 
 type HeaderType = keyof typeof HEADER_DATA;
 
@@ -20,16 +20,20 @@ const HEADER_DATA = {
     label: "예약관리",
   },
   apply: {
-    icon: Heart,
+    icon: CalendarCheck,
     label: "요청관리",
+  },
+  history: {
+    icon: BookOpen,
+    label: "빌리내역",
   },
 } as const;
 
 
-export default function LinkHeader ({type}: LinkHeaderProps){
+export default function LinkHeader({ type }: LinkHeaderProps) {
   const { icon: Icon, label } = HEADER_DATA[type];
 
-  return(
+  return (
     <div className="flex items-center gap-2">
       <div className="flex justify-center items-center bg-blue200 bg-opacity-40 w-8 h-8 rounded-lg">
         <Icon className="text-blue300 w-5" />
