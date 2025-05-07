@@ -1,17 +1,17 @@
 import axiosInstance from "@/lib/api/instance";
 
-interface ReservationActionBtnProps {
+interface RentalBtnProps {
   status: "update" | "cancel" | "confirm";
-  rentalId: number; // 예약 식별자 필요
+  reservationId: number; // 예약 식별자 필요
   onSuccess?: () => void; // 요청 성공 후 콜백
 }
 
-export default function ReservationActionBtn({
+export default function RentalActionBtn({
   status,
-  rentalId,
+  reservationId,
   onSuccess,
-}: ReservationActionBtnProps) {
-  const getLabel = (status: ReservationActionBtnProps["status"]) => {
+}: RentalBtnProps) {
+  const getLabel = (status: RentalBtnProps["status"]) => {
     switch (status) {
       case "update":
         return "수정";
@@ -33,12 +33,15 @@ export default function ReservationActionBtn({
         //   });
         //   break;
         case "confirm":
-          await axiosInstance.patch(`/api/v1/reservations/${rentalId}/status`, {
-            status: "CONFIRMED",
-          });
+          await axiosInstance.patch(
+            `/api/v1/reservations/${reservationId}/status`,
+            {
+              status: "CONFIRMED",
+            }
+          );
           break;
         case "cancel":
-          await axiosInstance.delete(`/api/v1/reservations/${rentalId}`);
+          await axiosInstance.delete(`/api/v1/reservations/${reservationId}`);
           break;
       }
       if (onSuccess) onSuccess();

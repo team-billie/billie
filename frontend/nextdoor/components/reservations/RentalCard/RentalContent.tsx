@@ -1,5 +1,6 @@
-import { formatKoreanDate } from "@/lib/utils/";
 import Image from "next/image";
+import SafeDealBtn from "../manage/Button/SafeDealBtn";
+import { usePathname } from "next/navigation";
 
 interface RentalPeriodProps {
   img: string;
@@ -14,11 +15,14 @@ export default function RentalContent({
   cost,
   date,
 }: RentalPeriodProps) {
+  const pathname = usePathname();
+
   return (
-    <div className="flex gap-4 px-4 pt-4">
-      <div className="w-24 h-24 relative flex-shrink-0 rounded-md overflow-hidden">
+    <div className="flex gap-4 p-4">
+      <div className="w-20 h-20 relative flex-shrink-0 rounded-md overflow-hidden">
         <Image src={img} alt={title} fill className="object-cover" />
       </div>
+      {/* 내용 */}
       <div className="flex flex-col justify-between flex-grow">
         <div>
           <div className="text-m  pt-3 ">{title}</div>
@@ -30,6 +34,11 @@ export default function RentalContent({
           <span className=" text-gray700 ">일</span>
         </div>
       </div>
+
+      {/* 안심 거래 버튼 */}
+      {(pathname === "/reservations" || pathname === "/reservations/lend") && (
+        <SafeDealBtn reservationId={1} />
+      )}
     </div>
   );
 }

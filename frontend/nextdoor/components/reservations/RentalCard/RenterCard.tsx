@@ -1,13 +1,10 @@
-import { formatKoreanDate } from "@/lib/utils";
-import { MessageCircleMore } from "lucide-react";
-import Image from "next/image";
-import { start } from "repl";
-import ReservationActionBtn from "../manage/Button/ReservationActionBtn";
 import RentalPeriod from "./RentalPeriod";
 import RentalContent from "./RentalContent";
 import TimelineBar from "./TimelineBar";
+import ReservationActionBtn from "../manage/Button/ReservationActionBtn";
+import RentalDetailBtn from "../manage/Button/RentalDetailBtn";
 
-interface LendCardProps {
+interface RenterCardProps {
   title: string;
   img: string;
   cost: number;
@@ -15,14 +12,14 @@ interface LendCardProps {
   startDate: string;
   endDate: string;
 }
-export default function LendCard({
+export default function RenterCard({
   title,
   img,
   cost,
   date,
   startDate,
   endDate,
-}: LendCardProps) {
+}: RenterCardProps) {
   return (
     <div className="w-full border rounded-lg flex flex-col">
       {/* 대여기간 */}
@@ -32,7 +29,14 @@ export default function LendCard({
       <RentalContent img={img} title={title} cost={cost} date={date} />
 
       {/* 상태 바 */}
+      {/* 1 ~ 4 단계 */}
       <TimelineBar currentStep={3} />
+
+      {/* 버튼들 */}
+      <div className="flex divide-x border rounded-md overflow-hidden text-center text-sm">
+        <RentalDetailBtn />
+        <ReservationActionBtn status={"cancel"} rentalId={1} />
+      </div>
     </div>
   );
 }
