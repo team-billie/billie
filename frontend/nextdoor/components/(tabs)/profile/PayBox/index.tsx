@@ -23,7 +23,10 @@ export default function PayBox({ type }: PayBoxProps) {
 
   return (
     <div className="flex flex-col shadow-popup bg-white bg-opacity-80 p-4 rounded-2xl gap-3">
-      <LinkHeader type="account" />
+      <div className="flex items-center justify-between">
+        <LinkHeader type="account" />
+        <Link href="/pays/myaccount" className="text-sm bg-blue300 text-white py-1 px-2 rounded-lg">내 계좌</Link>
+      </div>
 
       {type === "profile"
         ? <Link href="/pays/">
