@@ -6,7 +6,7 @@ import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.Reservati
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
-import com.nextdoor.nextdoor.domain.reservation.event.out.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedException;
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;

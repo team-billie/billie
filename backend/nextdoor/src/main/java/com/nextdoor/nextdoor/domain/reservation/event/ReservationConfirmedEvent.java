@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.reservation.event.out;
+package com.nextdoor.nextdoor.domain.reservation.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
