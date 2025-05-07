@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.listener;
 
-import com.nextdoor.nextdoor.domain.rental.enums.RentalProcess;
-import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
 import lombok.RequiredArgsConstructor;

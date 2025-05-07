@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.domainservice;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
-import com.nextdoor.nextdoor.domain.rental.enums.AiImageType;
+import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.strategy.RentalImageStrategy;
 import org.springframework.stereotype.Service;
 

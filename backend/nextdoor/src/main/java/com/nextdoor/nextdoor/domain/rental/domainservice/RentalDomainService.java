@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.domainservice;
 
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
-import com.nextdoor.nextdoor.domain.rental.enums.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
 import com.nextdoor.nextdoor.domain.rental.service.dto.ReservationDto;
 import org.springframework.stereotype.Service;
