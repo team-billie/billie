@@ -1,12 +1,10 @@
 package com.nextdoor.nextdoor.domain.rental.port;
 
-import com.nextdoor.nextdoor.common.OutboundPort;
 import com.nextdoor.nextdoor.domain.rental.service.dto.ReservationDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-@OutboundPort
 public interface ReservationQueryPort {
 
     ReservationDto getReservationByRentalId(Long rentalId);
