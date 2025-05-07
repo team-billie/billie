@@ -1,13 +1,10 @@
 "use client";
 
 import MainDock from "@/components/common/Dock/MainDock";
-import MainHeader from "@/components/common/Header/ReservationHeader";
-import OwnerCard from "@/components/reservations/RentalCard/OwnerCard";
-import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/ReservationStatusTabs";
+import BorrowManageCard from "@/components/reservations/RentalCard/BorrowManageCard";
+import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
 
-// import PhotoNotFound from "@/components/reservations/safe-deal/PhotoNotFound";
-
-export default function ReservationLendPage() {
+export default function ReservationBorrowManagePage() {
   const items = [
     {
       img: "https://picsum.photos/seed/picsum/200/300",
@@ -28,12 +25,11 @@ export default function ReservationLendPage() {
   ];
   return (
     <main>
-      <MainHeader title="Reservations" />
-      <ReservationStatusTabs />
-      <div className="h-screen overflow-y-auto p-4 flex flex-col gap-6">
+      <ReservationManageNavbar />
+      <div className="h-screen flex flex-col p-4 gap-4">
         {items.map((item) => (
           <div key={item.title}>
-            <OwnerCard
+            <BorrowManageCard
               title={item.title}
               img={item.img}
               cost={item.cost}
