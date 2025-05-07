@@ -147,3 +147,20 @@ function getKoreanDay(index: number): string {
   const days = ["일", "월", "화", "수", "목", "금", "토"];
   return days[index];
 }
+
+/**
+ * 시간을 "오전/오후 HH:MM" 형식으로 반환
+ * 예: 2025-05-02T14:30 → "오후 2:30"
+ */
+export function formatTime(dateInput: string | Date | null): string {
+  if (!dateInput) return "";
+
+  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+
+  const hours = date.getHours();
+  const minutes = padZero(date.getMinutes());
+  const isAM = hours < 12;
+  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+
+  return `${isAM ? "오전" : "오후"} ${hour12}:${minutes}`;
+}
