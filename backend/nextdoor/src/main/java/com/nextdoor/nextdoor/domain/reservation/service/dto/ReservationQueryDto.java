@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.query.dto;
+package com.nextdoor.nextdoor.domain.reservation.service.dto;
 
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
 import lombok.Builder;

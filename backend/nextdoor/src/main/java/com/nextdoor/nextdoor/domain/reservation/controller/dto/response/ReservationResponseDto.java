@@ -1,10 +1,9 @@
 package com.nextdoor.nextdoor.domain.reservation.controller.dto.response;
 
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
-import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
-import com.nextdoor.nextdoor.query.dto.ReservationQueryDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
 import lombok.Getter;
 
 import java.math.BigDecimal;

@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.reservation.port;
 
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationRetrieveRequestDto;
-import com.nextdoor.nextdoor.query.dto.ReservationQueryDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.query.repository;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationRetrieveRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.domain.QReservation;
 import com.nextdoor.nextdoor.domain.reservation.port.ReservationQueryPort;
-import com.nextdoor.nextdoor.query.dto.ReservationQueryDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
