@@ -3,6 +3,8 @@ package com.nextdoor.nextdoor.domain.reservation.service.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Builder
 @Getter
 public class FeedDto {
@@ -10,8 +12,8 @@ public class FeedDto {
     private Long feedId;
     private String title;
     private String content;
-    private Long rentalFee;
-    private Long deposit;
+    private BigDecimal rentalFee;
+    private BigDecimal deposit;
     // TODO 장소
     private String productImage;
     private String category;

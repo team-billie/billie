@@ -3,6 +3,7 @@ package com.nextdoor.nextdoor.domain.reservation.controller.dto.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -15,8 +16,8 @@ public class ReservationUpdateRequestDto {
     private LocalDate endDate;
 
     @NotNull
-    private Long rentalFee;
+    private BigDecimal rentalFee;
 
     @NotNull
-    private Long deposit;
+    private BigDecimal deposit;
 }
