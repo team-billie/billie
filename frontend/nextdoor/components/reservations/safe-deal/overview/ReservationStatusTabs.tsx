@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function ReservationStatusTabs() {
   return (
-    <div className="flex-1 w-full flex justify-between p-4 rounded-s-3xl border-t-2 -mt-12 bg-white ">
+    <div className="flex-1 w-full flex justify-between p-4 rounded-tl-3xl border-t-2 -mt-12 bg-white ">
       <div className="flex gap-3">
         <Link href="/reservations">
           <button className="btn-1">전체</button>
