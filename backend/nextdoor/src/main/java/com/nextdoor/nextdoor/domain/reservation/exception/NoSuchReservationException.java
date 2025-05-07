@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.reservation.exception;
 import lombok.Getter;
 
 @Getter
-public class NoSuchReservationException extends RuntimeException {
+public class NoSuchReservationException extends BaseCustomException {
 
     private final String errorCode = "NO_SUCH_RESERVATION";
 

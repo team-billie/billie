@@ -1,6 +1,4 @@
-import nextPWA from 'next-pwa';
-
-/** @type {import('next').NextConfig} */
+import nextPWA from "next-pwa";
 
 const withPWA = nextPWA({
   dest: 'public',
@@ -9,21 +7,17 @@ const withPWA = nextPWA({
   skipWaiting: true, 
 });
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  // kakao 맵 
-  async headers() {
-    return [
+  images: {
+    remotePatterns: [
       {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' https://*.kakao.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.kakao.com https://*.daumcdn.net; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.kakao.com https://*.daumcdn.net data: blob:;"
-          },
-        ],
+        hostname: "picsum.photos",
+        protocol: "https",
       },
-    ];
+    ],
   },
 };
 
+// export default nextConfig;
 export default withPWA(nextConfig);
