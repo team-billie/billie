@@ -2,12 +2,14 @@
 // import PhotoNotFound from "@/components/reservations/safe-deal/PhotoNotFound";
 import PhotoNotFound from "@/components/reservations/safe-deal/result/PhotoNotFound";
 import ResultSummary from "@/components/reservations/safe-deal/result/ResultSummary";
+import SafeDealNavbar from "@/components/reservations/safe-deal/SafeDealNavbar";
 import { useState } from "react";
 
 export default function SafeDealResult() {
   const [isResult, setIsResult] = useState(true);
   return (
     <main>
+      <SafeDealNavbar />
       <div className="h-screen flex flex-col p-4">
         <div className="pb-4">
           <div className="text-xl text-gray900">

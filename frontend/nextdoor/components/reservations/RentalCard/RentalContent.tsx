@@ -38,13 +38,6 @@ export default function RentalContent({
           </div>
         </div>
       </div>
-
-      {/* AI 안심거래 버튼
-      {(pathname === "/reservations" || pathname === "/reservations/lend") && (
-        <div className="flex-shrink-0 ml-2">
-          <SafeDealBtn reservationId={1} />
-        </div>
-      )} */}
     </div>
   );
 }

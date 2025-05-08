@@ -15,6 +15,10 @@ const nextConfig = {
         hostname: "picsum.photos",
         protocol: "https",
       },
+      {
+        protocol: "https",
+        hostname: "images.nextdoor.com",
+      },
     ],
   },
 
