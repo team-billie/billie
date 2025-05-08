@@ -60,9 +60,12 @@ public class RegistAccountService {
                     FintechUser fu = fintechUserRepository.findById(req.getUserKey())
                             .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
 
-                    // 2) SSAFY 계좌 확인
-                    Account acct = accountRepository.findByAccountNo(req.getAccountNo())
-                            .orElseThrow(() -> new RuntimeException("계좌 없음: " + req.getAccountNo()));
+                    // 2) SSAFY 계좌 확인(계좌번호+은행코드로 확인)
+                    Account acct = accountRepository
+                            .findByAccountNoAndBankCode(req.getAccountNo(), req.getBankCode())
+                            .orElseThrow(() -> new RuntimeException(
+                                    "계좌 없음 또는 은행코드 불일치: "
+                                            + req.getAccountNo() + " / " + req.getBankCode()));
 
                     // 3) 이미 등록된 계좌인지 검사
                     registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(req.getUserKey(), req.getAccountNo())

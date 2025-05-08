@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/fintechs")
@@ -33,13 +35,24 @@ public class RegistAccountController {
      * POST /api/v1/fintechs/regist-accounts
      */
     @PostMapping("/regist-accounts")
-    public Mono<ResponseEntity<RegistAccountResponseDto>> register(
+    public Mono<ResponseEntity<Object>> registerAccount(
             @RequestBody RegistAccountRequestDto req
     ) {
         return registAccountService.registerAccount(req)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(
-                        ResponseEntity.badRequest().build()
-                ));
+                // 성공 시: DTO 를 Object 로 body 에 담기
+                .map(dto -> ResponseEntity
+                        .ok()
+                        .<Object>body(dto)
+                )
+                // 실패 시: error Map 을 Object 로 body 에 담기
+                .onErrorResume(e -> {
+                    Map<String,String> error = new HashMap<>();
+                    error.put("error", e.getMessage());
+                    return Mono.just(
+                            ResponseEntity
+                                    .badRequest()
+                                    .<Object>body(error)
+                    );
+                });
     }
 }
