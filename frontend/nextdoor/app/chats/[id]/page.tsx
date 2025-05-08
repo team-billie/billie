@@ -3,7 +3,8 @@
 import { useState } from "react";
 import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
-import { Message } from "@/types"; // 메시지 타입 불러오기
+import { Message } from "@/types/chat";
+import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
 
 export default function ChatDetailPage() {
   // 메시지 입력 상태
@@ -56,6 +57,7 @@ export default function ChatDetailPage() {
         onChange={handleChange}
         onSendMessage={handleSend}
       >
+        <ChatAccordion title="예약 및 제품 정보"></ChatAccordion>
         {/* ChatLayout 내부에 ChatList 컴포넌트 추가 */}
         <ChatList
           messages={messages}
