@@ -17,8 +17,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AccountService {
     private final SsafyApiClient client;
-    private final AccountRepository repo;
-    private final FintechUserRepository userRepo;
+    private final AccountRepository accountRepository;
+    private final FintechUserRepository fintechUserRepository;
 
     //계좌 생성
     public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
@@ -36,7 +36,7 @@ public class AccountService {
 
                     // 2) FintechUser 조회 & Account 엔티티 생성·저장
                     return Mono.fromCallable(() -> {
-                                FintechUser user = userRepo.findById(userKey)
+                                FintechUser user = fintechUserRepository.findById(userKey)
                                         .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
                                 Account a = Account.builder()
@@ -48,7 +48,7 @@ public class AccountService {
                                         .build();
 
                                 // 블로킹 JPA 호출
-                                return repo.save(a);
+                                return accountRepository.save(a);
                             })
                             .subscribeOn(Schedulers.boundedElastic())
                             // 3) 저장 완료 후에도 SSAFY 원본 Map 그대로 흘려줌
@@ -64,9 +64,21 @@ public class AccountService {
     //계좌 입금(충전하기)
     public Mono<Map<String,Object>> depositAccount(String userKey, String accountNo, long transactionBalance, String transactionSummary) {
         return client.depositAccount(userKey, accountNo, transactionBalance, transactionSummary)
-                .map(resp -> {
-                    return resp; // 성공 시 DB에 Transaction 기록이 필요하면 여기서 repo.save(...) 등 추가
-                });
+                .flatMap(resp ->
+                        // 1) SSAFY 입금 API 호출이 성공했으면
+                        Mono.fromCallable(() -> {
+                                    // 2) 로컬 DB에서 accountNo에 해당하는 계좌 가져오기
+                                    Account acct = accountRepository.findByAccountNo(accountNo)
+                                            .orElseThrow(() -> new RuntimeException("계좌 없음: " + accountNo));
+                                    // 3) balance 업데이트
+                                    acct.setBalance(acct.getBalance() + (int) transactionBalance);
+                                    // 4) 저장
+                                    return accountRepository.save(acct);
+                                })
+                                .subscribeOn(Schedulers.boundedElastic())   // JPA 블로킹 호출은 별도 스케줄러에서
+                                // 5) 저장이 끝나면 원본 SSAFY resp Map을 그대로 흘려보냄
+                                .thenReturn(resp)
+                );
     }
 
     //계좌 이체
