@@ -153,6 +153,43 @@ public class RegistAccountService {
                 });
     }
 
+    /**
+     * 주계좌 변경: 해당 EXTERNAL 계좌만 primary=true, 나머지는 false
+     */
+    public Mono<RegistAccountResponseDto> changePrimary(
+            String userKey,
+            Long targetRegistAccountId
+    ) {
+        return Mono.fromCallable(() -> {
+                    // 1) 대상 RegistAccount 조회 및 검증
+                    RegistAccount target = registAccountRepository.findById(targetRegistAccountId)
+                            .orElseThrow(() -> new RuntimeException("등록 계좌 없음: " + targetRegistAccountId));
+                    if (!target.getUser().getUserKey().equals(userKey)) {
+                        throw new RuntimeException("권한 없음: 다른 사용자 계좌 변경 불가");
+                    }
+                    if (target.getAccountType() != RegistAccountType.EXTERNAL) {
+                        throw new RuntimeException("빌리페이나 BILI_PAY는 주계좌로 설정할 수 없습니다.");
+                    }
+
+                    // 2) 해당 사용자 모든 EXTERNAL 계좌 조회
+                    List<RegistAccount> externals = registAccountRepository.findByUser_UserKeyAndAccountType(userKey, RegistAccountType.EXTERNAL);
+                    // 3) 기존 primary=false 처리
+                    for (RegistAccount ra : externals) {
+                        if (ra.getPrimary()) {
+                            ra.setPrimary(false);
+                            registAccountRepository.save(ra);
+                        }
+                    }
+                    // 4) 대상 계좌 primary=true 처리
+                    target.setPrimary(true);
+                    target.setRegisteredAt(LocalDateTime.now()); // Optional: 갱신 시간
+                    RegistAccount saved = registAccountRepository.save(target);
+                    return toDto(saved);
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+
 
     private RegistAccountResponseDto toDto(RegistAccount ra) {
         return new RegistAccountResponseDto(
