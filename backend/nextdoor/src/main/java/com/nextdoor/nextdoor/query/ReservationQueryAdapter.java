@@ -28,6 +28,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                                 reservation.endDate,
                                 reservation.rentalFee,
                                 reservation.deposit,
+                                reservation.status.stringValue(),
                                 reservation.ownerId,
                                 reservation.renterId,
                                 reservation.feedId

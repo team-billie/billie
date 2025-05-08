@@ -1,22 +1,20 @@
 package com.nextdoor.nextdoor.domain.rental.service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SearchRentalResult {
 
-    private Long reservationId;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private Long id;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private BigDecimal rentalFee; //Per Day
     private BigDecimal deposit;
     private Long ownerId;
