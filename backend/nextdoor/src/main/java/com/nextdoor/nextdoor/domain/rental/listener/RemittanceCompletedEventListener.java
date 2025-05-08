@@ -20,7 +20,7 @@ public class RemittanceCompletedEventListener {
     @Async("asyncExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleRemittanceCompletedEvent(RemittanceCompletedEvent remittanceCompletedEvent){
-        messagingTemplate.convertAndSend("/topic/rental" + remittanceCompletedEvent.getRentalId() + "/status",
+        messagingTemplate.convertAndSend("/topic/rental/" + remittanceCompletedEvent.getRentalId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalProcess.RENTAL_IN_ACTIVE.name())
                         .detailStatus(RentalStatus.REMITTANCE_CONFIRMED.name())
