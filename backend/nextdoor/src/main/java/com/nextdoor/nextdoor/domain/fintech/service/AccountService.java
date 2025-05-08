@@ -8,6 +8,7 @@ import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -22,27 +23,30 @@ public class AccountService {
     //계좌 생성
     public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
         return client.createAccount(userKey, accountTypeUniqueNo)
-                .map(resp -> {
-                    // 1) SSAFY가 내려준 응답 그대로 resp(Map)을 리턴하기 전, DB에 persistence
-                    String acctNo   = (String) resp.get("accountNo");     // or "accountNumber" field 이름 확인
-                    String bankCode = (String) resp.get("bankCode");
-                    String acctName = (String) resp.get("accountName");
+                .flatMap(resp -> {
+                    // 1) SSAFY 응답에서 실제 생성된 계좌번호 필드명 확인
+                    //    (명세서대로라면 "accountNo" 입니다)
+                    String acctNo   = resp.get("accountNo").toString();
+                    String bankCode = resp.get("bankCode").toString();
 
-                    // JPA로 블로킹 조회/저장
-                    FintechUser user = userRepo.findById(userKey)
-                            .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                    // 2) FintechUser 조회 & Account 엔티티 생성·저장
+                    return Mono.fromCallable(() -> {
+                                FintechUser user = userRepo.findById(userKey)
+                                        .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-                    Account a = Account.builder()
-                            .user(user)
-                            .accountNumber(acctNo)
-                            .bankCode(bankCode)
-                            .accountName(acctName)
-                            .createdAt(LocalDateTime.now())
-                            .build();
-                    repo.save(a);  // 블로킹 저장
+                                Account a = Account.builder()
+                                        .accountNo(acctNo)
+                                        .bankCode(bankCode)
+                                        .balance(0)                      // 최초 발급 시 0원
+                                        .createdAt(LocalDateTime.now())
+                                        .build();
 
-                    // 2) 원본 SSAFY 응답 Map 그대로 리턴
-                    return resp;
+                                // 블로킹 JPA 호출
+                                return repo.save(a);
+                            })
+                            .subscribeOn(Schedulers.boundedElastic())
+                            // 3) 저장 완료 후에도 SSAFY 원본 Map 그대로 흘려줌
+                            .thenReturn(resp);
                 });
     }
 

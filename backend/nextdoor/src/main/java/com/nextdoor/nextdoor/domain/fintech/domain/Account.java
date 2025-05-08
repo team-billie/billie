@@ -14,7 +14,7 @@ public class Account {
     private Long id;
 
     @Column(name = "account_no", nullable = false, length = 30)
-    private String accountNumber;
+    private String accountNo;
 
     @Column(name = "bank_code", nullable = false, length = 10)
     private String bankCode;
