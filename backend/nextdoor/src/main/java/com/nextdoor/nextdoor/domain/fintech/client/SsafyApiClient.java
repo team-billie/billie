@@ -57,7 +57,7 @@ public class SsafyApiClient {
     }
 
     //계정 생성
-    public Mono<Map<String, Object>> createUser(String userId) {
+    public Mono<Map<String, Object>> createUser(Long userId) {
         Map<String,Object> body = Map.of(
                 "apiKey", apiKey,
                 "userId", userId
