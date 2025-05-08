@@ -183,8 +183,10 @@ public class RegistAccountService {
                     // 4) 대상 계좌 primary=true 처리
                     target.setPrimary(true);
                     target.setRegisteredAt(LocalDateTime.now()); // Optional: 갱신 시간
-                    RegistAccount saved = registAccountRepository.save(target);
-                    return toDto(saved);
+                    registAccountRepository.save(target);
+                    return toDto(target);                        // 원본 target 사용
+//                    RegistAccount saved = registAccountRepository.save(target); //여기꺼로 하면 no session 에러뜸
+//                    return toDto(saved);
                 })
                 .subscribeOn(Schedulers.boundedElastic());
     }
