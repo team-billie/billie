@@ -51,17 +51,17 @@ public class RentalQueryAdapter implements RentalQueryPort {
         whereCondition.and(rentalProcessCondition(condition));
 
         List<SearchRentalResult> results = queryFactory
-                .select(Projections.constructor(SearchRentalResult.class,
-                        reservation.id.as("reservationId"),
-                        reservation.startDate,
-                        reservation.endDate,
+                .select(Projections.fields(SearchRentalResult.class,
+                        reservation.id.as("id"),
+                        reservation.startDate.as("startDate"),
+                        reservation.endDate.as("endDate"),
                         reservation.rentalFee,
                         reservation.deposit,
                         reservation.ownerId,
                         reservation.renterId,
                         rental.rentalId,
-                        rental.rentalProcess,
-                        rental.rentalStatus,
+                        rental.rentalProcess.stringValue().as("rentalProcess"),
+                        rental.rentalStatus.stringValue().as("rentalStatus"),
                         post.title,
                         post.productImage))
                 .from(reservation)

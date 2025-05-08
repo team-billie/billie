@@ -49,7 +49,7 @@ public class RentalMapper {
 
     public RentalDetailResponse toResponse(SearchRentalResult result) {
         return RentalDetailResponse.builder()
-                .reservationId(result.getReservationId())
+                .reservationId(result.getId())
                 .startDate(result.getStartDate())
                 .endDate(result.getEndDate())
                 .rentalFee(result.getRentalFee())
@@ -57,6 +57,7 @@ public class RentalMapper {
                 .ownerId(result.getOwnerId())
                 .renterId(result.getRenterId())
                 .rentalId(result.getRentalId())
+                .rentalProcess(result.getRentalProcess())
                 .rentalStatus(result.getRentalStatus())
                 .title(result.getTitle())
                 .productImageUrl(result.getProductImage())
