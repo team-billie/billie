@@ -1,6 +1,5 @@
 package com.nextdoor.nextdoor.domain.fintech.domain;
 
-import com.nextdoor.nextdoor.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
