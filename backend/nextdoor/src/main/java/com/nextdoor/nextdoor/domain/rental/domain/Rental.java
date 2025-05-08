@@ -55,12 +55,11 @@ public class Rental {
     }
 
     public static Rental createFromReservation(Long reservationId) {
-        Rental r = new Rental();
-        r.reservationId = reservationId;
-        r.rentalStatus = RentalStatus.CREATED;
-        r.rentalProcess = RentalProcess.BEFORE_RENTAL;
-        r.createdAt = LocalDateTime.now();
-        return r;
+        return Rental.builder()
+                .reservationId(reservationId)
+                .rentalStatus(RentalStatus.CREATED)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     public void requestRemittance(BigDecimal amount) {
