@@ -1,26 +1,27 @@
-import { formatKoreanDate } from "@/lib/utils";
 import { MessageCircleMore } from "lucide-react";
-import Image from "next/image";
-import { start } from "repl";
 import ReservationActionBtn from "../manage/Button/ReservationActionBtn";
 import RentalPeriod from "./RentalPeriod";
 import RentalContent from "./RentalContent";
 
 interface LendManageCardProps {
   title: string;
+  id: number;
   img: string;
   cost: number;
   date: number;
   startDate: string;
   endDate: string;
+  onReload: () => void;
 }
 export default function LendManageCard({
   title,
+  id,
   img,
   cost,
   date,
   startDate,
   endDate,
+  onReload,
 }: LendManageCardProps) {
   return (
     <div className="w-full border rounded-lg flex flex-col">
@@ -32,9 +33,21 @@ export default function LendManageCard({
 
       {/* 버튼들 */}
       <div className="flex divide-x border rounded-md overflow-hidden text-center text-sm">
-        <ReservationActionBtn status={"update"} reservationId={1} />
-        <ReservationActionBtn status={"confirm"} reservationId={1} />
-        <ReservationActionBtn status={"cancel"} reservationId={1} />
+        <ReservationActionBtn
+          status={"update"}
+          reservationId={id}
+          onSuccess={onReload}
+        />
+        <ReservationActionBtn
+          status={"confirm"}
+          reservationId={id}
+          onSuccess={onReload}
+        />
+        <ReservationActionBtn
+          status={"cancel"}
+          reservationId={id}
+          onSuccess={onReload}
+        />
 
         <div className="w-12 py-2 hover:bg-gray-100 cursor-pointer flex text-gray600 justify-center items-center">
           <MessageCircleMore />

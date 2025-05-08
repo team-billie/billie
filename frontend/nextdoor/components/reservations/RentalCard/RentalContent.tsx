@@ -18,27 +18,33 @@ export default function RentalContent({
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-4 p-4">
+    <div className="flex items-center justify-between gap-4 p-4 mt-2">
+      {/* 썸네일 이미지 */}
       <div className="w-20 h-20 relative flex-shrink-0 rounded-md overflow-hidden">
         <Image src={img} alt={title} fill className="object-cover" />
       </div>
-      {/* 내용 */}
-      <div className="flex flex-col justify-between flex-grow">
-        <div>
-          <div className="text-m  pt-3 ">{title}</div>
-          <span className="text-xl text-gray900 font-semibold ">
-            {cost.toLocaleString()} won
-          </span>
-          <span className=" text-gray700 "> /</span>
-          <span className=" text-gray700 font-semibold"> {date}</span>
-          <span className=" text-gray700 ">일</span>
+
+      {/* 텍스트 영역 */}
+      <div className="flex flex-col justify-between flex-grow overflow-hidden">
+        <div className="truncate">
+          <div className="text-m  truncate">{title}</div>
+          <div className="whitespace-nowrap text-ellipsis overflow-hidden">
+            <span className="text-l text-gray900 font-semibold">
+              {cost.toLocaleString()}원
+            </span>
+            <span className="text-gray700"> /</span>
+            <span className="text-gray700 font-semibold"> {date}</span>
+            <span className="text-gray700">일</span>
+          </div>
         </div>
       </div>
 
-      {/* 안심 거래 버튼 */}
+      {/* AI 안심거래 버튼
       {(pathname === "/reservations" || pathname === "/reservations/lend") && (
-        <SafeDealBtn reservationId={1} />
-      )}
+        <div className="flex-shrink-0 ml-2">
+          <SafeDealBtn reservationId={1} />
+        </div>
+      )} */}
     </div>
   );
 }

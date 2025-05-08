@@ -4,14 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
 import { createReservation } from "@/lib/api/reservations/request";
 
-export default function ProductReservation() {
+interface ProductReservationProps {
+  feedId: number;
+}
+
+export default function ProductReservation({
+  feedId,
+}: ProductReservationProps) {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Handle clicking outside to close calendar
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -28,12 +33,10 @@ export default function ProductReservation() {
     };
   }, []);
 
-  // Toggle calendar visibility
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
   };
 
-  // Handle date selection
   const handleDateSelect = (year: number, month: number, day: number) => {
     const selectedDate = new Date(year, month, day);
 
@@ -75,17 +78,24 @@ export default function ProductReservation() {
       return;
     }
 
+    const formatDate = (date: Date) =>
+      `${date.getFullYear()}-${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+
     const reservation = {
-      feedId: 1,
-      startDate: startDate.toISOString().split("T")[0],
-      endDate: endDate.toISOString().split("T")[0],
+      feedId: feedId,
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
     };
 
     try {
       const result = await createReservation(reservation);
       console.log("예약 성공:", result);
       alert(
-        `${startDate.toLocaleDateString()}부터 ${endDate.toLocaleDateString()}까지 예약이 완료되었습니다.`
+        `${formatDate(startDate)}부터 ${formatDate(
+          endDate
+        )}까지 예약이 완료되었습니다.`
       );
       setShowCalendar(false);
     } catch (e) {
