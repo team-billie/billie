@@ -17,7 +17,7 @@ const ChatDetailHeader: React.FC<ChatDetailHeaderProps> = ({
 }) => {
   const router = useRouter();
 
-  const handleBackClick = onBackClick || (() => router.push("/chat"));
+  const handleBackClick = onBackClick || (() => router.push("/chat/borrow"));
 
   return (
     <div className={`flex items-center p-4 bg-white border-b ${className}`}>

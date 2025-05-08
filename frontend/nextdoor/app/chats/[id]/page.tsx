@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
-import { Message } from "@/types/chat";
+import { Message } from "@/types/chats/chat";
 import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
 
 export default function ChatDetailPage() {
