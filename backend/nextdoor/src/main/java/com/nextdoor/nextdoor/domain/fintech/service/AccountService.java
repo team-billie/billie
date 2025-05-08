@@ -92,9 +92,19 @@ public class AccountService {
     //계좌 출금(보증금 관련)
     public Mono<Map<String,Object>> withdrawAccount(String userKey, String accountNo, long transactionBalance, String transactionSummary) {
         return client.withdrawAccount(userKey, accountNo, transactionBalance, transactionSummary)
-                .map(resp -> {
-                    // 필요시 DB 기록 로직 추가 가능
-                    return resp;
-                });
+                .flatMap(resp ->
+                        Mono.fromCallable(() -> {
+                                    // 1) 로컬 DB에서 계좌 조회
+                                    Account acct = accountRepository.findByAccountNo(accountNo)
+                                            .orElseThrow(() -> new RuntimeException("계좌 없음: " + accountNo));
+                                    // 2) 출금 금액만큼 balance 차감
+                                    acct.setBalance(acct.getBalance() - (int)transactionBalance);
+                                    // 3) 변경된 엔티티 저장
+                                    return accountRepository.save(acct);
+                                })
+                                .subscribeOn(Schedulers.boundedElastic())
+                                // 4) 저장이 완료되면 원본 SSAFY 응답(Map) 반환
+                                .thenReturn(resp)
+                );
     }
 }
