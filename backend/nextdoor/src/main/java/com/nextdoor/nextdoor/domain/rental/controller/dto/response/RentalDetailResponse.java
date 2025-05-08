@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,14 +15,15 @@ import java.time.LocalDateTime;
 public class RentalDetailResponse {
 
     private Long reservationId;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private BigDecimal rentalFee; //Per Day
     private BigDecimal deposit;
     private String reservationStatus;
     private Long ownerId;
     private Long renterId;
     private Long rentalId;
+    private String rentalProcess;
     private String rentalStatus;
     private String title;
     private String productImageUrl;

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/rentals")
@@ -28,22 +29,29 @@ public class RentalController {
 
     @GetMapping
     public ResponseEntity<Page<RentalDetailResponse>> getMyRentals(
-            Long userId,
-            @Valid @ModelAttribute RetrieveRentalsRequest retrieveRentalsRequest,
+            @RequestParam Long userId,
+            @RequestParam String userRole,
+            @RequestParam String condition,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
+        RetrieveRentalsRequest retrieveRentalsRequest = new RetrieveRentalsRequest(userRole, condition);
         SearchRentalCommand command = rentalMapper.toCommand(userId, retrieveRentalsRequest, pageable);
         Page<SearchRentalResult> results = rentalService.searchRentals(command);
-        Page<RentalDetailResponse> responsePage =
-                results.map(rentalMapper::toResponse);
+        Page<RentalDetailResponse> responsePage = results.map(rentalMapper::toResponse);
 
         return ResponseEntity.ok(responsePage);
     }
 
     @PostMapping("/{rentalId}/before/photos")
-    ResponseEntity<UploadImageResponse> registerBeforePhoto(@PathVariable Long rentalId,
-                                                            @Valid @RequestPart UploadImageRequest request) {
+    public ResponseEntity<UploadImageResponse> registerBeforePhoto(
+            @PathVariable Long rentalId,
+            @RequestParam("file") MultipartFile file) {
+
+        UploadImageRequest request = UploadImageRequest.builder()
+                .file(file)
+                .build();
+
         UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
         UploadImageResult result = rentalService.registerBeforePhoto(command);
         UploadImageResponse response = rentalMapper.toUploadImageResponse(result);
@@ -61,8 +69,14 @@ public class RentalController {
     }
 
     @PostMapping("/{rentalId}/after/photos")
-    ResponseEntity<UploadImageResponse> registerAfterPhoto(@PathVariable Long rentalId,
-                                                           @Valid @RequestPart UploadImageRequest request) {
+    public ResponseEntity<UploadImageResponse> registerAfterPhoto(
+            @PathVariable Long rentalId,
+            @RequestParam("file") MultipartFile file) {
+
+        UploadImageRequest request = UploadImageRequest.builder()
+                .file(file)
+                .build();
+
         UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
         UploadImageResult result = rentalService.registerAfterPhoto(command);
         UploadImageResponse response = rentalMapper.toUploadImageResponse(result);

@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.rental.service.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 public class ReservationDto {
 
     private Long reservationId;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private BigDecimal rentalFee; //Per Day
     private BigDecimal deposit;
     private String reservationStatus;
