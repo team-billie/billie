@@ -57,10 +57,10 @@ public class SsafyApiClient {
     }
 
     //계정 생성
-    public Mono<Map<String, Object>> createUser(Long userId) {
+    public Mono<Map<String, Object>> createUser(Long userId, String ssafyApiEmail) {
         Map<String,Object> body = Map.of(
                 "apiKey", apiKey,
-                "userId", userId
+                "userId", ssafyApiEmail
         );
 
         return webClient.post()
