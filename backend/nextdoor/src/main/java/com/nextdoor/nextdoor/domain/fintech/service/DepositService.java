@@ -38,27 +38,25 @@ public class DepositService {
         return client.withdrawAccount(userKey, accountNo, amount, null)
                 .flatMap(resp ->
                         Mono.fromCallable(() -> {
-                                    // 1. SSAFY userKey → FintechUser → plateforme userId(Long)
-                                    FintechUser fu = fintechUserRepository.findById(userKey)
-                                            .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
-                                    Long platformUserId = fu.getUserId();
+                            // fintechUser 를 userKey 로 조회
+                            FintechUser fu = fintechUserRepository.findById(userKey)
+                                    .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
 
-                                    // 2. 유저가 등록한 계좌(RegistAccount) 조회
-                                    RegistAccount ra = registAccountRepository
-                                            .findByUserIdAndAccount_AccountNo(platformUserId, accountNo)
-                                            .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
+                            // 2) RegistAccount 를 user.userKey + accountNo 로 조회
+                            RegistAccount ra = registAccountRepository
+                                    .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
+                                    .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
 
-                                    // 3. Deposit 엔티티 생성·저장
-                                    Deposit d = Deposit.builder()
-                                            .rentalId(rentalId)
-                                            .registAccount(ra)
-                                            .amount(amount)
-                                            .status(DepositStatus.HELD)
-                                            .heldAt(LocalDateTime.now())
-                                            .build();
-                                    return depositRepository.save(d);
-                                })
-                                .subscribeOn(Schedulers.boundedElastic())
+                            // 3) Deposit 생성·저장
+                            Deposit d = Deposit.builder()
+                                    .rentalId(rentalId)
+                                    .registAccount(ra)
+                                    .amount(amount)
+                                    .status(DepositStatus.HELD)
+                                    .heldAt(LocalDateTime.now())
+                                    .build();
+                            return depositRepository.save(d);
+                        }).subscribeOn(Schedulers.boundedElastic())
                 );
     }
 
