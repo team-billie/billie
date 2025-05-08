@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.fintech.service;
 
+import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
@@ -17,6 +18,7 @@ import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class RegistAccountService {
     private final RegistAccountRepository registAccountRepository;
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
+    private final SsafyApiClient client;
 
     /**
      * 등록된 모든 계좌를 조회해서 DTO 리스트로 반환
@@ -36,19 +39,6 @@ public class RegistAccountService {
                                 .collect(Collectors.toList())
                 )
                 .subscribeOn(Schedulers.boundedElastic());
-    }
-
-    private RegistAccountResponseDto toDto(RegistAccount ra) {
-        return new RegistAccountResponseDto(
-                ra.getId(),
-                ra.getAccount().getAccountNo(),
-                ra.getAccount().getBankCode(),
-                ra.getAccountType(),
-                ra.getAlias(),
-                ra.getPrimary(),
-                ra.getBalance(),
-                ra.getRegisteredAt()
-        );
     }
 
     /**
@@ -95,6 +85,8 @@ public class RegistAccountService {
 
                     // 6) 저장 후 DTO 변환
                     RegistAccount saved = registAccountRepository.save(ra);
+
+                    //return toDto(saved); 이걸로 return new RegistAccountResponseDto 대체할 수 있음
                     return new RegistAccountResponseDto(
                             saved.getId(),
                             saved.getAccount().getAccountNo(),
@@ -107,5 +99,71 @@ public class RegistAccountService {
                     );
                 })
                 .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    /**
+     * 빌리페이 (BILI_PAY)
+     * 사용자 계정 생성 직후 자동 호출: 계좌 생성 & DB 저장 → RegistAccount 생성
+     * 빌리페이 생성 메서드, 따로 api 는 필요없다. 계정 생성하고 service로 요청해서 만들면 끝
+     */
+    public Mono<RegistAccountResponseDto> createBilipay(String userKey) {
+        // 1) SSAFY API 로 계좌 생성 (빌리페이 == 싸피은행)
+        // 싸피은행 고유은행 번호를 넣어주면 된다.
+        return client.createAccount(userKey, /* 빌리페이 고정 파라미터 */ "999-1-6c20074711854e")
+                .flatMap(resp -> {
+                    // 1) SSAFY 응답에서 실제 생성된 계좌번호 필드명 확인
+                    //여기서 발생할 수 있는 unchecked 경고(경고 코드: unchecked)를 무시해 달라”는 지시문
+                    @SuppressWarnings("unchecked")
+                    Map<String,Object> rec = (Map<String,Object>)resp.get("REC");
+                    if (rec == null) {
+                        return Mono.error(new RuntimeException("SSAFY 계좌 생성 응답에 REC가 없습니다."));
+                    }
+                    String acctNo   = rec.get("accountNo").toString();
+                    String bankCode = rec.get("bankCode").toString();
+
+                    // 2) DB에 Account 저장 (blocking)
+                    return Mono.fromCallable(() -> {
+                                FintechUser fu = fintechUserRepository.findById(userKey)
+                                        .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
+
+                                Account a = Account.builder()
+                                        .accountNo(acctNo)
+                                        .bankCode(bankCode)
+                                        .balance(0)                   // 새로 발급된 계좌 초기잔액
+                                        .createdAt(LocalDateTime.now())
+                                        .user(fu)
+                                        .build();
+                                a = accountRepository.save(a);
+
+                                // 3) RegistAccount에 타입=BILI_PAY 로 등록
+                                RegistAccount ra = RegistAccount.builder()
+                                        .user(fu)
+                                        .account(a)
+                                        .accountType(RegistAccountType.BILI_PAY)
+                                        .alias("빌리페이")
+                                        .balance(a.getBalance())
+                                        .primary(false)        // 빌리페이는 주계좌 될 수 없음
+                                        .registeredAt(LocalDateTime.now())
+                                        .build();
+                                ra = registAccountRepository.save(ra);
+
+                                return toDto(ra);
+                            })
+                            .subscribeOn(Schedulers.boundedElastic());
+                });
+    }
+
+
+    private RegistAccountResponseDto toDto(RegistAccount ra) {
+        return new RegistAccountResponseDto(
+                ra.getId(),
+                ra.getAccount().getAccountNo(),
+                ra.getAccount().getBankCode(),
+                ra.getAccountType(),
+                ra.getAlias(),
+                ra.getPrimary(),
+                ra.getBalance(),
+                ra.getRegisteredAt()
+        );
     }
 }
