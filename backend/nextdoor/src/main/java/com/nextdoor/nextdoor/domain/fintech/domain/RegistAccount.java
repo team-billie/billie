@@ -5,11 +5,17 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+//@Table(name = "regist_account",
+//        uniqueConstraints = @UniqueConstraint(name = "uq_primary_account_per_user",
+//                columnNames = {"user_id"},
+//                /* partial index cannot be expressed in JPA, enforce in application */
+//                columnDefinition = "user_id WHERE is_primary = true"))
 @Table(name = "regist_account",
-        uniqueConstraints = @UniqueConstraint(name = "uq_primary_account_per_user",
-                columnNames = {"user_id"},
-                /* partial index cannot be expressed in JPA, enforce in application */
-                columnDefinition = "user_id WHERE is_primary = true"))
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_primary_account_per_user",
+                columnNames = {"user_id", "is_primary"}
+        )
+)
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class RegistAccount {
     @Id
