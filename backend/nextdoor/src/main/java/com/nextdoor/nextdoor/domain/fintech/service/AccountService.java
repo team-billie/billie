@@ -25,9 +25,14 @@ public class AccountService {
         return client.createAccount(userKey, accountTypeUniqueNo)
                 .flatMap(resp -> {
                     // 1) SSAFY 응답에서 실제 생성된 계좌번호 필드명 확인
-                    //    (명세서대로라면 "accountNo" 입니다)
-                    String acctNo   = resp.get("accountNo").toString();
-                    String bankCode = resp.get("bankCode").toString();
+                    //여기서 발생할 수 있는 unchecked 경고(경고 코드: unchecked)를 무시해 달라”는 지시문
+                    @SuppressWarnings("unchecked")
+                    Map<String,Object> rec = (Map<String,Object>) resp.get("REC");
+                    if (rec == null) {
+                        return Mono.error(new RuntimeException("SSAFY 계좌 생성 응답에 REC가 없습니다."));
+                    }
+                    String acctNo   = rec.get("accountNo").toString();
+                    String bankCode = rec.get("bankCode").toString();
 
                     // 2) FintechUser 조회 & Account 엔티티 생성·저장
                     return Mono.fromCallable(() -> {
@@ -37,8 +42,9 @@ public class AccountService {
                                 Account a = Account.builder()
                                         .accountNo(acctNo)
                                         .bankCode(bankCode)
-                                        .balance(0)                      // 최초 발급 시 0원
+                                        .balance(0)
                                         .createdAt(LocalDateTime.now())
+                                        .user(user)      // 연관관계 바인딩
                                         .build();
 
                                 // 블로킹 JPA 호출
