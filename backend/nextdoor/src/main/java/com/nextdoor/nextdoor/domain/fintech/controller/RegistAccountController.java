@@ -17,13 +17,13 @@ public class RegistAccountController {
 
     /**
      * 등록된 계좌 목록 조회
-     * GET /api/v1/fintechs/regist-accounts?userId=123
+     * GET /api/v1/fintechs/regist-accounts?userKey=123123123123
      */
     @GetMapping("/regist-accounts")
     public Mono<ResponseEntity<List<RegistAccountResponseDto>>> listRegistAccounts(
-            @RequestParam("userId") Long userId
+            @RequestParam("userKey") String userKey
     ) {
-        return service.getRegistAccounts(userId)
+        return service.getRegistAccounts(userKey)
                 .map(ResponseEntity::ok);
     }
 }

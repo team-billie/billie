@@ -19,11 +19,13 @@ public class RegistAccountService {
     /**
      * 등록된 모든 계좌를 조회해서 DTO 리스트로 반환
      */
-    public Mono<List<RegistAccountResponseDto>> getRegistAccounts(Long userId) {
-        return Mono.fromCallable(() -> registAccountRepository.findByUserId(userId)
-                        .stream()
-                        .map(this::toDto)
-                        .collect(Collectors.toList()))
+    public Mono<List<RegistAccountResponseDto>> getRegistAccounts(String userKey) {
+        return Mono.fromCallable(() ->
+                        registAccountRepository.findByUser_UserKey(userKey)
+                                .stream()
+                                .map(this::toDto)
+                                .collect(Collectors.toList())
+                )
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
