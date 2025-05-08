@@ -22,7 +22,7 @@ public class RegistAccount {
     // private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_key", nullable = false)
     private FintechUser user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
