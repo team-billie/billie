@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.RentalEndService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class RentalTestController {
      * @param daysUntilEnd Number of days until the rental ends
      * @return 200 OK if successful
      */
+    @Transactional
     @PostMapping("/reservation-confirmed")
     public ResponseEntity<Void> simulateReservationConfirmed(
             @RequestParam Long reservationId,
@@ -50,6 +52,8 @@ public class RentalTestController {
      * @param rentalId The ID of the rental
      * @return 200 OK if successful
      */
+    //TransactionalEventListener 어노테이션을 사용중이라 트랜잭션 경계 설정
+    @Transactional
     @PostMapping("/{rentalId}/remittance-completed")
     public ResponseEntity<Void> simulateRemittanceCompleted(@PathVariable Long rentalId) {
         RemittanceCompletedEvent event = RemittanceCompletedEvent.builder()
@@ -66,6 +70,7 @@ public class RentalTestController {
      * @param rentalId The ID of the rental
      * @return 200 OK if successful
      */
+    @Transactional
     @PostMapping("/{rentalId}/deposit-completed")
     public ResponseEntity<Void> simulateDepositCompleted(@PathVariable Long rentalId) {
         DepositCompletedEvent event = DepositCompletedEvent.builder()
