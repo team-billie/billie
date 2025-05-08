@@ -6,8 +6,8 @@ import Button from "@/components/pays/common/Button";
 import { AmountInput } from "@/components/pays/common/Input";
 import { FormProvider, useForm } from "react-hook-form";
 import { useBankStore } from "@/lib/store/useBankStore";
-import { WithdrawAccountRequestDto } from "@/types/pays/request/index";
-type FormValues = WithdrawAccountRequestDto;
+import { TransferAccountRequestDto } from "@/types/pays/request/index";
+type FormValues = TransferAccountRequestDto;
 
 export default function WithdrawAmount() {
     const { targetBank } = useBankStore();
@@ -15,9 +15,11 @@ export default function WithdrawAmount() {
     const withdrawForm = useForm<FormValues>({
         defaultValues: {
             userKey: "",
-            accountNo: targetBank?.bankAccountNo,
+            depositAccountNo: targetBank?.bankAccountNo,
             // transactionBalance: 0,
-            transactionSummary: "",
+            withdrawalAccountNo: "",
+            depositTransactionSummary: "",
+            withdrawalTransactionSummary: "",
         },
     });
     

@@ -11,7 +11,7 @@ export default function WithdrawPage() {
   const [isPossibleAccount, setIsPossibleAccount] = useState(false);
 
   return (
-      <div className="relative flex flex-col max-h-screen">
+      <div className="relative flex flex-col h-screen">
         <Header txt="계좌송금"/>
         { isPossibleAccount  
           ? <WithdrawAmount /> 

@@ -1,4 +1,4 @@
-// 현재 충전, 등록, 송금하려는 계좌를 관리하는 store
+// 현재 등록, 송금하려는 계좌를 관리하는 store
 
 import { create } from "zustand";
 

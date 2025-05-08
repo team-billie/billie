@@ -1,5 +1,5 @@
 import axiosInstance from "../instance";
-import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, DepositAccountRequestDto, WithdrawAccountRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto } from "@/types/pays/request/index";
+import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
 const handleApiError = (error: any, name: string) => {
@@ -36,14 +36,6 @@ export const AddAccountRequest = (requestBody: AddAccountRequestDto) =>
 //등록된 계좌 목록 조회
 export const GetAddedListRequest = (requestBody: GetAddedListRequestDto) => 
   apiCall("/fintechs/accounts/list", requestBody, "등록된 계좌 목록 조회");
-
-//계좌 입금
-export const DepositAccountRequest = (requestBody: DepositAccountRequestDto) => 
-  apiCall("/fintechs/accounts/deposit", requestBody, "계좌 입금");
-
-//계좌 출금
-export const WithdrawAccountRequest = (requestBody: WithdrawAccountRequestDto) => 
-  apiCall("/fintechs/accounts/withdraw", requestBody, "계좌 출금");
 
 //계좌 이체
 export const TransferAccountRequest = (requestBody: TransferAccountRequestDto) => 

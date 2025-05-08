@@ -7,16 +7,18 @@ import Button from "@/components/pays/common/Button";
 import { AmountInput } from "@/components/pays/common/Input";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { DepositAccountRequestDto } from "@/types/pays/request/index";
-type FormValues = DepositAccountRequestDto;
+import { TransferAccountRequestDto } from "@/types/pays/request/index";
+type FormValues = TransferAccountRequestDto;
 
 export default function RechargePage() {
     const rechargeForm = useForm<FormValues>({
         defaultValues: {
             userKey: "",
-            accountNo: "",
+            depositAccountNo: "",
             // transactionBalance: 0,
-            transactionSummary: "",
+            withdrawalAccountNo: "",
+            depositTransactionSummary: "",
+            withdrawalTransactionSummary: "",
         },
     });
 

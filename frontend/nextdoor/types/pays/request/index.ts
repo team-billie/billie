@@ -24,22 +24,6 @@ type GetAddedListRequestDto = {
     //미정
 }
 
-// 계좌 입금
-type DepositAccountRequestDto = {
-    userKey: string;
-    accountNo: string;
-    transactionBalance: number;
-    transactionSummary: string;
-}
-
-// 계좌 출금
-type WithdrawAccountRequestDto = {
-    userKey: string;
-    accountNo: string;
-    transactionBalance: number;
-    transactionSummary: string;
-}
-
 // 계좌 이체
 type TransferAccountRequestDto = {
     userKey: string;
@@ -69,8 +53,6 @@ export type { CreateFinUserRequestDto,
     GetAccountListRequestDto,   
     AddAccountRequestDto, 
     GetAddedListRequestDto, 
-    DepositAccountRequestDto, 
-    WithdrawAccountRequestDto, 
     TransferAccountRequestDto, 
     WithdrawDepositRequestDto, 
     ReturnDepositRequestDto  }; 
