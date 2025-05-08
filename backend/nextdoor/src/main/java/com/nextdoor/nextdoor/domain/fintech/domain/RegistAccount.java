@@ -5,11 +5,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-//@Table(name = "regist_account",
-//        uniqueConstraints = @UniqueConstraint(name = "uq_primary_account_per_user",
-//                columnNames = {"user_id"},
-//                /* partial index cannot be expressed in JPA, enforce in application */
-//                columnDefinition = "user_id WHERE is_primary = true"))
 @Table(name = "regist_account",
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_primary_account_per_user",
@@ -19,17 +14,16 @@ import java.time.LocalDateTime;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class RegistAccount {
     @Id
-    @Column(name = "regist_account_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "regist_account_id")
     private Long id;
+    //↳ 기존 userId 컬럼을 지우고
+    // @Column(name = "user_id", nullable = false)
+    // private Long userId;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private Long user; // 나중에 User user로 바꾸기
-
-    // userId만 칼럼으로 저장 (ManyToOne 제거)
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private FintechUser user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "account_id", nullable = false)
