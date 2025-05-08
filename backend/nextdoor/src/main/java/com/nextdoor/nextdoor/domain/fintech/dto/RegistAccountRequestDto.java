@@ -11,5 +11,6 @@ import lombok.AllArgsConstructor;
 public class RegistAccountRequestDto {
     private String userKey;      // SSAFY userKey
     private String accountNo;    // SSAFY 계좌번호
+    private String bankCode;   // 은행 코드
     private String alias;        // 사용자 지정 별칭 (optional)
 }
