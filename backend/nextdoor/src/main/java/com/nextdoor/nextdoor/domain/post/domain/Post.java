@@ -16,7 +16,7 @@ public class Post {
     @Column(name = "title", length = 255)
     private String title;
 
-    @Column(name = "content", columnDefinition = "VARCHAR")
+    @Column(length = 1000)
     private String content;
 
     @Column(name = "rental_fee")
