@@ -6,6 +6,7 @@ import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
@@ -91,6 +92,24 @@ public class RentalServiceImpl implements RentalService {
                 .renterId(command.getRenterId())
                 .amount(command.getRemittanceAmount())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public void completeRemittanceProcessing(RemittanceCompletedEvent remittanceCompletedEvent){
+        Rental rental = rentalRepository.findByRentalId(remittanceCompletedEvent.getRentalId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.processRemittanceCompletion();
+    }
+
+    @Override
+    @Transactional
+    public void completeRentalEndProcessing(Long rentalId){
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.processRentalPeriodEnd();
     }
 
     @Override
