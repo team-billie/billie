@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class CreateUserRequestDto {
     private Long userId;
+    private String ssafyApiEmail; //이걸로 ssafy api 호출할때 body에 해당하는 userId에 넣을거임
 }
