@@ -37,7 +37,7 @@ export default function PayBox({ type }: PayBoxProps) {
 
       <div className="grid grid-cols-2 gap-3 text-white">
         <Link href="/pays/recharge" className="w-full text-center bg-blue300 py-[10px] rounded-lg">충전하기</Link>
-        <Link href="/pays/transfer" className="w-full text-center bg-blue300 py-[10px] rounded-lg">송금하기</Link>
+        <Link href="/pays/withdraw" className="w-full text-center bg-blue300 py-[10px] rounded-lg">송금하기</Link>
       </div>
     </div>
   )

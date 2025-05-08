@@ -12,7 +12,7 @@ export default function AccountList({ addBtn = false }: AccountListProps) {
     return (
         <div className="flex flex-col gap-3">
             {bankList.map((bank) => (
-                <div className="flex items-center justify-between p-4 border border-gray400 rounded-lg">
+                <div key={bank.bankCode} className="flex items-center justify-between p-4 border border-gray400 rounded-lg">
                     <div className="flex items-center gap-2">
                         <img
                             src={bank.image}

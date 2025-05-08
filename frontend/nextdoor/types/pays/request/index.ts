@@ -14,6 +14,16 @@ type GetAccountListRequestDto = {
     userKey: string;
 }
 
+//계좌 등록
+type AddAccountRequestDto = {
+    accountNo: string;
+}
+
+//등록된 계좌 목록 조회
+type GetAddedListRequestDto = {
+    //미정
+}
+
 // 계좌 입금
 type DepositAccountRequestDto = {
     userKey: string;
@@ -54,4 +64,13 @@ type ReturnDepositRequestDto = {
     depositId: number;
 }
 
-export type { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, DepositAccountRequestDto, WithdrawAccountRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto  };
+export type { CreateFinUserRequestDto, 
+    CreateFinAccountRequestDto, 
+    GetAccountListRequestDto,   
+    AddAccountRequestDto, 
+    GetAddedListRequestDto, 
+    DepositAccountRequestDto, 
+    WithdrawAccountRequestDto, 
+    TransferAccountRequestDto, 
+    WithdrawDepositRequestDto, 
+    ReturnDepositRequestDto  }; 

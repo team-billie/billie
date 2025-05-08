@@ -1,45 +1,48 @@
 "use client";
 
-//충전하기 페이지
+//송금하기 컴포넌트
 import { ChevronDown } from "lucide-react"
-import Header from "@/components/pays/common/Header";
 import Button from "@/components/pays/common/Button";
 import { AmountInput } from "@/components/pays/common/Input";
 import { FormProvider, useForm } from "react-hook-form";
+import { useBankStore } from "@/lib/store/useBankStore";
+import { WithdrawAccountRequestDto } from "@/types/pays/request/index";
+type FormValues = WithdrawAccountRequestDto;
 
-import { DepositAccountRequestDto } from "@/types/pays/request/index";
-type FormValues = DepositAccountRequestDto;
+export default function WithdrawAmount() {
+    const { targetBank } = useBankStore();
 
-export default function RechargePage() {
-    const rechargeForm = useForm<FormValues>({
+    const withdrawForm = useForm<FormValues>({
         defaultValues: {
             userKey: "",
-            accountNo: "",
+            accountNo: targetBank?.bankAccountNo,
             // transactionBalance: 0,
             transactionSummary: "",
         },
     });
-
+    
     const onSubmit = (data: FormValues) => {
         console.log(data);
+        // console.log(targetBank);
     }
 
     return (
-    <div className="flex flex-col min-h-screen">
-    <Header txt="충전" />
-    <FormProvider {...rechargeForm}>
+    <FormProvider {...withdrawForm}>
         <div className="flex-1 flex flex-col items-center">
-            <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
+            <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
+                <div className="text-gray900 text-lg font-semibold">{targetBank?.bankUserName}님에게</div>
                 <div className="flex gap-2 items-center justify-center">
-                    <div className="w-5 text-center bg-yellow-300 font-extrabold text-gray900">B</div>
-                    <div className="text-gray900 font-semibold">내 <span>카카오뱅크</span> 계좌에서</div>
-                    <ChevronDown className="w-4 h-full"/>
+                    <img
+                        src={targetBank?.bankImage}
+                        alt={targetBank?.bankName}
+                        className="w-7 h-7 rounded-full border border-gray500"
+                    />
+                    <div className="text-gray700 font-semibold"><span>{targetBank?.bankName}</span> {targetBank?.bankAccountNo}</div>
                 </div>
-                <div className="text-sm">3333139177983</div>
             </div>
             
             <div className="flex flex-col items-center">
-                <AmountInput placeholderTxt="얼마를 충전할까요?"/>
+                <AmountInput placeholderTxt="얼마를 송금할까요?"/>
                 <div className="text-xs text-gray600">빌리페이 잔액 <span>0</span>원</div>
             </div>
 
@@ -50,10 +53,9 @@ export default function RechargePage() {
             </div>
 
             <div className="p-4 w-full flex-1 flex items-end">
-                <Button onClick={rechargeForm.handleSubmit(onSubmit)} txt="충전하기" state={true}/>
+                <Button onClick={withdrawForm.handleSubmit(onSubmit)} txt="송금하기" state={true}/>
             </div>
         </div>
     </FormProvider>
-    </div>
     );
 }
