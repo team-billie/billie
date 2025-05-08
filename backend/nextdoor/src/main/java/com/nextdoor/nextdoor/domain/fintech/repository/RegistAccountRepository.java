@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.fintech.repository;
 
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccountType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +17,7 @@ public interface RegistAccountRepository extends JpaRepository<RegistAccount, Lo
     @EntityGraph(attributePaths = {"account"})
     Optional<RegistAccount> findByUser_UserKeyAndAccount_AccountNo(String userKey, String accountNo);
 
+    // 주계좌 변경
+    @EntityGraph(attributePaths = {"account"})
+    List<RegistAccount> findByUser_UserKeyAndAccountType(String userKey, RegistAccountType accountType);
 }

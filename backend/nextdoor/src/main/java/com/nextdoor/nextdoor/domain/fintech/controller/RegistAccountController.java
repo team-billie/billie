@@ -55,4 +55,27 @@ public class RegistAccountController {
                     );
                 });
     }
+
+    /**
+     * 주계좌 변경
+     * PUT /api/v1/fintechs/regist-accounts/{id}/primary?userKey=123456789
+     */
+    @PutMapping("/regist-accounts/{id}/primary")
+    public Mono<ResponseEntity<Object>>  changePrimary(
+            @PathVariable("id") Long id,
+            @RequestParam("userKey") String userKey
+    ) {
+        return registAccountService.changePrimary(userKey, id)
+                // 성공 시: DTO
+                .map(dto -> ResponseEntity.ok().<Object>body(dto))
+                // 그 외 예외는 400 + 메시지 JSON
+                .onErrorResume(e -> {
+                    Map<String, String> err = Map.of("error", e.getMessage());
+                    return Mono.just(
+                            ResponseEntity
+                                    .badRequest()
+                                    .<Object>body(err)
+                    );
+                });
+    }
 }
