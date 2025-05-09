@@ -147,7 +147,8 @@ public class RentalServiceImpl implements RentalService {
             eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
-        } else if(rental.getRentalStatus().equals(RentalStatus.RENTAL_COMPLETED)){
+        } else if(rental.getRentalStatus().equals(RentalStatus. RENTAL_COMPLETED)){
+            rental.updateDealCount();
             eventPublisher.publishEvent(RentalCompletedEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
