@@ -19,7 +19,6 @@ public class RentalCreatedEventListener {
 
     @Async("asyncExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional
     public void handleRentalCreatedEvent(RentalCreatedEvent rentalCreatedEvent) {
         Reservation reservation = reservationRepository.findById(rentalCreatedEvent.getReservationId())
                 .orElseThrow(NoSuchReservationException::new);
