@@ -66,4 +66,8 @@ public class Reservation {
     public void updateStatus(ReservationStatus status) {
         this.status = status;
     }
+
+    public void updateRentalId(Long rentalId) {
+        this.rentalId = rentalId;
+    }
 }
