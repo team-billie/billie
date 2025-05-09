@@ -28,9 +28,9 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponseDto> createReservation(
             HttpServletRequest request,
+            @RequestHeader("X-User-Id") Long loginUserId,
             @RequestBody ReservationSaveRequestDto reservationSaveRequestDto
     ) {
-        Long loginUserId = 1L;
         ReservationResponseDto reservationResponseDto = reservationService.createReservation(loginUserId, reservationSaveRequestDto);
         return ResponseEntity.created(URI.create(request.getRequestURI())).body(reservationResponseDto);
     }
@@ -38,46 +38,46 @@ public class ReservationController {
     @PutMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
             HttpServletRequest request,
+            @RequestHeader("X-User-Id") Long loginUserId,
             @PathVariable Long reservationId,
             @RequestBody ReservationUpdateRequestDto reservationUpdateRequestDto
     ) {
-        Long loginUserId = 1L;
         ReservationResponseDto reservationResponseDto = reservationService.updateReservation(loginUserId, reservationId, reservationUpdateRequestDto);
         return ResponseEntity.ok(reservationResponseDto);
     }
 
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponseDto> updateReservationStatus(
+            @RequestHeader("X-User-Id") Long loginUserId,
             @PathVariable Long reservationId,
             @RequestBody ReservationStatusUpdateRequestDto reservationStatusUpdateRequestDto
     ) {
-        Long loginUserId = 1L;
         ReservationResponseDto reservationResponseDto = reservationService.updateReservationStatus(loginUserId, reservationId, reservationStatusUpdateRequestDto);
         return ResponseEntity.ok(reservationResponseDto);
     }
 
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> deleteReservation(
+            @RequestHeader("X-User-Id") Long loginUserId,
             @PathVariable Long reservationId
     ) {
-        Long loginUserId = 1L;
         reservationService.deleteReservation(loginUserId, reservationId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/sent")
     public ResponseEntity<List<ReservationResponseDto>> retrieveSentReservations(
+            @RequestHeader("X-User-Id") Long loginUserId,
             @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
     ) {
-        Long loginUserId = 1L;
         return ResponseEntity.ok(reservationQueryService.retrieveSentReservations(loginUserId, reservationRetrieveRequestDto));
     }
 
     @GetMapping("/received")
     public ResponseEntity<List<ReservationResponseDto>> retrieveReceivedReservations(
+            @RequestHeader("X-User-Id") Long loginUserId,
             @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
     ) {
-        Long loginUserId = 1L;
         return ResponseEntity.ok(reservationQueryService.retrieveReceivedReservations(loginUserId, reservationRetrieveRequestDto));
     }
 }
