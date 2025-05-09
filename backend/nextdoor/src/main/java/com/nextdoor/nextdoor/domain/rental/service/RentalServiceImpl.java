@@ -183,4 +183,13 @@ public class RentalServiceImpl implements RentalService {
         return rentalRepository.findRentalWithImagesByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여의 ai 분석 정보가 존재하지 않습니다."));
     }
+
+    @Override
+    @Transactional
+    public void updateDamageAnalysis(Long rentalId, String damageAnalysis) {
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateDamageAnalysis(damageAnalysis);
+    }
 }
