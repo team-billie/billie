@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,11 +15,24 @@ public class ReservationHandler {
 
     @ExceptionHandler({
             AlreadyConfirmedException.class,
-            NoSuchReservationException.class,
             IllegalStatusException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequestException(BaseCustomException e, HttpServletRequest request) {
         return logAndHandleException(HttpStatus.BAD_REQUEST, e, request);
+    }
+
+    @ExceptionHandler({
+            AccessDeniedException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
+        return logAndHandleException(HttpStatus.FORBIDDEN, e, "ACCESS_DENIED", request);
+    }
+
+    @ExceptionHandler({
+            NoSuchReservationException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleNotFoundException(BaseCustomException e, HttpServletRequest request) {
+        return logAndHandleException(HttpStatus.NOT_FOUND, e, request);
     }
 
     @ExceptionHandler({
@@ -40,7 +54,16 @@ public class ReservationHandler {
             BaseCustomException e,
             HttpServletRequest request
     ) {
-        return logAndHandleException(httpStatus, e, e.getErrorCode(), e.getMessage(), request);
+        return logAndHandleException(httpStatus, e, e.getErrorCode(), request);
+    }
+
+    private ResponseEntity<ErrorResponseDto> logAndHandleException(
+            HttpStatus httpStatus,
+            Exception e,
+            String errorCode,
+            HttpServletRequest request
+    ) {
+        return logAndHandleException(httpStatus, e, errorCode, e.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponseDto> logAndHandleException(
