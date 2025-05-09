@@ -5,7 +5,7 @@ import Header from "@/components/pays/common/Header";
 
 export default function PayPage() {
   return (
-    <div className=" min-h-screen">
+    <div className=" min-h-[100dvh]">
       <Header txt="billy pay" />
       <div className="flex flex-col gap-3 p-4">
         <PayBox type="pay" />

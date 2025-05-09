@@ -3,7 +3,7 @@ import PayBox from "@/components/(tabs)/profile/PayBox";
 
 export default function ProfilePage() {
     return (
-    <div className="flex flex-col min-h-screen pb-20">
+    <div className="flex flex-col min-h-[100dvh] pb-20">
       <div className="flex-1 flex flex-col bg-blue300 p-4">
         <div className="flex-1 flex flex-col pt-8 text-white font-bold text-2xl px-2">
           <span>안녕하세요</span>

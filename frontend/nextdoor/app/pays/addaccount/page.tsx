@@ -25,7 +25,7 @@ export default function AddAccountPage() {
     }
 
     return (
-        <div className="relative flex flex-col h-screen">
+        <div className="relative flex flex-col h-[100dvh]">
             <Header txt="계좌 등록" />
             <FormProvider {...addAccountForm}>
                 <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">

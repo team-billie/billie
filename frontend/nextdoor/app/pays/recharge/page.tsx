@@ -27,7 +27,7 @@ export default function RechargePage() {
     }
 
     return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-[100dvh]">
     <Header txt="충전" />
     <FormProvider {...rechargeForm}>
         <div className="flex-1 flex flex-col items-center">

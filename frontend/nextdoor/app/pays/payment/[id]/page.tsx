@@ -18,7 +18,7 @@ export default function PaymentPage() {
     }
 
     return (
-    <div className="relative flex flex-col min-h-screen">
+    <div className="relative flex flex-col min-h-[100dvh]">
         {isLoading 
         ?<Loading txt="결제가" isSuccess={isSuccess} headerTxt="빌리페이 송금"/>
         :<><Header txt="빌리페이 송금" />

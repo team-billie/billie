@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen max-w-md mx-auto bg-white">{children}</body>
+      <body className="min-h-[100dvh] max-w-md mx-auto bg-white">{children}</body>
     </html>
   );
 }
