@@ -22,10 +22,10 @@ public class ReservationHandler {
     }
 
     @ExceptionHandler({
-            AccessDeniedException.class
+            UnauthorizedException.class
     })
-    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
-        return logAndHandleException(HttpStatus.FORBIDDEN, e, "ACCESS_DENIED", request);
+    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(BaseCustomException e, HttpServletRequest request) {
+        return logAndHandleException(HttpStatus.FORBIDDEN, e, request);
     }
 
     @ExceptionHandler({
