@@ -1,40 +1,43 @@
 package com.nextdoor.nextdoor.domain.fintech.domain;
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "deposit")
+@Table(name = "rental_payment")
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
-public class Deposit {
+public class RentalPayment {
     @Id
-    @Column(name = "deposit_id")
+    @Column(name = "payment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "rental_id", nullable = false)
 //    private Rental rental;
+    // userId만 칼럼으로 저장 (ManyToOne 제거)
     @Column(name = "rental_id", nullable = false)
     private Long rentalId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "regist_account_id", nullable = false)
-    private RegistAccount registAccount;
+    @JoinColumn(name = "payer_regist_account_id", nullable = false)
+    private RegistAccount payer;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "payee_regist_account_id", nullable = false)
+    private RegistAccount payee;
 
     @Column(nullable = false)
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private DepositStatus status; // HELD, RETURNED, DEDUCTED
+    private RentalPaymentStatus status;
 
-    @Column(name = "deducted_amount")
-    private Integer deductedAmount;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "held_at", nullable = false)
-    private LocalDateTime heldAt;
-
-    @Column(name = "returned_at")
-    private LocalDateTime returnedAt;
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 }

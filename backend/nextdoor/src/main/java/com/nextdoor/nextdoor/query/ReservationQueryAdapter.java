@@ -28,12 +28,13 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                                 reservation.endDate,
                                 reservation.rentalFee,
                                 reservation.deposit,
+                                reservation.status.stringValue(),
                                 reservation.ownerId,
                                 reservation.renterId,
                                 reservation.feedId
                         ))
                         .from(reservation)
-                        .where(reservation.id.eq(rentalId))
+                        .where(reservation.rentalId.eq(rentalId))
                         .fetchOne()
         );
     }

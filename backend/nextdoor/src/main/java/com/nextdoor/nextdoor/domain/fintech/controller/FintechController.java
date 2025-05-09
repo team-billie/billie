@@ -24,7 +24,7 @@ public class FintechController {
     //계정 생성
     @PostMapping("/users")
     public Mono<ResponseEntity<Map<String,Object>>> createUser(@RequestBody CreateUserRequestDto req) {
-        return userService.createUser(req.getUserId())
+        return userService.createUser(req.getUserId(), req.getSsafyApiEmail())
                 .map(ResponseEntity::ok)
                 .doOnError(e -> log.error("계정 생성 오류", e))
                 .onErrorResume(SsafyApiException.class, ex -> {

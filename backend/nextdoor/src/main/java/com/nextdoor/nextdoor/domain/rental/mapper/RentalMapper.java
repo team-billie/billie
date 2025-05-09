@@ -49,18 +49,18 @@ public class RentalMapper {
 
     public RentalDetailResponse toResponse(SearchRentalResult result) {
         return RentalDetailResponse.builder()
-                .reservationId(result.getReservationId())
+                .reservationId(result.getId())
                 .startDate(result.getStartDate())
                 .endDate(result.getEndDate())
                 .rentalFee(result.getRentalFee())
                 .deposit(result.getDeposit())
-                .reservationStatus(result.getReservationStatus())
                 .ownerId(result.getOwnerId())
                 .renterId(result.getRenterId())
                 .rentalId(result.getRentalId())
+                .rentalProcess(result.getRentalProcess())
                 .rentalStatus(result.getRentalStatus())
                 .title(result.getTitle())
-                .productImageUrl(result.getProductImageUrl())
+                .productImageUrl(result.getProductImage())
                 .build();
     }
 

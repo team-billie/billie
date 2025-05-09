@@ -2,27 +2,30 @@ package com.nextdoor.nextdoor.domain.fintech.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "account")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-//단일 사용자가 여러 계좌를 가질 수 있도록 userKey와 1:N 매핑
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Account {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "account_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String accountNumber;
+    @Column(name = "account_no", nullable = false, length = 30)
+    private String accountNo;
+
+    @Column(name = "bank_code", nullable = false, length = 10)
     private String bankCode;
-    private String accountName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_key")
-    private FintechUser user;
+    @Column(nullable = false)
+    private Integer balance;
 
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_key", nullable = false)
+    private FintechUser user;
 }

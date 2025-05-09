@@ -17,7 +17,7 @@ export default function EnterAccount({btnTxt}: EnterAccountProps) {
     
 
     return (
-        <div>
+        <>
             <div className="w-full flex flex-col items-center gap-3">
                 <input type="text" className="w-full py-5 px-4 border border-gray400 rounded-lg text-lg font-bold focus:outline-none focus:ring-0 placeholder-gray500" placeholder="계좌번호 입력"/>
                 
@@ -44,6 +44,6 @@ export default function EnterAccount({btnTxt}: EnterAccountProps) {
                     <SelectBankModal setIsModalOpen={setIsModalOpen} setSelectedBank={setSelectedBank}/>
                 </div>
             }
-        </div>
+        </>
     );
 }

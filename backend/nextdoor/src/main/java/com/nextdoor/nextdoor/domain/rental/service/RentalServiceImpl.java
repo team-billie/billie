@@ -6,9 +6,11 @@ import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
@@ -43,6 +45,11 @@ public class RentalServiceImpl implements RentalService {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
         rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
+
+        eventPublisher.publishEvent(RentalCreatedEvent.builder()
+                .rentalId(createdRental.getRentalId())
+                .reservationId(reservationConfirmedEvent.getReservationId())
+                .build());
     }
 
     @Override
@@ -91,6 +98,24 @@ public class RentalServiceImpl implements RentalService {
                 .renterId(command.getRenterId())
                 .amount(command.getRemittanceAmount())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public void completeRemittanceProcessing(RemittanceCompletedEvent remittanceCompletedEvent){
+        Rental rental = rentalRepository.findByRentalId(remittanceCompletedEvent.getRentalId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.processRemittanceCompletion();
+    }
+
+    @Override
+    @Transactional
+    public void completeRentalEndProcessing(Long rentalId){
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.processRentalPeriodEnd();
     }
 
     @Override
