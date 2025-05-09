@@ -39,11 +39,11 @@ public class DepositService {
         return client.withdrawAccount(userKey, accountNo, amount, null)
                 .flatMap(resp ->
                         Mono.fromCallable(() -> {
-                            // fintechUser 를 userKey 로 조회
+                            // 1) 핀테크 사용자 유효성 검사, fintechUser 를 userKey 로 조회
                             FintechUser fu = fintechUserRepository.findById(userKey)
                                     .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
 
-                            // 2) RegistAccount 를 user.userKey + accountNo 로 조회
+                            // 2) 등록된 계좌(RegistAccount) 조회, RegistAccount 를 user.userKey + accountNo 로 조회
                             RegistAccount ra = registAccountRepository
                                     .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
                                     .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
