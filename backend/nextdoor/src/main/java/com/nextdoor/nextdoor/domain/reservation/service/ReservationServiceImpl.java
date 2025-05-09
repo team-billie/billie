@@ -15,6 +15,7 @@ import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationResponseDto updateReservation(Long loginUserId, Long reservationId, ReservationUpdateRequestDto reservationUpdateRequestDto) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateOwner(loginUserId, reservation);
         reservation.updateStartDate(reservationUpdateRequestDto.getStartDate());
         reservation.updateEndDate(reservationUpdateRequestDto.getEndDate());
         reservation.updateRentalFee(reservationUpdateRequestDto.getRentalFee());
@@ -62,6 +64,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalStatusException("잘못된 status입니다.");
         }
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateOwner(loginUserId, reservation);
         validateNotConfirmed(reservation);
         reservation.updateStatus(reservationStatusUpdateRequestDto.getStatus());
         applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId()));
@@ -71,8 +74,9 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void deleteReservation(Long loginUserid, Long reservationId) {
+    public void deleteReservation(Long loginUserId, Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateOwner(loginUserId, reservation);
         validateNotConfirmed(reservation);
         reservationRepository.delete(reservation);
     }
@@ -80,6 +84,12 @@ public class ReservationServiceImpl implements ReservationService {
     private void validateNotConfirmed(Reservation reservation) {
         if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
             throw new AlreadyConfirmedException("이미 확정된 예약입니다.");
+        }
+    }
+
+    private void validateOwner(Long loginUserId, Reservation reservation) {
+        if (!reservation.getOwnerId().equals(loginUserId)) {
+            throw new AccessDeniedException("권한이 없습니다.");
         }
     }
 }
