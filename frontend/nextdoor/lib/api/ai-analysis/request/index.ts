@@ -2,6 +2,7 @@ import axiosInstance from "../../instance";
 
 export const fetchAiAnalysis = async (rentalId: number) => {
   try {
+    console.log(rentalId);
     const response = await axiosInstance.post(
       "/api/v1/ai-analysis",
       { rentalId },

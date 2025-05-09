@@ -14,10 +14,10 @@ export default function SafeDealManage() {
   const { id } = useParams();
 
   const handleAnalysis = async () => {
-    if (rentalPhotos.length === 0 || returnPhotos.length === 0) {
-      alert("대여 물품 사진과 반납 물품 사진을 모두 등록해주세요.");
-      return;
-    }
+    // if (rentalPhotos.length === 0 || returnPhotos.length === 0) {
+    //   alert("대여 물품 사진과 반납 물품 사진을 모두 등록해주세요.");
+    //   return;
+    // }
 
     setLoading(true);
     try {
@@ -35,8 +35,20 @@ export default function SafeDealManage() {
     <main>
       <SafeDealNavbar />
       <div className="h-screen flex flex-col justify-center items-center">
-        <PhotoManager status="대여 물품 사진" />
-        <PhotoManager status="반납 물품 사진" />
+        <PhotoManager
+          rentalId={Number(id)}
+          status="대여 물품 사진"
+          uploadType="before"
+          onPhotoChange={setRentalPhotos}
+          photos={rentalPhotos}
+        />
+        <PhotoManager
+          rentalId={Number(id)}
+          status="반납 물품 사진"
+          uploadType="after"
+          onPhotoChange={setReturnPhotos}
+          photos={returnPhotos}
+        />
 
         <div className="px-4 w-full">
           <button

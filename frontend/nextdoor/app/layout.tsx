@@ -10,7 +10,6 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-
 export const metadata: Metadata = {
   title: {
     template: "%s | 옆집물건",

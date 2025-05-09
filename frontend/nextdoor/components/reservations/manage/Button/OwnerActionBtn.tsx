@@ -24,7 +24,9 @@ export default function OwnerActionBtn({
     // 프로세스와 상태를 함께 고려하여 레이블 결정
     switch (process) {
       case RENTAL_PROCESS.BEFORE_RENTAL:
-        if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
+        if (status === RENTAL_STATUS.CREATED) {
+          return "안심 사진 등록";
+        } else if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
           return "결제 요청";
         } else {
           return "취소됨";
@@ -56,56 +58,57 @@ export default function OwnerActionBtn({
 
   // 버튼 활성화 여부 - 프로세스와 상태를 모두 고려
   const isButtonDisabled = () => {
-    // 특정 상태에서만 버튼 활성화
-    const activeStatuses = [
-      RENTAL_STATUS.CREATED, // 안심 사진 등록을 위해
-      RENTAL_STATUS.BEFORE_PHOTO_REGISTERED, // 결제 요청을 위해
-      RENTAL_STATUS.REMITTANCE_REQUESTED, // 결제 승인을 위해
-      RENTAL_STATUS.AFTER_PHOTO_REGISTERED, // 보증금 처리를 위해
-    ];
+    switch (process) {
+      case RENTAL_PROCESS.BEFORE_RENTAL:
+        return !(
+          status === RENTAL_STATUS.CREATED ||
+          status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED
+        );
 
-    return !activeStatuses.includes(status);
+      case RENTAL_PROCESS.RENTAL_IN_ACTIVE:
+        return !(status === RENTAL_STATUS.REMITTANCE_REQUESTED);
+
+      case RENTAL_PROCESS.RETURNED:
+        return status !== RENTAL_STATUS.AFTER_PHOTO_REGISTERED;
+
+      default:
+        return true;
+    }
   };
 
-  // 액션 핸들러
   const handleClick = async () => {
     if (isButtonDisabled()) return;
 
-    try {
-      // 현재 상태에 따른 액션 실행
-      switch (status) {
-        case RENTAL_STATUS.CREATED:
-          // 안심 사진 등록 페이지로 이동
-          window.location.href = `/rentals/${rentalId}/safety-photo/owner`;
-          break;
+    if (
+      process === RENTAL_PROCESS.BEFORE_RENTAL &&
+      status === RENTAL_STATUS.CREATED
+    ) {
+      // 안심 사진 등록은 axios 요청 없이 이동만 하면 되므로, try-catch 밖에서 바로 실행
+      window.location.href = `/reservations/${rentalId}/safe-deal/manage`;
+      return;
+    }
 
-        case RENTAL_STATUS.BEFORE_PHOTO_REGISTERED:
-          // 결제 요청 상태로 변경
+    try {
+      if (process === RENTAL_PROCESS.BEFORE_RENTAL) {
+        if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.REMITTANCE_REQUESTED,
           });
-          break;
-
-        case RENTAL_STATUS.REMITTANCE_REQUESTED:
-          // 결제 확인 처리
+        }
+      } else if (process === RENTAL_PROCESS.RENTAL_IN_ACTIVE) {
+        if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.REMITTANCE_CONFIRMED,
           });
-          break;
-
-        case RENTAL_STATUS.AFTER_PHOTO_REGISTERED:
-          // 보증금 반환 요청
+        }
+      } else if (process === RENTAL_PROCESS.RETURNED) {
+        if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.DEPOSIT_REQUESTED,
           });
-          break;
-
-        default:
-          console.log("No action available for current status/process");
-          break;
+        }
       }
 
-      // 성공 콜백 호출
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("요청 처리 실패:", error);

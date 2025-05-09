@@ -25,7 +25,7 @@ export default function RenterActionBtn({
     switch (process) {
       case RENTAL_PROCESS.BEFORE_RENTAL:
         if (status === RENTAL_STATUS.CREATED) {
-          return "결제"; // Renter 버튼 - 대여 시작 등록 후 (비활성화)
+          return "사진 등록 대기 중"; // Renter 버튼 - 대여 시작 등록 후 (비활성화)
         } else if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
           return "결제"; // Renter 버튼 - 소유자가 안심 사진 등록 후
         }
@@ -80,7 +80,7 @@ export default function RenterActionBtn({
 
         case RENTAL_STATUS.RENTAL_PERIOD_ENDED:
           // 안심 사진 등록 페이지로 이동
-          window.location.href = `/rentals/${rentalId}/safety-photo/renter`;
+          window.location.href = `/reservations/${rentalId}/safe-deal/manage`;
           break;
 
         default:
