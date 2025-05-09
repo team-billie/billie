@@ -34,7 +34,7 @@ public class BeforeImageStrategy implements RentalImageStrategy {
     @Override
     public void validateImageUploadAllowed(Rental rental) {
         if(rental.getRentalStatus() != RentalStatus.CREATED) {
-            throw new InvalidRentalStatusException("이미 업로드된 이미지가 있습니다.");
+            throw new InvalidRentalStatusException("이미지 업로드가 불가능한 대여 상태입니다");
         }
     }
 }
