@@ -104,20 +104,33 @@ public class AccountService {
                                     // 1) 출금 계좌 조회
                                     Account withdrawAcct = accountRepository.findByAccountNo(withdrawalAccountNo)
                                             .orElseThrow(() -> new RuntimeException("출금 계좌 없음: " + withdrawalAccountNo));
-                                    // 2) 입금 계좌 조회
-                                    Account depositAcct  = accountRepository.findByAccountNo(depositAccountNo)
-                                            .orElseThrow(() -> new RuntimeException("입금 계좌 없음: " + depositAccountNo));
-
-                                    // 3) 잔액 업데이트
-                                    withdrawAcct.setBalance(withdrawAcct.getBalance() - (int)transactionBalance);
-                                    depositAcct .setBalance(depositAcct .getBalance()  + (int)transactionBalance);
-
-                                    // 4) DB 저장
+                                    int newWithdrawBalance = withdrawAcct.getBalance() - (int)transactionBalance;
+                                    withdrawAcct.setBalance(newWithdrawBalance);
                                     accountRepository.save(withdrawAcct);
+                                    // 2) 입금 계좌 조회
+                                    Account depositAcct = accountRepository.findByAccountNo(depositAccountNo)
+                                            .orElseThrow(() -> new RuntimeException("입금 계좌 없음: " + depositAccountNo));
+                                    int newDepositBalance = depositAcct.getBalance() + (int)transactionBalance;
+                                    depositAcct.setBalance(newDepositBalance);
                                     accountRepository.save(depositAcct);
 
-                                    // 5) 원본 SSAFY 응답 맵 리턴
+                                    // 3) regist_account balance 동기화 (출금측)
+                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(userKey, withdrawalAccountNo)
+                                            .ifPresent(ra -> {
+                                                ra.setBalance(newWithdrawBalance);
+                                                registAccountRepository.save(ra);
+                                            });
+
+                                    // 4) regist_account balance 동기화 (입금측)
+                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(userKey, depositAccountNo)
+                                            .ifPresent(ra -> {
+                                                ra.setBalance(newDepositBalance);
+                                                registAccountRepository.save(ra);
+                                            });
+
+                                    // 5) 원본 SSAFY 응답 Map 반환
                                     return resp;
+
                                 })
                                 .subscribeOn(Schedulers.boundedElastic())
                 );
