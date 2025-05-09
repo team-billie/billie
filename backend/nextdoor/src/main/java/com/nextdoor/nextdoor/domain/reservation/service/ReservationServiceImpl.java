@@ -10,9 +10,9 @@ import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedException;
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
+import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,15 +25,12 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final ReservationPostQueryService reservationPostQueryService;
-    private final ReservationMemberQueryService reservationMemberQueryService;
-
+    private final ReservationPostQueryPort reservationPostQueryPort;
     private final ReservationRepository reservationRepository;
 
     @Override
     public ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto) {
-        PostDto feed = reservationPostQueryService.findById(reservationSaveRequestDto.getFeedId());
-        MemberDto owner = reservationMemberQueryService.findById(loginUserId);
+        PostDto feed = reservationPostQueryPort.findById(reservationSaveRequestDto.getFeedId()).orElseThrow();
         Reservation reservation = reservationRepository.save(Reservation.builder()
                 .startDate(reservationSaveRequestDto.getStartDate())
                 .endDate(reservationSaveRequestDto.getEndDate())
@@ -42,9 +39,9 @@ public class ReservationServiceImpl implements ReservationService {
                 .status(ReservationStatus.PENDING)
                 .ownerId(feed.getAuthorId())
                 .renterId(loginUserId)
-                .feedId(feed.getFeedId())
+                .feedId(feed.getPostId())
                 .build());
-        return ReservationResponseDto.from(reservation, feed, owner);
+        return ReservationResponseDto.from(reservation, feed);
     }
 
     @Override
@@ -56,8 +53,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.updateDeposit(reservationUpdateRequestDto.getDeposit());
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryService.findById(reservation.getFeedId()),
-                reservationMemberQueryService.findById(reservation.getOwnerId()));
+                reservationPostQueryPort.findById(reservation.getFeedId()).orElseThrow());
     }
 
     @Override
@@ -71,8 +67,7 @@ public class ReservationServiceImpl implements ReservationService {
         applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId()));
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryService.findById(reservation.getFeedId()),
-                reservationMemberQueryService.findById(reservation.getOwnerId()));
+                reservationPostQueryPort.findById(reservation.getFeedId()).orElseThrow());
     }
 
     @Override
