@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.reservation.controller.dto.response;
 
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class ReservationResponseDto {
     private String ownerName;
     private String ownerProfileImageUrl;
 
-    public static ReservationResponseDto from(Reservation reservation, FeedDto feed, MemberDto owner) {
+    public static ReservationResponseDto from(Reservation reservation, PostDto feed, MemberDto owner) {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getId();
         response.feedTitle = feed.getTitle();

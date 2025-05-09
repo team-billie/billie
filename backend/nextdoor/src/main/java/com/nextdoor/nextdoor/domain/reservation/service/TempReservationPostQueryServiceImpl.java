@@ -1,16 +1,16 @@
 package com.nextdoor.nextdoor.domain.reservation.service;
 
-import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
-public class TempReservationFeedQueryServiceImpl implements ReservationFeedQueryService {
+public class TempReservationPostQueryServiceImpl implements ReservationPostQueryService {
 
     @Override
-    public FeedDto findById(Long feedId) {
-        return FeedDto.builder()
+    public PostDto findById(Long feedId) {
+        return PostDto.builder()
                 .feedId(feedId)
                 .title("Temp Feed")
                 .authorId(1L)

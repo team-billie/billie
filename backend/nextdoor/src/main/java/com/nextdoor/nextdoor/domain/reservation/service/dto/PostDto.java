@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Builder
 @Getter
-public class FeedDto {
+public class PostDto {
 
     private Long feedId;
     private String title;
