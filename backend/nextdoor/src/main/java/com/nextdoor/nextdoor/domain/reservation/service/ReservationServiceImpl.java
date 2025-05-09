@@ -31,18 +31,18 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto) {
-        PostDto feed = reservationPostQueryPort.findById(reservationSaveRequestDto.getFeedId()).orElseThrow();
+        PostDto post = reservationPostQueryPort.findById(reservationSaveRequestDto.getPostId()).orElseThrow();
         Reservation reservation = reservationRepository.save(Reservation.builder()
                 .startDate(reservationSaveRequestDto.getStartDate())
                 .endDate(reservationSaveRequestDto.getEndDate())
-                .rentalFee(feed.getRentalFee())
-                .deposit(feed.getDeposit())
+                .rentalFee(post.getRentalFee())
+                .deposit(post.getDeposit())
                 .status(ReservationStatus.PENDING)
-                .ownerId(feed.getAuthorId())
+                .ownerId(post.getAuthorId())
                 .renterId(loginUserId)
-                .feedId(feed.getPostId())
+                .feedId(post.getPostId())
                 .build());
-        return ReservationResponseDto.from(reservation, feed);
+        return ReservationResponseDto.from(reservation, post);
     }
 
     @Override
