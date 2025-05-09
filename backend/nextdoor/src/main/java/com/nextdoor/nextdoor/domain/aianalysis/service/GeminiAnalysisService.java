@@ -32,7 +32,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     @Override
     public InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto) {
-        RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId()).orElseThrow();
+        RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
         if (rental.getDamageAnalysis() != null) {
             throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
         }

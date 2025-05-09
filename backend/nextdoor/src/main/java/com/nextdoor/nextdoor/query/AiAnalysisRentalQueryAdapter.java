@@ -3,9 +3,9 @@ package com.nextdoor.nextdoor.query;
 import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
+import com.nextdoor.nextdoor.domain.rental.domain.QAiImage;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
-import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.Projections;
+import com.nextdoor.nextdoor.domain.rental.domain.Rental;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -17,23 +17,30 @@ public class AiAnalysisRentalQueryAdapter implements AiAnalysisRentalQueryPort {
 
     private final JPAQueryFactory jpaQueryFactory;
     private final QRental qRental = QRental.rental;
+    private final QAiImage qAiImage = QAiImage.aiImage;
 
     @Override
-    public Optional<RentalDto> findById(Long id) {
-        return Optional.ofNullable(jpaQueryFactory.select(createRentalDtoProjectionConstructor())
-                .from(qRental)
-                .where(qRental.rentalId.eq(id))
-                .fetchOne());
-    }
-
-    private ConstructorExpression<RentalDto> createRentalDtoProjectionConstructor() {
-        return Projections.constructor(
-                RentalDto.class,
-                qRental.rentalId,
-                qRental.reservationId,
-                qRental.rentalStatus.stringValue(),
-                qRental.damageAnalysis,
-                qRental.aiImages
-        );
+    public RentalDto findById(Long id) {
+        Rental rental = Optional.ofNullable(jpaQueryFactory.select(qRental)
+                        .from(qRental)
+                        .join(qAiImage)
+                        .on(qRental.rentalId.eq(qAiImage.rental.rentalId))
+                        .fetchJoin()
+                        .where(qRental.rentalId.eq(id))
+                        .fetchOne())
+                .orElseThrow();
+        return RentalDto.builder()
+                .rentalId(rental.getRentalId())
+                .reservationId(rental.getReservationId())
+                .rentalStatus(rental.getRentalStatus().name())
+                .damageAnalysis(rental.getDamageAnalysis())
+                .aiImages(rental.getAiImages().stream().map(aiImage -> RentalDto.AiImageDto.builder()
+                        .aiImageId(aiImage.getId())
+                        .type(RentalDto.AiImageDto.Type.valueOf(aiImage.getType().name()))
+                        .imageUrl(aiImage.getImageUrl())
+                        .mimeType(aiImage.getMimeType())
+                        .rentalId(rental.getRentalId())
+                        .build()).toList())
+                .build();
     }
 }
