@@ -147,7 +147,8 @@ public class RentalServiceImpl implements RentalService {
             eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
-        } else if(rental.getRentalStatus().equals(RentalStatus.RENTAL_COMPLETED)){
+        } else if(rental.getRentalStatus().equals(RentalStatus. RENTAL_COMPLETED)){
+            rental.updateDealCount();
             eventPublisher.publishEvent(RentalCompletedEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
@@ -180,8 +181,7 @@ public class RentalServiceImpl implements RentalService {
         rentalRepository.findByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        return rentalRepository.findRentalWithImagesByRentalId(rentalId)
-                .orElseThrow(() -> new NoSuchRentalException("대여의 ai 분석 정보가 존재하지 않습니다."));
+        return rentalRepository.findRentalWithImagesByRentalId(rentalId).orElse(null);
     }
 
     @Override
