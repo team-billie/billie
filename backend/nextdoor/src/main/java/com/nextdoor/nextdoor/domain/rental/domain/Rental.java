@@ -83,6 +83,10 @@ public class Rental {
         updateStatus(RentalStatus.RENTAL_PERIOD_ENDED);
     }
 
+    public void updateDamageAnalysis(String damageAnalysis) {
+        this.damageAnalysis = damageAnalysis;
+    }
+
     public void processDepositCompletion(){
         if(rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED){
             throw new InvalidRentalStatusException("보증금을 처리가 불가능한 대여 상태입니다");
