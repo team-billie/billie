@@ -10,6 +10,7 @@ import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedException;
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
+import com.nextdoor.nextdoor.domain.reservation.exception.UnauthorizedException;
 import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
@@ -89,7 +90,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private void validateOwner(Long loginUserId, Reservation reservation) {
         if (!reservation.getOwnerId().equals(loginUserId)) {
-            throw new AccessDeniedException("권한이 없습니다.");
+            throw new UnauthorizedException("권한이 없습니다.");
         }
     }
 }
