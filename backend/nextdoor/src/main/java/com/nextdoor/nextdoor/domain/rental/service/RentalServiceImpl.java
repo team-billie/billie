@@ -10,6 +10,7 @@ import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
@@ -44,6 +45,11 @@ public class RentalServiceImpl implements RentalService {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
         rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
+
+        eventPublisher.publishEvent(RentalCreatedEvent.builder()
+                .rentalId(createdRental.getRentalId())
+                .reservationId(reservationConfirmedEvent.getReservationId())
+                .build());
     }
 
     @Override
