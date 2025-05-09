@@ -34,7 +34,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                                 reservation.feedId
                         ))
                         .from(reservation)
-                        .where(reservation.id.eq(rentalId))
+                        .where(reservation.rentalId.eq(rentalId))
                         .fetchOne()
         );
     }
