@@ -76,7 +76,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void deleteReservation(Long loginUserId, Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
-        validateOwner(loginUserId, reservation);
+        validateOwnerOrRenter(loginUserId, reservation);
         validateNotConfirmed(reservation);
         reservationRepository.delete(reservation);
     }
@@ -89,6 +89,12 @@ public class ReservationServiceImpl implements ReservationService {
 
     private void validateOwner(Long loginUserId, Reservation reservation) {
         if (!reservation.getOwnerId().equals(loginUserId)) {
+            throw new UnauthorizedException("권한이 없습니다.");
+        }
+    }
+
+    private void validateOwnerOrRenter(Long loginUserId, Reservation reservation) {
+        if (!reservation.getOwnerId().equals(loginUserId) && !reservation.getRenterId().equals(loginUserId)) {
             throw new UnauthorizedException("권한이 없습니다.");
         }
     }
