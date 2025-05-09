@@ -160,10 +160,7 @@ public class FintechController {
     public Mono<ResponseEntity<Deposit>> returnDeposit(
             @RequestBody ReturnDepositRequestDto req
     ) {
-        return depositService.returnDeposit(
-                        req.getUserKey(),
-                        req.getDepositId()
-                )
+        return depositService.returnDeposit(req)
                 .map(ResponseEntity::ok)
                 .doOnError(e -> log.error("보증금 반환 오류", e))
                 .onErrorResume(SsafyApiException.class, ex ->

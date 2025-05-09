@@ -5,6 +5,7 @@ import com.nextdoor.nextdoor.domain.fintech.domain.Deposit;
 import com.nextdoor.nextdoor.domain.fintech.domain.DepositStatus;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
@@ -38,11 +39,11 @@ public class DepositService {
         return client.withdrawAccount(userKey, accountNo, amount, null)
                 .flatMap(resp ->
                         Mono.fromCallable(() -> {
-                            // fintechUser 를 userKey 로 조회
+                            // 1) 핀테크 사용자 유효성 검사, fintechUser 를 userKey 로 조회
                             FintechUser fu = fintechUserRepository.findById(userKey)
                                     .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
 
-                            // 2) RegistAccount 를 user.userKey + accountNo 로 조회
+                            // 2) 등록된 계좌(RegistAccount) 조회, RegistAccount 를 user.userKey + accountNo 로 조회
                             RegistAccount ra = registAccountRepository
                                     .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
                                     .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
@@ -61,38 +62,48 @@ public class DepositService {
     }
 
     //보증금 반환
-    public Mono<Deposit> returnDeposit(
-            String userKey,
-            Long depositId
-    ) {
+    public Mono<Deposit> returnDeposit(ReturnDepositRequestDto req) {
         return Mono.fromCallable(() ->
-                        depositRepository.findById(depositId)
+                        depositRepository.findById(req.getDepositId())
                                 .orElseThrow(() -> new RuntimeException("보증금 내역 없음"))
                 )
                 .subscribeOn(Schedulers.boundedElastic())
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(d -> {
-                    // 1) get platform userId
-                    FintechUser fu = fintechUserRepository.findById(userKey)
-                            .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
-                    Long platformUserId = fu.getUserId();
+                    // 0) 금액 계산
+                    long original = d.getAmount();
+                    long deducted = req.getDeductedAmount() == null ? 0 : req.getDeductedAmount();
+                    long renterRefund = original - deducted;
 
-                    // 2) SSAFY 입금 API 호출 (accountNo는 registAccount → Account → accountNo)
-                    return client.depositAccount(
-                                    userKey,
-                                    d.getRegistAccount().getAccount().getAccountNo(),
-                                    d.getAmount(),
-                                    null
-                            )
-                            // 3) 상태 변경 및 저장
-                            .flatMap(resp ->
-                                    Mono.fromCallable(() -> {
-                                                d.setStatus(DepositStatus.RETURNED);
-                                                d.setReturnedAt(LocalDateTime.now());
-                                                return depositRepository.save(d);
-                                            })
-                                            .subscribeOn(Schedulers.boundedElastic())
-                            );
+                    // 1) 렌터 환불
+                    Mono<Map<String,Object>> renterPay = client.depositAccount(
+                            req.getUserKey(),                          // 렌터 userKey
+                            d.getRegistAccount().getAccount().getAccountNo(),
+                            renterRefund,
+                            "보증금 반환(차감)"
+                    );
+                    // 2) 오너 차감액 지급 (deducted>0 일 때만)
+                    Mono<Map<String,Object>> ownerPay = deducted > 0
+                            ? client.depositAccount(
+                            req.getOwnerUserKey(),               // 오너 userKey
+                            req.getOwnerAccountNo(),
+                            deducted,
+                            "보증금 차감 수익"
+                    )
+                            : Mono.just(Map.of());
+
+                    // 3) 두 API 호출을 순차적으로 실행
+                    return renterPay
+                            .then(ownerPay)
+                            .flatMap(__ -> Mono.fromCallable(() -> {
+                                d.setDeductedAmount((int) deducted);
+                                d.setStatus(deducted > 0
+                                        ? DepositStatus.DEDUCTED
+                                        : DepositStatus.RETURNED
+                                );
+                                d.setReturnedAt(LocalDateTime.now());
+                                return depositRepository.save(d);
+                            }).subscribeOn(Schedulers.boundedElastic()));
                 });
     }
 }
