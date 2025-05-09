@@ -22,7 +22,7 @@ export default function ReservationManageNavbar() {
       </div>
 
       <div className="w-full flex justify-center border-b border-gray-200">
-        <nav className="flex w-3/4">
+        <nav className="flex w-4/5">
           <Link
             href="/reservations/manage"
             className={`w-1/2 text-center py-3 border-b-2 font-medium text-l transition-all duration-200
