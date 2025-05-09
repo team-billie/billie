@@ -16,7 +16,6 @@ import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
