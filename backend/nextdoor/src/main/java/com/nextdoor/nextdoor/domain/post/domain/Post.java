@@ -60,6 +60,10 @@ public class Post extends TimestampedEntity{
         this.likes.removeIf(like -> like.getMemberId().equals(memberId));
     }
 
+    public int getLikeCount() {
+        return this.likes.size();
+    }
+
     @Builder
     public Post(Long id, String title, String content, Long rentalFee, Long deposit, String address, String location, String productImage, String category, Long authorId) {
         this.id = id;
