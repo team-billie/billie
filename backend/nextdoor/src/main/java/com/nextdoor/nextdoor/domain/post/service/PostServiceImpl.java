@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.post.service;
 
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
+import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
 import lombok.RequiredArgsConstructor;
@@ -18,5 +19,11 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public Page<SearchPostResult> searchPostsByUserAddress(SearchPostCommand command) {
         return postQueryPort.searchPostsByUserAddress(command);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PostDetailResult getPostDetail(Long postId) {
+        return postQueryPort.getPostDetail(postId);
     }
 }
