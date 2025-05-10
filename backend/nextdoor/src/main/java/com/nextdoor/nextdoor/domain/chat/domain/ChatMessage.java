@@ -1,20 +1,21 @@
 package com.nextdoor.nextdoor.domain.chat.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Table;
-import java.time.Instant;
 
-@Table("chat_message")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import lombok.*;
+import org.springframework.data.cassandra.core.mapping.*;
+
+@Table("chat_messages")
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class ChatMessage {
-    @Id
+    @PrimaryKey
     private ChatMessageKey key;
+
+    @Column("sender_id")
     private Long senderId;
+
+    @Column("content")
     private String content;
-    private Instant sentAt;
+
+    @Column("is_read")
+    private Boolean read;
 }
