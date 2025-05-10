@@ -7,6 +7,6 @@ import org.springframework.data.domain.Page;
 
 public interface PostQueryPort {
 
-    Page<SearchPostResult> searchPostsByUserAddress(SearchPostCommand command);
+    Page<SearchPostResult> searchPostsByMemberAddress(SearchPostCommand command);
     PostDetailResult getPostDetail(Long postId);
 }
