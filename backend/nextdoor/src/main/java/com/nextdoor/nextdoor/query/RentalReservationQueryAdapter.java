@@ -31,7 +31,7 @@ public class RentalReservationQueryAdapter implements ReservationQueryPort {
                                 reservation.status.stringValue(),
                                 reservation.ownerId,
                                 reservation.renterId,
-                                reservation.feedId
+                                reservation.postId
                         ))
                         .from(reservation)
                         .where(reservation.rentalId.eq(rentalId))
