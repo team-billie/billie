@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemitta
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
@@ -28,12 +29,18 @@ public class RentalMapper {
                 .build();
     }
 
-    public RequestRemittanceCommand toCommand(Long rentalId, RequestRemittanceRequest request) {
-        return new RequestRemittanceCommand(
-                rentalId,
-                request.getRenterId(),
-                request.getRemittanceAmount()
-        );
+    public RequestRemittanceCommand toCommand(Long rentalId) {
+        return RequestRemittanceCommand.builder()
+                .rentalId(rentalId)
+                .build();
+    }
+
+    public RemittanceResponse toResponse(RequestRemittanceResult result) {
+        return RemittanceResponse.builder()
+                .ownerNickname(result.getOwnerNickname())
+                .rentalFee(result.getRentalFee())
+                .deposit(result.getDeposit())
+                .build();
     }
 
     public SearchRentalCommand toCommand(Long userId,
@@ -72,5 +79,3 @@ public class RentalMapper {
                 .build();
     }
 }
-
-
