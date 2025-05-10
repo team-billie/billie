@@ -65,9 +65,7 @@ public class Rental {
                 .build();
     }
 
-    public void requestRemittance(BigDecimal amount) {
-        validateRemittancePendingState();
-        validateAmount(amount);
+    public void processRemittanceRequest() {
         updateStatus(RentalStatus.REMITTANCE_REQUESTED);
     }
 
