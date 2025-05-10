@@ -47,9 +47,8 @@ public class PostMapper {
                 .deposit(result.getDeposit())
                 .address(result.getAddress())
                 .location(result.getLocation())
-                .productImage(result.getProductImage())
+                .productImage(result.getProductImages())
                 .category(result.getCategory())
-                .authorId(result.getAuthorId())
                 .nickname(result.getNickname())
                 .build();
     }
