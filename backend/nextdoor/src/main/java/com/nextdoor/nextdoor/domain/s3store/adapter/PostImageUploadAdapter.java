@@ -26,7 +26,7 @@ public class PostImageUploadAdapter implements S3ImageUploadPort {
                     .resourceType("product_image")
                     .directory("posts/" + postId)
                     .build();
-=
+
             FileUploadResponseDto uploadResponse = s3Service.uploadFile(uploadRequest);
             return uploadResponse.getFileUrl();
         } catch (Exception e) {
