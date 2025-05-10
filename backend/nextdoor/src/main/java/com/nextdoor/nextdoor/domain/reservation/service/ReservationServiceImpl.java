@@ -10,9 +10,10 @@ import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedException;
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
+import com.nextdoor.nextdoor.domain.reservation.exception.UnauthorizedException;
+import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.FeedDto;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.MemberDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,39 +26,36 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final ReservationFeedQueryService reservationFeedQueryService;
-    private final ReservationMemberQueryService reservationMemberQueryService;
-
+    private final ReservationPostQueryPort reservationPostQueryPort;
     private final ReservationRepository reservationRepository;
 
     @Override
     public ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto) {
-        FeedDto feed = reservationFeedQueryService.findById(reservationSaveRequestDto.getFeedId());
-        MemberDto owner = reservationMemberQueryService.findById(loginUserId);
+        PostDto post = reservationPostQueryPort.findById(reservationSaveRequestDto.getPostId()).orElseThrow();
         Reservation reservation = reservationRepository.save(Reservation.builder()
                 .startDate(reservationSaveRequestDto.getStartDate())
                 .endDate(reservationSaveRequestDto.getEndDate())
-                .rentalFee(feed.getRentalFee())
-                .deposit(feed.getDeposit())
+                .rentalFee(post.getRentalFee())
+                .deposit(post.getDeposit())
                 .status(ReservationStatus.PENDING)
-                .ownerId(feed.getAuthorId())
+                .ownerId(post.getAuthorId())
                 .renterId(loginUserId)
-                .feedId(feed.getFeedId())
+                .postId(post.getPostId())
                 .build());
-        return ReservationResponseDto.from(reservation, feed, owner);
+        return ReservationResponseDto.from(reservation, post);
     }
 
     @Override
     public ReservationResponseDto updateReservation(Long loginUserId, Long reservationId, ReservationUpdateRequestDto reservationUpdateRequestDto) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateOwner(loginUserId, reservation);
         reservation.updateStartDate(reservationUpdateRequestDto.getStartDate());
         reservation.updateEndDate(reservationUpdateRequestDto.getEndDate());
         reservation.updateRentalFee(reservationUpdateRequestDto.getRentalFee());
         reservation.updateDeposit(reservationUpdateRequestDto.getDeposit());
         return ReservationResponseDto.from(
                 reservation,
-                reservationFeedQueryService.findById(reservation.getFeedId()),
-                reservationMemberQueryService.findById(reservation.getOwnerId()));
+                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());
     }
 
     @Override
@@ -66,18 +64,19 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalStatusException("잘못된 status입니다.");
         }
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateOwner(loginUserId, reservation);
         validateNotConfirmed(reservation);
         reservation.updateStatus(reservationStatusUpdateRequestDto.getStatus());
         applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId()));
         return ReservationResponseDto.from(
                 reservation,
-                reservationFeedQueryService.findById(reservation.getFeedId()),
-                reservationMemberQueryService.findById(reservation.getOwnerId()));
+                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());
     }
 
     @Override
-    public void deleteReservation(Long loginUserid, Long reservationId) {
+    public void deleteReservation(Long loginUserId, Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NoSuchReservationException::new);
+        validateOwnerOrRenter(loginUserId, reservation);
         validateNotConfirmed(reservation);
         reservationRepository.delete(reservation);
     }
@@ -85,6 +84,18 @@ public class ReservationServiceImpl implements ReservationService {
     private void validateNotConfirmed(Reservation reservation) {
         if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
             throw new AlreadyConfirmedException("이미 확정된 예약입니다.");
+        }
+    }
+
+    private void validateOwner(Long loginUserId, Reservation reservation) {
+        if (!reservation.getOwnerId().equals(loginUserId)) {
+            throw new UnauthorizedException("권한이 없습니다.");
+        }
+    }
+
+    private void validateOwnerOrRenter(Long loginUserId, Reservation reservation) {
+        if (!reservation.getOwnerId().equals(loginUserId) && !reservation.getRenterId().equals(loginUserId)) {
+            throw new UnauthorizedException("권한이 없습니다.");
         }
     }
 }

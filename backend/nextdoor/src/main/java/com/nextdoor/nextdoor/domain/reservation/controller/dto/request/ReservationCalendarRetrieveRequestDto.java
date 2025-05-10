@@ -3,17 +3,15 @@ package com.nextdoor.nextdoor.domain.reservation.controller.dto.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
-import java.time.LocalDate;
-
 @Getter
-public class ReservationSaveRequestDto {
+public class ReservationCalendarRetrieveRequestDto {
 
     @NotNull
     private Long postId;
 
     @NotNull
-    private LocalDate startDate;
+    private Integer year;
 
     @NotNull
-    private LocalDate endDate;
+    private Integer month;
 }

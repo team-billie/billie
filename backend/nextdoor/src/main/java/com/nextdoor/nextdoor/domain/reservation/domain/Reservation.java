@@ -45,7 +45,7 @@ public class Reservation {
     private Long renterId;
 
     @NotNull
-    private Long feedId;
+    private Long postId;
 
     public void updateStartDate(LocalDate startDate) {
         this.startDate = startDate;

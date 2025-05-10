@@ -1,0 +1,45 @@
+package com.nextdoor.nextdoor.query;
+
+import com.nextdoor.nextdoor.common.Adapter;
+import com.nextdoor.nextdoor.domain.member.domain.QMember;
+import com.nextdoor.nextdoor.domain.post.domain.QPost;
+import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.StringExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+@RequiredArgsConstructor
+@Adapter
+public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
+
+    private final JPAQueryFactory jpaQueryFactory;
+    private final QPost qPost = QPost.post;
+    private final QMember qMember = QMember.member;
+
+    @Override
+    public Optional<PostDto> findById(Long postId) {
+        return Optional.ofNullable(
+                jpaQueryFactory.select(Projections.constructor(
+                                PostDto.class,
+                                qPost.postId,
+                                qPost.title,
+                                qPost.content,
+                                qPost.rentalFee.castToNum(BigDecimal.class),
+                                qPost.deposit.castToNum(BigDecimal.class),
+                                qPost.productImage,
+                                qPost.category,
+                                qPost.authorId,
+                                qMember.name,
+                                qMember.profileImageUrl))
+                        .from(qPost)
+                        .join(qMember).on(qPost.authorId.eq(qMember.id)).fetchJoin()
+                        .where(qPost.postId.eq(postId))
+                        .fetchOne()
+        );
+    }
+}
