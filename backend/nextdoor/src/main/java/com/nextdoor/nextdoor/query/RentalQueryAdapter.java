@@ -1,10 +1,12 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
+import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
+import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
 import com.nextdoor.nextdoor.domain.reservation.domain.QReservation;
@@ -23,6 +25,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Adapter
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
     private final QReservation reservation = QReservation.reservation;
     private final QRental rental = QRental.rental;
     private final QPost post = QPost.post;
+    private final QMember member = QMember.member;
 
     @Override
     public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
@@ -83,6 +87,24 @@ public class RentalQueryAdapter implements RentalQueryPort {
 
         return new PageImpl<>(results, pageable, total != null ? total : 0L);
     }
+
+    @Override
+    public Optional<RequestRemittanceResult> findRemittanceRequestViewData(Long rentalId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(Projections.constructor(
+                                RequestRemittanceResult.class,
+                                member.nickname.as("ownerNickname"),
+                                reservation.rentalFee,
+                                reservation.deposit
+                        ))
+                        .from(reservation)
+                        .join(member).on(reservation.ownerId.eq(member.id))
+                        .where(reservation.rentalId.eq(rentalId))
+                        .fetchOne()
+        );
+    }
+
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
         if (!pageable.getSort().isEmpty()) {
