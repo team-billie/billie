@@ -11,7 +11,6 @@ import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.ReservationQueryPort;
@@ -82,22 +81,14 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
-    public void requestRemittance(RequestRemittanceCommand command) {
+    public RequestRemittanceResult requestRemittance(RequestRemittanceCommand command) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        ReservationDto reservationDto = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+        rental.processRemittanceRequest();
+
+        return rentalQueryPort.findRemittanceRequestViewData(command.getRentalId())
                 .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
-
-        rentalDomainService.validateRentalForRemittance(rental, command.getRenterId(), reservationDto);
-
-        rental.requestRemittance(command.getRemittanceAmount());
-
-        eventPublisher.publishEvent(RequestRemittanceNotificationEvent.builder()
-                .rentalId(command.getRentalId())
-                .renterId(command.getRenterId())
-                .amount(command.getRemittanceAmount())
-                .build());
     }
 
     @Override
