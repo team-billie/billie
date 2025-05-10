@@ -1,6 +1,6 @@
 package com.nextdoor.nextdoor.config;
 
-import com.nextdoor.nextdoor.domain.member.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.nextdoor.nextdoor.domain.auth.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

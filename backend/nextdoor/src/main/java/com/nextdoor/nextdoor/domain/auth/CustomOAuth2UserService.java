@@ -1,7 +1,6 @@
-package com.nextdoor.nextdoor.domain.member.service;
+package com.nextdoor.nextdoor.domain.auth;
 
 
-import com.nextdoor.nextdoor.domain.member.ApplicationOAuth2User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

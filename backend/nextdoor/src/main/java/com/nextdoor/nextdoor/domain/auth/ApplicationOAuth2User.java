@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.member;
+package com.nextdoor.nextdoor.domain.auth;
 
 import java.util.Collection;
 import java.util.Collections;
