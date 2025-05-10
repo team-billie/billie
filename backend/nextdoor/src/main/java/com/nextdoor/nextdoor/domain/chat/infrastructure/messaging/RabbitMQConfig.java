@@ -20,12 +20,12 @@ public class RabbitMQConfig {
 
     @Bean
     public TopicExchange chatExchange() {
-        return new TopicExchange(EXCHANGE_NAME);                              // 토픽 익스체인지
+        return new TopicExchange(EXCHANGE_NAME);  // 토픽 익스체인지
     }
 
     @Bean
     public Queue chatQueue() {
-        return new Queue(QUEUE_NAME, true);                                   // 내구성 있는 큐
+        return new Queue(QUEUE_NAME, true);  // 내구성 있는 큐
     }
 
     @Bean
@@ -33,12 +33,12 @@ public class RabbitMQConfig {
         return BindingBuilder
                 .bind(chatQueue)
                 .to(chatExchange)
-                .with(ROUTING_KEY);                                          // 익스체인지 ↔ 큐 바인딩
+                .with(ROUTING_KEY);    // 익스체인지 ↔ 큐 바인딩
     }
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();                            // JSON 직렬화
+        return new Jackson2JsonMessageConverter();  // JSON 직렬화
     }
 
     @Bean
@@ -46,7 +46,7 @@ public class RabbitMQConfig {
             ConnectionFactory connectionFactory,
             Jackson2JsonMessageConverter messageConverter) {
         RabbitTemplate tpl = new RabbitTemplate(connectionFactory);
-        tpl.setMessageConverter(messageConverter);                            // 메시지 컨버터 적용
+        tpl.setMessageConverter(messageConverter);   // 메시지 컨버터 적용
         return tpl;
     }
 
@@ -57,7 +57,7 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory =
                 new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(messageConverter);                       // 리스너에도 JSON 컨버터 적용
+        factory.setMessageConverter(messageConverter);  // 리스너에도 JSON 컨버터 적용
         return factory;
     }
 }
