@@ -40,7 +40,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .status(ReservationStatus.PENDING)
                 .ownerId(post.getAuthorId())
                 .renterId(loginUserId)
-                .feedId(post.getPostId())
+                .postId(post.getPostId())
                 .build());
         return ReservationResponseDto.from(reservation, post);
     }
@@ -55,7 +55,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.updateDeposit(reservationUpdateRequestDto.getDeposit());
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryPort.findById(reservation.getFeedId()).orElseThrow());
+                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ReservationServiceImpl implements ReservationService {
         applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId()));
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryPort.findById(reservation.getFeedId()).orElseThrow());
+                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());
     }
 
     @Override
