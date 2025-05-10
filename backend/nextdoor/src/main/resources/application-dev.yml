@@ -33,6 +33,10 @@ spring:
     keyspace-name: nextdoor_chat
     local-datacenter: datacenter1
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+
 server:
   port: 8081
 
