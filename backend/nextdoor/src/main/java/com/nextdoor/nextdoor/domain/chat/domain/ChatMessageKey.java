@@ -1,21 +1,22 @@
 package com.nextdoor.nextdoor.domain.chat.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import java.io.Serializable;
 import java.time.Instant;
-
-import static org.springframework.data.cassandra.core.cql.PrimaryKeyType.PARTITIONED;
-//import static org.springframework.data.cassandra.core.mapping.PrimaryKeyType.PARTITIONED;
+import java.util.UUID;
+import lombok.*;
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.*;
 
 @PrimaryKeyClass
 @Data @NoArgsConstructor @AllArgsConstructor
-public class ChatMessageKey {
-    @PrimaryKeyColumn(name = "conversation_id", ordinal = 0, type = PARTITIONED)
+public class ChatMessageKey implements Serializable {
+    @PrimaryKeyColumn(name = "conversation_id", type = PrimaryKeyType.PARTITIONED)
     private String conversationId;
 
-    @PrimaryKeyColumn(name = "sent_at", ordinal = 1)
+    @PrimaryKeyColumn(name = "sent_at", type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Instant sentAt;
+
+    @PrimaryKeyColumn(name = "message_id", type = PrimaryKeyType.CLUSTERED)
+    private UUID messageId;
 }
