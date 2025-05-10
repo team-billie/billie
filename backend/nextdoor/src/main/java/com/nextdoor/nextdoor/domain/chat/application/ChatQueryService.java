@@ -32,7 +32,7 @@ public class ChatQueryService {
         // 2) 각 방마다 마지막 메시지 꺼내서 DTO 생성
         return convs.stream()
                 .map(conv -> {
-                    String cid = conv.getId();
+                    String cid = conv.getConversationId();
                     ChatMessage last = messageRepo
                             .findFirstByKeyConversationIdOrderByKeySentAtDesc(cid);
 
