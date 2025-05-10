@@ -5,6 +5,7 @@ import com.nextdoor.nextdoor.domain.fintech.domain.Deposit;
 import com.nextdoor.nextdoor.domain.fintech.domain.DepositStatus;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.dto.DepositResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -62,48 +64,71 @@ public class DepositService {
     }
 
     //보증금 반환
-    public Mono<Deposit> returnDeposit(ReturnDepositRequestDto req) {
-        return Mono.fromCallable(() ->
-                        depositRepository.findById(req.getDepositId())
-                                .orElseThrow(() -> new RuntimeException("보증금 내역 없음"))
-                )
+    public Mono<DepositResponseDto> returnDeposit(ReturnDepositRequestDto req) {
+        return Mono.fromCallable(() -> {
+                    Deposit d = depositRepository
+                            .findWithAccount(req.getDepositId())      // @Query JOIN FETCH 적용된 메서드
+                            .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
+
+                    // 세션이 열려 있을 때, 연관 필드에서 직접 꺼내 두기
+                    String accountNo = d.getRegistAccount().getAccount().getAccountNo();
+                    String bankCode  = d.getRegistAccount().getAccount().getBankCode();
+
+                    // Tuple.of(d, accountNo, bankCode) 형태로 리턴
+                    return Tuples.of(d, accountNo, bankCode);
+                })
                 .subscribeOn(Schedulers.boundedElastic())
                 .publishOn(Schedulers.boundedElastic())
-                .flatMap(d -> {
-                    // 0) 금액 계산
-                    long original = d.getAmount();
-                    long deducted = req.getDeductedAmount() == null ? 0 : req.getDeductedAmount();
+                // 2) 꺼내 둔 accountNo, bankCode 만 사용해서 API 호출
+                .flatMap(tp -> {
+                    Deposit d         = tp.getT1();
+                    String accountNo  = tp.getT2();
+                    String bankCode   = tp.getT3();
+
+                    long original     = d.getAmount();
+                    long deducted     = req.getDeductedAmount() == null ? 0 : req.getDeductedAmount();
                     long renterRefund = original - deducted;
 
-                    // 1) 렌터 환불
                     Mono<Map<String,Object>> renterPay = client.depositAccount(
-                            req.getUserKey(),                          // 렌터 userKey
-                            d.getRegistAccount().getAccount().getAccountNo(),
+                            req.getUserKey(),
+                            accountNo,
                             renterRefund,
                             "보증금 반환(차감)"
                     );
-                    // 2) 오너 차감액 지급 (deducted>0 일 때만)
                     Mono<Map<String,Object>> ownerPay = deducted > 0
                             ? client.depositAccount(
-                            req.getOwnerUserKey(),               // 오너 userKey
+                            req.getOwnerUserKey(),
                             req.getOwnerAccountNo(),
                             deducted,
                             "보증금 차감 수익"
                     )
                             : Mono.just(Map.of());
 
-                    // 3) 두 API 호출을 순차적으로 실행
+                    // 3) API 순차 실행 → 엔티티 업데이트 & 저장 → DTO 생성
                     return renterPay
                             .then(ownerPay)
                             .flatMap(__ -> Mono.fromCallable(() -> {
-                                d.setDeductedAmount((int) deducted);
-                                d.setStatus(deducted > 0
-                                        ? DepositStatus.DEDUCTED
-                                        : DepositStatus.RETURNED
-                                );
-                                d.setReturnedAt(LocalDateTime.now());
-                                return depositRepository.save(d);
-                            }).subscribeOn(Schedulers.boundedElastic()));
+                                        d.setDeductedAmount((int) deducted);
+                                        d.setStatus(deducted > 0
+                                                ? DepositStatus.DEDUCTED
+                                                : DepositStatus.RETURNED);
+                                        d.setReturnedAt(LocalDateTime.now());
+                                        depositRepository.save(d);
+
+                                        // 프록시 대신 미리 꺼내 둔 accountNo, bankCode 사용
+                                        return DepositResponseDto.builder()
+                                                .id(d.getId())
+                                                .rentalId(d.getRentalId())
+                                                .amount(d.getAmount())
+                                                .status(d.getStatus())
+                                                .deductedAmount(d.getDeductedAmount())
+                                                .heldAt(d.getHeldAt())
+                                                .returnedAt(d.getReturnedAt())
+                                                .accountNo(accountNo)
+                                                .bankCode(bankCode)
+                                                .build();
+                                    })
+                                    .subscribeOn(Schedulers.boundedElastic()));
                 });
     }
 }

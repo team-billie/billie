@@ -1,4 +1,5 @@
 package com.nextdoor.nextdoor.domain.fintech.domain;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -6,6 +7,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "deposit")
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Deposit {
     @Id
     @Column(name = "deposit_id")
