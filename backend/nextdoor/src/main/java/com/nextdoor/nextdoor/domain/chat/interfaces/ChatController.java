@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.chat.interfaces.rest;
+package com.nextdoor.nextdoor.domain.chat.interfaces;
 
 import java.util.List;
 
