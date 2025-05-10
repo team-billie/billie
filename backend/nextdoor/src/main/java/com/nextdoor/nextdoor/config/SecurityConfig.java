@@ -1,6 +1,8 @@
 package com.nextdoor.nextdoor.config;
 
 import com.nextdoor.nextdoor.domain.auth.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.nextdoor.nextdoor.domain.auth.filter.JwtAuthenticationFilter;
+import com.nextdoor.nextdoor.domain.auth.filter.RedirectUrlCookieFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.filter.CorsFilter;
 
 @RequiredArgsConstructor
 @Configuration
@@ -18,6 +22,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RedirectUrlCookieFilter redirectUrlCookieFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -34,8 +41,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(httpRequest -> httpRequest
                         .requestMatchers(
-                                "/api/v1/auth",
-                                "/api/v1/oauth"
+                                "/api/v1/auth"
                         ).permitAll()
                         // TODO OAuth2 구현 후 아래 줄 수정
                         .anyRequest().permitAll())
@@ -46,6 +52,8 @@ public class SecurityConfig {
                                 .baseUri("/api/v1/auth/authorize")
                                 .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository)))
                 .oauth2Client(Customizer.withDefaults())
+                .addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
+                .addFilterBefore(redirectUrlCookieFilter, OAuth2AuthorizationRequestRedirectFilter.class)
                 .build();
     }
 }
