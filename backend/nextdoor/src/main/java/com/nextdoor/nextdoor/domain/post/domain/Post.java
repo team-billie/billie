@@ -43,7 +43,7 @@ public class Post extends TimestampedEntity{
     @Column(name = "author_id")
     private Long authorId;
 
-    @OneToMany(mappedBy = "feed", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes = new HashSet<>();
 
     public void addLike(Long memberId) {
