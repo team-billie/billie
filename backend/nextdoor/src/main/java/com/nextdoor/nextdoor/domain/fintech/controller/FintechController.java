@@ -157,7 +157,7 @@ public class FintechController {
 
     //보증금 반환
     @PostMapping("/deposits/return")
-    public Mono<ResponseEntity<Deposit>> returnDeposit(
+    public Mono<ResponseEntity<DepositResponseDto>> returnDeposit(
             @RequestBody ReturnDepositRequestDto req
     ) {
         return depositService.returnDeposit(req)
