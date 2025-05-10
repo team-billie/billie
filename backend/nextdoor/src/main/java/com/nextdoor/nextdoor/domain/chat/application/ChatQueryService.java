@@ -22,10 +22,10 @@ public class ChatQueryService {
     private final ConversationRepository   conversationRepo;
 
     /**
-     * 1:1 채팅방 목록 조회
+     * 1:1 채팅방 목록 조회 (마지막 메시지 + 안 읽은 개수)
      */
     public List<ChatRoomDto> getChatRooms(Long memberId) {
-        // 1) 자신이 참여한 Conversation 리스트
+        // 1) 자신이 참여한 Conversation 리스트(채팅방 목록) 조회
         List<Conversation> convs = conversationRepo
                 .findByParticipantIdsContains(memberId);
 
@@ -33,14 +33,21 @@ public class ChatQueryService {
         return convs.stream()
                 .map(conv -> {
                     String cid = conv.getConversationId();
+
+                    // 3) 마지막 메시지 조회
                     ChatMessage last = messageRepo
                             .findFirstByKeyConversationIdOrderByKeySentAtDesc(cid);
+
+                    // 4) 안 읽은 메시지 개수 조회
+                    long unreadCount = messageRepo
+                            .countByKeyConversationIdAndSenderIdNotAndReadFalse(
+                                    cid, memberId);
 
                     return ChatRoomDto.builder()
                             .conversationId(cid)
                             .lastMessage(last != null ? last.getContent() : "")
                             .lastSentAt (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
-                            .unreadCount(0L)  // TODO: 안 읽은 개수 로직 추가
+                            .unreadCount(unreadCount)
                             .build();
                 })
                 .collect(Collectors.toList());
