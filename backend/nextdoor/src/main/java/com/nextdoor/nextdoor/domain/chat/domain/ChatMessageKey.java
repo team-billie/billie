@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Table;
 import java.time.Instant;
 
 import static org.springframework.data.cassandra.core.cql.PrimaryKeyType.PARTITIONED;
