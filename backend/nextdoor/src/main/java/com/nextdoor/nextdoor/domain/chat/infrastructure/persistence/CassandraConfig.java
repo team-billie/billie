@@ -14,6 +14,6 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Override
     public String[] getEntityBasePackages() {
-        return new String[]{"com.nextdoor.nextdoor.chat.domain"};
+        return new String[]{"com.nextdoor.nextdoor.domain.chat.domain"};
     }
 }
