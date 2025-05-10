@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
-public class S3ImageUploadAdapter implements S3ImageUploadPort {
+public class RentalImageUploadAdapter implements S3ImageUploadPort {
 
     private final S3Service s3Service;
 
