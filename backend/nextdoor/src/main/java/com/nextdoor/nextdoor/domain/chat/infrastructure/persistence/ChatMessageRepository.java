@@ -12,5 +12,8 @@ public interface ChatMessageRepository extends CassandraRepository<ChatMessage, 
     // 특정 대화방 메시지 페이징 조회
     List<ChatMessage> findByKeyConversationId(String conversationId);
 
+    // 마지막 메시지 한 건만 꺼내올 쿼리 메서드
+    ChatMessage findFirstByKeyConversationIdOrderByKeySentAtDesc(String conversationId);
+
     // (필요시) 안 읽은 메시지 개수 조회 등 추가 메서드 선언
 }
