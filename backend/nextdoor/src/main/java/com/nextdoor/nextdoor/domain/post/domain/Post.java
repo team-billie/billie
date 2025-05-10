@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.post.domain;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -34,17 +35,29 @@ public class Post extends TimestampedEntity{
     @Column(name = "location", columnDefinition = "POINT")
     private String location;
 
-    @Column(name = "product_image", length = 255)
-    private String productImage;
+    @Column(name = "product_image")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImages;
 
-    @Column(name = "category", length = 255)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     @Column(name = "author_id")
     private Long authorId;
 
     @OneToMany(mappedBy = "feed", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes = new HashSet<>();
+
+    public void addProductImage(String imageUrl){
+        ProductImage productImage = ProductImage.builder()
+                .imageUrl(imageUrl)
+                .post(this)
+                .build();
+
+        if(productImage.getPost() != this){
+            this.productImages.add(productImage);
+        }
+    }
 
     public void addLike(Long memberId) {
         boolean alreadyLiked = this.likes.stream()
@@ -65,7 +78,7 @@ public class Post extends TimestampedEntity{
     }
 
     @Builder
-    public Post(Long id, String title, String content, Long rentalFee, Long deposit, String address, String location, String productImage, String category, Long authorId) {
+    public Post(Long id, String title, String content, Long rentalFee, Long deposit, String address, String location, List<ProductImage> productImages, Category category, Long authorId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -73,7 +86,7 @@ public class Post extends TimestampedEntity{
         this.deposit = deposit;
         this.address = address;
         this.location = location;
-        this.productImage = productImage;
+        this.productImages = productImages;
         this.category = category;
         this.authorId = authorId;
     }
