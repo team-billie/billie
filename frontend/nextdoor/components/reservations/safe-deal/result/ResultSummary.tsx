@@ -7,6 +7,8 @@ import axiosInstance from "@/lib/api/instance";
 import blueStar2 from "@/public/images/blueStar2.png";
 import Image from "next/image";
 import { cleanAnalysisText } from "@/lib/utils/analysis";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
+
 interface ApiResponse {
   beforeImages: string[];
   afterImages: string[];
@@ -15,6 +17,9 @@ interface ApiResponse {
 
 export default function ResultSummary() {
   const { id } = useParams();
+  const { userId } = useTestUserStore();
+  console.log("ResultSummary userId:", userId);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ApiResponse | null>(null);
@@ -46,6 +51,11 @@ export default function ResultSummary() {
 
     fetchData();
   }, [id]);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
 
   // 로딩 중일 때 표시할 컴포넌트
   if (loading) {

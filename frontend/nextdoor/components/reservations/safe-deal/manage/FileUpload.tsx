@@ -1,3 +1,5 @@
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
+
 interface FileUploadProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   multiple?: boolean;
@@ -13,6 +15,14 @@ export default function FileUpload({
   accept = "image/*",
   maxFiles = 10,
 }: FileUploadProps) {
+  const { userId } = useTestUserStore();
+  console.log("FileUpload userId:", userId);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
+
   return (
     <div className="mt-2">
       <label

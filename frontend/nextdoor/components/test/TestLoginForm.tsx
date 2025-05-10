@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import { useUserStore } from '@/lib/store/useUserStore'
-import { useState } from 'react'
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import { useState } from "react";
 
 export default function TestLoginForm() {
-  const [inputId, setInputId] = useState('')
-  const { setUserId, userId, logout } = useUserStore()
+  const [inputId, setInputId] = useState("");
+  const { setUserId, userId, logout } = useTestUserStore();
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const id = parseInt(inputId)
+    e.preventDefault();
+    const id = parseInt(inputId);
     if (!isNaN(id)) {
-      setUserId(id)
+      setUserId(id);
     }
-  }
+  };
 
   if (userId) {
     return (
@@ -26,7 +26,7 @@ export default function TestLoginForm() {
           로그아웃
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -52,5 +52,5 @@ export default function TestLoginForm() {
         로그인
       </button>
     </form>
-  )
-} 
+  );
+}

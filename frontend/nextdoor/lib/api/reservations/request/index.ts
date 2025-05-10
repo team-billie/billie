@@ -15,10 +15,11 @@ export const createReservation = async (data: ReservationRequestDTO) => {
   }
 };
 
-export const fetchOwnerReservations = async () => {
+export const fetchOwnerReservations = async (userId: number) => {
   try {
     const response = await axiosInstance.get("/api/v1/reservations/received", {
       params: {
+        userId,
         status: "PENDING",
         cursorId: "",
         pageSize: 10,
@@ -31,10 +32,11 @@ export const fetchOwnerReservations = async () => {
   }
 };
 
-export const fetchRenterReservations = async () => {
+export const fetchRenterReservations = async (userId: number) => {
   try {
     const response = await axiosInstance.get("/api/v1/reservations/sent", {
       params: {
+        userId,
         status: "PENDING",
         cursorId: "",
         pageSize: 10,

@@ -5,6 +5,7 @@ import {
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface RenterActionBtnProps {
   status: RentalStatus;
@@ -19,6 +20,14 @@ export default function RenterActionBtn({
   process,
   onSuccess,
 }: RenterActionBtnProps) {
+  const { userId } = useTestUserStore();
+  console.log("RenterActionBtn userId:", userId);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
+
   // 대여자 입장의 레이블 - 프로세스와 상태를 모두 고려
   const getLabel = () => {
     // 프로세스와 상태를 함께 고려하여 레이블 결정
@@ -64,24 +73,28 @@ export default function RenterActionBtn({
   const handleClick = async () => {
     if (isButtonDisabled()) return;
 
-    // 👉 안심 사진 등록: 이동만 하는 케이스는 try-catch 밖에서 실행
-    if (
-      process === RENTAL_PROCESS.RETURNED &&
-      status === RENTAL_STATUS.RENTAL_PERIOD_ENDED
-    ) {
-      window.location.href = `/reservations/${rentalId}/safe-deal/manage`;
-      return;
-    }
-
     try {
-      if (
-        process === RENTAL_PROCESS.BEFORE_RENTAL &&
-        status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED
-      ) {
-        // 결제 요청
-        await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-          status: RENTAL_STATUS.REMITTANCE_REQUESTED,
-        });
+      if (process === RENTAL_PROCESS.BEFORE_RENTAL) {
+        if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
+          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
+            status: RENTAL_STATUS.REMITTANCE_CONFIRMED,
+            userId: userId,
+          });
+        }
+      } else if (process === RENTAL_PROCESS.RENTAL_IN_ACTIVE) {
+        if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
+          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
+            status: RENTAL_STATUS.AFTER_PHOTO_REGISTERED,
+            userId: userId,
+          });
+        }
+      } else if (process === RENTAL_PROCESS.RETURNED) {
+        if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
+          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
+            status: RENTAL_STATUS.RENTAL_COMPLETED,
+            userId: userId,
+          });
+        }
       }
 
       if (onSuccess) onSuccess();

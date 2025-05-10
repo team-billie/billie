@@ -6,6 +6,7 @@ import RentalCard from "@/components/reservations/RentalCard/RentalCard";
 import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/ReservationStatusTabs";
 import { fetchRentals } from "@/lib/api/rental/request";
 import { RentalProcess, RentalStatus } from "@/types/rental";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 // 화면에서 사용할 예약 항목 타입
 interface ReservationItem {
@@ -25,18 +26,18 @@ export default function ReservationPage() {
   const [reservations, setReservations] = useState<ReservationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const userId = 1;
+  const { userId: testUserId } = useTestUserStore();
   const userRole: "OWNER" | "RENTER" = "RENTER";
   const condition = "ALL";
 
+  console.log("testUserId", testUserId);
   useEffect(() => {
     const fetchReservationData = async () => {
       try {
         setLoading(true);
 
         const data: ReservationResponse[] = await fetchRentals({
-          userId,
+          userId: testUserId || 1,
           userRole,
           condition,
           page: 0,
@@ -74,7 +75,7 @@ export default function ReservationPage() {
     };
 
     fetchReservationData();
-  }, []);
+  }, [testUserId]);
 
   const handleActionSuccess = (rentalId: number) => {
     console.log(`예약 ID ${rentalId}의 상태가 변경되었습니다.`);

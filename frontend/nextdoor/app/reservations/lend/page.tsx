@@ -7,6 +7,7 @@ import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/
 import { fetchRentals } from "@/lib/api/rental/request";
 import { RENTAL_STATUS, RentalProcess, RentalStatus } from "@/types/rental";
 import { useEffect, useState } from "react";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 // import PhotoNotFound from "@/components/reservations/safe-deal/PhotoNotFound";
 
@@ -27,13 +28,16 @@ export default function ReservationLendPage() {
   const [reservations, setReservations] = useState<ReservationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { userId } = useTestUserStore();
+  console.log("ReservationLendPage userId:", userId);
 
-  const userId = 2;
   const userRole: "OWNER" | "RENTER" = "OWNER";
   const condition = "ALL";
 
   useEffect(() => {
     const fetchReservationData = async () => {
+      if (!userId) return;
+
       try {
         setLoading(true);
 
@@ -76,10 +80,15 @@ export default function ReservationLendPage() {
     };
 
     fetchReservationData();
-  }, []);
+  }, [userId]);
 
   function handleActionSuccess(id: number): void {
     throw new Error("Function not implemented.");
+  }
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
   }
 
   // 로딩 상태 처리

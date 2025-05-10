@@ -5,6 +5,7 @@ import LendManageCard from "@/components/reservations/RentalCard/LendManageCard"
 import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
 import { fetchOwnerReservations } from "@/lib/api/reservations/request";
 import { useEffect, useState } from "react";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
@@ -18,10 +19,14 @@ interface ReservationItem {
 
 export default function ReservationManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
+  const { userId } = useTestUserStore();
+  console.log("ReservationManagePage userId:", userId);
 
   const loadReservations = async () => {
+    if (!userId) return;
+
     try {
-      const data = await fetchOwnerReservations();
+      const data = await fetchOwnerReservations(userId);
       console.log(data);
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
@@ -49,7 +54,12 @@ export default function ReservationManagePage() {
 
   useEffect(() => {
     loadReservations();
-  }, []);
+  }, [userId]);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
 
   return (
     <main>

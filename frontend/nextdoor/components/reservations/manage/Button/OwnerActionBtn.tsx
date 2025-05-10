@@ -5,6 +5,7 @@ import {
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
@@ -19,6 +20,14 @@ export default function OwnerActionBtn({
   process,
   onSuccess,
 }: OwnerActionBtnProps) {
+  const { userId } = useTestUserStore();
+  console.log("OwnerActionBtn userId:", userId);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
+
   // 소유자 입장의 레이블 - 프로세스와 상태를 모두 고려
   const getLabel = () => {
     // 프로세스와 상태를 함께 고려하여 레이블 결정
@@ -93,18 +102,21 @@ export default function OwnerActionBtn({
         if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.REMITTANCE_REQUESTED,
+            userId: userId,
           });
         }
       } else if (process === RENTAL_PROCESS.RENTAL_IN_ACTIVE) {
         if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.REMITTANCE_CONFIRMED,
+            userId: userId,
           });
         }
       } else if (process === RENTAL_PROCESS.RETURNED) {
         if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.DEPOSIT_REQUESTED,
+            userId: userId,
           });
         }
       }
