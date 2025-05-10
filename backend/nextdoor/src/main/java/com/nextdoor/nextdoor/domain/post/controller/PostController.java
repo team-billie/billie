@@ -1,8 +1,10 @@
 package com.nextdoor.nextdoor.domain.post.controller;
 
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostDetailResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostListResponse;
 import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.service.PostService;
+import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -35,5 +34,13 @@ public class PostController {
         Page<PostListResponse> responsePage = results.map(postMapper::toResponse);
 
         return ResponseEntity.ok(responsePage);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> getPostDetail(@PathVariable Long postId) {
+        PostDetailResult result = postService.getPostDetail(postId);
+        PostDetailResponse response = postMapper.toDetailResponse(result);
+
+        return ResponseEntity.ok(response);
     }
 }
