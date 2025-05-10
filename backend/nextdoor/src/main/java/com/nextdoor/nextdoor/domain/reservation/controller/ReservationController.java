@@ -1,9 +1,7 @@
 package com.nextdoor.nextdoor.domain.reservation.controller;
 
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationRetrieveRequestDto;
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationSaveRequestDto;
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationStatusUpdateRequestDto;
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationUpdateRequestDto;
+import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.*;
+import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationCalendarResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
 import com.nextdoor.nextdoor.domain.reservation.service.ReservationQueryService;
 import com.nextdoor.nextdoor.domain.reservation.service.ReservationService;
@@ -79,5 +77,13 @@ public class ReservationController {
             @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
     ) {
         return ResponseEntity.ok(reservationQueryService.retrieveReceivedReservations(loginUserId, reservationRetrieveRequestDto));
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<ReservationCalendarResponseDto> retrieveReservationCalendar(
+            @RequestHeader("X-User-Id") Long loginUserId,
+            @ModelAttribute ReservationCalendarRetrieveRequestDto reservationCalendarRetrieveRequestDto
+    ) {
+        return ResponseEntity.ok(reservationQueryService.retrieveReservationCalendar(loginUserId, reservationCalendarRetrieveRequestDto));
     }
 }
