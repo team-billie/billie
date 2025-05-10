@@ -3,8 +3,10 @@ package com.nextdoor.nextdoor.domain.fintech.service;
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
+import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
 import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
+import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -19,6 +21,7 @@ public class AccountService {
     private final SsafyApiClient client;
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
+    private final RegistAccountRepository registAccountRepository;
 
     //계좌 생성
     public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
@@ -71,9 +74,21 @@ public class AccountService {
                                     Account acct = accountRepository.findByAccountNo(accountNo)
                                             .orElseThrow(() -> new RuntimeException("계좌 없음: " + accountNo));
                                     // 3) balance 업데이트
-                                    acct.setBalance(acct.getBalance() + (int) transactionBalance);
+                                    int updatedBalance = acct.getBalance() + (int) transactionBalance;
+                                    acct.setBalance(updatedBalance);
                                     // 4) 저장
-                                    return accountRepository.save(acct);
+                                    accountRepository.save(acct);
+
+                                    // 5) regist_account 테이블에서도 동일하게 balance 갱신
+                                    RegistAccount ra = registAccountRepository
+                                            .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
+                                            .orElseThrow(() -> new RuntimeException("등록 계좌 없음: " + accountNo));
+                                    ra.setBalance(updatedBalance);
+                                    registAccountRepository.save(ra);
+
+                                    // 6) 원본 SSAFY 응답 Map 그대로 리턴
+                                    return resp;
+
                                 })
                                 .subscribeOn(Schedulers.boundedElastic())   // JPA 블로킹 호출은 별도 스케줄러에서
                                 // 5) 저장이 끝나면 원본 SSAFY resp Map을 그대로 흘려보냄
@@ -89,20 +104,33 @@ public class AccountService {
                                     // 1) 출금 계좌 조회
                                     Account withdrawAcct = accountRepository.findByAccountNo(withdrawalAccountNo)
                                             .orElseThrow(() -> new RuntimeException("출금 계좌 없음: " + withdrawalAccountNo));
-                                    // 2) 입금 계좌 조회
-                                    Account depositAcct  = accountRepository.findByAccountNo(depositAccountNo)
-                                            .orElseThrow(() -> new RuntimeException("입금 계좌 없음: " + depositAccountNo));
-
-                                    // 3) 잔액 업데이트
-                                    withdrawAcct.setBalance(withdrawAcct.getBalance() - (int)transactionBalance);
-                                    depositAcct .setBalance(depositAcct .getBalance()  + (int)transactionBalance);
-
-                                    // 4) DB 저장
+                                    int newWithdrawBalance = withdrawAcct.getBalance() - (int)transactionBalance;
+                                    withdrawAcct.setBalance(newWithdrawBalance);
                                     accountRepository.save(withdrawAcct);
+                                    // 2) 입금 계좌 조회
+                                    Account depositAcct = accountRepository.findByAccountNo(depositAccountNo)
+                                            .orElseThrow(() -> new RuntimeException("입금 계좌 없음: " + depositAccountNo));
+                                    int newDepositBalance = depositAcct.getBalance() + (int)transactionBalance;
+                                    depositAcct.setBalance(newDepositBalance);
                                     accountRepository.save(depositAcct);
 
-                                    // 5) 원본 SSAFY 응답 맵 리턴
+                                    // 3) regist_account balance 동기화 (출금측)
+                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(userKey, withdrawalAccountNo)
+                                            .ifPresent(ra -> {
+                                                ra.setBalance(newWithdrawBalance);
+                                                registAccountRepository.save(ra);
+                                            });
+
+                                    // 4) regist_account balance 동기화 (입금측)
+                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(userKey, depositAccountNo)
+                                            .ifPresent(ra -> {
+                                                ra.setBalance(newDepositBalance);
+                                                registAccountRepository.save(ra);
+                                            });
+
+                                    // 5) 원본 SSAFY 응답 Map 반환
                                     return resp;
+
                                 })
                                 .subscribeOn(Schedulers.boundedElastic())
                 );
@@ -117,9 +145,20 @@ public class AccountService {
                                     Account acct = accountRepository.findByAccountNo(accountNo)
                                             .orElseThrow(() -> new RuntimeException("계좌 없음: " + accountNo));
                                     // 2) 출금 금액만큼 balance 차감
-                                    acct.setBalance(acct.getBalance() - (int)transactionBalance);
+                                    int updatedBalance = acct.getBalance() - (int) transactionBalance;
+                                    acct.setBalance(updatedBalance);
                                     // 3) 변경된 엔티티 저장
-                                    return accountRepository.save(acct);
+                                    accountRepository.save(acct);
+
+                                    // 4) 등록계좌(RegistAccount) balance 도 동기화
+                                    RegistAccount ra = registAccountRepository
+                                            .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
+                                            .orElseThrow(() -> new RuntimeException("등록 계좌 없음: " + accountNo));
+                                    ra.setBalance(updatedBalance);
+                                    registAccountRepository.save(ra);
+
+                                    //5) 원본 SSAFY 응답 Map 그대로 리턴
+                                    return resp;
                                 })
                                 .subscribeOn(Schedulers.boundedElastic())
                                 // 4) 저장이 완료되면 원본 SSAFY 응답(Map) 반환

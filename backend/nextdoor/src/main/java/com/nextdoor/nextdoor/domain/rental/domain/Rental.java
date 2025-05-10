@@ -40,6 +40,9 @@ public class Rental {
     @Column(name = "damage_analysis")
     private String damageAnalysis;
 
+    @Column(name = "deal_count")
+    private Integer dealCount;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -51,6 +54,7 @@ public class Rental {
         this.rentalProcess = rentalProcess != null ? rentalProcess : getRentalProcessForStatus(rentalStatus);
         this.damageAnalysis = damageAnalysis;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+        this.dealCount = 0;
     }
 
     public static Rental createFromReservation(Long reservationId) {
@@ -83,12 +87,21 @@ public class Rental {
         updateStatus(RentalStatus.RENTAL_PERIOD_ENDED);
     }
 
+    public void updateDamageAnalysis(String damageAnalysis) {
+        this.damageAnalysis = damageAnalysis;
+    }
+
     public void processDepositCompletion(){
         if(rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED){
             throw new InvalidRentalStatusException("보증금을 처리가 불가능한 대여 상태입니다");
         }
 
+        updateDealCount();
         updateStatus(RentalStatus.RENTAL_COMPLETED);
+    }
+
+    public void updateDealCount() {
+        this.dealCount = dealCount + 1;
     }
 
     public void validateRemittancePendingState() {

@@ -1,8 +1,8 @@
-package com.nextdoor.nextdoor.domain.aianalysis.service;
+package com.nextdoor.nextdoor.domain.aianalysis.port;
 
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 
-public interface AiAnalysisRentalQueryService {
+public interface AiAnalysisRentalQueryPort {
 
     RentalDto findById(Long id);
 }
