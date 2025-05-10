@@ -52,43 +52,38 @@ export default function RenterActionBtn({
         return "";
     }
   };
-
-  // 버튼 활성화 여부 - 프로세스와 상태를 모두 고려
   const isButtonDisabled = () => {
-    // 특정 상태에서만 버튼 활성화
-    const activeStatuses = [
-      RENTAL_STATUS.BEFORE_PHOTO_REGISTERED, // 결제를 위해
-      RENTAL_STATUS.RENTAL_PERIOD_ENDED, // 안심 사진 등록을 위해
-    ];
-
-    return !activeStatuses.includes(status);
+    return !(
+      (process === RENTAL_PROCESS.BEFORE_RENTAL &&
+        status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) ||
+      (process === RENTAL_PROCESS.RETURNED &&
+        status === RENTAL_STATUS.RENTAL_PERIOD_ENDED)
+    );
   };
 
-  // 액션 핸들러 - 상태와 프로세스에 따른 다음 단계
   const handleClick = async () => {
     if (isButtonDisabled()) return;
 
+    // 👉 안심 사진 등록: 이동만 하는 케이스는 try-catch 밖에서 실행
+    if (
+      process === RENTAL_PROCESS.RETURNED &&
+      status === RENTAL_STATUS.RENTAL_PERIOD_ENDED
+    ) {
+      window.location.href = `/reservations/${rentalId}/safe-deal/manage`;
+      return;
+    }
+
     try {
-      // 현재 상태에 따른 액션 실행
-      switch (status) {
-        case RENTAL_STATUS.BEFORE_PHOTO_REGISTERED:
-          // 결제 요청
-          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-            status: RENTAL_STATUS.REMITTANCE_REQUESTED,
-          });
-          break;
-
-        case RENTAL_STATUS.RENTAL_PERIOD_ENDED:
-          // 안심 사진 등록 페이지로 이동
-          window.location.href = `/reservations/${rentalId}/safe-deal/manage`;
-          break;
-
-        default:
-          console.log("No action available for current status/process");
-          break;
+      if (
+        process === RENTAL_PROCESS.BEFORE_RENTAL &&
+        status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED
+      ) {
+        // 결제 요청
+        await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
+          status: RENTAL_STATUS.REMITTANCE_REQUESTED,
+        });
       }
 
-      // 성공 콜백 호출
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("요청 처리 실패:", error);
