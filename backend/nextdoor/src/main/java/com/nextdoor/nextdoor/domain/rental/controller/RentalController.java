@@ -1,15 +1,14 @@
 package com.nextdoor.nextdoor.domain.rental.controller;
 
-import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemittanceRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.mapper.RentalMapper;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,12 +59,12 @@ public class RentalController {
     }
 
     @PostMapping("/{rentalId}/request-remittance")
-    public ResponseEntity<Void> requestPayments(@PathVariable Long rentalId,
-                                                @Valid @RequestBody RequestRemittanceRequest request) {
-        RequestRemittanceCommand command = rentalMapper.toCommand(rentalId, request);
-        rentalService.requestRemittance(command);
+    public ResponseEntity<RemittanceResponse> requestRemittance(@PathVariable Long rentalId) {
+        RequestRemittanceCommand command = rentalMapper.toCommand(rentalId);
+        RequestRemittanceResult result = rentalService.requestRemittance(command);
+        RemittanceResponse response = rentalMapper.toResponse(result);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{rentalId}/after/photos")
