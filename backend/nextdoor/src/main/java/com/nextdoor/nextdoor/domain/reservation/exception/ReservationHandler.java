@@ -5,12 +5,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice(basePackages = "com.nextdoor.nextdoor.domain.reservation")
 public class ReservationHandler {
+
+    @ExceptionHandler({
+            MissingRequestHeaderException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleBadRequestException(MissingRequestHeaderException e, HttpServletRequest request) {
+        return logAndHandleException(HttpStatus.BAD_REQUEST, e, "MISSING_HEADER", request);
+    }
 
     @ExceptionHandler({
             AlreadyConfirmedException.class,
