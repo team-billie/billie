@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.fintech.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class RegistAccount {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_key", nullable = false)
+    @JsonIgnore
     private FintechUser user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
