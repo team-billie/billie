@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public class ReservationResponseDto {
 
     private Long reservationId;
-    private String feedTitle;
-    private String feedProductImage;
+    private String postTitle;
+    private String postProductImage;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal rentalFee;
@@ -25,8 +25,8 @@ public class ReservationResponseDto {
     public static ReservationResponseDto from(Reservation reservation, PostDto post) {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getId();
-        response.feedTitle = post.getTitle();
-        response.feedProductImage = post.getProductImage();
+        response.postTitle = post.getTitle();
+        response.postProductImage = post.getProductImage();
         response.startDate = reservation.getStartDate();
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();
@@ -40,8 +40,8 @@ public class ReservationResponseDto {
     public static ReservationResponseDto from(ReservationQueryDto reservation) {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getReservationId();
-        response.feedTitle = reservation.getFeedTitle();
-        response.feedProductImage = reservation.getFeedProductImage();
+        response.postTitle = reservation.getPostTitle();
+        response.postProductImage = reservation.getPostProductImage();
         response.startDate = reservation.getStartDate();
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();
