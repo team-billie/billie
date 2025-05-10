@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface ReservationPostQueryPort {
 
-    Optional<PostDto> findById(Long feedId);
+    Optional<PostDto> findById(Long postId);
 }
