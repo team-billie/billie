@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Table;
 import java.time.Instant;
-import com.nextdoor.nextdoor.chat.domain.ChatMessageKey;
 
 @Table("chat_message")
 @Data

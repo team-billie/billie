@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.chat.domain;
+package com.nextdoor.nextdoor.domain.chat.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
