@@ -8,6 +8,7 @@ import {
   fetchRenterReservations,
 } from "@/lib/api/reservations/request";
 import { useEffect, useState } from "react";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
@@ -18,12 +19,17 @@ interface ReservationItem {
   startDate: string;
   endDate: string;
 }
+
 export default function ReservationBorrowManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
+  const { userId } = useTestUserStore();
+  console.log("ReservationBorrowManagePage userId:", userId);
 
   const loadReservations = async () => {
+    if (!userId) return;
+
     try {
-      const data = await fetchRenterReservations();
+      const data = await fetchRenterReservations(userId);
       console.log(data);
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
@@ -51,7 +57,12 @@ export default function ReservationBorrowManagePage() {
 
   useEffect(() => {
     loadReservations();
-  }, []);
+  }, [userId]);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
 
   return (
     <main>

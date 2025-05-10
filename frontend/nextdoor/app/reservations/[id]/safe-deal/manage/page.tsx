@@ -3,21 +3,63 @@
 import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManager";
 import SafeDealNavbar from "@/components/reservations/safe-deal/SafeDealNavbar";
 import { fetchAiAnalysis } from "@/lib/api/ai-analysis/request";
+import axiosInstance from "@/lib/api/instance";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+interface AiAnalysisData {
+  beforeImages: string[];
+  afterImages: string[];
+  analysis: any | null;
+}
 
 export default function SafeDealManage() {
+  const { userId } = useTestUserStore();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
   const [returnPhotos, setReturnPhotos] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [serverData, setServerData] = useState<AiAnalysisData | null>(null);
   const { id } = useParams();
 
+  console.log("SafeDealManage userId:", userId);
+
+  // 컴포넌트 마운트 시 서버에서 데이터 가져오기
+  useEffect(() => {
+    if (!userId || !id) return;
+
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/api/v1/rentals/${id}/ai-analysis`
+        );
+        setServerData(response.data);
+        console.log(response.data);
+        // 분석 결과가 있으면 설정
+        if (response.data.analysis) {
+          setResult(response.data.analysis);
+        }
+      } catch (error) {
+        console.error("데이터 로드 오류:", error);
+      }
+    };
+
+    fetchData();
+  }, [id, userId]);
+
   const handleAnalysis = async () => {
-    // if (rentalPhotos.length === 0 || returnPhotos.length === 0) {
-    //   alert("대여 물품 사진과 반납 물품 사진을 모두 등록해주세요.");
-    //   return;
-    // }
+    if (!userId) return;
+
+    const hasBeforeImages =
+      rentalPhotos.length > 0 || (serverData?.beforeImages?.length || 0) > 0;
+    const hasAfterImages =
+      returnPhotos.length > 0 || (serverData?.afterImages?.length || 0) > 0;
+
+    if (!hasBeforeImages || !hasAfterImages) {
+      alert("대여 물품 사진과 반납 물품 사진을 모두 등록해주세요.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -31,16 +73,21 @@ export default function SafeDealManage() {
     }
   };
 
+  if (!userId) {
+    return null;
+  }
+
   return (
     <main>
       <SafeDealNavbar />
-      <div className="h-screen flex flex-col justify-center items-center">
+      <div className="h-screen flex flex-col items-center gap-4 py-6">
         <PhotoManager
           rentalId={Number(id)}
           status="대여 물품 사진"
           uploadType="before"
           onPhotoChange={setRentalPhotos}
           photos={rentalPhotos}
+          serverImages={serverData?.beforeImages || []}
         />
         <PhotoManager
           rentalId={Number(id)}
@@ -48,6 +95,7 @@ export default function SafeDealManage() {
           uploadType="after"
           onPhotoChange={setReturnPhotos}
           photos={returnPhotos}
+          serverImages={serverData?.afterImages || []}
         />
 
         <div className="px-4 w-full">

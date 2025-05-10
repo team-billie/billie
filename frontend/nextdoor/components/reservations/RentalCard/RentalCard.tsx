@@ -7,6 +7,7 @@ import RenterActionBtn from "../manage/Button/RenterActionBtn";
 import { RentalProcess, RentalStatus, UserType } from "@/types/rental";
 import { usePathname } from "next/navigation";
 import SafeDealBtn from "../manage/Button/SafeDealBtn";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface RentalCardProps {
   title: string;
@@ -36,6 +37,14 @@ export default function RentalCard({
   onActionSuccess,
 }: RentalCardProps) {
   const pathname = usePathname();
+  const { userId } = useTestUserStore();
+  console.log("RentalCard userId:", userId);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
+
   return (
     <div className="w-full border rounded-lg flex flex-col">
       {/* 대여기간 */}
