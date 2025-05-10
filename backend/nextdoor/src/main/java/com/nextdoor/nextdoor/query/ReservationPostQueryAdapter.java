@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
+import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
@@ -18,11 +19,10 @@ public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
 
     private final JPAQueryFactory jpaQueryFactory;
     private final QPost qPost = QPost.post;
-    // TODO qMember 추가하기
+    private final QMember qMember = QMember.member;
 
     @Override
     public Optional<PostDto> findById(Long postId) {
-        // TODO Member 추가 후 필드에 사용자 정보 할당하기
         return Optional.ofNullable(
                 jpaQueryFactory.select(Projections.constructor(
                                 PostDto.class,
@@ -34,9 +34,10 @@ public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
                                 qPost.productImage,
                                 qPost.category,
                                 qPost.authorId,
-                                qPost.title,
-                                qPost.title))
+                                qMember.name,
+                                qMember.profileImageUrl))
                         .from(qPost)
+                        .join(qMember).on(qPost.authorId.eq(qMember.id)).fetchJoin()
                         .where(qPost.postId.eq(postId))
                         .fetchOne()
         );
