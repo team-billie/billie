@@ -14,7 +14,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatWebSocketHandler, "/ws/chat")
-                .setAllowedOrigins("*");
+        registry.addHandler(chatWebSocketHandler, "/ws/chat")   // WS 엔드포인트
+                .setAllowedOrigins("*");                       // CORS 허용 (필요시 출처 제한)
     }
 }
