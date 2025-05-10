@@ -33,7 +33,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
         return Optional.ofNullable(
                 jpaQueryFactory.select(createReservationQueryDtoProjection())
                         .from(qReservation)
-                        .join(qPost).on(qReservation.postId.eq(qPost.postId)).fetchJoin()
+                        .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
                         .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
                         .where(qReservation.id.eq(reservationId))
                         .fetchOne()
@@ -44,7 +44,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
     public List<ReservationQueryDto> findSentReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
         return jpaQueryFactory.select(createReservationQueryDtoProjection())
                 .from(qReservation)
-                .join(qPost).on(qReservation.postId.eq(qPost.postId)).fetchJoin()
+                .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
                 .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
                 .where(createSentReservationCondition(loginUserId, requestDto))
                 .fetch();
@@ -62,7 +62,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
     public List<ReservationQueryDto> findReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
         return jpaQueryFactory.select(createReservationQueryDtoProjection())
                 .from(qReservation)
-                .join(qPost).on(qReservation.postId.eq(qPost.postId)).fetchJoin()
+                .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
                 .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
                 .where(createReceivedReservationCondition(loginUserId, requestDto))
                 .fetch();

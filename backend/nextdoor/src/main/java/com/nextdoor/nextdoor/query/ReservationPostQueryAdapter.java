@@ -26,7 +26,7 @@ public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
         return Optional.ofNullable(
                 jpaQueryFactory.select(Projections.constructor(
                                 PostDto.class,
-                                qPost.postId,
+                                qPost.id,
                                 qPost.title,
                                 qPost.content,
                                 qPost.rentalFee.castToNum(BigDecimal.class),
@@ -38,7 +38,7 @@ public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
                                 qMember.profileImageUrl))
                         .from(qPost)
                         .join(qMember).on(qPost.authorId.eq(qMember.id)).fetchJoin()
-                        .where(qPost.postId.eq(postId))
+                        .where(qPost.id.eq(postId))
                         .fetchOne()
         );
     }

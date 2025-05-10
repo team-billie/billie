@@ -70,7 +70,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
                         post.productImage))
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
-                .join(post).on(reservation.postId.eq(post.postId))
+                .join(post).on(reservation.postId.eq(post.id))
                 .where(whereCondition)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -81,7 +81,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
                 .select(reservation.count())
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
-                .join(post).on(reservation.postId.eq(post.postId))
+                .join(post).on(reservation.postId.eq(post.id))
                 .where(whereCondition)
                 .fetchOne();
 
