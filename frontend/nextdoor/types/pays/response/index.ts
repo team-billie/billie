@@ -7,6 +7,15 @@ type CreateFinUserResponseDto = {
     modified: string;
 }
 
+type GetFinUserResponseDto = {
+    userId: string;
+    userName: string;
+    institutionCode: string;
+    userKey: string;
+    created: string;
+    modified: string;
+}
+
 type CreateFinAccountResponseDto = {
     REC: {
         bankCode: string;
@@ -28,4 +37,8 @@ type AddAccountResponseDto = {
     registeredAt: string;
 }
 
-export type { AddAccountResponseDto, CreateFinUserResponseDto, CreateFinAccountResponseDto };
+export type { 
+    AddAccountResponseDto, 
+    CreateFinUserResponseDto, 
+    CreateFinAccountResponseDto,
+    GetFinUserResponseDto };
