@@ -38,9 +38,7 @@ export default function ReservationBorrowManagePage() {
 
         return {
           id: item.reservationId,
-          img:
-            // item.feedProductImage ??
-            "https://picsum.photos/seed/picsum/200/300",
+          img: "https://picsum.photos/seed/picsum/200/300",
           title: item.feedTitle,
           cost: item.rentalFee,
           date: duration,

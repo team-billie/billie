@@ -41,7 +41,7 @@ export default function ReservationLendPage() {
       try {
         setLoading(true);
 
-        const data: ReservationResponse[] = await fetchRentals({
+        const data: ReservationResponseDTO[] = await fetchRentals({
           userId,
           userRole,
           condition,

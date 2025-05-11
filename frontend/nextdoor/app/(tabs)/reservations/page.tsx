@@ -29,14 +29,14 @@ export default function ReservationPage() {
   const { userId: testUserId } = useTestUserStore();
   const userRole: "OWNER" | "RENTER" = "RENTER";
   const condition = "ALL";
-
   console.log("testUserId", testUserId);
   useEffect(() => {
     const fetchReservationData = async () => {
       try {
         setLoading(true);
+        setError(null); // 에러 상태 초기화
 
-        const data: ReservationResponse[] = await fetchRentals({
+        const data: ReservationResponseDTO[] = await fetchRentals({
           userId: testUserId || 1,
           userRole,
           condition,
@@ -74,18 +74,23 @@ export default function ReservationPage() {
       }
     };
 
-    fetchReservationData();
-  }, [testUserId]);
+    if (testUserId) {
+      // testUserId가 있을 때만 fetch 실행
+      fetchReservationData();
+    }
+  }, [testUserId, userRole, condition]); // 의존성 배열에 필요한 값들 추가
 
   const handleActionSuccess = (rentalId: number) => {
     console.log(`예약 ID ${rentalId}의 상태가 변경되었습니다.`);
   };
 
   return (
-    <main>
-      <MainHeader title="Reservations" />
-      <ReservationStatusTabs />
-      <div className="h-screen overflow-y-auto p-4 flex flex-col gap-6">
+    <main className="flex flex-col">
+      <div>
+        <MainHeader title="Reservations" />
+        <ReservationStatusTabs />
+      </div>
+      <div className="flex flex-col m-4">
         {loading && <p>불러오는 중입니다...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading &&

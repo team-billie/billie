@@ -49,7 +49,7 @@ export default function OwnerActionBtn({
 
       case RENTAL_PROCESS.RETURNED:
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
-          return "보증금 처리";
+          return "사진 등록 대기중";
         } else if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
           return "보증금 처리";
         } else if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
