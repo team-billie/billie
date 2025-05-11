@@ -1,9 +1,11 @@
 'use client';
+import axiosInstance from "@/lib/api/instance";
 import Button from "../../common/Button";
 import { AddAccountRequest } from "@/lib/api/pays";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
 import { AddAccountRequestDto } from "@/types/pays/request";
 import { useRouter } from "next/navigation";
+
 
 interface MakeAccountModalProps {
     account: AddAccountRequestDto;
@@ -12,17 +14,25 @@ interface MakeAccountModalProps {
 export default function MakeAccountModal({account}: MakeAccountModalProps){
     const router = useRouter();
 
-    const handleYesBtn = () => {
+    const handleBtn = (register: boolean) => {
+        if(register){
         console.log("앱에 등록하기");
         AddAccountRequest(account).then((res) => {
             console.log("계좌가 등록됨");
         });
+        }else{
+            console.log("나중에 등록하기");
+        }
 
-        router.push("/profile");
-    }
-    
-    const handleNoBtn = () => {
-        console.log("나중에 등록하기");
+        axiosInstance.post("/api/v1/fintechs/accounts/deposit", {
+            "userKey": account.userKey,
+            "accountNo": account.accountNo,
+            "transactionBalance": 200000,
+            "transactionSummary": "(수시입출금) : 생성 계좌 돈 입금"
+          }).then((res) => {
+            console.log("입금 완료");
+        })
+
         router.push("/profile");
     }
 
@@ -44,8 +54,8 @@ export default function MakeAccountModal({account}: MakeAccountModalProps){
                     <div>미등록시 내 계좌 페이지에서 등록이 가능합니다. 미등록된 계좌번호는 <span className="font-bold">다시 확인하기 어려우니</span> 꼭 따로 저장해두시고 등록하시길 바랍니다.</div>
                 </div>
                 <div className="flex flex-col gap-4 p-4">
-                    <Button state={true} txt="앱에 등록하기" onClick={handleYesBtn} />
-                    <Button state={false} txt="나중에 등록하기" onClick={handleNoBtn} />
+                    <Button state={true} txt="앱에 등록하기" onClick={() => handleBtn(true)} />
+                    <Button state={false} txt="나중에 등록하기" onClick={() => handleBtn(false)} />
                 </div>
         </div>
     </>)

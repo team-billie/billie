@@ -1,7 +1,12 @@
-type PostListResponseDto = {
-    id: number;
+type PostListItem = {
     title: string;
-    content: string;
-    createdAt: string;
-    updatedAt: string;
+    productImage: string;
+    rentalFee: string;
+    deposit: string;
+    like: number;
+    dealCount: number;
+}
+
+type PostListResponseDto = {
+    content: PostListItem[];
 }
