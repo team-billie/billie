@@ -3,9 +3,11 @@ package com.nextdoor.nextdoor.domain.reservation.service.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @Builder
@@ -25,5 +27,7 @@ public class ReservationQueryDto {
     private Long renterId;
     private Long postId;
     private String postTitle;
-    private String postProductImage;
+
+    @Setter
+    private List<String> postProductImages;
 }
