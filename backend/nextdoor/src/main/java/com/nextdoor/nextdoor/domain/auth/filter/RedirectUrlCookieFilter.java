@@ -13,7 +13,7 @@ import java.io.IOException;
 @Component
 public class RedirectUrlCookieFilter extends OncePerRequestFilter {
 
-    public static final String REDIRECT_URI_PARAM = "redirect_url";
+    public static final String REDIRECT_URI_PARAM = "redirectUrl";
     private static final int MAX_AGE = 180;
 
     @Override
