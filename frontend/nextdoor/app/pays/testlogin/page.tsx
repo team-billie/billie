@@ -44,9 +44,9 @@ export default function TestLoginPage() {
     
     return (
         <div className="flex flex-col gap-3">
-            <Header txt="테스트 계좌 등록" />
+            <Header txt="테스트 로그인" />
             <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
-                <div className="text-xl text-blue400 font-bold mb-10">로그인</div>
+                <div className="text-3xl text-blue400 font-extrabold mb-4">테스트 로그인</div>
                 <FormProvider {...form}>
                         <Controller
                             control={form.control}
@@ -70,9 +70,10 @@ export default function TestLoginPage() {
                             className="w-full border border-gray-500 rounded-md p-4"
                             />
                         <Button txt="로그인" state={true} type="submit" onClick={form.handleSubmit(onSubmit)} />
+                        <Button txt="테스트 유저 회원가입" state={false} onClick={() => router.push("/pays/testsignup")} />
                 </FormProvider>
                 <Link href="/pays/testsignup" className="text-center text-gray-500 text-sm">
-                    테스트 유저 회원가입 
+                    ※ 사용자번호는 테스트 용으로 사용되며 싸피 금융망 사용자 번호와 일치하지 않아도 괜찮습니다. 
                 </Link>
             </div>
         </div>

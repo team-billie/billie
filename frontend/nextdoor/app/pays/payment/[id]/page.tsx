@@ -6,8 +6,9 @@ import Loading from "@/components/pays/common/Loading";
 import AutoRechargeModal from "@/components/pays/modals/AutoRechargeModal";
 import { TransferAccountRequest } from "@/lib/api/pays";
 import useUserStore from "@/lib/store/useUserStore";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { GetPaymentDataRequest } from "@/lib/api/pays";
 
 export default function PaymentPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,10 +49,17 @@ export default function PaymentPage() {
         });
     }
         
+    //params에서 id값 가져오기
+    const { id } = useParams();
+
     const [chargeNeeded, setChargeNeeded] = useState(0);
     useEffect(() => {
         const chargeAmount = amount - balance;
         setChargeNeeded(chargeAmount);
+        
+        GetPaymentDataRequest(id as string).then((res) => {
+            console.log(res);
+        });
 
         if (chargeAmount > 0) {
             setIsChargeNeeded(true);

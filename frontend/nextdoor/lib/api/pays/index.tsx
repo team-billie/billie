@@ -66,3 +66,15 @@ export const WithdrawDepositRequest = (requestBody: WithdrawDepositRequestDto) =
 //보증금 반환
 export const ReturnDepositRequest = (requestBody: ReturnDepositRequestDto) => 
   apiCall("/api/v1/fintechs/deposits/return", requestBody, "보증금 반환");
+
+// -----------------------------------------
+// 결제 데이터 호출
+export const GetPaymentDataRequest = (rentalId: string) => 
+  axiosInstance.post(`/api/v1/rentals/${rentalId}/request-remittance`)
+  .then((response) => {
+    return response.data;
+  })
+  .catch((error) => {
+    return handleApiError(error, "등록된 계좌 목록 조회");
+});
+
