@@ -1,6 +1,6 @@
 package com.nextdoor.nextdoor.domain.auth.service;
 
-import com.nextdoor.nextdoor.domain.auth.ApplicationOAuth2User;
+import com.nextdoor.nextdoor.domain.auth.CustomOAuth2User;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,7 @@ public class JwtProvider {
     private static final Key SECRET_KEY = Jwts.SIG.HS512.key().build();
 
     public String createAccessToken(Authentication authentication) {
-        ApplicationOAuth2User userPrincipal = (ApplicationOAuth2User) authentication.getPrincipal();
+        CustomOAuth2User userPrincipal = (CustomOAuth2User) authentication.getPrincipal();
         Date expiryDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
         return Jwts.builder()
                 .signWith(SECRET_KEY)
