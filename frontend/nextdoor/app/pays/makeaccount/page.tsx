@@ -13,7 +13,7 @@ import { AddAccountRequestDto } from "@/types/pays/request";
 import { CreateFinAccountResponseDto } from "@/types/pays/response";
 import useUserStore from "@/lib/store/useUserStore";
 
-export default function MakeAccount() {
+export default function MakeAccountPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedBank, setSelectedBank] = useState<BankDto | null>(null);
     const [isMakeAccountModalOpen, setIsMakeAccountModalOpen] = useState(false);
