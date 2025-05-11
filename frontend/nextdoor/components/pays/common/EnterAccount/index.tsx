@@ -4,22 +4,30 @@
 import { ChevronDown } from "lucide-react"
 import SelectBankModal from "../../modals/SelectBankModal";
 import { useState } from "react";
-import { BankDto } from "@/lib/utils/getBankInfo";
 import Button from "../Button";
+import { BankDto } from "@/lib/utils/getBankInfo";
+import { CheckAccountRequestDto } from "@/types/pays/request";
 
 interface EnterAccountProps {
     btnTxt: string;
+    handleAccountSelected: (selectedAccount: CheckAccountRequestDto) => void;
 }
 
-export default function EnterAccount({btnTxt}: EnterAccountProps) {
+export default function EnterAccount({btnTxt, handleAccountSelected}: EnterAccountProps) {     
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedBank, setSelectedBank] = useState<BankDto | null>(null);
-    
+    const [accountNo, setAccountNo] = useState<string>("");
 
     return (
         <>
             <div className="w-full flex flex-col items-center gap-3">
-                <input type="text" className="w-full py-5 px-4 border border-gray400 rounded-lg text-lg font-bold focus:outline-none focus:ring-0 placeholder-gray500" placeholder="계좌번호 입력"/>
+                <input 
+                    type="number" 
+                    className="w-full py-5 px-4 border border-gray400 rounded-lg text-lg font-bold focus:outline-none focus:ring-0 placeholder-gray500" 
+                    placeholder="계좌번호 입력"
+                    onChange={(e) => setAccountNo(e.target.value)}
+                    value={accountNo}
+                /> 
                 
                 <div
                     onClick={() => setIsModalOpen(true)}
@@ -37,7 +45,13 @@ export default function EnterAccount({btnTxt}: EnterAccountProps) {
                     <ChevronDown className="w-7 h-7 text-gray-700" />
                 </div>
 
-                <Button txt={btnTxt} state={true}/>
+                <Button 
+                    txt={btnTxt} 
+                    state={true} 
+                    onClick={() => handleAccountSelected({
+                        bankCode: selectedBank?.bankCode || "000",
+                        accountNo: accountNo || "", 
+                    })}/>
             </div>
             {isModalOpen && 
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">

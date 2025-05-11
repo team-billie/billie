@@ -6,6 +6,7 @@ interface SelectBankModalProps {
 }
 
 export default function SelectBankModal({setIsModalOpen, setSelectedBank}: SelectBankModalProps){
+
     return (
         <div className="absolute max-h-[70vh] overflow-y-auto bottom-0 bg-white w-full rounded-t-3xl transform transition-transform duration-300 translate-y-0">
             <div className="sticky bg-white top-0 px-4 pt-4 pb-2 font-bold text-lg">은행</div>
