@@ -31,18 +31,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com", // ✅ 추가
       },
-      {
-        protocol: "https",
-        hostname: "images.nextdoor.com",
-      },
-      {
-        protocol: "https",
-        hostname: "nextdoor-images.com", // ✅ 추가
-      },
-      {
-        protocol: "https",
-        hostname: "oneders.s3.ap-northeast-2.amazonaws.com", // ✅ 추가
-      },
     ],
   },
 
