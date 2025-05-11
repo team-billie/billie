@@ -111,10 +111,13 @@ public class RentalQueryAdapter implements RentalQueryPort {
                                 RequestRemittanceResult.class,
                                 member.nickname.as("ownerNickname"),
                                 reservation.rentalFee,
-                                reservation.deposit
+                                reservation.deposit,
+                                rental.accountNo,
+                                rental.bankCode
                         ))
                         .from(reservation)
                         .join(member).on(reservation.ownerId.eq(member.id))
+                        .join(rental).on(reservation.id.eq(rental.reservationId))
                         .where(reservation.rentalId.eq(rentalId))
                         .fetchOne()
         );
