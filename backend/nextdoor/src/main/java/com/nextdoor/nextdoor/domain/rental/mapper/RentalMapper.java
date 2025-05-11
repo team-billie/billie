@@ -70,6 +70,7 @@ public class RentalMapper {
                 .rentalStatus(result.getRentalStatus())
                 .title(result.getTitle())
                 .productImageUrls(result.getProductImages())
+                .createdAt(result.getCreatedAt())
                 .build();
     }
 
