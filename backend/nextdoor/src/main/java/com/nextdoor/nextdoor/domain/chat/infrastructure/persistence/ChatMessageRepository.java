@@ -17,19 +17,4 @@ public interface ChatMessageRepository extends CassandraRepository<ChatMessage, 
 
     // 마지막 메시지 조회,  마지막 메시지 한 건만 꺼내올 쿼리 메서드
     ChatMessage findFirstByKeyConversationIdOrderByKeySentAtDesc(UUID conversationId);
-
-    // 안 읽은 메시지 개수 조회,  senderId 가 아닌 메시지 중 read = false(안 읽음) 개수 조회
-//    long countByKeyConversationIdAndSenderIdNotAndReadFalse(UUID conversationId, Long senderId);
-    @Query("""
-      SELECT count(*) 
-        FROM chat_messages 
-       WHERE conversation_id = :conversationId 
-         AND is_read        = false 
-         AND sender_id     != :senderId 
-       ALLOW FILTERING
-    """)
-    long countUnreadMessages(
-            @Param("conversationId") UUID conversationId,
-            @Param("senderId")       Long   senderId);
-
 }

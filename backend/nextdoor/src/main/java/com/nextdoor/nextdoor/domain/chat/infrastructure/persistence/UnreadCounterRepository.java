@@ -13,5 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface UnreadCounterRepository
         extends CassandraRepository<UnreadCounter, UnreadCounterKey> {
 
+    // 안 읽은 채팅 수 조회
     Optional<UnreadCounter> findById(UnreadCounterKey key);
 }
