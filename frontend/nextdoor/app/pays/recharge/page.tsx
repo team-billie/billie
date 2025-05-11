@@ -1,29 +1,46 @@
 "use client";
 
 //충전하기 페이지
-import { ChevronDown } from "lucide-react"
-import Header from "@/components/pays/common/Header";
 import Button from "@/components/pays/common/Button";
+import Header from "@/components/pays/common/Header";
 import { AmountInput } from "@/components/pays/common/Input";
-import { FormProvider, useForm } from "react-hook-form";
-
+import MyAccountListModal from "@/components/pays/modals/MyAccountListModal";
+import useUserStore from "@/lib/store/useUserStore";
 import { TransferAccountRequestDto } from "@/types/pays/request/index";
+import { AddAccountResponseDto } from "@/types/pays/response";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { getBankInfo } from "@/lib/utils/getBankInfo";
+import { FormProvider, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { TransferAccountRequest } from "@/lib/api/pays";
+
 type FormValues = TransferAccountRequestDto;
 
 export default function RechargePage() {
+    const [isAccountListModalOpen, setIsAccountListModalOpen] = useState(false);
+    const [selectedAccount, setSelectedAccount] = useState<AddAccountResponseDto | null>(null);
+    const { mainAccount, billyAccount, userKey } = useUserStore();
+    const router = useRouter();
+    const rechargeAccount = selectedAccount ?? mainAccount;
+    
     const rechargeForm = useForm<FormValues>({
         defaultValues: {
-            userKey: "",
-            depositAccountNo: "",
+            userKey: userKey,
+            depositAccountNo: billyAccount?.accountNo ?? "",
             // transactionBalance: 0,
-            withdrawalAccountNo: "",
-            depositTransactionSummary: "",
-            withdrawalTransactionSummary: "",
+            depositTransactionSummary: "빌리계좌 충전",
+            withdrawalTransactionSummary: "빌리계좌 충전",
         },
     });
 
     const onSubmit = (data: FormValues) => {
-        console.log(data);
+        rechargeForm.setValue("withdrawalAccountNo", rechargeAccount?.accountNo ?? "");
+        console.log(rechargeForm.getValues());
+        TransferAccountRequest(rechargeForm.getValues()).then((res) => {
+            alert("충전 완료");
+            router.push("/profile");
+        });
     }
 
     return (
@@ -32,17 +49,21 @@ export default function RechargePage() {
     <FormProvider {...rechargeForm}>
         <div className="flex-1 flex flex-col items-center">
             <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
-                <div className="flex gap-2 items-center justify-center">
-                    <div className="w-5 text-center bg-yellow-300 font-extrabold text-gray900">B</div>
-                    <div className="text-gray900 font-semibold">내 <span>카카오뱅크</span> 계좌에서</div>
+                <div className="flex gap-2 items-center justify-center" onClick={() => setIsAccountListModalOpen(true)}>
+                    <img
+                        src={getBankInfo(rechargeAccount?.bankCode ?? "000")?.image}
+                        alt={getBankInfo(rechargeAccount?.bankCode ?? "000")?.bankName}
+                        className="w-7 h-7 rounded-full"
+                    />
+                    <div className="text-gray900 font-semibold">내 <span>{getBankInfo(rechargeAccount?.bankCode ?? "000")?.bankName}</span> 계좌에서</div>
                     <ChevronDown className="w-4 h-full"/>
                 </div>
-                <div className="text-sm">3333139177983</div>
+                <div className="text-sm">{rechargeAccount?.accountNo}</div>
             </div>
             
             <div className="flex flex-col items-center">
                 <AmountInput placeholderTxt="얼마를 충전할까요?"/>
-                <div className="text-xs text-gray600">빌리페이 잔액 <span>0</span>원</div>
+                <div className="text-xs text-gray600">빌리페이 잔액 <span>{billyAccount?.balance}</span>원</div>
             </div>
 
             <div className="flex text-gray900 text-sm mt-5 py-5 gap-3">
@@ -56,6 +77,11 @@ export default function RechargePage() {
             </div>
         </div>
     </FormProvider>
+    {isAccountListModalOpen && 
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
+            <MyAccountListModal setIsModalOpen={setIsAccountListModalOpen} setSelectedAccount={setSelectedAccount}/>
+        </div>
+    }
     </div>
     );
 }

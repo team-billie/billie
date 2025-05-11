@@ -1,6 +1,7 @@
 //사용자 계정 생성
 type CreateFinUserRequestDto = {
     userId: string;
+    ssafyApiEmail: string;
 }
 
 //계좌 생성
@@ -14,14 +15,23 @@ type GetAccountListRequestDto = {
     userKey: string;
 }
 
+//계좌 정보 확인
+type CheckAccountRequestDto = {
+    bankCode: string;
+    accountNo: string;
+}
+
 //계좌 등록
 type AddAccountRequestDto = {
+    userKey: string;
     accountNo: string;
+    bankCode: string;
+    alias: string;
 }
 
 //등록된 계좌 목록 조회
 type GetAddedListRequestDto = {
-    //미정
+    userKey: string;
 }
 
 // 계좌 이체
@@ -55,4 +65,5 @@ export type { CreateFinUserRequestDto,
     GetAddedListRequestDto, 
     TransferAccountRequestDto, 
     WithdrawDepositRequestDto, 
-    ReturnDepositRequestDto  }; 
+    ReturnDepositRequestDto,
+    CheckAccountRequestDto }; 

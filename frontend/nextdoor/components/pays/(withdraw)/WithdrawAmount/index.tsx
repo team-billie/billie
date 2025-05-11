@@ -7,45 +7,53 @@ import { AmountInput } from "@/components/pays/common/Input";
 import { FormProvider, useForm } from "react-hook-form";
 import { useBankStore } from "@/lib/store/useBankStore";
 import { TransferAccountRequestDto } from "@/types/pays/request/index";
+import useUserStore from "@/lib/store/useUserStore";
+import { TransferAccountRequest } from "@/lib/api/pays";
+import { useRouter } from "next/navigation";
+
 type FormValues = TransferAccountRequestDto;
 
 export default function WithdrawAmount() {
-    const { targetBank } = useBankStore();
-
+    const { userKey, billyAccount } = useUserStore();
+    const { receiverBank } = useBankStore();
+    const router = useRouter();
     const withdrawForm = useForm<FormValues>({
         defaultValues: {
-            userKey: "",
-            depositAccountNo: targetBank?.bankAccountNo,
+            userKey: userKey,
+            depositAccountNo: receiverBank?.bankAccountNo,
             // transactionBalance: 0,
-            withdrawalAccountNo: "",
-            depositTransactionSummary: "",
-            withdrawalTransactionSummary: "",
+            withdrawalAccountNo: billyAccount?.accountNo,
+            depositTransactionSummary: "빌리페이 출금",
+            withdrawalTransactionSummary: "빌리페이 입금",
         },
     });
     
     const onSubmit = (data: FormValues) => {
         console.log(data);
-        // console.log(targetBank);
+        TransferAccountRequest(data).then((res) => {
+            alert("빌리에서 계좌로 이체가 완료되었습니다.");
+            router.push("/profile");
+        });
     }
 
     return (
     <FormProvider {...withdrawForm}>
         <div className="flex-1 flex flex-col items-center">
             <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
-                <div className="text-gray900 text-lg font-semibold">{targetBank?.bankUserName}님에게</div>
+                <div className="text-gray900 text-lg font-semibold">{receiverBank?.bankUserName}에게</div>
                 <div className="flex gap-2 items-center justify-center">
                     <img
-                        src={targetBank?.bankImage}
-                        alt={targetBank?.bankName}
+                        src={receiverBank?.bankImage}
+                        alt={receiverBank?.bankName}
                         className="w-7 h-7 rounded-full border border-gray500"
                     />
-                    <div className="text-gray700 font-semibold"><span>{targetBank?.bankName}</span> {targetBank?.bankAccountNo}</div>
+                    <div className="text-gray700 font-semibold"><span>{receiverBank?.bankName}</span> {receiverBank?.bankAccountNo}</div>
                 </div>
             </div>
             
             <div className="flex flex-col items-center">
                 <AmountInput placeholderTxt="얼마를 송금할까요?"/>
-                <div className="text-xs text-gray600">빌리페이 잔액 <span>0</span>원</div>
+                <div className="text-xs text-gray600">빌리페이 잔액 <span>{billyAccount?.balance}</span>원</div>
             </div>
 
             <div className="flex text-gray900 text-sm mt-5 py-5 gap-3">
