@@ -2,6 +2,7 @@ package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
+import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationCalendarRetrieveRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.ReservationRetrieveRequestDto;
 import com.nextdoor.nextdoor.domain.reservation.domain.QReservation;
@@ -9,13 +10,16 @@ import com.nextdoor.nextdoor.domain.reservation.port.ReservationQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationCalendarQueryDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,27 +31,39 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
     private final QReservation qReservation = QReservation.reservation;
     private final QPost qPost = QPost.post;
     private final QMember qMember = QMember.member;
+    private final QProductImage qProductImage = QProductImage.productImage;
 
     @Override
     public Optional<ReservationQueryDto> findById(Long reservationId) {
-        return Optional.ofNullable(
+        Optional<ReservationQueryDto> optionalReservationQueryDto = Optional.ofNullable(
                 jpaQueryFactory.select(createReservationQueryDtoProjection())
                         .from(qReservation)
                         .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
                         .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
                         .where(qReservation.id.eq(reservationId))
-                        .fetchOne()
-        );
+                        .fetchOne());
+        optionalReservationQueryDto.ifPresent(reservationQueryDto ->
+                reservationQueryDto.setPostProductImages(jpaQueryFactory.select(qProductImage.imageUrl)
+                        .from(qProductImage)
+                        .where(qProductImage.post.id.eq(reservationQueryDto.getPostId()))
+                        .fetch()));
+        return optionalReservationQueryDto;
     }
 
     @Override
     public List<ReservationQueryDto> findSentReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
-        return jpaQueryFactory.select(createReservationQueryDtoProjection())
+        List<ReservationQueryDto> reservationQueryDtos = jpaQueryFactory.select(createReservationQueryDtoProjection())
                 .from(qReservation)
                 .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
                 .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
                 .where(createSentReservationCondition(loginUserId, requestDto))
                 .fetch();
+        reservationQueryDtos.forEach(reservationQueryDto ->
+                reservationQueryDto.setPostProductImages(jpaQueryFactory.select(qProductImage.imageUrl)
+                        .from(qProductImage)
+                        .where(qProductImage.post.id.eq(reservationQueryDto.getPostId()))
+                        .fetch()));
+        return reservationQueryDtos;
     }
 
     private BooleanBuilder createSentReservationCondition(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
@@ -60,12 +76,18 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
 
     @Override
     public List<ReservationQueryDto> findReceivedReservations(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
-        return jpaQueryFactory.select(createReservationQueryDtoProjection())
+        List<ReservationQueryDto> reservationQueryDtos = jpaQueryFactory.select(createReservationQueryDtoProjection())
                 .from(qReservation)
                 .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
                 .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
                 .where(createReceivedReservationCondition(loginUserId, requestDto))
                 .fetch();
+        reservationQueryDtos.forEach(reservationQueryDto ->
+                reservationQueryDto.setPostProductImages(jpaQueryFactory.select(qProductImage.imageUrl)
+                        .from(qProductImage)
+                        .where(qProductImage.post.id.eq(reservationQueryDto.getPostId()))
+                        .fetch()));
+        return reservationQueryDtos;
     }
 
     private BooleanBuilder createReceivedReservationCondition(Long loginUserId, ReservationRetrieveRequestDto requestDto) {
@@ -108,7 +130,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                 qReservation.renterId,
                 qReservation.postId,
                 qPost.title,
-                qPost.productImages
+                Expressions.constant(Collections.emptyList())
         );
     }
 
