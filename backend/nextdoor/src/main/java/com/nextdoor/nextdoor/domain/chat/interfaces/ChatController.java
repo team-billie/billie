@@ -34,7 +34,7 @@ public class ChatController {
      */
     @GetMapping("/{conversationId}/messages")
     public List<ChatMessageDto> getChatHistory(
-            @PathVariable String conversationId) {
+            @PathVariable Long conversationId) {
         return chatQueryService.getChatHistory(conversationId);
     }
 }
