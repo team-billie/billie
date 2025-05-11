@@ -27,6 +27,7 @@ public class Member extends TimestampedEntity {
     private String birth;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     private String address;

@@ -11,7 +11,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-blue300 to-blue200 flex justify-center px-5">
+    <div className="min-h-[100dvh] w-full bg-gradient-to-b from-blue300 to-blue200 flex justify-center px-5">
       <div className="w-full max-w-[400px] py-12 text-white flex flex-col">
         <h1 className="text-4xl font-bold mt-12 flex-1">
           옆집 물건
