@@ -12,8 +12,10 @@ import java.util.List;
 @Table("conversation")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Conversation {
-    @PrimaryKeyColumn(name = "conversation_id", type = PrimaryKeyType.PARTITIONED)
-    private String conversationId;
+//    @PrimaryKeyColumn(name = "conversation_id", type = PrimaryKeyType.PARTITIONED)
+    @PrimaryKey
+    @Column("conversation_id")
+    private Long conversationId;
 
     @Column("participant_ids")
     private List<Long> participantIds;

@@ -11,8 +11,10 @@ import org.springframework.data.cassandra.core.mapping.*;
 @PrimaryKeyClass
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class ChatMessageKey implements Serializable {
-    @PrimaryKeyColumn(name = "conversation_id", type = PrimaryKeyType.PARTITIONED)
-    private String conversationId;
+//    @PrimaryKeyColumn(name = "conversation_id", type = PrimaryKeyType.PARTITIONED)
+    @PrimaryKey
+    @Column("conversation_id")
+    private Long conversationId;
 
     @PrimaryKeyColumn(name = "sent_at", type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Instant sentAt;
