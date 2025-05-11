@@ -13,5 +13,5 @@ public class PaymentRequestDto {
     private String withdrawalAccountNo;         // 출금(보내는) 계좌번호
     private String depositTransactionSummary;   // 입금계좌 거래 요약 (선택)
     private String withdrawalTransactionSummary;// 출금계좌 거래 요약 (선택)
-    private String rentalId;                    // 결제와 관련된 rentalId
+    private Long rentalId;                    // 결제와 관련된 rentalId
 }

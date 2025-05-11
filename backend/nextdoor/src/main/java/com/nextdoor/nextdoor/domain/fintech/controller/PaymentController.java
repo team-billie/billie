@@ -26,7 +26,7 @@ public class PaymentController {
     public Mono<ResponseEntity<Map<String, Object>>> makePayment(
             @RequestBody PaymentRequestDto req) {
 
-        return accountService.processPayment(
+        return accountService.paymentAccount(
                         req.getUserKey(),
                         req.getDepositAccountNo(),
                         req.getTransactionBalance(),

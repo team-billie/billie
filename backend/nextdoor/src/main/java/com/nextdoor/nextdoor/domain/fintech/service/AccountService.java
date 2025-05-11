@@ -4,11 +4,13 @@ import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -24,6 +26,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
     private final RegistAccountRepository registAccountRepository;
+    private ApplicationEventPublisher eventPublisher;
 
     //계좌 생성
     public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
@@ -177,7 +180,7 @@ public class AccountService {
             String withdrawalAccountNo,
             String depositTransactionSummary,
             String withdrawalTransactionSummary,
-            String rentalId
+            Long rentalId
     ) {
         return transferAccount(
                 userKey,
@@ -190,17 +193,9 @@ public class AccountService {
                 .flatMap(ssafyResp ->
                         // 블로킹 작업은 boundedElastic 스케줄러에서 처리
                         Mono.fromCallable(() -> {
-                                    // ——————————————————————————————
-                                    // 1) rentalId 기반 결제 내역 저장
-                                    //    예시: RentalPayment 엔티티와 Repository를 추가한 뒤 아래처럼 사용하세요.
-                                    //    RentalPayment rp = new RentalPayment(rentalId, transactionBalance, LocalDateTime.now());
-                                    //    rentalPaymentRepository.save(rp);
-                                    //
-                                    // 2) (필요하다면) ssafyResp 에 rentalId 삽입
-                                    //    ssafyResp.put("rentalId", rentalId);
-                                    //
-                                    // 3) 기타 추가 로직…
-                                    // ——————————————————————————————
+                            
+                                    // 송금 완료 후 이벤트 발행
+                                    RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
 
                                     log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
                                     return ssafyResp;
