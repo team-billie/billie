@@ -184,4 +184,19 @@ public class RentalServiceImpl implements RentalService {
 
         rental.updateDamageAnalysis(damageAnalysis);
     }
+
+    @Override
+    @Transactional
+    public UpdateAccountResult updateAccount(UpdateAccountCommand command) {
+        Rental rental = rentalRepository.findByRentalId(command.getRentalId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateAccountInfo(command.getAccountNo(), command.getBankCode());
+
+        return UpdateAccountResult.builder()
+                .rentalId(rental.getRentalId())
+                .accountNo(rental.getAccountNo())
+                .bankCode(rental.getBankCode())
+                .build();
+    }
 }

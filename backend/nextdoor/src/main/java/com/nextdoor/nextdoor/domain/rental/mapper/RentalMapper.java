@@ -2,10 +2,12 @@ package com.nextdoor.nextdoor.domain.rental.mapper;
 
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemittanceRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UpdateAccountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import org.springframework.data.domain.Pageable;
@@ -67,7 +69,7 @@ public class RentalMapper {
                 .rentalProcess(result.getRentalProcess())
                 .rentalStatus(result.getRentalStatus())
                 .title(result.getTitle())
-                .productImageUrl(result.getProductImage())
+                .productImageUrls(result.getProductImages())
                 .build();
     }
 
@@ -76,6 +78,22 @@ public class RentalMapper {
                 .beforeImages(result.getBeforeImages())
                 .afterImages(result.getAfterImages())
                 .analysis(result.getAnalysis())
+                .build();
+    }
+
+    public UpdateAccountCommand toUpdateAccountCommand(Long rentalId, UpdateAccountRequest request) {
+        return UpdateAccountCommand.builder()
+                .rentalId(rentalId)
+                .accountNo(request.getAccountNo())
+                .bankCode(request.getBankCode())
+                .build();
+    }
+
+    public UpdateAccountResponse toUpdateAccountResponse(UpdateAccountResult result) {
+        return UpdateAccountResponse.builder()
+                .rentalId(result.getRentalId())
+                .accountNo(result.getAccountNo())
+                .bankCode(result.getBankCode())
                 .build();
     }
 }
