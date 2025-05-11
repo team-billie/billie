@@ -30,11 +30,11 @@ public class Rental {
     private Long reservationId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rental_status", nullable = false)
+    @Column(name = "rental_status", nullable = false, length = 30)
     private RentalStatus rentalStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rental_process", nullable = false)
+    @Column(name = "rental_process", nullable = false, length = 30)
     private RentalProcess rentalProcess;
 
     @Column(name = "damage_analysis")
