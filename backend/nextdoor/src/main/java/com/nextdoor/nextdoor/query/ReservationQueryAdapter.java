@@ -108,7 +108,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                 qReservation.renterId,
                 qReservation.postId,
                 qPost.title,
-                qPost.productImage
+                qPost.productImages
         );
     }
 

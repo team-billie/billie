@@ -67,7 +67,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
                         rental.rentalProcess.stringValue().as("rentalProcess"),
                         rental.rentalStatus.stringValue().as("rentalStatus"),
                         post.title,
-                        post.productImage))
+                        post.productImages))
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
                 .join(post).on(reservation.postId.eq(post.id))
