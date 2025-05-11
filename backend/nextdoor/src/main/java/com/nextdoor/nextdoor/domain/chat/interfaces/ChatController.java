@@ -50,7 +50,8 @@ public class ChatController {
      */
     @GetMapping("/{conversationId}/messages")
     public List<ChatMessageDto> getChatHistory(
-            @PathVariable UUID conversationId) {
-        return chatQueryService.getChatHistory(conversationId);
+            @PathVariable UUID conversationId,
+            @RequestParam Long userId) {
+        return chatQueryService.getChatHistory(conversationId, userId);
     }
 }

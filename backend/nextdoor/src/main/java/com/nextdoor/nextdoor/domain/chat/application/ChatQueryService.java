@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.nextdoor.nextdoor.domain.chat.application.dto.ChatMessageDto;
@@ -56,9 +57,13 @@ public class ChatQueryService {
 
     /**
      * 대화 내역(메시지 리스트) 조회
+     * -> 조회 직후 해당 사용자(UnreadCounter.userId)의 카운터를 0으로 만들기 위해
+     *    기존 unread_count 만큼 차감(clear) 처리
      */
-    public List<ChatMessageDto> getChatHistory(UUID conversationId) {
-        return messageRepo.findByKeyConversationId(conversationId)
+    @Transactional
+    public List<ChatMessageDto> getChatHistory(UUID conversationId, Long userId) {
+        // 1) 메시지 조회
+        List<ChatMessageDto> history = messageRepo.findByKeyConversationId(conversationId)
                 .stream()
                 .map(msg -> ChatMessageDto.builder()
                         .conversationId(msg.getKey().getConversationId())
@@ -68,5 +73,15 @@ public class ChatQueryService {
                         .build()
                 )
                 .collect(Collectors.toList());
+
+        // 2) 현재 남은 unreadCount 조회
+        long unreadCount = unreadCounterService.getUnreadCount(conversationId, userId);
+
+        // 3) clearUnread 로 해당 만큼 차감
+        if (unreadCount > 0) {
+            unreadCounterService.clearUnread(conversationId, userId, unreadCount);
+        }
+
+        return history;
     }
 }
