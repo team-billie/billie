@@ -1,13 +1,13 @@
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 import Image from "next/image";
 import blueStar from "@/public/images/blueStar.png";
 import Link from "next/link";
+import useUserStore from "@/lib/store/useUserStore";
 interface SafeDealBtnProps {
   reservationId: number;
 }
 
 export default function SafeDealBtn({ reservationId }: SafeDealBtnProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("SafeDealBtn userId:", userId);
 
   // userId가 없으면 렌더링하지 않음

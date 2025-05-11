@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
 import { createReservation } from "@/lib/api/reservations/request";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
 
 interface ProductReservationProps {
   feedId: number;
@@ -17,7 +17,8 @@ export default function ProductReservation({
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
+  console.log("❤️❤️❤️", userId);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (

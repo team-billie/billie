@@ -1,11 +1,11 @@
 import axiosInstance from "@/lib/api/instance";
+import useUserStore from "@/lib/store/useUserStore";
 import {
   RENTAL_PROCESS,
   RENTAL_STATUS,
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
@@ -20,7 +20,7 @@ export default function OwnerActionBtn({
   process,
   onSuccess,
 }: OwnerActionBtnProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("OwnerActionBtn userId:", userId);
 
   // userId가 없으면 렌더링하지 않음

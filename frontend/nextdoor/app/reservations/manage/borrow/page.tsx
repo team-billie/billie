@@ -7,8 +7,8 @@ import {
   fetchOwnerReservations,
   fetchRenterReservations,
 } from "@/lib/api/reservations/request";
+import useUserStore from "@/lib/store/useUserStore";
 import { useEffect, useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
@@ -22,7 +22,7 @@ interface ReservationItem {
 
 export default function ReservationBorrowManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ReservationBorrowManagePage userId:", userId);
 
   const loadReservations = async () => {

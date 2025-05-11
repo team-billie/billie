@@ -6,9 +6,8 @@ import RentalCard from "@/components/reservations/RentalCard/RentalCard";
 import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/ReservationStatusTabs";
 import { fetchRentals } from "@/lib/api/rental/request";
 import { RentalProcess, RentalStatus } from "@/types/rental";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
 
-// 화면에서 사용할 예약 항목 타입
 interface ReservationItem {
   id: number;
   img: string;
@@ -26,10 +25,9 @@ export default function ReservationPage() {
   const [reservations, setReservations] = useState<ReservationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { userId: testUserId } = useTestUserStore();
+  const { userId } = useUserStore();
   const userRole: "OWNER" | "RENTER" = "RENTER";
   const condition = "ALL";
-  console.log("testUserId", testUserId);
   useEffect(() => {
     const fetchReservationData = async () => {
       try {
@@ -37,7 +35,7 @@ export default function ReservationPage() {
         setError(null); // 에러 상태 초기화
 
         const data: ReservationResponseDTO[] = await fetchRentals({
-          userId: testUserId || 1,
+          userId: userId || 1,
           userRole,
           condition,
           page: 0,
@@ -74,12 +72,10 @@ export default function ReservationPage() {
       }
     };
 
-    if (testUserId) {
-      // testUserId가 있을 때만 fetch 실행
+    if (userId) {
       fetchReservationData();
     }
-  }, [testUserId, userRole, condition]); // 의존성 배열에 필요한 값들 추가
-
+  }, [userId, userRole, condition]);
   const handleActionSuccess = (rentalId: number) => {
     console.log(`예약 ID ${rentalId}의 상태가 변경되었습니다.`);
   };

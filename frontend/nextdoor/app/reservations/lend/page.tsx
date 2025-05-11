@@ -5,9 +5,9 @@ import MainHeader from "@/components/common/Header/ReservationHeader";
 import RentalCard from "@/components/reservations/RentalCard/RentalCard";
 import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/ReservationStatusTabs";
 import { fetchRentals } from "@/lib/api/rental/request";
+import useUserStore from "@/lib/store/useUserStore";
 import { RENTAL_STATUS, RentalProcess, RentalStatus } from "@/types/rental";
 import { useEffect, useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 // import PhotoNotFound from "@/components/reservations/safe-deal/PhotoNotFound";
 
@@ -28,7 +28,7 @@ export default function ReservationLendPage() {
   const [reservations, setReservations] = useState<ReservationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ReservationLendPage userId:", userId);
 
   const userRole: "OWNER" | "RENTER" = "OWNER";

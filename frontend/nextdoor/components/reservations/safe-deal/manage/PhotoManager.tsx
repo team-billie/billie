@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ImagePreview from "./ImagePreview";
 import FileUpload from "./FileUpload";
 import axiosInstance from "@/lib/api/instance";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
 // 1. 이미지 도메인 next.config.mjs 에 설정 해야함.
 // 2. Image 컴포넌트를 사용함. -> 가변적으로 하고 싶으면 껍데기를 relative, Image fill, objectFit cover or contain
 
@@ -23,7 +23,7 @@ export default function PhotoManager({
   photos = [],
   serverImages = [],
 }: PhotoManagerProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("PhotoManager userId:", userId);
 
   // userId가 없으면 렌더링하지 않음

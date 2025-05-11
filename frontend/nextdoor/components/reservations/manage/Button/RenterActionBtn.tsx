@@ -1,11 +1,12 @@
 import axiosInstance from "@/lib/api/instance";
+import useUserStore from "@/lib/store/useUserStore";
 import {
   RENTAL_PROCESS,
   RENTAL_STATUS,
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import { useRouter } from "next/router";
 
 interface RenterActionBtnProps {
   status: RentalStatus;
@@ -20,7 +21,8 @@ export default function RenterActionBtn({
   process,
   onSuccess,
 }: RenterActionBtnProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
+  const router = useRouter();
   console.log("RenterActionBtn userId:", userId);
 
   // userId가 없으면 렌더링하지 않음
@@ -75,11 +77,9 @@ export default function RenterActionBtn({
 
     try {
       if (process === RENTAL_PROCESS.BEFORE_RENTAL) {
-        if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
-          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-            status: RENTAL_STATUS.REMITTANCE_CONFIRMED,
-            userId: userId,
-          });
+        if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
+          router.push(`/pays/payment/${rentalId}`);
+          return;
         }
       } else if (process === RENTAL_PROCESS.RENTAL_IN_ACTIVE) {
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
