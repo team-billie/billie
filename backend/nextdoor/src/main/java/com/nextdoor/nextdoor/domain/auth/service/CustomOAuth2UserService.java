@@ -2,7 +2,7 @@ package com.nextdoor.nextdoor.domain.auth.service;
 
 import com.nextdoor.nextdoor.domain.auth.AuthMemberQueryPort;
 import com.nextdoor.nextdoor.domain.auth.CustomOAuth2User;
-import com.nextdoor.nextdoor.domain.auth.event.NewUserInfoObtainedEvent;
+import com.nextdoor.nextdoor.domain.auth.event.NewOAuth2UserInfoObtainedEvent;
 import com.nextdoor.nextdoor.domain.auth.exception.UnsupportedOAuth2ProviderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,7 +39,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 throw new UnsupportedOAuth2ProviderException("지원하지 않는 OAuth2 제공자입니다.");
         }
         authMemberQueryPort.findByNickname(nickname).ifPresentOrElse(memberQueryDto -> {},
-                () -> applicationEventPublisher.publishEvent(new NewUserInfoObtainedEvent(nickname)));
+                () -> applicationEventPublisher.publishEvent(new NewOAuth2UserInfoObtainedEvent(nickname)));
         return new CustomOAuth2User(nickname, oAuth2User.getAttributes());
     }
 }
