@@ -10,12 +10,12 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public class CustomOAuth2User implements OAuth2User {
 
-	private String id;
+	private String name;
 	private Collection<? extends GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
 
-	public CustomOAuth2User(String id, Map<String, Object> attributes) {
-		this.id = id;
+	public CustomOAuth2User(String name, Map<String, Object> attributes) {
+		this.name = name;
 		this.attributes = attributes;
 		this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 	}
@@ -32,7 +32,7 @@ public class CustomOAuth2User implements OAuth2User {
 
 	@Override
 	public String getName() {
-		return this.id; // name 대신 id 리턴
+		return this.name;
 	}
 
 }
