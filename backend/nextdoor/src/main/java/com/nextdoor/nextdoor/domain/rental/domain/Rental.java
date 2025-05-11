@@ -43,11 +43,17 @@ public class Rental {
     @Column(name = "deal_count")
     private Integer dealCount;
 
+    @Column(name = "account_no", nullable = false, length = 30)
+    private String accountNo;
+
+    @Column(name = "bank_code", nullable = false, length = 10)
+    private String bankCode;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Builder
-    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis, LocalDateTime createdAt) {
+    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis, LocalDateTime createdAt, String accountNo, String bankCode) {
         this.aiImages = aiImages;
         this.reservationId = reservationId;
         this.rentalStatus = rentalStatus;
@@ -55,6 +61,8 @@ public class Rental {
         this.damageAnalysis = damageAnalysis;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
         this.dealCount = 0;
+        this.accountNo = accountNo != null ? accountNo : "";
+        this.bankCode = bankCode != null ? bankCode : "";
     }
 
     public static Rental createFromReservation(Long reservationId) {
@@ -62,6 +70,8 @@ public class Rental {
                 .reservationId(reservationId)
                 .rentalStatus(RentalStatus.CREATED)
                 .createdAt(LocalDateTime.now())
+                .accountNo("")
+                .bankCode("")
                 .build();
     }
 
@@ -87,6 +97,13 @@ public class Rental {
 
     public void updateDamageAnalysis(String damageAnalysis) {
         this.damageAnalysis = damageAnalysis;
+    }
+
+    public void updateAccountInfo(String accountNo, String bankCode) {
+        validateNotBlank(accountNo, "accountNo");
+        validateNotBlank(bankCode, "bankCode");
+        this.accountNo = accountNo;
+        this.bankCode = bankCode;
     }
 
     public void processDepositCompletion(){

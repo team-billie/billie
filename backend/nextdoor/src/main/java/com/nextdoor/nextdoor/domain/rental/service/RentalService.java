@@ -20,4 +20,5 @@ public interface RentalService {
     void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
     AiAnalysisResult getAiAnalysis(Long rentalId);
     void updateDamageAnalysis(Long rentalId, String damageAnalysis);
+    UpdateAccountResult updateAccount(UpdateAccountCommand command);
 }
