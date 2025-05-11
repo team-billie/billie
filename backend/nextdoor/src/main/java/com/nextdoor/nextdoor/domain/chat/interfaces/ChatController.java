@@ -2,6 +2,9 @@ package com.nextdoor.nextdoor.domain.chat.interfaces;
 
 import java.util.List;
 
+import com.nextdoor.nextdoor.domain.chat.application.ConversationService;
+import com.nextdoor.nextdoor.domain.chat.application.dto.CreateConversationRequest;
+import com.nextdoor.nextdoor.domain.chat.domain.Conversation;
 import org.springframework.web.bind.annotation.*;
 
 import com.nextdoor.nextdoor.domain.chat.application.ChatService;
@@ -18,6 +21,19 @@ public class ChatController {
 
     private final ChatService       chatService;
     private final ChatQueryService  chatQueryService;
+    private final ConversationService conversationService;
+
+    /**
+     * 1:1 채팅방 생성
+     */
+    @PostMapping
+    public Conversation createChatRoom(@RequestBody CreateConversationRequest req) {
+        return conversationService.createConversation(
+                req.getConversationId(),
+                req.getParticipantIds()
+        );
+    }
+
 
     /**
      * 채팅방 목록 조회
