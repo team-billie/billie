@@ -3,6 +3,8 @@ package com.nextdoor.nextdoor.domain.chat.infrastructure.persistence;
 import com.nextdoor.nextdoor.domain.chat.domain.ChatMessage;
 import com.nextdoor.nextdoor.domain.chat.domain.ChatMessageKey;
 import org.springframework.data.cassandra.repository.CassandraRepository;
+import org.springframework.data.cassandra.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,5 +19,17 @@ public interface ChatMessageRepository extends CassandraRepository<ChatMessage, 
     ChatMessage findFirstByKeyConversationIdOrderByKeySentAtDesc(UUID conversationId);
 
     // 안 읽은 메시지 개수 조회,  senderId 가 아닌 메시지 중 read = false(안 읽음) 개수 조회
-    long countByKeyConversationIdAndSenderIdNotAndReadFalse(UUID conversationId, Long senderId);
+//    long countByKeyConversationIdAndSenderIdNotAndReadFalse(UUID conversationId, Long senderId);
+    @Query("""
+      SELECT count(*) 
+        FROM chat_messages 
+       WHERE conversation_id = :conversationId 
+         AND is_read        = false 
+         AND sender_id     != :senderId 
+       ALLOW FILTERING
+    """)
+    long countUnreadMessages(
+            @Param("conversationId") UUID conversationId,
+            @Param("senderId")       Long   senderId);
+
 }

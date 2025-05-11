@@ -41,8 +41,7 @@ public class ChatQueryService {
 
                     // 4) 안 읽은 메시지 개수 조회
                     long unreadCount = messageRepo
-                            .countByKeyConversationIdAndSenderIdNotAndReadFalse(
-                                    cid, memberId);
+                            .countUnreadMessages(cid, memberId);
 
                     return ChatRoomDto.builder()
                             .conversationId(cid)
