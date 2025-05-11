@@ -1,6 +1,6 @@
+import useUserStore from "@/lib/store/useUserStore";
 import Image from "next/image";
 import { useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ImagePreviewProps {
   preview: string;
@@ -17,7 +17,7 @@ export default function ImagePreview({
   isMultiple = false,
   isServerImage = false,
 }: ImagePreviewProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ImagePreview userId:", userId);
 
   // userId가 없으면 렌더링하지 않음

@@ -3,15 +3,28 @@
 import LinkHeader from "@/components/(tabs)/profile/LinkHeader";
 import PayBox from "@/components/(tabs)/profile/PayBox";
 import useUserStore from "@/lib/store/useUserStore";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-    const { username } = useUserStore();
+    const { username, userKey, userId, reset } = useUserStore();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        reset();
+        router.push("/login");
+    }
+
+    useEffect(() => {
+        console.log(userKey, userId);
+    }, []);
+
     return (
     <div className="flex flex-col min-h-[100dvh] pb-20">
       <div className="flex-1 flex flex-col bg-blue300 p-4">
         <div className="flex-1 flex flex-col pt-8 text-white font-bold text-2xl px-2">
           <span>안녕하세요</span>
-          <span>{username} 님!</span>
+          <span>{username || "사용자"} 님!</span>
         </div>
         
         <PayBox type="profile"/>
@@ -43,7 +56,7 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex justify-end">
-          <div className="text-center text-white text-lg bg-gray900 shadow-popup py-2 px-14 rounded-2xl">logout</div>
+          <div onClick={handleLogout} className="text-center text-white text-lg bg-gray900 shadow-popup py-2 px-14 rounded-2xl">logout</div>
         </div>
       </div>
     </div>

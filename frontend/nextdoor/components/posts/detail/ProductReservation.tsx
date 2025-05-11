@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
 import { createReservation } from "@/lib/api/reservations/request";
+import useUserStore from "@/lib/store/useUserStore";
 
 interface ProductReservationProps {
   feedId: number;
@@ -16,7 +17,8 @@ export default function ProductReservation({
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
-
+  const { userId } = useUserStore();
+  console.log("❤️❤️❤️", userId);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -46,7 +48,6 @@ export default function ProductReservation({
       setEndDate(null);
       setSelectedDates([selectedDate]);
     } else {
-      // Complete the selection
       if (selectedDate < startDate) {
         setEndDate(startDate);
         setStartDate(selectedDate);
@@ -54,7 +55,6 @@ export default function ProductReservation({
         setEndDate(selectedDate);
       }
 
-      // Generate all dates in the range
       const dateRange: Date[] = [];
       const currentDate = new Date(
         selectedDate < startDate ? selectedDate : startDate
@@ -84,13 +84,13 @@ export default function ProductReservation({
         .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
 
     const reservation = {
-      feedId: feedId,
+      postId: feedId,
       startDate: formatDate(startDate),
       endDate: formatDate(endDate),
     };
 
     try {
-      const result = await createReservation(reservation);
+      const result = await createReservation(reservation, userId);
       console.log("예약 성공:", result);
       alert(
         `${formatDate(startDate)}부터 ${formatDate(

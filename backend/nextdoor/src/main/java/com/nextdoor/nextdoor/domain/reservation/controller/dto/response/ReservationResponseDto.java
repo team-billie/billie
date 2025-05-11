@@ -7,13 +7,14 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 public class ReservationResponseDto {
 
     private Long reservationId;
     private String postTitle;
-    private String postProductImage;
+    private List<String> postProductImages;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal rentalFee;
@@ -26,7 +27,7 @@ public class ReservationResponseDto {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getId();
         response.postTitle = post.getTitle();
-        response.postProductImage = post.getProductImage();
+        response.postProductImages = post.getProductImages();
         response.startDate = reservation.getStartDate();
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();
@@ -41,7 +42,7 @@ public class ReservationResponseDto {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getReservationId();
         response.postTitle = reservation.getPostTitle();
-        response.postProductImage = reservation.getPostProductImage();
+        response.postProductImages = reservation.getPostProductImages();
         response.startDate = reservation.getStartDate();
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();

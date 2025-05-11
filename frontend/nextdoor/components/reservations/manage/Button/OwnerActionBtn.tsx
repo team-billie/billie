@@ -1,11 +1,11 @@
 import axiosInstance from "@/lib/api/instance";
+import useUserStore from "@/lib/store/useUserStore";
 import {
   RENTAL_PROCESS,
   RENTAL_STATUS,
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
@@ -20,7 +20,7 @@ export default function OwnerActionBtn({
   process,
   onSuccess,
 }: OwnerActionBtnProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("OwnerActionBtn userId:", userId);
 
   // userId가 없으면 렌더링하지 않음
@@ -49,7 +49,7 @@ export default function OwnerActionBtn({
 
       case RENTAL_PROCESS.RETURNED:
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
-          return "보증금 처리";
+          return "사진 등록 대기중";
         } else if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
           return "보증금 처리";
         } else if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {

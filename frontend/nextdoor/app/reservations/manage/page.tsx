@@ -4,8 +4,8 @@ import MainDock from "@/components/common/Dock/MainDock";
 import LendManageCard from "@/components/reservations/RentalCard/LendManageCard";
 import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
 import { fetchOwnerReservations } from "@/lib/api/reservations/request";
+import useUserStore from "@/lib/store/useUserStore";
 import { useEffect, useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
@@ -19,7 +19,7 @@ interface ReservationItem {
 
 export default function ReservationManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ReservationManagePage userId:", userId);
 
   const loadReservations = async () => {

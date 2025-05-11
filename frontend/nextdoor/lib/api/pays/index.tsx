@@ -1,5 +1,6 @@
+import axios from "axios";
 import axiosInstance from "../instance";
-import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto } from "@/types/pays/request/index";
+import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto, GetFinUserRequestDto } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
 const handleApiError = (error: any, name: string) => {
@@ -20,6 +21,16 @@ const apiCall = async (endpoint: string, data: any, name: string) => {
 //사용자 계정 생성
 export const CreateFinUserRequest = (requestBody: CreateFinUserRequestDto) => 
   apiCall("/api/v1/fintechs/users", requestBody, "사용자 계정 생성");
+
+//사용자 계정 조회
+export const GetFinUserRequest = (requestBody: GetFinUserRequestDto) => 
+  axios.post(`https://finopenapi.ssafy.io/ssafy/api/v1/member/search`, requestBody)
+  .then((response) => {
+    return response.data;
+  })
+  .catch((error) => {
+    return handleApiError(error, "사용자 계정 조회");
+});
 
 //계좌 생성
 export const CreateFinAccountRequest = (requestBody: CreateFinAccountRequestDto) => 

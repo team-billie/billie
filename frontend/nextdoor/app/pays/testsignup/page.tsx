@@ -9,7 +9,7 @@ import { CreateFinUserResponseDto, AddAccountResponseDto } from "@/types/pays/re
 import useUserStore from "@/lib/store/useUserStore";
 import { useRouter } from "next/navigation";
 
-export default function TestPage() {
+export default function TestSignUpPage() {
     const router = useRouter();
     const { setUserKey, setBillyAccount, setAddedAccounts } = useUserStore();
 
@@ -43,7 +43,7 @@ export default function TestPage() {
             <Header txt="테스트 계좌 등록" />
             <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
                 <div className="text-xl text-blue400 font-bold">임의의 이메일과 번호 등록시</div>
-                <div className="text-xl text-blue400 font-bold mb-10">계좌 등록 테스트 가능</div>
+                <div className="text-xl text-blue400 font-bold mb-10">계좌 및 거래 테스트 가능</div>
                 <FormProvider {...form}>
                         <Controller
                             control={form.control}
@@ -52,7 +52,7 @@ export default function TestPage() {
                                 <input 
                                     required
                                     type="text"
-                                    placeholder="사용자 아이디 번호"
+                                    placeholder="사용자 번호"
                                     className="w-full border border-gray-500 rounded-md p-4"
                                     {...field} />}
                         />
