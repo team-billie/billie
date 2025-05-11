@@ -27,7 +27,7 @@ public class ChatController {
     /**
      * 1:1 채팅방 생성
      */
-    @PostMapping
+    @PostMapping("/create")
     public Conversation createChatRoom(@RequestBody CreateConversationRequest req) {
         return conversationService.createConversation(
                 req.getParticipantIds()
