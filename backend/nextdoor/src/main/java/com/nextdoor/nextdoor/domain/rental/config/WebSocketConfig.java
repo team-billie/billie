@@ -23,6 +23,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         "http://nextdoor-nextdoor-fe:3000",
                         "http://localhost:3000"
                 );
+
+        registry.addEndpoint("/ws-rental")
+                .setAllowedOriginPatterns(
+                        "http://nextdoor-nextdoor-fe:3000",
+                        "http://localhost:3000"
+                )
+                .withSockJS();
     }
 }
 
