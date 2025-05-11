@@ -10,10 +10,16 @@ spring:
       maximum-pool-size: 10
       idle-timeout: 600000
     driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+      continue-on-error: false
+      separator: ;
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -21,6 +27,7 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 1000
     defer-datasource-initialization: true
+    show-sql: true
 
   servlet:
     multipart:
@@ -32,7 +39,6 @@ spring:
     port: 9042
     keyspace-name: nextdoor_chat
     local-datacenter: datacenter1
-#    schema-action: CREATE_IF_NOT_EXISTS #테이블 없으면 엔티티보고 자동 생성
 
   rabbitmq:
     host: localhost
@@ -57,4 +63,3 @@ cloud:
       auto: false
     s3:
       bucket: oneders
-

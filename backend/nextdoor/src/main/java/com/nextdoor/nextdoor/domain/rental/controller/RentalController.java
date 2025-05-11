@@ -58,7 +58,7 @@ public class RentalController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{rentalId}/request-remittance")
+    @GetMapping("/{rentalId}/request-remittance")
     public ResponseEntity<RemittanceResponse> requestRemittance(@PathVariable Long rentalId) {
         RequestRemittanceCommand command = rentalMapper.toCommand(rentalId);
         RequestRemittanceResult result = rentalService.requestRemittance(command);
