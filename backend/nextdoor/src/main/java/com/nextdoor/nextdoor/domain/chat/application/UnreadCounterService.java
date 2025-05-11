@@ -33,7 +33,8 @@ public class UnreadCounterService {
                     Criteria.where("conversation_id").is(conversationId),
                     Criteria.where("user_id").is(userId)
             );
-            Update u = Update.update("unread_count", 1L);
+            // counter 타입 컬럼은 Update.empty().increment(...) 로 증가시켜야 합니다
+            Update u = Update.empty().increment("unread_count", 1L);
             cassandraTemplate.update(q, u, UnreadCounter.class);
         }
     }

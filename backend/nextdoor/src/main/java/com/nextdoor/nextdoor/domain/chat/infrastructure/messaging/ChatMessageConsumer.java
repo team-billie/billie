@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.chat.infrastructure.messaging;
 
+import com.nextdoor.nextdoor.domain.chat.application.UnreadCounterService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -24,13 +25,15 @@ public class ChatMessageConsumer {
     private final ChatMessageRepository    chatMessageRepository;
     private final ConversationRepository   conversationRepository;
     private final ChatWebSocketHandler     webSocketHandler;
+    private final UnreadCounterService unreadCounterService;
 //    private final NotificationFacade notificationFacade;
 
     /**
      * RabbitMQ로부터 메시지를 수신하여
-     * 1) Cassandra에 영구 저장
-     * 2) WebSocket 연결된 상대에게 실시간 전달
-     * 3) 알림 트리거
+     * 1) Cassandra 에 영구 저장
+     * 2) Unread 카운트 증가
+     * 3) WebSocket 연결된 상대에게 실시간 전달
+     * 4) 알림 트리거
      */
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void receive(ChatMessage chatMessage) {
@@ -39,27 +42,29 @@ public class ChatMessageConsumer {
         // 1) Cassandra에 저장
         chatMessageRepository.save(chatMessage);
 
-        // 2) WebSocket 사용자에게 즉시 푸시할 DTO 생성
+        // 2) Unread 카운트 증가
+        UUID convId = chatMessage.getKey().getConversationId();
+        Conversation conv = conversationRepository.findById(convId)
+                .orElseThrow(() -> new IllegalStateException("Conversation not found: " + convId));
+        // 발신자(senderId) 제외한 상대 목록
+        List<Long> recipients = conv.getParticipantIds().stream()
+                .filter(id -> !id.equals(chatMessage.getSenderId()))
+                .toList();
+        // 실제 카운터 업데이트
+        unreadCounterService.incrementUnread(convId, recipients);
+
+        // 3) WebSocket 사용자에게 즉시 푸시할 DTO 생성
         ChatMessageDto dto = ChatMessageDto.builder()
-                .conversationId(chatMessage.getKey().getConversationId())
+                .conversationId(convId)
                 .senderId       (chatMessage.getSenderId())
                 .content        (chatMessage.getContent())
                 .sentAt         (chatMessage.getKey().getSentAt())
                 .build();
 
-        // 3) 대화 상대 ID 추출
-        UUID convId = chatMessage.getKey().getConversationId();
-        Conversation conv = conversationRepository.findById(convId)
-                .orElseThrow(() -> new IllegalStateException("Conversation not found: " + convId));
-        List<Long> participants = conv.getParticipantIds();
-        String targetUserId = participants.stream()
-                .filter(id -> !id.equals(chatMessage.getSenderId()))
-                .findFirst()
-                .map(Object::toString)
-                .orElseThrow(() -> new IllegalStateException("No target user in conversation: " + convId));
-
         // 4) WebSocket 전송
-        webSocketHandler.sendToUser(dto, targetUserId);
+        recipients.forEach(target ->
+                webSocketHandler.sendToUser(dto, target.toString())
+        );
 
         // 5) 알림(푸시) 전송 (구현은 NotificationFacade 구현체에서 처리)
 //        notificationFacade.notifyNewMessage(chatMessage);
