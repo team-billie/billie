@@ -31,7 +31,7 @@ public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
                                 qPost.content,
                                 qPost.rentalFee.castToNum(BigDecimal.class),
                                 qPost.deposit.castToNum(BigDecimal.class),
-                                qPost.productImage,
+                                qPost.productImages,
                                 qPost.category,
                                 qPost.authorId,
                                 qMember.name,
