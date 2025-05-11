@@ -4,6 +4,12 @@ type CreateFinUserRequestDto = {
     ssafyApiEmail: string;
 }
 
+//사용자 계정 조회
+type GetFinUserRequestDto = {
+    apiKey: string;
+    userId: string;
+}
+
 //계좌 생성
 type CreateFinAccountRequestDto = {
     userKey: string;
@@ -66,4 +72,5 @@ export type { CreateFinUserRequestDto,
     TransferAccountRequestDto, 
     WithdrawDepositRequestDto, 
     ReturnDepositRequestDto,
-    CheckAccountRequestDto }; 
+    CheckAccountRequestDto,
+    GetFinUserRequestDto }; 

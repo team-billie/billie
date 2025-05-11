@@ -25,28 +25,42 @@ const test2 = {
 
 interface UserStore {
     username: string;
+    userId: number | null;
     userKey: string;
     setUserKey: (userKey: string) => void;
+    setUserId: (userId: number) => void;
     billyAccount: AddAccountResponseDto | null;
     mainAccount: AddAccountResponseDto | null;
     setBillyAccount: (billyAccount: AddAccountResponseDto) => void;
     setMainAccount: (mainAccount: AddAccountResponseDto) => void;
     addedAccounts: AddAccountResponseDto[];
     setAddedAccounts: (addedAccounts: AddAccountResponseDto[]) => void;
+
+    reset: () => void;
 }
 
 const useUserStore = create<UserStore>((set) => ({
-    username: "다정",   
+    username: "",   
     // username:"", 
-    userKey: "99c3ca90-758f-432c-b561-7c0ecccdcf14",    
+    userKey: "",
+    userId: null,    
     // userKey:"",
     billyAccount: test,
     mainAccount: test2,
     addedAccounts: [],
     setUserKey: (userKey: string) => set({ userKey }),
+    setUserId: (userId: number) => set({ userId }),
     setBillyAccount: (billyAccount: AddAccountResponseDto) => set({ billyAccount }),
     setMainAccount: (mainAccount: AddAccountResponseDto) => set({ mainAccount }),
     setAddedAccounts: (addedAccounts: AddAccountResponseDto[]) => set({ addedAccounts }),
+
+    reset: () => set({
+        username: "",
+        userKey: "",
+        userId: null,
+        billyAccount: null,
+        mainAccount: null,
+    })
 }));
 
 export default useUserStore;    
