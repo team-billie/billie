@@ -40,6 +40,7 @@ public class RentalServiceImpl implements RentalService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
