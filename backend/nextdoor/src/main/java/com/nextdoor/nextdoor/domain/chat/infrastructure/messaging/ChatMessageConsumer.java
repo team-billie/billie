@@ -47,7 +47,7 @@ public class ChatMessageConsumer {
                 .build();
 
         // 3) 대화 상대 ID 추출
-        String convId = chatMessage.getKey().getConversationId();
+        Long convId = chatMessage.getKey().getConversationId();
         Conversation conv = conversationRepository.findById(convId)
                 .orElseThrow(() -> new IllegalStateException("Conversation not found: " + convId));
         List<Long> participants = conv.getParticipantIds();

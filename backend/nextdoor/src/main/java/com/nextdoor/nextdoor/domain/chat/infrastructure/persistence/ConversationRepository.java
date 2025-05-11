@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ConversationRepository extends CassandraRepository<Conversation, String> {
+public interface ConversationRepository extends CassandraRepository<Conversation, Long> {
     /**
      * participantIds 컬렉션에 memberId가 포함된 Conversation 조회
      */

@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ChatMessageDto {
     /** 대화방 식별자 */
-    private String conversationId;
+    private Long conversationId;
     /** 보낸 사람 ID */
     private Long senderId;
     /** 메시지 본문 */

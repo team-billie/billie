@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 public class ChatRoomDto {
     /** 채팅방 ID */
-    private String conversationId;
+    private Long conversationId;
     /** 마지막 메시지 내용 미리보기 */
     private String lastMessage;
     /** 마지막 메시지 전송 시각 */
