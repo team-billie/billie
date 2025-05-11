@@ -47,9 +47,9 @@ public class SecurityConfig {
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .redirectionEndpoint(redirection -> redirection
-                                .baseUri("/api/v1/auth/login/oauth2/code/*"))
+                                .baseUri("/api/v1/auth/oauth2/code/*"))
                         .authorizationEndpoint(authorization -> authorization
-                                .baseUri("/api/v1/auth/authorize")
+                                .baseUri("/api/v1/auth/oauth2/authorization")
                                 .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository)))
                 .oauth2Client(Customizer.withDefaults())
                 .addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
