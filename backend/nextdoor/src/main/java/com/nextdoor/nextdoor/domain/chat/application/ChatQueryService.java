@@ -21,6 +21,7 @@ public class ChatQueryService {
 
     private final ChatMessageRepository    messageRepo;
     private final ConversationRepository   conversationRepo;
+    private final UnreadCounterService unreadCounterService;
 
     /**
      * 1:1 채팅방 목록 조회 (마지막 메시지 + 안 읽은 개수)
@@ -40,8 +41,8 @@ public class ChatQueryService {
                             .findFirstByKeyConversationIdOrderByKeySentAtDesc(cid);
 
                     // 4) 안 읽은 메시지 개수 조회
-                    long unreadCount = messageRepo
-                            .countUnreadMessages(cid, memberId);
+                    // 메시지 저장소 대신 UnreadCounterService 에서 꺼냄
+                    long unreadCount = unreadCounterService.getUnreadCount(cid, memberId);
 
                     return ChatRoomDto.builder()
                             .conversationId(cid)
