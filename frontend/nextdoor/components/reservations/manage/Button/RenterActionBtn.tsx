@@ -1,3 +1,6 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import {
@@ -6,7 +9,7 @@ import {
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface RenterActionBtnProps {
   status: RentalStatus;
@@ -15,7 +18,7 @@ interface RenterActionBtnProps {
   onSuccess?: () => void;
 }
 
-export default function RenterActionBtn({
+function RenterActionBtn({
   status,
   rentalId,
   process,
@@ -115,3 +118,8 @@ export default function RenterActionBtn({
     </div>
   );
 }
+
+// dynamic import로 컴포넌트를 감싸서 클라이언트 사이드에서만 렌더링되도록 설정
+export default dynamic(() => Promise.resolve(RenterActionBtn), {
+  ssr: false
+});
