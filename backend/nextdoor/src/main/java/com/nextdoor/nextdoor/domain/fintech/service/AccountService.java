@@ -193,14 +193,15 @@ public class AccountService {
                 .flatMap(ssafyResp ->
                         // 블로킹 작업은 boundedElastic 스케줄러에서 처리
                         Mono.fromCallable(() -> {
-                            
-                                    // 송금 완료 후 이벤트 발행
-                                    RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
 
-                                    log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
-                                    return ssafyResp;
-                                })
-                                .subscribeOn(Schedulers.boundedElastic())
+                                // 송금 완료 후 이벤트 발행
+                                RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
+                                eventPublisher.publishEvent(event);
+
+                                log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
+                                return ssafyResp;
+                            })
+                            .subscribeOn(Schedulers.boundedElastic())
                 );
     }
 }
