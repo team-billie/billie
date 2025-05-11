@@ -26,7 +26,7 @@ public class Rental {
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AiImage> aiImages = new ArrayList<>();
 
-    @Column(name="reservation_id", nullable=false, updatable=false, insertable=false)
+    @Column(name="reservation_id", nullable=false)
     private Long reservationId;
 
     @Enumerated(EnumType.STRING)
