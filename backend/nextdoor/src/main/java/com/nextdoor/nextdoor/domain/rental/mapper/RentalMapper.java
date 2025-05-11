@@ -42,6 +42,8 @@ public class RentalMapper {
                 .ownerNickname(result.getOwnerNickname())
                 .rentalFee(result.getRentalFee())
                 .deposit(result.getDeposit())
+                .accountNo(result.getAccountNo())
+                .bankCode(result.getBankCode())
                 .build();
     }
 
