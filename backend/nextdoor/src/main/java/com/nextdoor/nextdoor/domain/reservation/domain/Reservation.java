@@ -45,7 +45,7 @@ public class Reservation {
     private Long renterId;
 
     @NotNull
-    private Long feedId;
+    private Long postId;
 
     public void updateStartDate(LocalDate startDate) {
         this.startDate = startDate;
@@ -65,5 +65,9 @@ public class Reservation {
 
     public void updateStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public void updateRentalId(Long rentalId) {
+        this.rentalId = rentalId;
     }
 }

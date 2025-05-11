@@ -3,11 +3,20 @@
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 export default function ReservationManageNavbar() {
   const pathname = usePathname();
+  const { userId } = useTestUserStore();
+  console.log("ReservationManageNavbar userId:", userId);
+
   const isManage = pathname?.endsWith("/manage");
   const isBorrow = pathname?.endsWith("/borrow");
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
 
   return (
     <main>
@@ -22,7 +31,7 @@ export default function ReservationManageNavbar() {
       </div>
 
       <div className="w-full flex justify-center border-b border-gray-200">
-        <nav className="flex w-3/4">
+        <nav className="flex w-4/5">
           <Link
             href="/reservations/manage"
             className={`w-1/2 text-center py-3 border-b-2 font-medium text-l transition-all duration-200

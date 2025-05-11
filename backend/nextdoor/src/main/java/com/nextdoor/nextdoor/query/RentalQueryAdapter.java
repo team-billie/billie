@@ -1,10 +1,12 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
+import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
+import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
 import com.nextdoor.nextdoor.domain.reservation.domain.QReservation;
@@ -23,6 +25,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Adapter
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
     private final QReservation reservation = QReservation.reservation;
     private final QRental rental = QRental.rental;
     private final QPost post = QPost.post;
+    private final QMember member = QMember.member;
 
     @Override
     public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
@@ -51,22 +55,22 @@ public class RentalQueryAdapter implements RentalQueryPort {
         whereCondition.and(rentalProcessCondition(condition));
 
         List<SearchRentalResult> results = queryFactory
-                .select(Projections.constructor(SearchRentalResult.class,
-                        reservation.id.as("reservationId"),
-                        reservation.startDate,
-                        reservation.endDate,
+                .select(Projections.fields(SearchRentalResult.class,
+                        reservation.id.as("id"),
+                        reservation.startDate.as("startDate"),
+                        reservation.endDate.as("endDate"),
                         reservation.rentalFee,
                         reservation.deposit,
                         reservation.ownerId,
                         reservation.renterId,
                         rental.rentalId,
-                        rental.rentalProcess,
-                        rental.rentalStatus,
+                        rental.rentalProcess.stringValue().as("rentalProcess"),
+                        rental.rentalStatus.stringValue().as("rentalStatus"),
                         post.title,
                         post.productImage))
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
-                .join(post).on(reservation.feedId.eq(post.postId))
+                .join(post).on(reservation.postId.eq(post.id))
                 .where(whereCondition)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -77,12 +81,30 @@ public class RentalQueryAdapter implements RentalQueryPort {
                 .select(reservation.count())
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
-                .join(post).on(reservation.feedId.eq(post.postId))
+                .join(post).on(reservation.postId.eq(post.id))
                 .where(whereCondition)
                 .fetchOne();
 
         return new PageImpl<>(results, pageable, total != null ? total : 0L);
     }
+
+    @Override
+    public Optional<RequestRemittanceResult> findRemittanceRequestViewData(Long rentalId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(Projections.constructor(
+                                RequestRemittanceResult.class,
+                                member.nickname.as("ownerNickname"),
+                                reservation.rentalFee,
+                                reservation.deposit
+                        ))
+                        .from(reservation)
+                        .join(member).on(reservation.ownerId.eq(member.id))
+                        .where(reservation.rentalId.eq(rentalId))
+                        .fetchOne()
+        );
+    }
+
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
         if (!pageable.getSort().isEmpty()) {

@@ -10,15 +10,21 @@ export default function RentalPeriod({
   endDate,
 }: RentalPeriodProps) {
   return (
-    <div className="flex w-full border-b ">
-      <div className="flex justify-between w-1/2 p-3 border-r">
-        <div className="text-gray-500">대여일</div>
-        <div>{formatKoreanDate(startDate)}</div>
+    <div className="flex w-full border-b text-sm">
+      {/* 대여일 */}
+      <div className="flex items-center justify-between w-1/2 p-2 border-r whitespace-nowrap">
+        <span className="text-gray700">대여일</span>
+        <span className="ml-2 text-gray-900 truncate">
+          {formatKoreanDate(startDate)}
+        </span>
       </div>
 
-      <div className="flex justify-between w-1/2  p-3">
-        <div className="text-gray-500">반납일</div>
-        <div>{formatKoreanDate(endDate)}</div>
+      {/* 반납일 */}
+      <div className="flex items-center justify-between w-1/2 p-2 whitespace-nowrap">
+        <span className="text-gray700">반납일</span>
+        <span className="ml-2 text-gray900 truncate">
+          {formatKoreanDate(endDate)}
+        </span>
       </div>
     </div>
   );

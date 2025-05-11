@@ -1,15 +1,22 @@
+"use client";
 import ProductInfos from "@/components/posts/detail/ProductInfos";
 import ProductPhotos from "@/components/posts/detail/ProductPhotos";
 import ProductReservation from "@/components/posts/detail/ProductReservation";
 import { MessageCircle } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function PostDetailPage() {
+  const [product, setProduct] = useState(null);
+  useEffect(() => {}, []);
+  const { id } = useParams();
+
+  const feedId = Number(id);
   return (
     <main className="relative">
       <div className="min-h-screen flex flex-col pb-24">
         {/* 물품 사진 */}
         <ProductPhotos />
-
         {/* 상세정보 */}
         <ProductInfos />
       </div>
@@ -22,7 +29,7 @@ export default function PostDetailPage() {
         </div>
         {/* 예약 버튼 */}
         <div className=" bg-white p-2 border-t shadow-md">
-          <ProductReservation />
+          <ProductReservation feedId={feedId} />
         </div>
       </div>
     </main>

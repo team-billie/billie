@@ -6,10 +6,11 @@ import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.out.RequestRemittanceNotificationEvent;
+import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
 import com.nextdoor.nextdoor.domain.rental.port.ReservationQueryPort;
@@ -43,6 +44,11 @@ public class RentalServiceImpl implements RentalService {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
         rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
+
+        eventPublisher.publishEvent(RentalCreatedEvent.builder()
+                .rentalId(createdRental.getRentalId())
+                .reservationId(reservationConfirmedEvent.getReservationId())
+                .build());
     }
 
     @Override
@@ -75,22 +81,32 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
-    public void requestRemittance(RequestRemittanceCommand command) {
+    public RequestRemittanceResult requestRemittance(RequestRemittanceCommand command) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        ReservationDto reservationDto = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+        rental.processRemittanceRequest();
+
+        return rentalQueryPort.findRemittanceRequestViewData(command.getRentalId())
                 .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+    }
 
-        rentalDomainService.validateRentalForRemittance(rental, command.getRenterId(), reservationDto);
+    @Override
+    @Transactional
+    public void completeRemittanceProcessing(RemittanceCompletedEvent remittanceCompletedEvent){
+        Rental rental = rentalRepository.findByRentalId(remittanceCompletedEvent.getRentalId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        rental.requestRemittance(command.getRemittanceAmount());
+        rental.processRemittanceCompletion();
+    }
 
-        eventPublisher.publishEvent(RequestRemittanceNotificationEvent.builder()
-                .rentalId(command.getRentalId())
-                .renterId(command.getRenterId())
-                .amount(command.getRemittanceAmount())
-                .build());
+    @Override
+    @Transactional
+    public void completeRentalEndProcessing(Long rentalId){
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.processRentalPeriodEnd();
     }
 
     @Override
@@ -122,7 +138,8 @@ public class RentalServiceImpl implements RentalService {
             eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
-        } else if(rental.getRentalStatus().equals(RentalStatus.RENTAL_COMPLETED)){
+        } else if(rental.getRentalStatus().equals(RentalStatus. RENTAL_COMPLETED)){
+            rental.updateDealCount();
             eventPublisher.publishEvent(RentalCompletedEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
@@ -155,7 +172,15 @@ public class RentalServiceImpl implements RentalService {
         rentalRepository.findByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        return rentalRepository.findRentalWithImagesByRentalId(rentalId)
-                .orElseThrow(() -> new NoSuchRentalException("대여의 ai 분석 정보가 존재하지 않습니다."));
+        return rentalRepository.findRentalWithImagesByRentalId(rentalId).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public void updateDamageAnalysis(Long rentalId, String damageAnalysis) {
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateDamageAnalysis(damageAnalysis);
     }
 }

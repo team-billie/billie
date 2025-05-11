@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RentalEndService {
 
+    private final RentalService rentalService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public void rentalEnd(Long rentalId) {
+        rentalService.completeRentalEndProcessing(rentalId);
+
         messagingTemplate.convertAndSend("/topic/rental/" + rentalId + "/status"
             , RentalStatusMessage.builder()
                     .process(RentalProcess.RETURNED.name())

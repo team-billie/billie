@@ -14,3 +14,37 @@ export const createReservation = async (data: ReservationRequestDTO) => {
     throw error;
   }
 };
+
+export const fetchOwnerReservations = async (userId: number) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/reservations/received", {
+      params: {
+        userId,
+        status: "PENDING",
+        cursorId: "",
+        pageSize: 10,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("예약 목록 요청 실패", error);
+    throw error;
+  }
+};
+
+export const fetchRenterReservations = async (userId: number) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/reservations/sent", {
+      params: {
+        userId,
+        status: "PENDING",
+        cursorId: "",
+        pageSize: 10,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("예약 목록 요청 실패", error);
+    throw error;
+  }
+};

@@ -3,12 +3,18 @@ package com.nextdoor.nextdoor.domain.fintech.service;
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Deposit;
 import com.nextdoor.nextdoor.domain.fintech.domain.DepositStatus;
-import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
+import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
+import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.dto.DepositResponseDto;
+import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
+import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
+import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,7 +25,8 @@ import java.util.Map;
 public class DepositService {
     private final SsafyApiClient client;
     private final DepositRepository depositRepository;
-    private final AccountRepository accountRepository;
+    private final RegistAccountRepository registAccountRepository;
+    private final FintechUserRepository fintechUserRepository;
 
     // 보증금 보관(홀딩)
     public Mono<Deposit> holdDeposit(
@@ -34,56 +41,94 @@ public class DepositService {
         return client.withdrawAccount(userKey, accountNo, amount, null)
                 .flatMap(resp ->
                         Mono.fromCallable(() -> {
-                                    // 계좌 조회 + Deposit 생성 + 저장
-                                    // accountNo→ID 매핑이 필요함
-                                    Long acctId = accountRepository.findByAccountNumber(accountNo)
-                                            .orElseThrow(() -> new RuntimeException("계좌 없음"))
-                                            .getId();
-                                    Deposit d = Deposit.builder()
-                                            .rentalId(rentalId)
-                                            .accountId(acctId)
-                                            .amount(amount)
-                                            .status(DepositStatus.HELD)
-                                            .heldAt(LocalDateTime.now())
-                                            .build();
-                                    return depositRepository.save(d);
-                                })
-                                .subscribeOn(Schedulers.boundedElastic())
+                            // 1) 핀테크 사용자 유효성 검사, fintechUser 를 userKey 로 조회
+                            FintechUser fu = fintechUserRepository.findById(userKey)
+                                    .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
+
+                            // 2) 등록된 계좌(RegistAccount) 조회, RegistAccount 를 user.userKey + accountNo 로 조회
+                            RegistAccount ra = registAccountRepository
+                                    .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
+                                    .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
+
+                            // 3) Deposit 생성·저장
+                            Deposit d = Deposit.builder()
+                                    .rentalId(rentalId)
+                                    .registAccount(ra)
+                                    .amount(amount)
+                                    .status(DepositStatus.HELD)
+                                    .heldAt(LocalDateTime.now())
+                                    .build();
+                            return depositRepository.save(d);
+                        }).subscribeOn(Schedulers.boundedElastic())
                 );
     }
 
     //보증금 반환
-    public Mono<Deposit> returnDeposit(String userKey, Long depositId) {
-        // 1) 블로킹 조회를 boundedElastic 스케줄러로 분리
-        return Mono.fromCallable(() ->
-                        depositRepository.findById(depositId)
-                                .orElseThrow(() -> new RuntimeException("보증금 내역 없음"))
-                )
-                .subscribeOn(Schedulers.boundedElastic())
-                // 2) SSAFY 입금 API 호출
-                .flatMap(d ->
-                        client.depositAccount(
-                                        userKey,
-                                        getAccountNumber(d.getAccountId()),
-                                        d.getAmount(),
-                                        null
-                                )
-                                // 3) 다시 블로킹 save 를 boundedElastic 에서 처리
-                                .flatMap(resp ->
-                                        Mono.fromCallable(() -> {
-                                                    d.setStatus(DepositStatus.RETURNED);
-                                                    d.setReturnedAt(LocalDateTime.now());
-                                                    return depositRepository.save(d);
-                                                })
-                                                .subscribeOn(Schedulers.boundedElastic())
-                                )
-                );
-    }
+    public Mono<DepositResponseDto> returnDeposit(ReturnDepositRequestDto req) {
+        return Mono.fromCallable(() -> {
+                    Deposit d = depositRepository
+                            .findWithAccount(req.getDepositId())      // @Query JOIN FETCH 적용된 메서드
+                            .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
 
-    // accountId → accountNo 매핑 (AccountRepository 이용)
-    private String getAccountNumber(Long accountId) {
-        return accountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("계좌 없음"))
-                .getAccountNumber(); //계좌 번호 반환
+                    // 세션이 열려 있을 때, 연관 필드에서 직접 꺼내 두기
+                    String accountNo = d.getRegistAccount().getAccount().getAccountNo();
+                    String bankCode  = d.getRegistAccount().getAccount().getBankCode();
+
+                    // Tuple.of(d, accountNo, bankCode) 형태로 리턴
+                    return Tuples.of(d, accountNo, bankCode);
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.boundedElastic())
+                // 2) 꺼내 둔 accountNo, bankCode 만 사용해서 API 호출
+                .flatMap(tp -> {
+                    Deposit d         = tp.getT1();
+                    String accountNo  = tp.getT2();
+                    String bankCode   = tp.getT3();
+
+                    long original     = d.getAmount();
+                    long deducted     = req.getDeductedAmount() == null ? 0 : req.getDeductedAmount();
+                    long renterRefund = original - deducted;
+
+                    Mono<Map<String,Object>> renterPay = client.depositAccount(
+                            req.getUserKey(),
+                            accountNo,
+                            renterRefund,
+                            "보증금 반환(차감)"
+                    );
+                    Mono<Map<String,Object>> ownerPay = deducted > 0
+                            ? client.depositAccount(
+                            req.getOwnerUserKey(),
+                            req.getOwnerAccountNo(),
+                            deducted,
+                            "보증금 차감 수익"
+                    )
+                            : Mono.just(Map.of());
+
+                    // 3) API 순차 실행 → 엔티티 업데이트 & 저장 → DTO 생성
+                    return renterPay
+                            .then(ownerPay)
+                            .flatMap(__ -> Mono.fromCallable(() -> {
+                                        d.setDeductedAmount((int) deducted);
+                                        d.setStatus(deducted > 0
+                                                ? DepositStatus.DEDUCTED
+                                                : DepositStatus.RETURNED);
+                                        d.setReturnedAt(LocalDateTime.now());
+                                        depositRepository.save(d);
+
+                                        // 프록시 대신 미리 꺼내 둔 accountNo, bankCode 사용
+                                        return DepositResponseDto.builder()
+                                                .id(d.getId())
+                                                .rentalId(d.getRentalId())
+                                                .amount(d.getAmount())
+                                                .status(d.getStatus())
+                                                .deductedAmount(d.getDeductedAmount())
+                                                .heldAt(d.getHeldAt())
+                                                .returnedAt(d.getReturnedAt())
+                                                .accountNo(accountNo)
+                                                .bankCode(bankCode)
+                                                .build();
+                                    })
+                                    .subscribeOn(Schedulers.boundedElastic()));
+                });
     }
 }

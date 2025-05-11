@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RequestRemitta
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
@@ -28,12 +29,18 @@ public class RentalMapper {
                 .build();
     }
 
-    public RequestRemittanceCommand toCommand(Long rentalId, RequestRemittanceRequest request) {
-        return new RequestRemittanceCommand(
-                rentalId,
-                request.getRenterId(),
-                request.getRemittanceAmount()
-        );
+    public RequestRemittanceCommand toCommand(Long rentalId) {
+        return RequestRemittanceCommand.builder()
+                .rentalId(rentalId)
+                .build();
+    }
+
+    public RemittanceResponse toResponse(RequestRemittanceResult result) {
+        return RemittanceResponse.builder()
+                .ownerNickname(result.getOwnerNickname())
+                .rentalFee(result.getRentalFee())
+                .deposit(result.getDeposit())
+                .build();
     }
 
     public SearchRentalCommand toCommand(Long userId,
@@ -49,18 +56,18 @@ public class RentalMapper {
 
     public RentalDetailResponse toResponse(SearchRentalResult result) {
         return RentalDetailResponse.builder()
-                .reservationId(result.getReservationId())
+                .reservationId(result.getId())
                 .startDate(result.getStartDate())
                 .endDate(result.getEndDate())
                 .rentalFee(result.getRentalFee())
                 .deposit(result.getDeposit())
-                .reservationStatus(result.getReservationStatus())
                 .ownerId(result.getOwnerId())
                 .renterId(result.getRenterId())
                 .rentalId(result.getRentalId())
+                .rentalProcess(result.getRentalProcess())
                 .rentalStatus(result.getRentalStatus())
                 .title(result.getTitle())
-                .productImageUrl(result.getProductImageUrl())
+                .productImageUrl(result.getProductImage())
                 .build();
     }
 
@@ -72,5 +79,3 @@ public class RentalMapper {
                 .build();
     }
 }
-
-

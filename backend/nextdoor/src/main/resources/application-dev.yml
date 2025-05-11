@@ -22,6 +22,11 @@ spring:
         default_batch_fetch_size: 1000
     defer-datasource-initialization: true
 
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
 server:
   port: 8081
 
@@ -41,3 +46,4 @@ cloud:
       auto: false
     s3:
       bucket: oneders
+

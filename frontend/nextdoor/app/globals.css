@@ -3,14 +3,31 @@
 @tailwind utilities;
 
 @layer base {
-}
-
-@layer utilities {
+  /* 기본 스타일 정의 */
 }
 
 @layer components {
+  /* 기존 버튼 스타일 */
+  .btn-1 {
+    @apply p-1 px-2 border-2 rounded-full text-sm;
+  }
+
+  /* 새로 추가할 액션 버튼 스타일 */
+  .action-btn {
+    @apply flex-1 py-2 cursor-pointer text-center;
+  }
+
+  /* 비활성화된 액션 버튼 스타일 */
+  .action-btn-disabled {
+    @apply action-btn text-gray-400 cursor-default;
+  }
+
+  /* 활성화된 액션 버튼 스타일 */
+  .action-btn-enabled {
+    @apply action-btn hover:bg-gray-100;
+  }
 }
 
-.btn-1 {
-  @apply p-1 px-2 border-2 rounded-full text-sm;
+@layer utilities {
+  /* 유틸리티 스타일 정의 */
 }

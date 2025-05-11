@@ -10,6 +10,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDa
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
+import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,11 +28,11 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final GenerativeModel generativeModel;
     private final Part promptPart;
 
-    private final AiAnalysisRentalQueryService aiAnalysisRentalQueryService;
+    private final AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort;
 
     @Override
     public InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto) {
-        RentalDto rental = aiAnalysisRentalQueryService.findById(inspectDamageRequestDto.getRentalId());
+        RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
         if (rental.getDamageAnalysis() != null) {
             throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
         }

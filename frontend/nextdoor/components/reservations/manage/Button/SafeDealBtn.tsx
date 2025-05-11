@@ -1,27 +1,28 @@
-import Image from "next/image";
-import blueStar from "@/public/images/blueStar.png";
-import Link from "next/link";
+import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface SafeDealBtnProps {
   reservationId: number;
 }
 
 export default function SafeDealBtn({ reservationId }: SafeDealBtnProps) {
-  const goSaveDeal = () => {};
+  const { userId } = useTestUserStore();
+  console.log("SafeDealBtn userId:", userId);
+
+  // userId가 없으면 렌더링하지 않음
+  if (!userId) {
+    return null;
+  }
+
+  const handleClick = () => {
+    window.location.href = `/reservations/${reservationId}/safe-deal/manage`;
+  };
+
   return (
-    <div className="relative inline-block" onClick={goSaveDeal}>
-      <Link href={`/reservations/${reservationId}/safe-deal/manage`}>
-        <div className="bg-blue400 p-1.5 rounded-xl text-white px-3.5 font-semibold text-sm">
-          AI 안심거래
-        </div>
-      </Link>
-      <Image
-        src={blueStar}
-        width={24}
-        height={24}
-        alt="안심 아이콘"
-        className="absolute -top-2 -right-3"
-      />
-    </div>
+    <button
+      onClick={handleClick}
+      className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-600"
+    >
+      AI 안심거래
+    </button>
   );
 }

@@ -24,7 +24,7 @@ public class FintechController {
     //계정 생성
     @PostMapping("/users")
     public Mono<ResponseEntity<Map<String,Object>>> createUser(@RequestBody CreateUserRequestDto req) {
-        return userService.createUser(req.getUserId())
+        return userService.createUser(req.getUserId(), req.getSsafyApiEmail())
                 .map(ResponseEntity::ok)
                 .doOnError(e -> log.error("계정 생성 오류", e))
                 .onErrorResume(SsafyApiException.class, ex -> {
@@ -157,13 +157,10 @@ public class FintechController {
 
     //보증금 반환
     @PostMapping("/deposits/return")
-    public Mono<ResponseEntity<Deposit>> returnDeposit(
+    public Mono<ResponseEntity<DepositResponseDto>> returnDeposit(
             @RequestBody ReturnDepositRequestDto req
     ) {
-        return depositService.returnDeposit(
-                        req.getUserKey(),
-                        req.getDepositId()
-                )
+        return depositService.returnDeposit(req)
                 .map(ResponseEntity::ok)
                 .doOnError(e -> log.error("보증금 반환 오류", e))
                 .onErrorResume(SsafyApiException.class, ex ->
