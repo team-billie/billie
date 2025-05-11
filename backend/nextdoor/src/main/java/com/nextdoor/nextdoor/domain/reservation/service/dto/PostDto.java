@@ -3,8 +3,10 @@ package com.nextdoor.nextdoor.domain.reservation.service.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @AllArgsConstructor
 @Builder
@@ -17,7 +19,9 @@ public class PostDto {
     private BigDecimal rentalFee;
     private BigDecimal deposit;
     // TODO 장소
-    private String productImage;
+
+    @Setter
+    private List<String> productImages;
     private String category;
     private Long authorId;
     private String authorName;
