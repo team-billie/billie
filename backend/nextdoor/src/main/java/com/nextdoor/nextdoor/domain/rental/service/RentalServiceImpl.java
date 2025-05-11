@@ -7,7 +7,7 @@ import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
