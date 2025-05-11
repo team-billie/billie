@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.listener;
 
-import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
+import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;

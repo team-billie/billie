@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -14,16 +16,21 @@ public class RentalScheduleService {
 
     private final Scheduler scheduler;
 
-    public void scheduleRentalEnd(Long rentalId, Date endDate) {
-        try{
+    public void scheduleRentalEnd(Long rentalId, LocalDate endDate) {
+        try {
             JobDetail endJob = JobBuilder.newJob(RentalEndJob.class)
                     .withIdentity("rentalEndJob" + rentalId, "rentalJobs")
                     .usingJobData("rentalId", rentalId)
                     .build();
 
+            Date endDateTime = Date.from(
+                    endDate.atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+            );
+
             Trigger endTrigger = TriggerBuilder.newTrigger()
                     .withIdentity("rentalEndTrigger_" + rentalId, "rentalTriggers")
-                    .startAt(endDate)
+                    .startAt(endDateTime)
                     .build();
 
             scheduler.scheduleJob(endJob, endTrigger);

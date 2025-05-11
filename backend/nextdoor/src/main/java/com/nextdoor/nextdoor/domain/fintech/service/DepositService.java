@@ -7,10 +7,12 @@ import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
 import com.nextdoor.nextdoor.domain.fintech.dto.DepositResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
+import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -27,6 +29,7 @@ public class DepositService {
     private final DepositRepository depositRepository;
     private final RegistAccountRepository registAccountRepository;
     private final FintechUserRepository fintechUserRepository;
+    private ApplicationEventPublisher eventPublisher;
 
     // 보증금 보관(홀딩)
     public Mono<Deposit> holdDeposit(
@@ -114,6 +117,9 @@ public class DepositService {
                                                 : DepositStatus.RETURNED);
                                         d.setReturnedAt(LocalDateTime.now());
                                         depositRepository.save(d);
+
+                                        DepositCompletedEvent event = new DepositCompletedEvent(d.getRentalId());
+                                        eventPublisher.publishEvent(event);
 
                                         // 프록시 대신 미리 꺼내 둔 accountNo, bankCode 사용
                                         return DepositResponseDto.builder()
