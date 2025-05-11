@@ -40,7 +40,7 @@ export function formatKoreanDate(dateInput: string | Date | null): string {
 
   const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
 
-  const year = date.getFullYear();
+  const year = date.getFullYear() % 100;
   const month = date.getMonth() + 1;
   const day = date.getDate();
 

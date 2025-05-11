@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class ReservationSaveRequestDto {
 
     @NotNull
-    private Long feedId;
+    private Long postId;
 
     @NotNull
     private LocalDate startDate;

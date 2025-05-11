@@ -1,6 +1,8 @@
 package com.nextdoor.nextdoor.domain.rental.domain;
 
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidAmountException;
+import com.nextdoor.nextdoor.domain.rental.exception.InvalidRentalStatusException;
+import com.nextdoor.nextdoor.domain.rental.exception.RentalImageUploadException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,48 +40,71 @@ public class Rental {
     @Column(name = "damage_analysis")
     private String damageAnalysis;
 
+    @Column(name = "deal_count")
+    private Integer dealCount;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     @Builder
-    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis) {
+    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis, LocalDateTime createdAt) {
         this.aiImages = aiImages;
         this.reservationId = reservationId;
         this.rentalStatus = rentalStatus;
         this.rentalProcess = rentalProcess != null ? rentalProcess : getRentalProcessForStatus(rentalStatus);
         this.damageAnalysis = damageAnalysis;
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+        this.dealCount = 0;
     }
 
     public static Rental createFromReservation(Long reservationId) {
-        Rental r = new Rental();
-        r.reservationId = reservationId;
-        r.rentalStatus = RentalStatus.CREATED;
-        r.rentalProcess = RentalProcess.BEFORE_RENTAL;
-        return r;
+        return Rental.builder()
+                .reservationId(reservationId)
+                .rentalStatus(RentalStatus.CREATED)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
-    public void requestRemittance(BigDecimal amount) {
-        validateRemittancePendingState();
-        validateAmount(amount);
+    public void processRemittanceRequest() {
         updateStatus(RentalStatus.REMITTANCE_REQUESTED);
     }
 
-    public void processAfterImageRegistration(BigDecimal depositAmount) {
-        if (depositAmount != null && depositAmount.compareTo(BigDecimal.ZERO) > 0) {
-            updateStatus(RentalStatus.AFTER_PHOTO_REGISTERED);
-        } else {
-            updateStatus(RentalStatus.RENTAL_COMPLETED);
+    public void processRemittanceCompletion() {
+        if(rentalStatus != RentalStatus.BEFORE_PHOTO_REGISTERED){
+            throw new InvalidRentalStatusException("결제 완료 처리가 불가능한 대여 상태입니다");
         }
+
+        updateStatus(RentalStatus.REMITTANCE_CONFIRMED);
+    }
+
+    public void processRentalPeriodEnd() {
+        if(rentalStatus != RentalStatus.REMITTANCE_CONFIRMED){
+            throw new InvalidRentalStatusException("대여 기간 종료가 불가능한 대여 상태입니다");
+        }
+
+        updateStatus(RentalStatus.RENTAL_PERIOD_ENDED);
+    }
+
+    public void updateDamageAnalysis(String damageAnalysis) {
+        this.damageAnalysis = damageAnalysis;
     }
 
     public void processDepositCompletion(){
-        if(rentalStatus != RentalStatus.DEPOSIT_REQUESTED){
-            throw new IllegalStateException("보증금을 처리할 수 있는 상태가 아닙니다");
+        if(rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED){
+            throw new InvalidRentalStatusException("보증금을 처리가 불가능한 대여 상태입니다");
         }
 
+        updateDealCount();
         updateStatus(RentalStatus.RENTAL_COMPLETED);
+    }
+
+    public void updateDealCount() {
+        this.dealCount = dealCount + 1;
     }
 
     public void validateRemittancePendingState() {
         if (this.rentalStatus != RentalStatus.REMITTANCE_REQUESTED) {
-            throw new IllegalStateException("송금 대기 상태가 아닙니다.");
+            throw new InvalidRentalStatusException("송금 대기 상태가 아닙니다.");
         }
     }
 
@@ -118,17 +144,9 @@ public class Rental {
         }
     }
 
-    private void validateStatusForAddImage() {
-        if (!RentalStatus.REMITTANCE_REQUESTED.equals(this.rentalStatus)) {
-            throw new IllegalStateException(
-                    "현재 상태(" + this.rentalStatus + ")에서는 Before 이미지 등록이 불가합니다."
-            );
-        }
-    }
-
     private void validateQuantityLimit() {
-        if (aiImages.size() >= 5) {
-            throw new IllegalStateException("최대 등록 가능 이미지 수를 초과했습니다.");
+        if (aiImages.size() >= 10) {
+            throw new RentalImageUploadException("최대 등록 가능 이미지 수를 초과했습니다.");
         }
     }
 

@@ -42,10 +42,10 @@ public class S3Service {
         fileMetadataRepository.findByServiceIdAndResourceIdAndResourceType(
                         request.getServiceId(), request.getResourceId(), request.getResourceType())
                 .ifPresent(existingFile -> {
-                    // 기존 S3 파일 삭제
-                    amazonS3.deleteObject(new DeleteObjectRequest(bucketName, existingFile.getFileName()));
-                    // 메타데이터 삭제 (업데이트를 위해)
-                    fileMetadataRepository.delete(existingFile);
+//                    // 기존 S3 파일 삭제
+//                    amazonS3.deleteObject(new DeleteObjectRequest(bucketName, existingFile.getFileName()));
+//                    // 메타데이터 삭제 (업데이트를 위해)
+//                    fileMetadataRepository.delete(existingFile);
                 });
 
         // 파일 이름 생성 (UUID)
