@@ -58,7 +58,7 @@ public class UnreadCounterService {
                 Criteria.where("conversation_id").is(conversationId),
                 Criteria.where("user_id").is(userId)
         );
-        Update u = Update.update("unread_count", -n);
+        Update u = Update.empty().decrement("unread_count", n);
         cassandraTemplate.update(q, u, UnreadCounter.class);
     }
 }
