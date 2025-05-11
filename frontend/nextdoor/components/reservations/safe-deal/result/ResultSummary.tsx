@@ -7,7 +7,7 @@ import axiosInstance from "@/lib/api/instance";
 import blueStar2 from "@/public/images/blueStar2.png";
 import Image from "next/image";
 import { cleanAnalysisText } from "@/lib/utils/analysis";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
 
 interface ApiResponse {
   beforeImages: string[];
@@ -17,7 +17,7 @@ interface ApiResponse {
 
 export default function ResultSummary() {
   const { id } = useParams();
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ResultSummary userId:", userId);
 
   const [loading, setLoading] = useState(true);

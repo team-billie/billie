@@ -1,4 +1,4 @@
-interface ReservationResponse {
+interface ReservationResponseDTO {
   reservationId: number;
   startDate: string;
   endDate: string;

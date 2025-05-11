@@ -7,8 +7,8 @@ import {
   fetchOwnerReservations,
   fetchRenterReservations,
 } from "@/lib/api/reservations/request";
+import useUserStore from "@/lib/store/useUserStore";
 import { useEffect, useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
@@ -22,7 +22,7 @@ interface ReservationItem {
 
 export default function ReservationBorrowManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ReservationBorrowManagePage userId:", userId);
 
   const loadReservations = async () => {
@@ -38,9 +38,7 @@ export default function ReservationBorrowManagePage() {
 
         return {
           id: item.reservationId,
-          img:
-            // item.feedProductImage ??
-            "https://picsum.photos/seed/picsum/200/300",
+          img: "https://picsum.photos/seed/picsum/200/300",
           title: item.feedTitle,
           cost: item.rentalFee,
           date: duration,

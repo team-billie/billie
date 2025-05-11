@@ -44,8 +44,16 @@ export default function TimelineBar({
 
   // 마커 색상 결정
   const getCircleClasses = (step: RentalProcess) => {
-    // 모든 원이 동일한 크기로 보이도록 테두리 두께를 일정하게 유지
-    return currentStep >= step
+    const processOrder = [
+      RENTAL_PROCESS.BEFORE_RENTAL,
+      RENTAL_PROCESS.RENTAL_IN_ACTIVE,
+      RENTAL_PROCESS.RETURNED,
+      RENTAL_PROCESS.RENTAL_COMPLETED,
+    ];
+    const currentIndex = processOrder.indexOf(currentStep);
+    const stepIndex = processOrder.indexOf(step);
+    
+    return currentIndex >= stepIndex
       ? "bg-blue300 border-blue300 border-2"
       : "bg-white border-gray300 border-2";
   };

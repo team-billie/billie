@@ -1,6 +1,6 @@
 export type ReservationStatus = "PENDING" | "APPROVED" | "REJECTED";
 export interface ReservationRequestDTO {
-  feedId: number;
+  postId: number;
   startDate: string;
   endDate: string;
 }
