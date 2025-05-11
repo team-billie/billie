@@ -70,7 +70,7 @@ export const ReturnDepositRequest = (requestBody: ReturnDepositRequestDto) =>
 // -----------------------------------------
 // 결제 데이터 호출
 export const GetPaymentDataRequest = (rentalId: string) => 
-  axiosInstance.post(`/api/v1/rentals/${rentalId}/request-remittance`)
+  axiosInstance.get(`/api/v1/rentals/${rentalId}/request-remittance`)
   .then((response) => {
     return response.data;
   })

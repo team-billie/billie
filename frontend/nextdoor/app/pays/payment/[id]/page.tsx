@@ -9,7 +9,7 @@ import useUserStore from "@/lib/store/useUserStore";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GetPaymentDataRequest } from "@/lib/api/pays";
-
+import { GetPaymentDataResponseDto } from "@/types/pays/response";
 export default function PaymentPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -22,8 +22,8 @@ export default function PaymentPage() {
 
     // 이체할 금액, 사람, 계좌 : api 호출
     const amount = 30000;
-    const receiverName = "단추";
-    const receiverAccount = "0234094711070771";
+    const [receiverName, setReceiverName] = useState("");
+    const [receiverAccount, setReceiverAccount] = useState(0);
 
     const [isChargeNeeded, setIsChargeNeeded] = useState(false);
     
@@ -37,7 +37,7 @@ export default function PaymentPage() {
             
         TransferAccountRequest({
             userKey: userKey,
-            depositAccountNo: receiverAccount,
+            depositAccountNo: receiverAccount.toString(),
             transactionBalance: amount,
             withdrawalAccountNo: billyAccount?.accountNo ?? "",
             depositTransactionSummary: "빌리페이 입금",
@@ -57,8 +57,10 @@ export default function PaymentPage() {
         const chargeAmount = amount - balance;
         setChargeNeeded(chargeAmount);
         
-        GetPaymentDataRequest(id as string).then((res) => {
+        GetPaymentDataRequest(id as string).then((res: GetPaymentDataResponseDto) => {
             console.log(res);
+            setReceiverName(res.ownerNickname);
+            setReceiverAccount(res.deposit);
         });
 
         if (chargeAmount > 0) {
