@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Message } from '@/types';
+import { Message } from '@/types/chats/chat';
 import ChatBubble from './ChatBubble';
 import DateDivider from './DateDivider';
 
@@ -18,12 +18,12 @@ const ChatList: React.FC<ChatListProps> = ({
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 새 메시지가 추가될 때 자동 스크롤
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages.length]);
 
-  // 날짜별로 메시지 그룹화
   const groupMessagesByDate = () => {
     const groups: { date: Date; messages: Message[] }[] = [];
 
@@ -45,6 +45,12 @@ const ChatList: React.FC<ChatListProps> = ({
       }
     });
 
+    groups.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    groups.forEach(group => {
+      group.messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    });
+
     return groups;
   };
 
@@ -53,29 +59,29 @@ const ChatList: React.FC<ChatListProps> = ({
   return (
     <div className={`flex-1 overflow-y-auto p-4 ${className}`}>
       {messageGroups.map((group, groupIndex) => (
-        <div key={group.date.getTime()}>
+        <div key={`group-${group.date.getTime()}-${groupIndex}`}>
           <DateDivider date={group.date} />
 
           {group.messages.map((message, messageIndex) => {
-            // 연속된 메시지인지 확인
             const prevMessage = messageIndex > 0 ? group.messages[messageIndex - 1] : null;
             const isContinuous = prevMessage?.sender === message.sender;
             
-            // 시간이 5분 이상 차이나면 연속된 메시지가 아님
             const isTimeClose = prevMessage 
               ? message.timestamp.getTime() - prevMessage.timestamp.getTime() < 5 * 60 * 1000
               : false;
             
             const showAvatar = !isContinuous || !isTimeClose;
             
+            const uniqueKey = `${groupIndex}-${messageIndex}-${message.id}`;
+            
             return (
               <ChatBubble
-                key={message.id}
+                key={uniqueKey}
                 message={message}
-                showAvatar={message.sender === 'other' && showAvatar}
+                showProfileIcon={message.sender === 'other' && showAvatar}
                 showUsername={message.sender === 'other' && showAvatar}
                 username={username}
-                userAvatar={userAvatar}
+                profileIcon={userAvatar}
               />
             );
           })}

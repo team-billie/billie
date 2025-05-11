@@ -1,12 +1,12 @@
 // src/components/chats/list/ChatRoomList.tsx
 import React from 'react';
-import { ChatRoom } from '@/types/chats/chat';
+import { ChatRoomUI } from '@/types/chats/chat';
 import ChatRoomItem from '@/components/chats/list/ChatRoomItem';
 import EmptyState from '@/components/chats/list/EmptyState';
 import LoadingSkeleton from '@/components/chats/list/LoadingSkeleton';
 
 interface ChatRoomListProps {
-  chatRooms: ChatRoom[];
+  chatRooms: ChatRoomUI[];
   isLoading: boolean;
   userRole: 'borrower' | 'lender';
 }
@@ -35,7 +35,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({
     <div className="divide-y">
       {sortedChats.map(chat => (
         <ChatRoomItem 
-          key={chat.id} 
+          key={chat.conversationId} 
           chat={chat} 
           userRole={userRole} 
         />

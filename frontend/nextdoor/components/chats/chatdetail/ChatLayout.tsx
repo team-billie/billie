@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import ChatHeader from '@/components/chats/chatdetail/ChatsDetailHeader';
 // import ProductInfo from '../chat/ProductInfo';
 import ChatInput from '@/components/chats/chatdetail/ChatInput';
-import { Product } from '@/types';
+import { Product } from '@/types/chats/chat';
 
 interface ChatLayoutProps {
   value: string;

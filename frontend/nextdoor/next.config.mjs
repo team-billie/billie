@@ -45,7 +45,8 @@ const nextConfig = {
               `
             default-src 'self';
             script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com;
-            connect-src 'self' http://k12e205.p.ssafy.io https://maps.googleapis.com https://maps.gstatic.com;
+            // connect-src 'self' http://k12e205.p.ssafy.io https://maps.googleapis.com https://maps.gstatic.com;
+            connect-src 'self' ws: wss: http: https:;
             img-src 'self' https://*.gstatic.com https://*.googleapis.com data: blob:
               https://nextdoor-images.com
               https://oneders.s3.ap-northeast-2.amazonaws.com

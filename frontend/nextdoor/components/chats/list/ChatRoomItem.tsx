@@ -2,18 +2,20 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChatRoom } from '@/types/chats';
+import { ChatRoomUI } from '@/types/chats/chat';
 import { formatTime } from '@/lib/utils/date/formatDate';
+import { useChatStore } from '@/lib/store/useChatStore';
 
 interface ChatRoomItemProps {
-  chat: ChatRoom;
+  chat: ChatRoomUI;
   userRole: 'borrower' | 'lender';
 }
 
 const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
+  const { userId } = useChatStore();
   // 상대방 사용자 찾기
   const otherUser = Array.isArray(chat.participants)
-  ? chat.participants.find(p => p.id !== 'user1') // 현재 사용자 제외
+  ? chat.participants.find((p: { id: number }) => p.id !== userId) // 현재 사용자 제외
   : null;
 
   const chatDate = chat.lastMessage?.timestamp 
@@ -22,7 +24,7 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
   
   return (
     <Link 
-      href={`/chats/${chat.id}`}
+      href={`/chats/${chat.conversationId}`}
       className="flex items-start p-3 hover:bg-gray-50"
     >
       <div className="flex-shrink-0 mr-3 relative">

@@ -20,7 +20,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ userRole }) => {
           : '아직 빌려준 내역이 없습니다.'}
       </p>
       <Link
-        href={isBorrower ? '/products' : '/products/register'}
+        href={isBorrower ? '/home' : '/posts/register'}
         className="bg-blue-500 text-white px-6 py-3 rounded-full font-medium"
       >
         {isBorrower ? '물건 빌리러 가기' : '물건 등록하기'}

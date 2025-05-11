@@ -1,6 +1,6 @@
 import React from "react";
 import ProfileIcon from "@/components/common/Profile/icon";
-import { Message } from "@/types";
+import { Message } from "@/types/chats/chat";
 import { formatTime } from "@/lib/utils/date/formatDate";
 
 interface ChatBubbleProps {
