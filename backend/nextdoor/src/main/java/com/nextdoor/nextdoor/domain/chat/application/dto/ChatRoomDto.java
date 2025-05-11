@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.chat.application.dto;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import lombok.*;
 
@@ -13,7 +14,7 @@ import lombok.*;
 @Builder
 public class ChatRoomDto {
     /** 채팅방 ID */
-    private Long conversationId;
+    private UUID conversationId;
     /** 마지막 메시지 내용 미리보기 */
     private String lastMessage;
     /** 마지막 메시지 전송 시각 */

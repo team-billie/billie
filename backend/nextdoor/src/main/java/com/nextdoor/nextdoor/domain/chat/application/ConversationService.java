@@ -2,6 +2,7 @@ package com.nextdoor.nextdoor.domain.chat.application;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +20,13 @@ public class ConversationService {
 
     /**
      * 새로운 1:1 채팅방을 생성합니다.
-     * @param conversationId 클라이언트가 주는 ID (Long)
+     * conversationId = UUID
      * @param participantIds 두 명의 사용자 ID (owner, renter)
      */
     @Transactional
-    public Conversation createConversation(Long conversationId, List<Long> participantIds) {
+    public Conversation createConversation(List<Long> participantIds) {
         Conversation conv = Conversation.builder()
-                .conversationId(conversationId)
+                .conversationId(UUID.randomUUID())
                 .participantIds(participantIds)
                 .createdAt(Instant.now())
                 .build();

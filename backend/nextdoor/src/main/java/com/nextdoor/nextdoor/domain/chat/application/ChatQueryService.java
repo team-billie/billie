@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.chat.application;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class ChatQueryService {
         // 2) 각 방마다 마지막 메시지 꺼내서 DTO 생성
         return convs.stream()
                 .map(conv -> {
-                    Long cid = conv.getConversationId();
+                    UUID cid = conv.getConversationId();
 
                     // 3) 마지막 메시지 조회
                     ChatMessage last = messageRepo
@@ -56,7 +57,7 @@ public class ChatQueryService {
     /**
      * 대화 내역(메시지 리스트) 조회
      */
-    public List<ChatMessageDto> getChatHistory(Long conversationId) {
+    public List<ChatMessageDto> getChatHistory(UUID conversationId) {
         return messageRepo.findByKeyConversationId(conversationId)
                 .stream()
                 .map(msg -> ChatMessageDto.builder()

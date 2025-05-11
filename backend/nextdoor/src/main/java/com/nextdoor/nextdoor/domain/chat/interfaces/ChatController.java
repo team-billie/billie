@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.chat.interfaces;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.nextdoor.nextdoor.domain.chat.application.ConversationService;
 import com.nextdoor.nextdoor.domain.chat.application.dto.CreateConversationRequest;
@@ -29,7 +30,6 @@ public class ChatController {
     @PostMapping
     public Conversation createChatRoom(@RequestBody CreateConversationRequest req) {
         return conversationService.createConversation(
-                req.getConversationId(),
                 req.getParticipantIds()
         );
     }
@@ -50,7 +50,7 @@ public class ChatController {
      */
     @GetMapping("/{conversationId}/messages")
     public List<ChatMessageDto> getChatHistory(
-            @PathVariable Long conversationId) {
+            @PathVariable UUID conversationId) {
         return chatQueryService.getChatHistory(conversationId);
     }
 }

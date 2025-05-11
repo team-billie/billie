@@ -14,6 +14,7 @@ import com.nextdoor.nextdoor.domain.chat.infrastructure.websocket.ChatWebSocketH
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -47,7 +48,7 @@ public class ChatMessageConsumer {
                 .build();
 
         // 3) 대화 상대 ID 추출
-        Long convId = chatMessage.getKey().getConversationId();
+        UUID convId = chatMessage.getKey().getConversationId();
         Conversation conv = conversationRepository.findById(convId)
                 .orElseThrow(() -> new IllegalStateException("Conversation not found: " + convId));
         List<Long> participants = conv.getParticipantIds();

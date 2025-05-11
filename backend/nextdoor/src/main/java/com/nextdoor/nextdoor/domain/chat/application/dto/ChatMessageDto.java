@@ -1,6 +1,8 @@
 package com.nextdoor.nextdoor.domain.chat.application.dto;
 
 import java.time.Instant;
+import java.util.UUID;
+
 import lombok.*;
 
 /**
@@ -12,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ChatMessageDto {
     /** 대화방 식별자 */
-    private Long conversationId;
+    private UUID conversationId;
     /** 보낸 사람 ID */
     private Long senderId;
     /** 메시지 본문 */
