@@ -32,7 +32,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .filter(cookie -> cookie.getName().equals(REDIRECT_URI_PARAM)).findFirst();
         Optional<String> redirectUrl = oCookie.map(Cookie::getValue);
         response.sendRedirect(redirectUrl.orElseThrow(RedirectUrlNotPresentException::new)
-                + "/api/v1/auth/sociallogin?token=" + accessToken);
+                + "/social-login?accessToken=" + accessToken);
         clearAuthenticationAttributes(request, response);
     }
 
