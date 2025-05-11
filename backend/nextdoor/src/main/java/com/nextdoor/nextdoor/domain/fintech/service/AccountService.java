@@ -8,6 +8,7 @@ import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -15,6 +16,7 @@ import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -163,6 +165,47 @@ public class AccountService {
                                 .subscribeOn(Schedulers.boundedElastic())
                                 // 4) 저장이 완료되면 원본 SSAFY 응답(Map) 반환
                                 .thenReturn(resp)
+                );
+    }
+
+
+    // 결제 처리 (rentalId 추가)
+    public Mono<Map<String,Object>> paymentAccount(
+            String userKey,
+            String depositAccountNo,
+            long transactionBalance,
+            String withdrawalAccountNo,
+            String depositTransactionSummary,
+            String withdrawalTransactionSummary,
+            String rentalId
+    ) {
+        return transferAccount(
+                userKey,
+                depositAccountNo,
+                transactionBalance,
+                withdrawalAccountNo,
+                depositTransactionSummary,
+                withdrawalTransactionSummary
+        )
+                .flatMap(ssafyResp ->
+                        // 블로킹 작업은 boundedElastic 스케줄러에서 처리
+                        Mono.fromCallable(() -> {
+                                    // ——————————————————————————————
+                                    // 1) rentalId 기반 결제 내역 저장
+                                    //    예시: RentalPayment 엔티티와 Repository를 추가한 뒤 아래처럼 사용하세요.
+                                    //    RentalPayment rp = new RentalPayment(rentalId, transactionBalance, LocalDateTime.now());
+                                    //    rentalPaymentRepository.save(rp);
+                                    //
+                                    // 2) (필요하다면) ssafyResp 에 rentalId 삽입
+                                    //    ssafyResp.put("rentalId", rentalId);
+                                    //
+                                    // 3) 기타 추가 로직…
+                                    // ——————————————————————————————
+
+                                    log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
+                                    return ssafyResp;
+                                })
+                                .subscribeOn(Schedulers.boundedElastic())
                 );
     }
 }
