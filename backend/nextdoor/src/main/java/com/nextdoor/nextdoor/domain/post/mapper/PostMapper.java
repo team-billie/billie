@@ -40,11 +40,12 @@ public class PostMapper {
     }
 
     public PostDetailResponse toDetailResponse(PostDetailResult result) {
+
         return PostDetailResponse.builder()
                 .title(result.getTitle())
                 .content(result.getContent())
-                .rentalFee(result.getRentalFee())
-                .deposit(result.getDeposit())
+                .rentalFee((long) result.getRentalFee())
+                .deposit((long) result.getDeposit())
                 .address(result.getAddress())
                 .location(result.getLocation())
                 .productImage(result.getProductImages())
