@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data @AllArgsConstructor @NoArgsConstructor
 @Builder
 public class DepositResponseDto {
-    private Long id;
+    private Long depositId;
     private Long rentalId;
     private Integer amount;
     private DepositStatus status;
