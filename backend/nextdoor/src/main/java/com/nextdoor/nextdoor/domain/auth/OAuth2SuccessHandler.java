@@ -1,6 +1,6 @@
 package com.nextdoor.nextdoor.domain.auth;
 
-import com.nextdoor.nextdoor.domain.auth.exception.RedirectUrlNotPresentException;
+import com.nextdoor.nextdoor.domain.auth.exception.InvalidRedirectUrlException;
 import com.nextdoor.nextdoor.domain.auth.service.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.nextdoor.nextdoor.domain.auth.filter.RedirectUrlCookieFilter.REDIRECT_URI_PARAM;
@@ -23,6 +24,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository;
     private final JwtProvider jwtProvider;
+    private final List<String> allowedRedirectUrls = List.of(
+            "http://localhost:3000",
+            "http://k12e205.p.ssafy.io",
+            "http://k12e205.p.ssafy.io:3000",
+            "http://localhost:8081"
+    );
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -31,7 +38,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Optional<Cookie> oCookie = Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(REDIRECT_URI_PARAM)).findFirst();
         Optional<String> redirectUrl = oCookie.map(Cookie::getValue);
-        response.sendRedirect(redirectUrl.orElseThrow(RedirectUrlNotPresentException::new)
+        redirectUrl.ifPresent(this::validateRedirectUrl);
+        response.sendRedirect(
+                redirectUrl.orElseThrow(() -> new InvalidRedirectUrlException("Redirect URL이 유효하지 않습니다."))
                 + "/social-login?accessToken=" + accessToken);
         clearAuthenticationAttributes(request, response);
     }
@@ -39,5 +48,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         oAuth2AuthorizationRequestBasedOnCookieRepository.removeAuthorizationRequestCookies(request, response);
+    }
+
+    private void validateRedirectUrl(String url) {
+        for (String allowedRedirectUrl : allowedRedirectUrls) {
+            if (url.startsWith(allowedRedirectUrl)) {
+                return;
+            }
+        }
+        throw new InvalidRedirectUrlException("Redirect URL이 유효하지 않습니다.");
     }
 }
