@@ -58,14 +58,14 @@ public class RegistAccountController {
 
     /**
      * 주계좌 변경
-     * PUT /api/v1/fintechs/regist-accounts/{id}/primary?userKey=123456789
+     * PUT /api/v1/fintechs/regist-accounts/primary?registAccountId=1&userKey=5b4e4cb4-c670-4ba9-96c9-ec191910005b
      */
-    @PutMapping("/regist-accounts/{id}/primary")
+    @PutMapping("/regist-accounts/primary")
     public Mono<ResponseEntity<Object>>  changePrimary(
-            @PathVariable("id") Long id,
+            @RequestParam("registAccountId") Long registAccountId,
             @RequestParam("userKey") String userKey
     ) {
-        return registAccountService.changePrimary(userKey, id)
+        return registAccountService.changePrimary(userKey, registAccountId)
                 // 성공 시: DTO
                 .map(dto -> ResponseEntity.ok().<Object>body(dto))
                 // 그 외 예외는 400 + 메시지 JSON
