@@ -169,6 +169,15 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
+    public void updateRentalDepositId(Long rentalId, Long depositId) {
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateDepositId(depositId);
+    }
+
+    @Override
     public AiAnalysisResult getAiAnalysis(Long rentalId) {
         rentalRepository.findByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
