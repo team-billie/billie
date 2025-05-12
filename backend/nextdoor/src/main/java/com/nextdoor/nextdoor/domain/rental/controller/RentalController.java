@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRental
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.ManagedRentalCountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UpdateAccountResponse;
@@ -101,6 +102,16 @@ public class RentalController {
         UpdateAccountCommand command = rentalMapper.toUpdateAccountCommand(rentalId, request);
         UpdateAccountResult result = rentalService.updateAccount(command);
         UpdateAccountResponse response = rentalMapper.toUpdateAccountResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/managed-count")
+    public ResponseEntity<ManagedRentalCountResponse> getManagedRentalCount(
+            @RequestParam Long userId) {
+
+        ManagedRentalCountResult result = rentalService.countManagedRentals(userId);
+        ManagedRentalCountResponse response = rentalMapper.toManagedRentalCountResponse(result);
 
         return ResponseEntity.ok(response);
     }

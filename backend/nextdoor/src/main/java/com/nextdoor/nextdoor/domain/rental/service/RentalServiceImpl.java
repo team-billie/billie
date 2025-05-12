@@ -199,4 +199,9 @@ public class RentalServiceImpl implements RentalService {
                 .bankCode(rental.getBankCode())
                 .build();
     }
+
+    @Override
+    public ManagedRentalCountResult countManagedRentals(Long ownerId) {
+        return rentalQueryPort.countManagedRentals(ownerId);
+    }
 }
