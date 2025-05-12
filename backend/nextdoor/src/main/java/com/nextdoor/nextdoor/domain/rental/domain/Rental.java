@@ -30,11 +30,11 @@ public class Rental {
     private Long reservationId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rental_status", nullable = false, length = 30)
+    @Column(name = "rental_status", nullable = false)
     private RentalStatus rentalStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rental_process", nullable = false, length = 30)
+    @Column(name = "rental_process", nullable = false)
     private RentalProcess rentalProcess;
 
     @Column(name = "damage_analysis")
@@ -107,7 +107,8 @@ public class Rental {
     }
 
     public void processDepositCompletion(){
-        if(rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED){
+        if (rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED
+                && rentalStatus != RentalStatus.DEPOSIT_REQUESTED) {
             throw new InvalidRentalStatusException("보증금을 처리가 불가능한 대여 상태입니다");
         }
 

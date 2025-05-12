@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
-import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
+import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import org.springframework.data.domain.Page;

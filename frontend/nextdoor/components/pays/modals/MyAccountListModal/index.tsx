@@ -9,9 +9,10 @@ import Link from "next/link";
 interface AccountListModalProps {
     setIsModalOpen: (isModalOpen: boolean) => void;
     setSelectedAccount: (account: AddAccountResponseDto) => void;
+    type?: "small";
 }
 
-export default function MyAccountListModal({ setIsModalOpen, setSelectedAccount }: AccountListModalProps) {
+export default function MyAccountListModal({ setIsModalOpen, setSelectedAccount, type }: AccountListModalProps) {
     const [isVisible, setIsVisible] = useState(false);
     const { addedAccounts } = useUserStore();
 
@@ -28,15 +29,15 @@ export default function MyAccountListModal({ setIsModalOpen, setSelectedAccount 
 
     return (
         <>
-        <div className={`h-[40dvh] absolute bottom-0 bg-white rounded-t-2xl w-full flex flex-col gap-2 border-t p-6 transform transition-transform duration-500 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+        <div className={`h-[40dvh] absolute bottom-0 bg-white rounded-t-2xl w-full flex flex-col gap-2 border-t ${type === "small" ? "p-4 py-6" : "p-6"} transform transition-transform duration-500 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
             <div className="text-gray900 text-2xl font-semibold mb-2">어떤 계좌에서 가져올까요?</div>
             <div className="overflow-y-auto flex flex-col gap-3">
-                {addedAccounts?.map((account) => (
+                {addedAccounts?.map((account: AddAccountResponseDto) => (
                     <button key={account.bankCode} onClick={() => handleBankBtnClick(account)}>
-                        <MyAccountItem account={account} />
+                        <MyAccountItem type={type} account={account} />
                     </button>
                 ))}
-                <Link href="/pays/addaccount" className="flex flex items-center gap-2 p-4 border border-blue200 rounded-lg">
+                <Link href="/pays/addaccount" className={`${type === "small" ? "p-2 py-3" : "p-4"} flex flex items-center gap-2 border border-blue200 rounded-lg`}>
                     <Plus className="w-6 h-6 p-1 bg-blue200 text-blue400 rounded-full" />
                     <div className="text-lg font-bold">계좌 추가하기</div>
                 </Link>

@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.post.controller.dto.response;
 
+import com.nextdoor.nextdoor.domain.post.service.dto.LocationDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +14,7 @@ public class PostDetailResponse {
     private Long rentalFee;
     private Long deposit;
     private String address;
-    private String location;
+    private LocationDto location;
     private List<String> productImage;
     private String category;
     private Long authorId;
