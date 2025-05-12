@@ -67,7 +67,7 @@ public class ReservationServiceImpl implements ReservationService {
         validateOwner(loginUserId, reservation);
         validateNotConfirmed(reservation);
         reservation.updateStatus(reservationStatusUpdateRequestDto.getStatus());
-        applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId()));
+        applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId(), reservation.getEndDate()));
         return ReservationResponseDto.from(
                 reservation,
                 reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());

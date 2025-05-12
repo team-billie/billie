@@ -1,11 +1,15 @@
 import { ReservationRequestDTO } from "@/types/reservations/request";
 import axiosInstance from "../../instance";
 
-export const createReservation = async (data: ReservationRequestDTO) => {
+export const createReservation = async (
+  data: ReservationRequestDTO,
+  userId: number | null
+) => {
   try {
     const response = await axiosInstance.post("/api/v1/reservations", data, {
       headers: {
         "Content-Type": "application/json",
+        "X-User-Id": userId,
       },
     });
     return response.data;
@@ -19,10 +23,13 @@ export const fetchOwnerReservations = async (userId: number) => {
   try {
     const response = await axiosInstance.get("/api/v1/reservations/received", {
       params: {
-        userId,
         status: "PENDING",
         cursorId: "",
         pageSize: 10,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Id": userId,
       },
     });
     return response.data;
@@ -36,10 +43,13 @@ export const fetchRenterReservations = async (userId: number) => {
   try {
     const response = await axiosInstance.get("/api/v1/reservations/sent", {
       params: {
-        userId,
         status: "PENDING",
         cursorId: "",
         pageSize: 10,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Id": userId,
       },
     });
     return response.data;

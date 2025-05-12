@@ -7,7 +7,7 @@ import RenterActionBtn from "../manage/Button/RenterActionBtn";
 import { RentalProcess, RentalStatus, UserType } from "@/types/rental";
 import { usePathname } from "next/navigation";
 import SafeDealBtn from "../manage/Button/SafeDealBtn";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
 
 interface RentalCardProps {
   title: string;
@@ -37,7 +37,7 @@ export default function RentalCard({
   onActionSuccess,
 }: RentalCardProps) {
   const pathname = usePathname();
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("RentalCard userId:", userId);
 
   // userId가 없으면 렌더링하지 않음

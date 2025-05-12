@@ -4,13 +4,13 @@ import MainDock from "@/components/common/Dock/MainDock";
 import LendManageCard from "@/components/reservations/RentalCard/LendManageCard";
 import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
 import { fetchOwnerReservations } from "@/lib/api/reservations/request";
+import useUserStore from "@/lib/store/useUserStore";
 import { useEffect, useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
   img: string;
-  title: string;
+  postTitle: string;
   cost: number;
   date: number;
   startDate: string;
@@ -19,7 +19,7 @@ interface ReservationItem {
 
 export default function ReservationManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ReservationManagePage userId:", userId);
 
   const loadReservations = async () => {
@@ -38,7 +38,7 @@ export default function ReservationManagePage() {
           img:
             // item.feedProductImage ??
             "https://picsum.photos/seed/picsum/200/300",
-          title: item.feedTitle,
+          postTitle: item.postTitle,
           cost: item.rentalFee,
           date: duration,
           startDate: item.startDate,
@@ -69,7 +69,7 @@ export default function ReservationManagePage() {
           <div key={item.id}>
             <LendManageCard
               id={item.id}
-              title={item.title}
+              postTitle={item.postTitle}
               img={item.img}
               cost={item.cost}
               date={item.date}

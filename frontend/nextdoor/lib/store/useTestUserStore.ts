@@ -10,7 +10,7 @@ interface TestUserState {
 export const useTestUserStore = create<TestUserState>()(
   persist(
     (set) => ({
-      userId: null,
+      userId: 100,
       setUserId: (id: number) => set({ userId: id }),
       logout: () => set({ userId: null }),
     }),

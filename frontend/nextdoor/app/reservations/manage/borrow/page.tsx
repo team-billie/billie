@@ -7,13 +7,13 @@ import {
   fetchOwnerReservations,
   fetchRenterReservations,
 } from "@/lib/api/reservations/request";
+import useUserStore from "@/lib/store/useUserStore";
 import { useEffect, useState } from "react";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 interface ReservationItem {
   id: number;
   img: string;
-  title: string;
+  postTitle: string;
   cost: number;
   date: number;
   startDate: string;
@@ -22,7 +22,7 @@ interface ReservationItem {
 
 export default function ReservationBorrowManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("ReservationBorrowManagePage userId:", userId);
 
   const loadReservations = async () => {
@@ -38,10 +38,8 @@ export default function ReservationBorrowManagePage() {
 
         return {
           id: item.reservationId,
-          img:
-            // item.feedProductImage ??
-            "https://picsum.photos/seed/picsum/200/300",
-          title: item.feedTitle,
+          img: "https://picsum.photos/seed/picsum/200/300",
+          postTitle: item.postTitle,
           cost: item.rentalFee,
           date: duration,
           startDate: item.startDate,
@@ -72,7 +70,7 @@ export default function ReservationBorrowManagePage() {
           <div key={item.id}>
             <BorrowManageCard
               id={item.id}
-              title={item.title}
+              postTitle={item.postTitle}
               img={item.img}
               cost={item.cost}
               date={item.date}

@@ -11,6 +11,7 @@ import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -34,23 +35,31 @@ public class PostQueryAdapter implements PostQueryPort {
 
     @Override
     public Page<SearchPostResult> searchPostsByMemberAddress(SearchPostCommand command) {
+        Long userId = command.getUserId();
+        String userAddress = queryFactory
+                .select(member.address)
+                .from(member)
+                .where(member.id.eq(userId))
+                .fetchOne();
+
         JPAQuery<SearchPostResult> query = queryFactory
                 .select(Projections.constructor(
                         SearchPostResult.class,
                         post.title,
-                        post.content,
+                        queryFactory
+                                .select(productImage.imageUrl.min())
+                                .from(productImage)
+                                .where(productImage.post.id.eq(post.id)),
                         post.rentalFee,
                         post.deposit,
-                        post.address,
-                        getFirstProductImageQuery(post.id),
-                        post.category.stringValue(),
-                        post.authorId,
-                        member.nickname,
-                        getLikeCountQuery(post.id),
-                        post.createdAt
+                        postLike.count().intValue(),
+                        Expressions.constant(0)
                 ))
                 .from(post)
-                .join(member).on(post.authorId.eq(member.id));
+                .join(member).on(post.authorId.eq(member.id))
+                .leftJoin(postLike).on(postLike.post.id.eq(post.id))
+                .where(post.address.eq(userAddress))
+                .groupBy(post.id);
 
         long total = query.fetchCount();
 
@@ -61,15 +70,6 @@ public class PostQueryAdapter implements PostQueryPort {
                 .fetch();
 
         return new PageImpl<>(results, pageable, total);
-    }
-
-    private JPQLQuery<String> getFirstProductImageQuery(NumberExpression<Long> postId) {
-        return queryFactory
-                .select(productImage.imageUrl)
-                .from(productImage)
-                .where(productImage.post.id.eq(postId))
-                .orderBy(productImage.id.asc())
-                .limit(1);
     }
 
     private JPQLQuery<Integer> getLikeCountQuery(NumberExpression<Long> postId) {

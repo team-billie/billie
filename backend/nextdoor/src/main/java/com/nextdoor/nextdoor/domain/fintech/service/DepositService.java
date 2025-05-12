@@ -7,17 +7,20 @@ import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
 import com.nextdoor.nextdoor.domain.fintech.dto.DepositResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
+import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -27,6 +30,10 @@ public class DepositService {
     private final DepositRepository depositRepository;
     private final RegistAccountRepository registAccountRepository;
     private final FintechUserRepository fintechUserRepository;
+    private final TransactionTemplate transactionTemplate; // 명시적 트랜잭션 관리를 위해 추가
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     // 보증금 보관(홀딩)
     public Mono<Deposit> holdDeposit(
@@ -35,7 +42,6 @@ public class DepositService {
             String accountNo,
             int amount
     ) {
-
         // 보증금 보관이라 summary는 따로 없으니 null
         //Reactive WebFlux에서 JPA는 Schedulers.boundedElastic() 같은 스케줄러로 분리해 주는 게 안전
         return client.withdrawAccount(userKey, accountNo, amount, null)
@@ -108,12 +114,18 @@ public class DepositService {
                     return renterPay
                             .then(ownerPay)
                             .flatMap(__ -> Mono.fromCallable(() -> {
+                                // 명시적 트랜잭션 내에서 DB 업데이트와 이벤트 발행을 함께 처리
+                                return transactionTemplate.execute(status -> {
+                                    try {
                                         d.setDeductedAmount((int) deducted);
                                         d.setStatus(deducted > 0
                                                 ? DepositStatus.DEDUCTED
                                                 : DepositStatus.RETURNED);
                                         d.setReturnedAt(LocalDateTime.now());
                                         depositRepository.save(d);
+
+                                        DepositCompletedEvent event = new DepositCompletedEvent(d.getRentalId());
+                                        eventPublisher.publishEvent(event);
 
                                         // 프록시 대신 미리 꺼내 둔 accountNo, bankCode 사용
                                         return DepositResponseDto.builder()
@@ -127,8 +139,12 @@ public class DepositService {
                                                 .accountNo(accountNo)
                                                 .bankCode(bankCode)
                                                 .build();
-                                    })
-                                    .subscribeOn(Schedulers.boundedElastic()));
+                                    } catch (Exception e) {
+                                        status.setRollbackOnly();
+                                        throw e;
+                                    }
+                                });
+                            }).subscribeOn(Schedulers.boundedElastic()));
                 });
     }
 }

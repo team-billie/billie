@@ -1,15 +1,6 @@
 import Link from "next/link";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
 
 export default function ReservationStatusTabs() {
-  const { userId } = useTestUserStore();
-  console.log("ReservationStatusTabs userId:", userId);
-
-  // userId가 없으면 렌더링하지 않음
-  if (!userId) {
-    return null;
-  }
-
   return (
     <div className="flex-1 w-full flex justify-between p-4 rounded-tl-3xl border-t-2 -mt-12 bg-white ">
       <div className="flex gap-3">

@@ -1,40 +1,52 @@
-"use client"
+"use client";
 
 import Header from "@/components/pays/common/Header";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { GetFinUserRequest, GetAddedListRequest } from "@/lib/api/pays";
 import { GetFinUserRequestDto } from "@/types/pays/request";
 import Button from "@/components/pays/common/Button";
-import { GetFinUserResponseDto, AddAccountResponseDto } from "@/types/pays/response";
+import {
+  GetFinUserResponseDto,
+  AddAccountResponseDto,
+} from "@/types/pays/response";
 import useUserStore from "@/lib/store/useUserStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function TestLoginPage() {
-    const router = useRouter();
-    const { setUserKey, setBillyAccount, setAddedAccounts, setUserId } = useUserStore();
-    const [userIdValue, setUserIdValue] = useState("")
+  const router = useRouter();
+  const { setUserKey, setBillyAccount, setAddedAccounts, setUserId } =
+    useUserStore();
+  const [userIdValue, setUserIdValue] = useState("");
 
-    const form = useForm<GetFinUserRequestDto>({
-        defaultValues: {
-            apiKey: "c65e002a7f5343cd93b5f578d512e400",
-            userId: "",
-        },
-    });
+  const form = useForm<GetFinUserRequestDto>({
+    defaultValues: {
+      apiKey: "c65e002a7f5343cd93b5f578d512e400",
+      userId: "",
+    },
+  });
 
-    const onSubmit = (data: GetFinUserRequestDto) => {
-        GetFinUserRequest(data).then((res: GetFinUserResponseDto) => {
-            console.log(res);
-            setUserKey(res.userKey);
-            setUserId(Number(userIdValue))
+  const onSubmit = (data: GetFinUserRequestDto) => {
+    GetFinUserRequest(data)
+      .then((res: GetFinUserResponseDto) => {
+        console.log(res);
+        setUserKey(res.userKey);
+        setUserId(Number(userIdValue));
 
-            GetAddedListRequest(res.userKey).then((res: AddAccountResponseDto[]) => {
-                console.log(res[0]);
-                setBillyAccount(res[0]);
-            });
-            alert("로그인 성공");
-            router.push("/home");
+        GetAddedListRequest(res.userKey).then(
+          (res: AddAccountResponseDto[]) => {
+            console.log(res[0]);
+            setBillyAccount(res[0]);
+          }
+        );
+        alert("로그인 성공");
+        router.push("/home");
+      })
+      .catch((error) => {
+        alert("로그인 실패");
+      });
+  };
 
         }).catch((error) => {
             alert("로그인 실패");

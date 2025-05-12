@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.rental.event.in;
+package com.nextdoor.nextdoor.domain.fintech.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RemittanceCompletedEvent {
+public class DepositCompletedEvent {
 
     private Long rentalId;
 }

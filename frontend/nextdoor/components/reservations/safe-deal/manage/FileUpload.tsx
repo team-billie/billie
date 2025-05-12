@@ -1,4 +1,4 @@
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
 
 interface FileUploadProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,7 +15,7 @@ export default function FileUpload({
   accept = "image/*",
   maxFiles = 10,
 }: FileUploadProps) {
-  const { userId } = useTestUserStore();
+  const { userId } = useUserStore();
   console.log("FileUpload userId:", userId);
 
   // userId가 없으면 렌더링하지 않음

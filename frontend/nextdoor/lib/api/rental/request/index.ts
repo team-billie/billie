@@ -1,6 +1,5 @@
 import { fetchRentalsRequestDTO } from "@/types/rental/request";
 import axiosInstance from "../../instance";
-import axios from "axios";
 
 export const fetchRentals = async (params: fetchRentalsRequestDTO) => {
   try {

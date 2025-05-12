@@ -1,10 +1,12 @@
 package com.nextdoor.nextdoor.domain.rental.controller;
 
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UpdateAccountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageResponse;
 import com.nextdoor.nextdoor.domain.rental.mapper.RentalMapper;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
@@ -58,7 +60,7 @@ public class RentalController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{rentalId}/request-remittance")
+    @GetMapping("/{rentalId}/request-remittance")
     public ResponseEntity<RemittanceResponse> requestRemittance(@PathVariable Long rentalId) {
         RequestRemittanceCommand command = rentalMapper.toCommand(rentalId);
         RequestRemittanceResult result = rentalService.requestRemittance(command);
@@ -87,6 +89,18 @@ public class RentalController {
     ResponseEntity<AiAnalysisResponse> getAiAnalysis(@PathVariable Long rentalId){
         AiAnalysisResult result = rentalService.getAiAnalysis(rentalId);
         AiAnalysisResponse response = rentalMapper.toResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{rentalId}/account")
+    public ResponseEntity<UpdateAccountResponse> updateAccount(
+            @PathVariable Long rentalId,
+            @RequestBody UpdateAccountRequest request) {
+
+        UpdateAccountCommand command = rentalMapper.toUpdateAccountCommand(rentalId, request);
+        UpdateAccountResult result = rentalService.updateAccount(command);
+        UpdateAccountResponse response = rentalMapper.toUpdateAccountResponse(result);
 
         return ResponseEntity.ok(response);
     }

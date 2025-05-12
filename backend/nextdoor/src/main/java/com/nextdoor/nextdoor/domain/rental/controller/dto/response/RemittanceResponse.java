@@ -14,4 +14,6 @@ public class RemittanceResponse {
     private String ownerNickname;
     private BigDecimal rentalFee;
     private BigDecimal deposit;
+    private String accountNo;
+    private String bankCode;
 }

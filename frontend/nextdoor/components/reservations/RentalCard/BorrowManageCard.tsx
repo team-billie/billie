@@ -5,7 +5,7 @@ import RentalContent from "./RentalContent";
 
 interface LendManageCardProps {
   id: number;
-  title: string;
+  postTitle: string;
   img: string;
   cost: number;
   date: number;
@@ -15,7 +15,7 @@ interface LendManageCardProps {
 }
 export default function BorrowManageCard({
   id,
-  title,
+  postTitle,
   img,
   cost,
   date,
@@ -29,7 +29,7 @@ export default function BorrowManageCard({
       <RentalPeriod startDate={startDate} endDate={endDate} />
 
       {/* 내용 */}
-      <RentalContent img={img} title={title} cost={cost} date={date} />
+      <RentalContent img={img} title={postTitle} cost={cost} date={date} />
 
       {/* 버튼들 */}
       <div className="flex divide-x border rounded-md overflow-hidden text-center text-sm">

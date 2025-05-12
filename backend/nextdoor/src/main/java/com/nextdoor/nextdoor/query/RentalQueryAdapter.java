@@ -3,6 +3,7 @@ package com.nextdoor.nextdoor.query;
 import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
+import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
@@ -36,6 +37,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
     private final QRental rental = QRental.rental;
     private final QPost post = QPost.post;
     private final QMember member = QMember.member;
+    private final QProductImage productImage = QProductImage.productImage;
 
     @Override
     public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
@@ -67,15 +69,28 @@ public class RentalQueryAdapter implements RentalQueryPort {
                         rental.rentalProcess.stringValue().as("rentalProcess"),
                         rental.rentalStatus.stringValue().as("rentalStatus"),
                         post.title,
-                        post.productImage))
+                        rental.createdAt))
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
                 .join(post).on(reservation.postId.eq(post.id))
                 .where(whereCondition)
+                .distinct()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifiers(pageable))
                 .fetch();
+
+        for (SearchRentalResult result : results) {
+            List<String> imageUrls = queryFactory
+                    .select(productImage.imageUrl)
+                    .from(productImage)
+                    .join(productImage.post, post)
+                    .join(reservation).on(reservation.postId.eq(post.id))
+                    .where(reservation.id.eq(result.getId()))
+                    .fetch();
+
+            result.setProductImages(imageUrls);
+        }
 
         Long total = queryFactory
                 .select(reservation.count())
@@ -96,10 +111,13 @@ public class RentalQueryAdapter implements RentalQueryPort {
                                 RequestRemittanceResult.class,
                                 member.nickname.as("ownerNickname"),
                                 reservation.rentalFee,
-                                reservation.deposit
+                                reservation.deposit,
+                                rental.accountNo,
+                                rental.bankCode
                         ))
                         .from(reservation)
                         .join(member).on(reservation.ownerId.eq(member.id))
+                        .join(rental).on(reservation.id.eq(rental.reservationId))
                         .where(reservation.rentalId.eq(rentalId))
                         .fetchOne()
         );

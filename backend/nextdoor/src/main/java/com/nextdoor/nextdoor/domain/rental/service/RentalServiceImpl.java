@@ -1,13 +1,13 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
+import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
-import com.nextdoor.nextdoor.domain.rental.event.in.DepositCompletedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.in.RemittanceCompletedEvent;
-import com.nextdoor.nextdoor.domain.rental.event.in.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
@@ -40,6 +40,7 @@ public class RentalServiceImpl implements RentalService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
@@ -182,5 +183,20 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.updateDamageAnalysis(damageAnalysis);
+    }
+
+    @Override
+    @Transactional
+    public UpdateAccountResult updateAccount(UpdateAccountCommand command) {
+        Rental rental = rentalRepository.findByRentalId(command.getRentalId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateAccountInfo(command.getAccountNo(), command.getBankCode());
+
+        return UpdateAccountResult.builder()
+                .rentalId(rental.getRentalId())
+                .accountNo(rental.getAccountNo())
+                .bankCode(rental.getBankCode())
+                .build();
     }
 }

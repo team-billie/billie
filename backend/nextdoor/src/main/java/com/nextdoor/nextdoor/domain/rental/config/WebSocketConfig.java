@@ -19,7 +19,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-rental")
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns(
+                        "http://nextdoor-nextdoor-fe:3000",
+                        "http://localhost:3000"
+                );
+
+        registry.addEndpoint("/ws-rental")
+                .setAllowedOriginPatterns(
+                        "http://nextdoor-nextdoor-fe:3000",
+                        "http://localhost:3000"
+                )
+                .withSockJS();
     }
 }
 

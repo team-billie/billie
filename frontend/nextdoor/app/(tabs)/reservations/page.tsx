@@ -6,9 +6,10 @@ import RentalCard from "@/components/reservations/RentalCard/RentalCard";
 import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/ReservationStatusTabs";
 import { fetchRentals } from "@/lib/api/rental/request";
 import { RentalProcess, RentalStatus } from "@/types/rental";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore";
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
 
-// 화면에서 사용할 예약 항목 타입
 interface ReservationItem {
   id: number;
   img: string;
@@ -26,18 +27,27 @@ export default function ReservationPage() {
   const [reservations, setReservations] = useState<ReservationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { userId: testUserId } = useTestUserStore();
+  const { userId } = useUserStore();
   const userRole: "OWNER" | "RENTER" = "RENTER";
   const condition = "ALL";
 
-  console.log("testUserId", testUserId);
+  const stompClient = new Client({
+    webSocketFactory: () =>
+      new SockJS("http://k12e205.p.ssafy.io:8081/ws-rental"),
+    reconnectDelay: 5000,
+    heartbeatIncoming: 4000,
+    heartbeatOutgoing: 4000,
+    debug: (msg) => console.log("[STOMP]", msg),
+  });
+
   useEffect(() => {
     const fetchReservationData = async () => {
       try {
         setLoading(true);
+        setError(null); // 에러 상태 초기화
 
-        const data: ReservationResponse[] = await fetchRentals({
-          userId: testUserId || 1,
+        const data: ReservationResponseDTO[] = await fetchRentals({
+          userId: userId || 1,
           userRole,
           condition,
           page: 0,
@@ -74,18 +84,27 @@ export default function ReservationPage() {
       }
     };
 
-    fetchReservationData();
-  }, [testUserId]);
-
+    if (userId) {
+      fetchReservationData();
+    }
+  }, [userId, userRole, condition]);
   const handleActionSuccess = (rentalId: number) => {
     console.log(`예약 ID ${rentalId}의 상태가 변경되었습니다.`);
   };
+  useEffect(() => {
+    stompClient.activate();
 
+    return () => {
+      stompClient.deactivate();
+    };
+  }, []);
   return (
-    <main>
-      <MainHeader title="Reservations" />
-      <ReservationStatusTabs />
-      <div className="h-screen overflow-y-auto p-4 flex flex-col gap-6">
+    <main className="flex flex-col">
+      <div>
+        <MainHeader title="Reservations" />
+        <ReservationStatusTabs />
+      </div>
+      <div className="flex flex-col m-4">
         {loading && <p>불러오는 중입니다...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading &&
