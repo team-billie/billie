@@ -10,6 +10,7 @@ import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,8 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
     private final RegistAccountRepository registAccountRepository;
+
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     //계좌 생성
