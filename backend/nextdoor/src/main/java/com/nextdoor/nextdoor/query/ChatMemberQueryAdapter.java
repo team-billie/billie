@@ -23,7 +23,7 @@ public class ChatMemberQueryAdapter implements ChatMemberQueryPort {
                 Projections.constructor(
                     MemberDto.class,
                     qMember.id,
-                    qMember.name,
+                    qMember.nickname,
                     qMember.profileImageUrl
                 ))
                 .from(qMember)
