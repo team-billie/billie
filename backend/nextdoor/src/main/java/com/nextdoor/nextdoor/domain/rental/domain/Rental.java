@@ -99,11 +99,13 @@ public class Rental {
         this.damageAnalysis = damageAnalysis;
     }
 
-    public void updateAccountInfo(String accountNo, String bankCode) {
+    public void processUpdateAccountInfo(String accountNo, String bankCode) {
         validateNotBlank(accountNo, "accountNo");
         validateNotBlank(bankCode, "bankCode");
         this.accountNo = accountNo;
         this.bankCode = bankCode;
+
+        updateStatus(RentalStatus.REMITTANCE_REQUESTED);
     }
 
     public void processDepositCompletion(){
