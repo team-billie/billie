@@ -1,13 +1,11 @@
 package com.nextdoor.nextdoor.domain.fintech.service;
 
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
-import com.nextdoor.nextdoor.domain.fintech.domain.Deposit;
-import com.nextdoor.nextdoor.domain.fintech.domain.DepositStatus;
-import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
-import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.domain.*;
 import com.nextdoor.nextdoor.domain.fintech.dto.DepositResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
@@ -27,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DepositService {
     private final SsafyApiClient client;
+    private final AccountRepository accountRepository;
     private final DepositRepository depositRepository;
     private final RegistAccountRepository registAccountRepository;
     private final FintechUserRepository fintechUserRepository;
@@ -55,6 +54,16 @@ public class DepositService {
                             RegistAccount ra = registAccountRepository
                                     .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
                                     .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
+
+                            // 여기에 로컬 balance 차감 로직 추가
+                            // 2-1) account 테이블에서 balance 차감
+                            Account acct = ra.getAccount();
+                            acct.setBalance(acct.getBalance() - amount);
+                            accountRepository.save(acct);
+
+                            // 2-2) regist_account 테이블에서도 balance 차감
+                            ra.setBalance(ra.getBalance() - amount);
+                            registAccountRepository.save(ra);
 
                             // 3) Deposit 생성·저장
                             Deposit d = Deposit.builder()
