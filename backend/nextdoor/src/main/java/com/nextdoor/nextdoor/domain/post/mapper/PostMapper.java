@@ -30,6 +30,7 @@ public class PostMapper {
 
     public PostListResponse toResponse(SearchPostResult result) {
         return PostListResponse.builder()
+                .postId(result.getPostId())
                 .title(result.getTitle())
                 .productImage(result.getProductImage())
                 .rentalFee(String.valueOf(result.getRentalFee()))

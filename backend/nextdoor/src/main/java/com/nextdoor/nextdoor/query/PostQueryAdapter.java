@@ -13,8 +13,6 @@ import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +46,7 @@ public class PostQueryAdapter implements PostQueryPort {
         JPAQuery<SearchPostResult> query = queryFactory
                 .select(Projections.constructor(
                         SearchPostResult.class,
+                        post.id,
                         post.title,
                         queryFactory
                                 .select(productImage.imageUrl.min())
