@@ -7,15 +7,17 @@ import { CheckAccountRequestDto } from "@/types/pays/request";
 
 interface AccountCheckProps {
     setIsPossibleAccount: (isPossibleAccount: boolean) => void;
+    setSelectedAccount: (selectedAccount: CheckAccountRequestDto) => void;
 }
 
-export default function AccountCheck({setIsPossibleAccount}: AccountCheckProps) {
+export default function AccountCheck({setIsPossibleAccount, setSelectedAccount}: AccountCheckProps) {
     const { addedAccounts } = useUserStore();
 
     const handleAccountSelected = (selectedAccount: CheckAccountRequestDto) => {
         // 계좌 정보 확인 코드 백엔드 구현후 작성예정
         console.log(selectedAccount);
         setIsPossibleAccount(true);
+        setSelectedAccount(selectedAccount);
     }
      
     return (

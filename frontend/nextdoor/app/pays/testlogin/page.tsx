@@ -47,12 +47,6 @@ export default function TestLoginPage() {
         alert("로그인 실패");
       });
   };
-
-        }).catch((error) => {
-            alert("로그인 실패");
-        });
-    }
-
     
     return (
         <div className="flex flex-col gap-3">
