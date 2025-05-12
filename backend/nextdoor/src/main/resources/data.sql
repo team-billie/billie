@@ -29,8 +29,8 @@ ALTER TABLE member AUTO_INCREMENT = 21;
 
 -- 2. Post 더미 데이터 (10개의 게시글)
 INSERT INTO post (post_id, title, content, rental_fee, deposit, address, location, category, author_id, created_at) VALUES
-                                                                                                                        (1, 'iPhone 15 Pro 대여', '완전 새 제품! 액정 보호필름 포함', 30000, 300000, '서울시 강남구 대치동', ST_GeomFromText('POINT(37.49794 127.05902)', 4326), 'DIGITAL_DEVICE', 1, '2024-02-01T10:00:00'),
-                                                                                                                        (2, '에어컨 대여해요', '삼성 무풍 에어컨 18평형', 50000, 500000, '서울시 송파구 잠실동', ST_GeomFromText('POINT(37.51133 127.08298)', 4326), 'HOME_APPLIANCE', 2, '2024-02-02T10:00:00'),
+                                                                                                                        (1, 'iPhone 15 Pro 대여', '완전 새 제품! 액정 보호필름 포함', 30000, 300000, '서울시 강남구', ST_GeomFromText('POINT(37.49794 127.05902)', 4326), 'DIGITAL_DEVICE', 1, '2024-02-01T10:00:00'),
+                                                                                                                        (2, '에어컨 대여해요', '삼성 무풍 에어컨 18평형', 50000, 500000, '서울시 강남구', ST_GeomFromText('POINT(37.51133 127.08298)', 4326), 'HOME_APPLIANCE', 2, '2024-02-02T10:00:00'),
                                                                                                                         (3, '이사용 트럭 대여', '1톤 트럭, 운전기사 포함', 80000, 800000, '경기도 성남시 분당구', ST_GeomFromText('POINT(37.35944 127.11794)', 4326), 'SPORTS_LEISURE', 3, '2024-02-03T10:00:00'),
                                                                                                                         (4, '닌텐도 스위치 대여', '모든 액세서리 포함, 게임 10개', 20000, 200000, '인천시 부평구 청천동', ST_GeomFromText('POINT(37.49444 126.71667)', 4326), 'HOBBY_GAMES_MUSIC', 4, '2024-02-04T10:00:00'),
                                                                                                                         (5, '카메라 대여합니다', '캐논 5D Mark IV + 렌즈 3개', 40000, 400000, '부산시 해운대구 좌동', ST_GeomFromText('POINT(35.16361 129.17944)', 4326), 'DIGITAL_DEVICE', 5, '2024-02-05T10:00:00'),
@@ -122,7 +122,7 @@ ALTER TABLE reservation AUTO_INCREMENT = 11;
 
 -- 6. Rental 더미 데이터 (10개) - account_no, bank_code 필드 추가
 INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, damage_analysis, deal_count, account_no, bank_code, created_at) VALUES
-                                                                                                                                                  (1, 1, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
+                                                                                                                                                  (1, 1, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
                                                                                                                                                   (2, 2, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '경미한 스크래치 발견', 1, '234-567-890123', '020', '2024-03-17T10:00:00'),
                                                                                                                                                   (3, 3, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '345-678-901234', '032', '2024-03-18T10:00:00'),
                                                                                                                                                   (4, 4, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '컨트롤러 버튼 불량', 1, '456-789-012345', '034', '2024-03-20T10:00:00'),

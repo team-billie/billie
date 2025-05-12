@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PostListResponse {
 
+    private Long postId;
     private String title;
     private String productImage;
     private String rentalFee;
