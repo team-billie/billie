@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
-import com.nextdoor.nextdoor.domain.auth.AuthMemberQueryPort;
+import com.nextdoor.nextdoor.domain.auth.port.AuthMemberQueryPort;
 import com.nextdoor.nextdoor.domain.auth.service.dto.MemberQueryDto;
 import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.querydsl.core.types.Projections;
