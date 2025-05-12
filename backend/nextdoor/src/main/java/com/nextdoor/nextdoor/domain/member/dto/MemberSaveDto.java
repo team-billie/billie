@@ -1,11 +1,13 @@
 package com.nextdoor.nextdoor.domain.member.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-@AllArgsConstructor
+@Builder
 @Getter
 public class MemberSaveDto {
 
+    private String authProvider;
     private String nickname;
+    private String email;
 }
