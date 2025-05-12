@@ -23,7 +23,7 @@ public class Account {
     private String bankCode;
 
     @Column(nullable = false)
-    private Long balance;
+    private Integer balance;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
