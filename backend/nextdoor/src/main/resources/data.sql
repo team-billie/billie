@@ -182,7 +182,7 @@ INSERT INTO fintech_user (created_at, user_id, user_key) VALUES
                                                              ('2025-05-12 10:33:26.789068', 2, '092ef68d-5a10-4b92-b323-b6db7c009e76');
 
 INSERT INTO account (balance, account_id, created_at, bank_code, account_no, user_key) VALUES
-                                                                                           (0, 1, '2025-05-12 10:33:18.577802', '999', '9990439285272673', '5b4e4cb4-c670-4ba9-96c9-ec191910005b'),
+                                                                                           (0, 1, '2025-05-12 10:33:18.577802', '999', '9990439282572673', '5b4e4cb4-c670-4ba9-96c9-ec191910005b'),
                                                                                            (0, 2, '2025-05-12 10:33:26.905820', '999', '9991329456396744', '092ef68d-5a10-4b92-b323-b6db7c009e76');
 
 INSERT INTO regist_account
