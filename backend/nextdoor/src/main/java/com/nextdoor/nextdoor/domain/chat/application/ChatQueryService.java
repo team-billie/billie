@@ -86,6 +86,36 @@ public class ChatQueryService {
     }
 
     /**
+     * 빌려주기(오너) 채팅방 목록 조회
+     * @param memberId 로그인한 오너 사용자 ID
+     */
+    public List<ChatRoomDto> getLendingChatRooms(Long memberId) {
+        // 1) ownerId 로 대화방 조회
+        List<Conversation> convs = conversationRepo.findByOwnerId(memberId);
+
+        // 2) 마지막 메시지 + 미읽음 개수 매핑
+        return convs.stream()
+                .map(conv -> {
+                    UUID cid = conv.getConversationId();
+
+                    // 마지막 메시지 조회
+                    ChatMessage last = messageRepo
+                            .findFirstByKeyConversationIdOrderByKeySentAtDesc(cid);
+
+                    // 미읽음 메시지 수
+                    long unread = unreadCounterService.getUnreadCount(cid, memberId);
+
+                    return ChatRoomDto.builder()
+                            .conversationId(cid)
+                            .lastMessage(last != null ? last.getContent() : "")
+                            .lastSentAt  (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
+                            .unreadCount(unread)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 대화 내역(메시지 리스트) 조회
      * -> 조회 직후 해당 사용자(UnreadCounter.userId)의 카운터를 0으로 만들기 위해
      *    기존 unread_count 만큼 차감(clear) 처리
