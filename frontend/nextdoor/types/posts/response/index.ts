@@ -1,4 +1,5 @@
-type PostListItem = {
+type PostListItemDto = {
+    postId: number;
     title: string;
     productImage: string;
     rentalFee: string;
@@ -7,8 +8,8 @@ type PostListItem = {
     dealCount: number;
 }
 
-type PostListResponseDto = {
-    content: PostListItem[];
+type GetPostListResponseDto = {
+    content: PostListItemDto[];
 }
 
 export interface PostDetailResponseDTO {
@@ -22,3 +23,5 @@ export interface PostDetailResponseDTO {
   authorId: number | null;
   nickname: string;
 }
+
+export type { GetPostListResponseDto, PostListItemDto };

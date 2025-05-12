@@ -7,8 +7,18 @@ const handleApiError = (error: any, name: string) => {
 };
 
 // 게시글 목록 조회
-export const GetPostListRequest = (rentalId: string) => 
-    axiosInstance.get(`/api/v1/rentals/${rentalId}/request-remittance`)
+export const GetPostListRequest = (userId: string) => 
+  //파라미터 sorted 넣기
+    axiosInstance.get(`/api/v1/posts`,
+      {
+        params: {
+          userId: userId,
+          page: 0,
+          size: 10,
+          sorted: "desc"
+        }
+      }
+    )
     .then((response) => {
       return response.data;
     })

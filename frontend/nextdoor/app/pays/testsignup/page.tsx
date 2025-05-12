@@ -31,7 +31,7 @@ export default function TestSignUpPage() {
                 setBillyAccount(res[0]);
             });
             alert("계좌 등록 성공");
-            router.push("/profile");
+            router.push("/home");
 
         }).catch((error) => {
             alert("계좌 등록 실패");

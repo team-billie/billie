@@ -3,13 +3,14 @@ import Button from "@/components/pays/common/Button"
 type ChangeDepositProps = {
     setPayCharge: React.Dispatch<React.SetStateAction<number>>;
     setChangeBtnClicked: React.Dispatch<React.SetStateAction<boolean>>;
+    payCharge: number;
   };
 
-export default function ChangeDeposit({setChangeBtnClicked, setPayCharge}: ChangeDepositProps){
+export default function ChangeDeposit({setChangeBtnClicked, setPayCharge, payCharge}: ChangeDepositProps){
     return(
         <>
             <div className="font-bold text-xl">
-                <div className="text-sm mb-2">보증금 <span className="text-blue400">100원</span></div>
+                <div className="text-sm mb-2">보증금 <span className="text-blue400">{payCharge}원</span></div>
                 <div>보증금을 얼마로 정산 할까요?</div>
             </div>
             

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import PostIistItem from "@/components/(tabs)/home/PostIistItem";
+import PostList from "@/components/(tabs)/home/PostList";
 
 export function generateMetadata(): Metadata {
   return {
@@ -11,8 +11,8 @@ export function generateMetadata(): Metadata {
 export default function HomePage() {
   return (
     <main className="p-4">
-      <h1 className="text-4xl font-bold">Home</h1>
-      <PostIistItem />
+      <h1 className="text-4xl font-bold mb-2 text-blue400">Home</h1>
+      <PostList />
     </main>
   );
 }
