@@ -122,8 +122,8 @@ public class DepositService {
                     // 2) 오너 차감 수익 API 호출 (차감액 > 0 일 때만)
                     Mono<Map<String,Object>> ownerPay = deducted > 0
                             ? client.depositAccount(
-                            req.getOwnerUserKey(),
-                            req.getOwnerAccountNo(),
+                            req.getUserKey(),
+                            req.getAccountNo(),
                             deducted,
                             "보증금 차감 수익"
                     )
@@ -162,14 +162,14 @@ public class DepositService {
                                         // (b) 오너 차감 수익 반영 (차감액 > 0)
                                         if (deducted > 0) {
                                             Account ownerAcct = accountRepository
-                                                    .findByAccountNo(req.getOwnerAccountNo())
-                                                    .orElseThrow(() -> new RuntimeException("오너 계좌 없음: " + req.getOwnerAccountNo()));
+                                                    .findByAccountNo(req.getAccountNo())
+                                                    .orElseThrow(() -> new RuntimeException("오너 계좌 없음: " + req.getAccountNo()));
                                             ownerAcct.setBalance(ownerAcct.getBalance() + (int)deducted);
                                             accountRepository.save(ownerAcct);
 
                                             RegistAccount ownerRa = registAccountRepository
-                                                    .findByUser_UserKeyAndAccount_AccountNo(req.getOwnerUserKey(), req.getOwnerAccountNo())
-                                                    .orElseThrow(() -> new RuntimeException("오너 등록계좌 없음: " + req.getOwnerAccountNo()));
+                                                    .findByUser_UserKeyAndAccount_AccountNo(req.getUserKey(), req.getAccountNo())
+                                                    .orElseThrow(() -> new RuntimeException("오너 등록계좌 없음: " + req.getAccountNo()));
                                             ownerRa.setBalance(ownerRa.getBalance() + (int)deducted);
                                             registAccountRepository.save(ownerRa);
                                         }
