@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AuthHandler {
 
     @ExceptionHandler({
-            RedirectUrlNotPresentException.class
+            InvalidRedirectUrlException.class
     })
-    public ResponseEntity<ErrorResponseDto> handleRedirectUrlNotPresentException(RedirectUrlNotPresentException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleRedirectUrlNotPresentException(InvalidRedirectUrlException e, HttpServletRequest request) {
         return logAndHandleException(HttpStatus.BAD_REQUEST, e, request);
     }
 
