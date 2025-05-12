@@ -21,4 +21,10 @@ public class ChatRoomDto {
     private Instant lastSentAt;
     /** 안 읽은 메시지 개수 (추후 구현) */
     private Long   unreadCount;
+    /** 상대 사용자 닉네임 */
+    private String otherNickname;
+    /** 상대 사용자 프로필 이미지 URL */
+    private String otherProfileImageUrl;
+    /** 채팅 대상 게시물 대표 이미지 URL */
+    private String postImageUrl;
 }
