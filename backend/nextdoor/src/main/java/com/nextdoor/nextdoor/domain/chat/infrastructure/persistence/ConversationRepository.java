@@ -17,9 +17,11 @@ public interface ConversationRepository extends CassandraRepository<Conversation
 //    List<Conversation> findByParticipantIdsContains(Long memberId);
 
     //빌리기(렌터) 전용 채팅 목록 조회
-    List<Conversation> findByRenterId(Long renterId);
+    @Query("SELECT * FROM conversation WHERE renter_id = :memberId ALLOW FILTERING")
+    List<Conversation> findByRenterId(Long memberId);
 
     //빌려주기(오너) 전용 채팅 목록 조회
+    @Query("SELECT * FROM conversation WHERE owner_id = :memberId ALLOW FILTERING")
     List<Conversation> findByOwnerId(Long memberId);
 
 }

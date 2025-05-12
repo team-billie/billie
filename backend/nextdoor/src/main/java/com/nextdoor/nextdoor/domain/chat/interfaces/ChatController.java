@@ -57,6 +57,17 @@ public class ChatController {
     }
 
     /**
+     * 빌려주기(오너) 채팅방 목록 조회
+     * GET /api/chats/lendings?memberId=123
+     */
+    @GetMapping("/lendings")
+    public ResponseEntity<List<ChatRoomDto>> getLendingChatRooms(
+            @RequestParam Long memberId) {
+        List<ChatRoomDto> rooms = chatQueryService.getLendingChatRooms(memberId);
+        return ResponseEntity.ok(rooms);
+    }
+
+    /**
      * 특정 채팅방의 대화 내역 조회
      * @param conversationId 채팅방 ID
      */
