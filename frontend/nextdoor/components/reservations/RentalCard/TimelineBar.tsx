@@ -52,7 +52,7 @@ export default function TimelineBar({
     ];
     const currentIndex = processOrder.indexOf(currentStep);
     const stepIndex = processOrder.indexOf(step);
-    
+
     return currentIndex >= stepIndex
       ? "bg-blue300 border-blue300 border-2"
       : "bg-white border-gray300 border-2";
@@ -90,7 +90,7 @@ export default function TimelineBar({
   };
 
   return (
-    <div className="w-full flex flex-col -mt-4 p-4 gap-2">
+    <div className="w-full flex flex-col -mt-8 p-4 gap-2">
       <div className="text-blue-400 font-bold">{statusText}</div>
       <div className="w-full px-2">
         {/* 프로그레스 바 컨테이너 */}

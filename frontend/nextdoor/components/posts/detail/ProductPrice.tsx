@@ -1,8 +1,17 @@
 "use client";
 
+import { formatNumberWithCommas } from "@/lib/utils/money";
 import { ShoppingCart } from "lucide-react";
 
-export default function ProductPrice() {
+interface ProductPriceProps {
+  deposit: number;
+  rentalFee: number;
+}
+
+export default function ProductPrice({
+  deposit,
+  rentalFee,
+}: ProductPriceProps) {
   return (
     <div className="mt-8">
       <div className="flex gap-2 my-2 ">
@@ -11,12 +20,12 @@ export default function ProductPrice() {
       </div>
       <div>
         <span>대여료 </span>
-        <span className="text-xl">20,000원</span>
+        <span className="text-xl">{formatNumberWithCommas(rentalFee)}원</span>
         <span> / 일</span>
       </div>
       <div>
         <span>보증금 </span>
-        <span className="text-xl">100,000원</span>
+        <span className="text-xl">{formatNumberWithCommas(deposit)}원</span>
       </div>
       <div className="h-0.5 w-full bg-gray200 my-2"></div>
     </div>

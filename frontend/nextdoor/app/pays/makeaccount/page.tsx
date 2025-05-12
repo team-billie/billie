@@ -7,11 +7,12 @@ import { useEffect, useState } from "react";
 import Button from "@/components/pays/common/Button";
 import { ChevronDown } from "lucide-react";
 import MakeAccountModal from "@/components/pays/modals/MakeAccountModal";
-import { CreateFinAccountRequest } from "@/lib/api/pays";
-import { CreateFinAccountRequestDto } from "@/types/pays/request";
+import { CreateFinAccountRequest, GetAddedListRequest } from "@/lib/api/pays";
 import { AddAccountRequestDto } from "@/types/pays/request";
 import { CreateFinAccountResponseDto } from "@/types/pays/response";
 import useUserStore from "@/lib/store/useUserStore";
+import { AddAccountResponseDto } from "@/types/pays/response";
+import axiosInstance from "@/lib/api/instance";
 
 export default function MakeAccountPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);

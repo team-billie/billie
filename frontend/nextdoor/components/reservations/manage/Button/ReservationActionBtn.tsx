@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/api/instance";
+import useUserStore from "@/lib/store/useUserStore";
 
 interface ReservationBtnProps {
   status: "update" | "cancel" | "confirm";
@@ -11,6 +12,7 @@ export default function ReservationActionBtn({
   reservationId,
   onSuccess,
 }: ReservationBtnProps) {
+  const { userId } = useUserStore();
   const getLabel = (status: ReservationBtnProps["status"]) => {
     switch (status) {
       case "update":
@@ -25,6 +27,8 @@ export default function ReservationActionBtn({
   };
 
   const handleClick = async () => {
+    console.log("❤️❤️❤️", reservationId, "user", userId);
+
     try {
       switch (status) {
         // case "update":
@@ -37,11 +41,22 @@ export default function ReservationActionBtn({
             `/api/v1/reservations/${reservationId}/status`,
             {
               status: "CONFIRMED",
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "X-User-Id": userId,
+              },
             }
           );
           break;
         case "cancel":
-          await axiosInstance.delete(`/api/v1/reservations/${reservationId}`);
+          await axiosInstance.delete(`/api/v1/reservations/${reservationId}`, {
+            headers: {
+              "Content-Type": "application/json",
+              "X-User-Id": userId,
+            },
+          });
           break;
       }
       if (onSuccess) onSuccess();

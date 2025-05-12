@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function TestSignUpPage() {
     const router = useRouter();
-    const { setUserKey, setBillyAccount, setAddedAccounts } = useUserStore();
+    const { setUserKey, setBillyAccount, setAddedAccounts, setUserId } = useUserStore();
 
     const form = useForm<CreateFinUserRequestDto>({
         defaultValues: {
@@ -24,6 +24,7 @@ export default function TestSignUpPage() {
         CreateFinUserRequest(data).then((res: CreateFinUserResponseDto) => {
             console.log(res);
             setUserKey(res.userKey);
+            setUserId(Number(data.userId));
 
             GetAddedListRequest(res.userKey).then((res: AddAccountResponseDto[]) => {
                 console.log(res[0]);
@@ -40,10 +41,9 @@ export default function TestSignUpPage() {
     
     return (
         <div className="flex flex-col gap-3">
-            <Header txt="테스트 계좌 등록" />
+            <Header txt="테스트 회원가입" />
             <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
-                <div className="text-xl text-blue400 font-bold">임의의 이메일과 번호 등록시</div>
-                <div className="text-xl text-blue400 font-bold mb-10">계좌 및 거래 테스트 가능</div>
+                <div className="text-3xl text-blue400 font-extrabold mb-4">테스트 회원가입</div>
                 <FormProvider {...form}>
                         <Controller
                             control={form.control}
@@ -51,8 +51,8 @@ export default function TestSignUpPage() {
                             render={({ field }) => 
                                 <input 
                                     required
-                                    type="text"
-                                    placeholder="사용자 번호"
+                                    type="number"
+                                    placeholder="싸피 금융망에 사용될 사용자 번호"
                                     className="w-full border border-gray-500 rounded-md p-4"
                                     {...field} />}
                         />

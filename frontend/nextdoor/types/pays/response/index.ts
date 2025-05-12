@@ -37,8 +37,18 @@ type AddAccountResponseDto = {
     registeredAt: string;
 }
 
+type GetPaymentDataResponseDto = {
+    ownerNickname: string;
+    rentalFee: number;
+    deposit: number;
+    accountNo: string;
+    bankCode: string;
+}
+
 export type { 
     AddAccountResponseDto, 
     CreateFinUserResponseDto, 
     CreateFinAccountResponseDto,
-    GetFinUserResponseDto };
+    GetFinUserResponseDto,
+    GetPaymentDataResponseDto
+};
