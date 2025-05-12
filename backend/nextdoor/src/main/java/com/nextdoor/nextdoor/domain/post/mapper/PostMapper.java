@@ -50,6 +50,7 @@ public class PostMapper {
                 .location(result.getLocation())
                 .productImage(result.getProductImages())
                 .category(result.getCategory())
+                .authorId(result.getAuthorId())
                 .nickname(result.getNickname())
                 .build();
     }

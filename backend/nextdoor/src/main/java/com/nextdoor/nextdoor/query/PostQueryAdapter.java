@@ -103,7 +103,6 @@ public class PostQueryAdapter implements PostQueryPort {
                 .where(post.id.eq(postId))
                 .fetchOne();
 
-        // Parse the POINT string and extract latitude and longitude
         LocationDto locationDto = parseLocationPoint(locationStr);
 
         return PostDetailResult.builder()
@@ -115,6 +114,7 @@ public class PostQueryAdapter implements PostQueryPort {
                 .location(locationDto)
                 .productImages(productImages)
                 .category(postEntity.getCategory().toString())
+                .authorId(postEntity.getAuthorId())
                 .nickname(nickname)
                 .build();
     }

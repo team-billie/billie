@@ -20,5 +20,6 @@ public class PostDetailResult {
     private LocationDto location;
     private List<String> productImages;
     private String category;
+    private Long authorId;
     private String nickname;
 }
