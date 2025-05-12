@@ -9,12 +9,16 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-export default function ProductPhotos() {
-  const images = [
-    "https://picsum.photos/id/1018/600/400",
-    "https://picsum.photos/id/1025/600/400",
-    "https://picsum.photos/id/1035/600/400",
-  ];
+interface ProductPhotosProps {
+  images: string[];
+}
+
+export default function ProductPhotos({ images }: ProductPhotosProps) {
+  // const images = [
+  //   "https://picsum.photos/id/1018/600/400",
+  //   "https://picsum.photos/id/1025/600/400",
+  //   "https://picsum.photos/id/1035/600/400",
+  // ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
 

@@ -4,10 +4,14 @@ import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -15,6 +19,7 @@ import reactor.core.scheduler.Schedulers;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -22,6 +27,9 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
     private final RegistAccountRepository registAccountRepository;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     //계좌 생성
     public Mono<Map<String, Object>> createAccount(String userKey, String accountTypeUniqueNo) {
@@ -163,6 +171,40 @@ public class AccountService {
                                 .subscribeOn(Schedulers.boundedElastic())
                                 // 4) 저장이 완료되면 원본 SSAFY 응답(Map) 반환
                                 .thenReturn(resp)
+                );
+    }
+
+
+    // 결제 처리 (rentalId 추가)
+    public Mono<Map<String,Object>> paymentAccount(
+            String userKey,
+            String depositAccountNo,
+            long transactionBalance,
+            String withdrawalAccountNo,
+            String depositTransactionSummary,
+            String withdrawalTransactionSummary,
+            Long rentalId
+    ) {
+        return transferAccount(
+                userKey,
+                depositAccountNo,
+                transactionBalance,
+                withdrawalAccountNo,
+                depositTransactionSummary,
+                withdrawalTransactionSummary
+        )
+                .flatMap(ssafyResp ->
+                        // 블로킹 작업은 boundedElastic 스케줄러에서 처리
+                        Mono.fromCallable(() -> {
+
+                                // 송금 완료 후 이벤트 발행
+                                RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
+                                eventPublisher.publishEvent(event);
+
+                                log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
+                                return ssafyResp;
+                            })
+                            .subscribeOn(Schedulers.boundedElastic())
                 );
     }
 }

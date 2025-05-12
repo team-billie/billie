@@ -1,3 +1,4 @@
+// common/Header/ReservationHeader.tsx
 "use client";
 
 import { Calendar, MessageCircle } from "lucide-react";
@@ -14,8 +15,8 @@ export default function MainHeader({ title }: { title: string }) {
         { label: "빌려주기", href: "/reservations/lend" },
       ]
     : [
-        { label: "빌리기", href: "/chat" },
-        { label: "빌려주기", href: "/chats/lend" },
+        { label: "빌리기", href: "/chat/borrow" },
+        { label: "빌려주기", href: "/chat/lend" },
       ];
 
   return (

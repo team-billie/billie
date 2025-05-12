@@ -18,14 +18,14 @@ export default function RentalContent({
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center justify-between gap-4 p-4 mt-2">
+    <div className="flex items-center justify-between gap-4 p-4 my-5">
       {/* 썸네일 이미지 */}
       <div className="w-20 h-20 relative flex-shrink-0 rounded-md overflow-hidden">
         <Image src={img} alt={title} fill className="object-cover" />
       </div>
 
       {/* 텍스트 영역 */}
-      <div className="flex flex-col justify-between flex-grow overflow-hidden">
+      <div className="flex flex-col justify-between flex-grow overflow-hidden ">
         <div className="truncate">
           <div className="text-m  truncate">{title}</div>
           <div className="whitespace-nowrap text-ellipsis overflow-hidden">

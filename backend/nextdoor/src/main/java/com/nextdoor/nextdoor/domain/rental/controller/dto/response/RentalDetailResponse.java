@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,5 +28,6 @@ public class RentalDetailResponse {
     private String rentalProcess;
     private String rentalStatus;
     private String title;
-    private String productImageUrl;
+    private List<String> productImageUrls;
+    private LocalDateTime createdAt;
 }
