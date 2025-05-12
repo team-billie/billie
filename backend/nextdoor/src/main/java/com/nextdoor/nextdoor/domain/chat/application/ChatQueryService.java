@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service;
 
 import com.nextdoor.nextdoor.domain.chat.application.dto.ChatMessageDto;
 import com.nextdoor.nextdoor.domain.chat.application.dto.ChatRoomDto;
+import com.nextdoor.nextdoor.domain.chat.application.dto.MemberDto;
+import com.nextdoor.nextdoor.domain.chat.application.dto.PostDto;
 import com.nextdoor.nextdoor.domain.chat.domain.ChatMessage;
 import com.nextdoor.nextdoor.domain.chat.infrastructure.persistence.ChatMessageRepository;
 import com.nextdoor.nextdoor.domain.chat.infrastructure.persistence.ConversationRepository;
 import com.nextdoor.nextdoor.domain.chat.domain.Conversation;
+import com.nextdoor.nextdoor.domain.chat.port.ChatMemberQueryPort;
+import com.nextdoor.nextdoor.domain.chat.port.ChatPostQueryPort;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +27,8 @@ public class ChatQueryService {
     private final ChatMessageRepository    messageRepo;
     private final ConversationRepository   conversationRepo;
     private final UnreadCounterService unreadCounterService;
+    private final ChatMemberQueryPort chatMemberQueryPort;
+    private final ChatPostQueryPort chatPostQueryPort;
 
 //    /**
 //     * 1:1 채팅방 목록 조회 (마지막 메시지 + 안 읽은 개수)
@@ -45,11 +51,23 @@ public class ChatQueryService {
 //                    // 메시지 저장소 대신 UnreadCounterService 에서 꺼냄
 //                    long unreadCount = unreadCounterService.getUnreadCount(cid, memberId);
 //
+//                    // 상대방 정보 조회 (자신이 오너인 경우 렌터, 자신이 렌터인 경우 오너)
+//                    Long otherMemberId = conv.getOwnerId().equals(memberId) ? conv.getRenterId() : conv.getOwnerId();
+//                    MemberDto otherMember = chatMemberQueryPort.findById(otherMemberId)
+//                            .orElse(MemberDto.builder().nickname("").profileImageUrl("").build());
+//                    
+//                    // 게시물 이미지 URL 조회
+//                    PostDto post = chatPostQueryPort.findById(conv.getPostId())
+//                            .orElse(PostDto.builder().imageUrl("").build());
+//
 //                    return ChatRoomDto.builder()
 //                            .conversationId(cid)
 //                            .lastMessage(last != null ? last.getContent() : "")
 //                            .lastSentAt (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
 //                            .unreadCount(unreadCount)
+//                            .otherNickname(otherMember.getNickname())
+//                            .otherProfileImageUrl(otherMember.getProfileImageUrl())
+//                            .postImageUrl(post.getImageUrl())
 //                            .build();
 //                })
 //                .collect(Collectors.toList());
@@ -75,11 +93,22 @@ public class ChatQueryService {
                     // 미읽음 개수
                     long unreadCount = unreadCounterService.getUnreadCount(cid, memberId);
 
+                    // 상대방(오너) 정보 조회
+                    MemberDto otherMember = chatMemberQueryPort.findById(conv.getOwnerId())
+                            .orElse(MemberDto.builder().nickname("").profileImageUrl("").build());
+
+                    // 게시물 이미지 URL 조회
+                    PostDto post = chatPostQueryPort.findById(conv.getPostId())
+                            .orElse(PostDto.builder().imageUrl("").build());
+
                     return ChatRoomDto.builder()
                             .conversationId(cid)
                             .lastMessage(last != null ? last.getContent() : "")
                             .lastSentAt  (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
                             .unreadCount(unreadCount)
+                            .otherNickname(otherMember.getNickname())
+                            .otherProfileImageUrl(otherMember.getProfileImageUrl())
+                            .postImageUrl(post.getImageUrl())
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -105,11 +134,22 @@ public class ChatQueryService {
                     // 미읽음 메시지 수
                     long unread = unreadCounterService.getUnreadCount(cid, memberId);
 
+                    // 상대방(렌터) 정보 조회
+                    MemberDto otherMember = chatMemberQueryPort.findById(conv.getRenterId())
+                            .orElse(MemberDto.builder().nickname("").profileImageUrl("").build());
+
+                    // 게시물 이미지 URL 조회
+                    PostDto post = chatPostQueryPort.findById(conv.getPostId())
+                            .orElse(PostDto.builder().imageUrl("").build());
+
                     return ChatRoomDto.builder()
                             .conversationId(cid)
                             .lastMessage(last != null ? last.getContent() : "")
                             .lastSentAt  (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
                             .unreadCount(unread)
+                            .otherNickname(otherMember.getNickname())
+                            .otherProfileImageUrl(otherMember.getProfileImageUrl())
+                            .postImageUrl(post.getImageUrl())
                             .build();
                 })
                 .collect(Collectors.toList());
