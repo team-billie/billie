@@ -8,5 +8,5 @@ import lombok.Getter;
 public class MemberQueryDto {
 
     private Long id;
-    private String nickname;
+    private String email;
 }
