@@ -25,10 +25,10 @@ export default function AlertModal({
 
   useEffect(() => {
     const closeTimer = setTimeout(() => {
-      setVisible(false); // 페이드 아웃 시작
+      setVisible(false);
       setTimeout(() => {
-        onClose(); // 실제 컴포넌트 제거
-      }, 300); // CSS transition duration과 맞춰야 자연스럽게 사라짐
+        onClose();
+      }, 300);
     }, 1500);
 
     return () => clearTimeout(closeTimer);
@@ -41,12 +41,14 @@ export default function AlertModal({
       } bg-black bg-opacity-30`}
     >
       <div
-        className={`rounded-xl p-8 w-96 text-center shadow-xl transform transition-all duration-300 ${
+        className={`inline-block max-w-[90vw] px-6 py-8 text-center shadow-xl transform transition-all duration-300 ${
           visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
-        } bg-white`}
+        } bg-white rounded-xl`}
       >
         <h2 className={`text-2xl font-semibold mb-4 ${colorClass}`}>{title}</h2>
-        <p className="text-gray-900 text-lg">{message}</p>
+        <p className="text-gray-900 text-lg break-words whitespace-pre-line">
+          {message}
+        </p>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ interface TimelineBarProps {
 export default function TimelineBar({
   currentStep = RENTAL_PROCESS.RENTAL_IN_ACTIVE,
 }: TimelineBarProps) {
+  console.log(currentStep);
   // 프로세스에 따른 퍼센트 계산
   const processToPercent = (process: RentalProcess): number => {
     switch (process) {

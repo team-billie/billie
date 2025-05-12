@@ -9,7 +9,7 @@ import RentalCard from "@/components/reservations/RentalCard/RentalCard";
 import ReservationStatusTabs from "@/components/reservations/safe-deal/overview/ReservationStatusTabs";
 import { fetchRentals } from "@/lib/api/rental/request";
 import useUserStore from "@/lib/store/useUserStore";
-import { RENTAL_STATUS, RentalProcess, RentalStatus } from "@/types/rental";
+import { RentalProcess, RentalStatus } from "@/types/rental";
 import { useEffect, useState } from "react";
 
 // import PhotoNotFound from "@/components/reservations/safe-deal/PhotoNotFound";
@@ -23,6 +23,7 @@ interface ReservationItem {
   startDate: string;
   endDate: string;
   status: RentalStatus;
+  renterId: number;
   process: RentalProcess;
   userType: "OWNER" | "RENTER";
 }
@@ -66,6 +67,7 @@ export default function ReservationLendPage() {
             cost: item.rentalFee,
             date: diffDays,
             startDate: item.startDate,
+            renterId: item.renterId,
             endDate: item.endDate,
             status: item.rentalStatus as RentalStatus,
             process: item.rentalProcess as RentalProcess,
@@ -143,6 +145,7 @@ export default function ReservationLendPage() {
                 date={reservation.date}
                 startDate={reservation.startDate}
                 endDate={reservation.endDate}
+                renterId={reservation.renterId}
                 status={reservation.status}
                 process={reservation.process}
                 userType={reservation.userType}

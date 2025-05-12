@@ -20,6 +20,7 @@ interface ReservationItem {
   cost: number;
   date: number;
   startDate: string;
+  renterId: number;
   endDate: string;
   status: RentalStatus;
   process: RentalProcess;
@@ -57,7 +58,7 @@ export default function ReservationPage() {
           page: 0,
           size: 10,
         });
-
+        console.log(data);
         const formattedData: ReservationItem[] = data.map((item) => {
           const start = new Date(item.startDate);
           const end = new Date(item.endDate);
@@ -71,6 +72,7 @@ export default function ReservationPage() {
             title: item.title,
             cost: item.rentalFee,
             date: diffDays,
+            renterId: item.renterId,
             startDate: item.startDate,
             endDate: item.endDate,
             status: item.rentalStatus as RentalStatus,
@@ -91,7 +93,7 @@ export default function ReservationPage() {
     if (userId) {
       fetchReservationData();
     }
-  }, [userId, userRole, condition]);
+  }, [userId, userRole, condition, process]);
   const handleActionSuccess = (rentalId: number) => {
     console.log(`예약 ID ${rentalId}의 상태가 변경되었습니다.`);
   };
@@ -128,6 +130,7 @@ export default function ReservationPage() {
                 cost={reservation.cost}
                 date={reservation.date}
                 startDate={reservation.startDate}
+                renterId={reservation.renterId}
                 endDate={reservation.endDate}
                 status={reservation.status}
                 process={reservation.process}

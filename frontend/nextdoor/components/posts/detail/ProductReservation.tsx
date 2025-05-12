@@ -6,6 +6,7 @@ import { createReservation } from "@/lib/api/reservations/request";
 import useUserStore from "@/lib/store/useUserStore";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import { formatKoreanDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface ProductReservationProps {
   feedId: number;
@@ -21,7 +22,7 @@ export default function ProductReservation({
   const calendarRef = useRef<HTMLDivElement>(null);
   const { userId } = useUserStore();
   const { showAlert } = useAlertModal();
-
+  const router = useRouter();
   console.log("❤️❤️❤️", userId);
 
   useEffect(() => {
@@ -106,6 +107,7 @@ export default function ProductReservation({
       );
 
       setShowCalendar(false);
+      router.push("/reservations");
     } catch (e) {
       console.log("예약 실패", e);
     }

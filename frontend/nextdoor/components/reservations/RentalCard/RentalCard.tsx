@@ -20,6 +20,7 @@ interface RentalCardProps {
   process: RentalProcess;
   userType: UserType;
   rentalId: number;
+  renterId: number;
   onActionSuccess?: () => void;
 }
 
@@ -34,6 +35,7 @@ export default function RentalCard({
   process,
   userType,
   rentalId,
+  renterId,
   onActionSuccess,
 }: RentalCardProps) {
   const pathname = usePathname();
@@ -73,6 +75,7 @@ export default function RentalCard({
         {/* 사용자 타입에 따라 다른 버튼 컴포넌트 렌더링 */}
         {userType === "OWNER" ? (
           <OwnerActionBtn
+            charge={cost}
             status={status}
             process={process}
             rentalId={rentalId}
