@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.member.util;
+package com.nextdoor.nextdoor.domain.auth.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
