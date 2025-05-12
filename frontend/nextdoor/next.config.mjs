@@ -25,6 +25,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "example.com",
+      },
+      {
+        protocol: "https",
         hostname: "oneders.s3.ap-northeast-2.amazonaws.com",
       },
       {

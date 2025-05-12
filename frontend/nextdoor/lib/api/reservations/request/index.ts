@@ -28,6 +28,7 @@ export const fetchOwnerReservations = async (userId: number) => {
         pageSize: 10,
       },
       headers: {
+        "Content-Type": "application/json",
         "X-User-Id": userId,
       },
     });
@@ -47,6 +48,7 @@ export const fetchRenterReservations = async (userId: number) => {
         pageSize: 10,
       },
       headers: {
+        "Content-Type": "application/json",
         "X-User-Id": userId,
       },
     });

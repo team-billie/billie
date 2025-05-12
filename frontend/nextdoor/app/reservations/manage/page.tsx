@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 interface ReservationItem {
   id: number;
   img: string;
-  title: string;
+  postTitle: string;
   cost: number;
   date: number;
   startDate: string;
@@ -38,7 +38,7 @@ export default function ReservationManagePage() {
           img:
             // item.feedProductImage ??
             "https://picsum.photos/seed/picsum/200/300",
-          title: item.feedTitle,
+          postTitle: item.postTitle,
           cost: item.rentalFee,
           date: duration,
           startDate: item.startDate,
@@ -69,7 +69,7 @@ export default function ReservationManagePage() {
           <div key={item.id}>
             <LendManageCard
               id={item.id}
-              title={item.title}
+              postTitle={item.postTitle}
               img={item.img}
               cost={item.cost}
               date={item.date}
