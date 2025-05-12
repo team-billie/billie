@@ -81,12 +81,18 @@ public class DepositService {
     //보증금 반환
     public Mono<DepositResponseDto> returnDeposit(ReturnDepositRequestDto req) {
         return Mono.fromCallable(() -> {
+                    // 1) 보증금 내역 + 연관 RegistAccount(fetch join) 조회
                     Deposit d = depositRepository
                             .findWithAccount(req.getDepositId())      // @Query JOIN FETCH 적용된 메서드
                             .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
 
+                    // 2) renterId → FintechUser.userKey 조회
+                    FintechUser renterUser = fintechUserRepository
+                            .findByUserId(req.getRenterId())
+                            .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음: renterId=" + req.getRenterId()));
+
                     // 세션이 열려 있을 때, 연관 필드에서 직접 꺼내 두기
-                    String renterUserKey   = req.getUserKey();
+                    String renterUserKey   = renterUser.getUserKey();
                     String renterAccountNo = d.getRegistAccount().getAccount().getAccountNo();
                     String bankCode        = d.getRegistAccount().getAccount().getBankCode();
 
