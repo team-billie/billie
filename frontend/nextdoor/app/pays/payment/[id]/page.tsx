@@ -4,7 +4,7 @@ import Button from "@/components/pays/common/Button";
 import Header from "@/components/pays/common/Header";
 import Loading from "@/components/pays/common/Loading";
 import AutoRechargeModal from "@/components/pays/modals/AutoRechargeModal";
-import { TransferAccountRequest } from "@/lib/api/pays";
+import { PayItemRequest } from "@/lib/api/pays";
 import useUserStore from "@/lib/store/useUserStore";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,13 +36,14 @@ export default function PaymentPage() {
             return;
         }
             
-        TransferAccountRequest({
+        PayItemRequest({
             userKey: userKey,
             depositAccountNo: paymentData?.accountNo ?? "",
             transactionBalance: paymentAmount,
             withdrawalAccountNo: billyAccount?.accountNo ?? "",
             depositTransactionSummary: "빌리페이 입금",
             withdrawalTransactionSummary: "빌리페이 출금",
+            rentalId: Number(id),
         }).then((res) => {
             console.log(res);
             alert("결제 완료");

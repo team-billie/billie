@@ -50,6 +50,17 @@ type TransferAccountRequestDto = {
     withdrawalTransactionSummary: string;
 }   
 
+//물품 결제
+type PayItemRequestDto = {
+    userKey: string;
+    depositAccountNo: string;
+    transactionBalance: number;
+    withdrawalAccountNo: string;
+    depositTransactionSummary: string;
+    withdrawalTransactionSummary: string;
+    rentalId: number;
+}
+
 //보증금 출금
 type WithdrawDepositRequestDto = {
     userKey: string;
@@ -80,4 +91,5 @@ export type { CreateFinUserRequestDto,
     ReturnDepositRequestDto,
     CheckAccountRequestDto,
     GetFinUserRequestDto,
-    SelectOwnerAccountRequestDto }; 
+    SelectOwnerAccountRequestDto,
+    PayItemRequestDto }; 
