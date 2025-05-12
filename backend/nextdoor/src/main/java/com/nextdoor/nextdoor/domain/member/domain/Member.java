@@ -3,13 +3,13 @@ package com.nextdoor.nextdoor.domain.member.domain;
 import com.nextdoor.nextdoor.domain.member.enums.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Getter
+@Entity
 public class Member extends TimestampedEntity {
 
     @Id
@@ -18,15 +18,10 @@ public class Member extends TimestampedEntity {
     private Long id;
 
     @NotNull
-    private String name;
-
-    @NotNull
     private String email;
 
-    @NotNull
     private String birth;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -39,4 +34,6 @@ public class Member extends TimestampedEntity {
 
     @NotNull
     private String nickname;
+
+    private String authProvider;
 }
