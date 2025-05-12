@@ -81,12 +81,18 @@ public class DepositService {
     //보증금 반환
     public Mono<DepositResponseDto> returnDeposit(ReturnDepositRequestDto req) {
         return Mono.fromCallable(() -> {
+                    // 1) 보증금 내역 + 연관 RegistAccount(fetch join) 조회
                     Deposit d = depositRepository
                             .findWithAccount(req.getDepositId())      // @Query JOIN FETCH 적용된 메서드
                             .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
 
+                    // 2) renterId → FintechUser.userKey 조회
+                    FintechUser renterUser = fintechUserRepository
+                            .findByUserId(req.getRenterId())
+                            .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음: renterId=" + req.getRenterId()));
+
                     // 세션이 열려 있을 때, 연관 필드에서 직접 꺼내 두기
-                    String renterUserKey   = req.getUserKey();
+                    String renterUserKey   = renterUser.getUserKey();
                     String renterAccountNo = d.getRegistAccount().getAccount().getAccountNo();
                     String bankCode        = d.getRegistAccount().getAccount().getBankCode();
 
@@ -116,8 +122,8 @@ public class DepositService {
                     // 2) 오너 차감 수익 API 호출 (차감액 > 0 일 때만)
                     Mono<Map<String,Object>> ownerPay = deducted > 0
                             ? client.depositAccount(
-                            req.getOwnerUserKey(),
-                            req.getOwnerAccountNo(),
+                            req.getUserKey(),
+                            req.getAccountNo(),
                             deducted,
                             "보증금 차감 수익"
                     )
@@ -156,14 +162,14 @@ public class DepositService {
                                         // (b) 오너 차감 수익 반영 (차감액 > 0)
                                         if (deducted > 0) {
                                             Account ownerAcct = accountRepository
-                                                    .findByAccountNo(req.getOwnerAccountNo())
-                                                    .orElseThrow(() -> new RuntimeException("오너 계좌 없음: " + req.getOwnerAccountNo()));
+                                                    .findByAccountNo(req.getAccountNo())
+                                                    .orElseThrow(() -> new RuntimeException("오너 계좌 없음: " + req.getAccountNo()));
                                             ownerAcct.setBalance(ownerAcct.getBalance() + (int)deducted);
                                             accountRepository.save(ownerAcct);
 
                                             RegistAccount ownerRa = registAccountRepository
-                                                    .findByUser_UserKeyAndAccount_AccountNo(req.getOwnerUserKey(), req.getOwnerAccountNo())
-                                                    .orElseThrow(() -> new RuntimeException("오너 등록계좌 없음: " + req.getOwnerAccountNo()));
+                                                    .findByUser_UserKeyAndAccount_AccountNo(req.getUserKey(), req.getAccountNo())
+                                                    .orElseThrow(() -> new RuntimeException("오너 등록계좌 없음: " + req.getAccountNo()));
                                             ownerRa.setBalance(ownerRa.getBalance() + (int)deducted);
                                             registAccountRepository.save(ownerRa);
                                         }
@@ -174,7 +180,7 @@ public class DepositService {
 
                                         // --- 3-4) 응답 DTO 생성 ---
                                         return DepositResponseDto.builder()
-                                                .id(d.getId())
+                                                .depositId(d.getDepositId())
                                                 .rentalId(d.getRentalId())
                                                 .amount(d.getAmount())
                                                 .status(d.getStatus())
