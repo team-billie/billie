@@ -30,19 +30,20 @@ public class ChatController {
      */
     @PostMapping("/create")
     public Conversation createChatRoom(@RequestBody CreateConversationRequest req) {
-        Conversation conv = conversationService.createConversation(
-                req.getOwnerId(), req.getRenterId(), req.getPostId());
+        return conversationService.createConversation(
+                req.getOwnerId(), req.getRenterId(), req.getPostId()
+        );
     }
 
 
-    /**
-     * 채팅방 목록 조회
-     * @param memberId 로그인한 사용자 ID
-     */
-    @GetMapping
-    public List<ChatRoomDto> getChatRooms(@RequestParam Long memberId) {
-        return chatQueryService.getChatRooms(memberId);
-    }
+//    /**
+//     * 채팅방 목록 조회
+//     * @param memberId 로그인한 사용자 ID
+//     */
+//    @GetMapping
+//    public List<ChatRoomDto> getChatRooms(@RequestParam Long memberId) {
+//        return chatQueryService.getChatRooms(memberId);
+//    }
 
     /**
      * 빌리기(렌터) 채팅방 목록 조회

@@ -24,36 +24,36 @@ public class ChatQueryService {
     private final ConversationRepository   conversationRepo;
     private final UnreadCounterService unreadCounterService;
 
-    /**
-     * 1:1 채팅방 목록 조회 (마지막 메시지 + 안 읽은 개수)
-     */
-    public List<ChatRoomDto> getChatRooms(Long memberId) {
-        // 1) 자신이 참여한 Conversation 리스트(채팅방 목록) 조회
-        List<Conversation> convs = conversationRepo
-                .findByParticipantIdsContains(memberId);
-
-        // 2) 각 방마다 마지막 메시지 꺼내서 DTO 생성
-        return convs.stream()
-                .map(conv -> {
-                    UUID cid = conv.getConversationId();
-
-                    // 3) 마지막 메시지 조회
-                    ChatMessage last = messageRepo
-                            .findFirstByKeyConversationIdOrderByKeySentAtDesc(cid);
-
-                    // 4) 안 읽은 메시지 개수 조회
-                    // 메시지 저장소 대신 UnreadCounterService 에서 꺼냄
-                    long unreadCount = unreadCounterService.getUnreadCount(cid, memberId);
-
-                    return ChatRoomDto.builder()
-                            .conversationId(cid)
-                            .lastMessage(last != null ? last.getContent() : "")
-                            .lastSentAt (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
-                            .unreadCount(unreadCount)
-                            .build();
-                })
-                .collect(Collectors.toList());
-    }
+//    /**
+//     * 1:1 채팅방 목록 조회 (마지막 메시지 + 안 읽은 개수)
+//     */
+//    public List<ChatRoomDto> getChatRooms(Long memberId) {
+//        // 1) 자신이 참여한 Conversation 리스트(채팅방 목록) 조회
+//        List<Conversation> convs = conversationRepo
+//                .findByParticipantIdsContains(memberId);
+//
+//        // 2) 각 방마다 마지막 메시지 꺼내서 DTO 생성
+//        return convs.stream()
+//                .map(conv -> {
+//                    UUID cid = conv.getConversationId();
+//
+//                    // 3) 마지막 메시지 조회
+//                    ChatMessage last = messageRepo
+//                            .findFirstByKeyConversationIdOrderByKeySentAtDesc(cid);
+//
+//                    // 4) 안 읽은 메시지 개수 조회
+//                    // 메시지 저장소 대신 UnreadCounterService 에서 꺼냄
+//                    long unreadCount = unreadCounterService.getUnreadCount(cid, memberId);
+//
+//                    return ChatRoomDto.builder()
+//                            .conversationId(cid)
+//                            .lastMessage(last != null ? last.getContent() : "")
+//                            .lastSentAt (last != null ? last.getKey().getSentAt() : conv.getCreatedAt())
+//                            .unreadCount(unreadCount)
+//                            .build();
+//                })
+//                .collect(Collectors.toList());
+//    }
 
     /**
      * 빌리기(렌터) 채팅방 목록 조회

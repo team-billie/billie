@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "regist_account",
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_primary_account_per_user",
-                columnNames = {"user_id", "is_primary"}
+                columnNames = {"user_key", "is_primary"}
         )
 )
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
