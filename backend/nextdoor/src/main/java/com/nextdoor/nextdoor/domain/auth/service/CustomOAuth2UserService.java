@@ -1,10 +1,13 @@
 package com.nextdoor.nextdoor.domain.auth.service;
 
-import com.nextdoor.nextdoor.domain.auth.AuthMemberQueryPort;
+import com.nextdoor.nextdoor.domain.auth.port.AuthMemberQueryPort;
 import com.nextdoor.nextdoor.domain.auth.CustomOAuth2User;
-import com.nextdoor.nextdoor.domain.auth.event.NewOAuth2UserInfoObtainedEvent;
 import com.nextdoor.nextdoor.domain.auth.exception.UnsupportedOAuth2ProviderException;
+import com.nextdoor.nextdoor.domain.auth.port.AuthMemberCommandPort;
+import com.nextdoor.nextdoor.domain.auth.service.dto.MemberCommandDto;
+import com.nextdoor.nextdoor.domain.auth.service.dto.MemberQueryDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -16,30 +19,35 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 @Transactional
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private final AuthMemberCommandPort authMemberCommandPort;
     private final AuthMemberQueryPort authMemberQueryPort;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String authProvider = userRequest.getClientRegistration().getClientName();
-        String nickname;
+        String nickname, email, profileImageUrl;
         switch (authProvider) {
             case "Kakao":
                 Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
                 Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
                 nickname = (String) profile.get("nickname");
+                email = (String) kakaoAccount.get("email");
+                profileImageUrl = (String) profile.get("profile_image_url");
                 break;
             default:
                 throw new UnsupportedOAuth2ProviderException("지원하지 않는 OAuth2 제공자입니다.");
         }
-        authMemberQueryPort.findByNickname(nickname).ifPresentOrElse(memberQueryDto -> {},
-                () -> applicationEventPublisher.publishEvent(new NewOAuth2UserInfoObtainedEvent(nickname)));
-        return new CustomOAuth2User(nickname, oAuth2User.getAttributes());
+        MemberQueryDto member = authMemberQueryPort.findByEmail(email).orElse(
+                authMemberCommandPort.save(new MemberCommandDto(authProvider, nickname, email, profileImageUrl))
+        );
+        return new CustomOAuth2User(member.getId().toString(), oAuth2User.getAttributes());
     }
 }
