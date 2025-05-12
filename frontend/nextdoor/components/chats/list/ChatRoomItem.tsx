@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChatRoomUI } from '@/types/chats/chat';
 import { formatTime } from '@/lib/utils/date/formatDate';
-import { useChatStore } from '@/lib/store/useChatStore';
+import useUserStore from '@/lib/store/useUserStore'; 
 
 interface ChatRoomItemProps {
   chat: ChatRoomUI;
@@ -12,7 +12,7 @@ interface ChatRoomItemProps {
 }
 
 const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
-  const { userId } = useChatStore();
+  const { userId } = useUserStore(); // useUserStore 사용
   // 상대방 사용자 찾기
   const otherUser = Array.isArray(chat.participants)
   ? chat.participants.find((p: { id: number }) => p.id !== userId) // 현재 사용자 제외

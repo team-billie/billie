@@ -1,18 +1,3 @@
-// import ChatsHeader from "@/components/chats/list/ChatsHeader";
-// import MainHeader from "@/components/common/Header/ReservationHeader";
-// import ChatsList from "@/components/chats/list/ChatRoomList";
-
-// export default function ChatLendPage() {
-//   return (
-//     <main>
-//       <MainHeader title="Messages" />
-//       <ChatsHeader />
-//       <ChatsList chatRooms={[1,2,3,4,5,6,7,8,9,10]} isLoading={false} userRole="lender" />
-//       <div className="h-screen overflow-y-auto p-4 flex flex-col gap-6"></div>
-//     </main>
-//   );
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -21,26 +6,14 @@ import MainHeader from "@/components/common/Header/ReservationHeader";
 import ChatsList from "@/components/chats/list/ChatRoomList";
 import { ChatRoomUI } from "@/types/chats/chat";
 import { getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
-import { useChatStore } from "@/lib/store/useChatStore";
-import { useTestUserStore } from "@/lib/store/useTestUserStore";
+import useUserStore from "@/lib/store/useUserStore"; 
 
 export default function ChatLendPage() {
   const [chatRooms, setChatRooms] = useState<ChatRoomUI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const { userId, setUser } = useChatStore();
-  const testUserId = useTestUserStore((state) => state.userId);
-  
-  useEffect(() => {
-    if (testUserId && !userId) {
-      setUser(
-        Number(testUserId),
-        '테스트사용자',
-        '/images/profileimg.png'
-      );
-    }
-  }, [testUserId, userId, setUser]);
+  const userId = useUserStore((state) => state.userId);
   
   useEffect(() => {
     const fetchChatRooms = async () => {
