@@ -50,7 +50,7 @@ export default function PayPage() {
           </div>
         </div>
         <Button txt="빌리페이 돈 더하기" onClick={handleAddBtn} state={true} />
-        <Link href="/pays/payment/2">
+        <Link href="/pays/testpage">
           <Button txt="결제하기" state={false} />
         </Link>
       </div>

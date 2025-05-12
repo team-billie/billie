@@ -4,18 +4,44 @@ import { ChevronDown } from "lucide-react"
 import { getBankInfo } from "@/lib/utils/getBankInfo"
 import Button from "@/components/pays/common/Button";
 import { useState } from "react"
+import useUserStore from "@/lib/store/useUserStore"
+import { SelectOwnerAccountRequest } from "@/lib/api/pays"
+import { SelectOwnerAccountRequestDto } from "@/types/pays/request/index"
+import MyAccountListModal from "@/components/pays/modals/MyAccountListModal"
+import { AddAccountResponseDto } from "@/types/pays/response"
 
 type SelectAccountProps = {
     payCharge: number;
     setChangeBtnClicked: React.Dispatch<React.SetStateAction<boolean>>;
+    rentalId: string;
+    setIsModalOpen: (isModalOpen: boolean) => void;
   };
 
 
-export default function SelectAccount({setChangeBtnClicked, payCharge}: SelectAccountProps){
-    const bankInfo = getBankInfo('090')
+export default function SelectAccount({setChangeBtnClicked, payCharge, rentalId}: SelectAccountProps){
     const [billySelected, setBillySelected] = useState(true)
+
+    const { mainAccount, billyAccount } = useUserStore()
     const btnClickHandler = () => {
         setBillySelected(!billySelected)
+    }
+
+    const [selectedAccount, setSelectedAccount] = useState<AddAccountResponseDto | null>(null)
+    const [isAccountListModalOpen, setIsAccountListModalOpen] = useState(false)
+
+    const selectAccount = selectedAccount ?? mainAccount;
+    const handleSelectAccount = () => {
+        if(billySelected){
+            SelectOwnerAccountRequest({
+                accountNo: billyAccount?.accountNo || '',
+                bankCode: billyAccount?.bankCode || ''
+            }, rentalId)
+        }else{
+            SelectOwnerAccountRequest({
+                accountNo: selectAccount?.accountNo || '',
+                bankCode: selectAccount?.bankCode || ''
+            }, rentalId)
+        }
     }
 
     return(
@@ -24,6 +50,7 @@ export default function SelectAccount({setChangeBtnClicked, payCharge}: SelectAc
                 <div className="mt-5 font-bold text-xl">
                     <div><span className="text-blue400">{payCharge}원</span>을</div>
                     <div>어디로 받을까요?</div>
+    
                 </div>
                 <div 
                     onClick={() => setChangeBtnClicked(true)} 
@@ -48,23 +75,28 @@ export default function SelectAccount({setChangeBtnClicked, payCharge}: SelectAc
                 
                 <button onClick={btnClickHandler} className={`${billySelected ? 'border-gray400' : 'border-blue200'} flex items-center gap-2 p-3 border rounded-lg`}>
                     <img 
-                        src={bankInfo?.image}
-                        alt={bankInfo?.bankName}
+                        src={getBankInfo(selectAccount?.bankCode || '000')?.image || ""}
+                        alt={getBankInfo(selectAccount?.bankCode || '000')?.bankName || ""}
                         className="w-6 h-6 rounded-full"
                     />
                     <div className="flex flex-col items-start">
                         <div className="font-bold">내 계좌로 받기</div>
-                        <div className="flex items-center gap-[1px] text-xs text-gray600">
-                            <span>{bankInfo?.bankName} 7983</span>
+                        <div onClick={() => setIsAccountListModalOpen(true)} className="flex items-center gap-[1px] text-xs text-gray600">
+                            <span>{getBankInfo(selectAccount?.bankCode || '000')?.bankName || ""} {selectAccount?.accountNo}</span>
                             <ChevronDown className="mt-[2px] w-4 h-4"/>
                         </div>
                     </div>
                 </button>
 
                 <div className="mt-5">
-                    <Button txt="확인" state={true}/>           
+                    <Button txt="확인" onClick={handleSelectAccount} state={true}/>           
                 </div>
             </div>
+            {isAccountListModalOpen && 
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
+                    <MyAccountListModal type="small" setIsModalOpen={setIsAccountListModalOpen} setSelectedAccount={setSelectedAccount}/>
+                </div>
+            }
         </>
     )
 }

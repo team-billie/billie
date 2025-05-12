@@ -1,6 +1,6 @@
 import axios from "axios";
 import axiosInstance from "../instance";
-import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto, GetFinUserRequestDto } from "@/types/pays/request/index";
+import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto, GetFinUserRequestDto, SelectOwnerAccountRequestDto } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
 const handleApiError = (error: any, name: string) => {
@@ -68,13 +68,23 @@ export const ReturnDepositRequest = (requestBody: ReturnDepositRequestDto) =>
   apiCall("/api/v1/fintechs/deposits/return", requestBody, "보증금 반환");
 
 // -----------------------------------------
-// 결제 데이터 호출
+// 대여 결제 데이터 호출
 export const GetPaymentDataRequest = (rentalId: string) => 
   axiosInstance.get(`/api/v1/rentals/${rentalId}/request-remittance`)
-  .then((response) => {
+.then((response) => {
     return response.data;
   })
   .catch((error) => {
     return handleApiError(error, "등록된 계좌 목록 조회");
-});
-
+  });
+  
+  
+// Owner 계좌 선택후 결제 요청
+export const SelectOwnerAccountRequest = (requestBody: SelectOwnerAccountRequestDto, rentalId: string) => 
+  axiosInstance.patch(`/api/v1/rentals/${rentalId}/account`, requestBody)
+  .then((response) => {
+    return response.data;
+  })
+  .catch((error) => {
+    return handleApiError(error, "Owner 계좌 선택");
+  });

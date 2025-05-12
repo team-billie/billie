@@ -64,6 +64,12 @@ type ReturnDepositRequestDto = {
     depositId: number;
 }
 
+//Owner 계좌 선택
+type SelectOwnerAccountRequestDto = {
+    accountNo: string;
+    bankCode: string;
+}
+
 export type { CreateFinUserRequestDto, 
     CreateFinAccountRequestDto, 
     GetAccountListRequestDto,   
@@ -73,4 +79,5 @@ export type { CreateFinUserRequestDto,
     WithdrawDepositRequestDto, 
     ReturnDepositRequestDto,
     CheckAccountRequestDto,
-    GetFinUserRequestDto }; 
+    GetFinUserRequestDto,
+    SelectOwnerAccountRequestDto }; 
