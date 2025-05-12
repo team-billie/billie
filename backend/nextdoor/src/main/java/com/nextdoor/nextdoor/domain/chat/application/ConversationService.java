@@ -21,13 +21,14 @@ public class ConversationService {
     /**
      * 새로운 1:1 채팅방을 생성합니다.
      * conversationId = UUID
-     * @param participantIds 두 명의 사용자 ID (owner, renter)
+     * @param 두 명의 사용자 ID (owner, renter)
      */
     @Transactional
-    public Conversation createConversation(List<Long> participantIds, Long postId) {
+    public Conversation createConversation(Long ownerId, Long renterId, Long postId) {
         Conversation conv = Conversation.builder()
                 .conversationId(UUID.randomUUID())
-                .participantIds(participantIds)
+                .ownerId(ownerId)
+                .renterId(renterId)
                 .createdAt(Instant.now())
                 .postId(postId)
                 .build();
