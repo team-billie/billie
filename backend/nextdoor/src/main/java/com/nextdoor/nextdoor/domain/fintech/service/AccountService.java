@@ -130,7 +130,8 @@ public class AccountService {
                                             });
 
                                     // 4) regist_account balance 동기화 (입금측)
-                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(userKey, depositAccountNo)
+                                    String depositUserKey = depositAcct.getUser().getUserKey();// 또는 depositAcct.getUser().getUserKey()
+                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(depositUserKey, depositAccountNo)
                                             .ifPresent(ra -> {
                                                 ra.setBalance(newDepositBalance);
                                                 registAccountRepository.save(ra);
