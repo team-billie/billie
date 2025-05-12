@@ -191,7 +191,7 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        rental.updateAccountInfo(command.getAccountNo(), command.getBankCode());
+        rental.processUpdateAccountInfo(command.getAccountNo(), command.getBankCode());
 
         return UpdateAccountResult.builder()
                 .rentalId(rental.getRentalId())
