@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.config;
 
 import com.nextdoor.nextdoor.domain.auth.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.nextdoor.nextdoor.domain.auth.OAuth2SuccessHandler;
 import com.nextdoor.nextdoor.domain.auth.filter.JwtAuthenticationFilter;
 import com.nextdoor.nextdoor.domain.auth.filter.RedirectUrlCookieFilter;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RedirectUrlCookieFilter redirectUrlCookieFilter;
@@ -50,7 +52,8 @@ public class SecurityConfig {
                                 .baseUri("/api/v1/auth/oauth2/code/*"))
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/api/v1/auth/oauth2/authorization")
-                                .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository)))
+                                .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository))
+                        .successHandler(oAuth2SuccessHandler))
                 .oauth2Client(Customizer.withDefaults())
                 .addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
                 .addFilterBefore(redirectUrlCookieFilter, OAuth2AuthorizationRequestRedirectFilter.class)
