@@ -180,7 +180,7 @@ public class DepositService {
 
                                         // --- 3-4) 응답 DTO 생성 ---
                                         return DepositResponseDto.builder()
-                                                .id(d.getId())
+                                                .depositId(d.getDepositId())
                                                 .rentalId(d.getRentalId())
                                                 .amount(d.getAmount())
                                                 .status(d.getStatus())
