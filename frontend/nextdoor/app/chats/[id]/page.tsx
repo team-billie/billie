@@ -6,8 +6,8 @@ import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
 import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
 import { ChatMessageDto, Message, Product } from "@/types/chats/chat";
-import { getChatMessages } from "@/lib/api/chats";
-import useUserStore from "@/lib/store/useUserStore"; 
+import { getChatMessages, getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
+import useUserStore from "@/lib/store/useUserStore"; // useUserStore 사용
 
 export default function ChatDetailPage() {
   const params = useParams();
@@ -16,6 +16,13 @@ export default function ChatDetailPage() {
 
   // useUserStore에서 사용자 정보 가져오기
   const { userId, username, profileImage } = useUserStore();
+  
+  // 상대방 정보 상태
+  const [otherUser, setOtherUser] = useState({
+    id: 0,
+    name: '상대방',
+    avatar: '/images/profileimg.png'
+  });
 
   // WebSocket 연결 상태 
   const [isConnected, setIsConnected] = useState(false);
@@ -31,6 +38,42 @@ export default function ChatDetailPage() {
   // 로딩 상태
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 채팅방 정보와 참가자 정보 가져오기
+  useEffect(() => {
+    const fetchChatRoomInfo = async () => {
+      if (!userId) return;
+      
+      try {
+        // 모든 채팅방 가져오기
+        const rooms = await getChatRooms(userId);
+        
+        // 현재 conversationId와 일치하는 채팅방 찾기
+        const currentRoom = rooms.find(room => room.conversationId === conversationId);
+        
+        if (currentRoom) {
+          // 채팅방 UI 데이터로 변환
+          const roomUI = convertToChatRoomUI(currentRoom);
+          
+          // 상대방 찾기 (내 ID가 아닌 참가자)
+          if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
+            const other = roomUI.participants.find(p => p.id !== userId);
+            if (other) {
+              setOtherUser({
+                id: other.id,
+                name: other.name || '상대방',
+                avatar: other.avatar || '/images/profileimg.png'
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("채팅방 정보 조회 오류:", err);
+      }
+    };
+    
+    fetchChatRoomInfo();
+  }, [conversationId, userId]);
 
   // WebSocket 연결 설정
   useEffect(() => {
@@ -222,7 +265,7 @@ export default function ChatDetailPage() {
 
   return (
     <ChatLayout
-      username={username || "사용자"}
+      username={otherUser.name} // 상대방 이름 표시
       value={value}
       onChange={handleChange}
       onSendMessage={handleSend}
@@ -235,8 +278,8 @@ export default function ChatDetailPage() {
       {/* 채팅 목록 */}
       <ChatList
         messages={messages}
-        username={username || "사용자"}
-        userAvatar={profileImage || "/images/profileimg.png"}
+        username={otherUser.name} // 상대방 이름 표시
+        userAvatar={otherUser.avatar} // 상대방 아바타 표시
       />
 
       {/* 연결 상태 표시 */}
@@ -246,11 +289,12 @@ export default function ChatDetailPage() {
         </div>
       )}
 
-      {/* 디버그 정보  -- 나중에 삭제 하기 */}
+      {/* 디버깅깅  -- 나중에 삭제 하기 */}
       {process.env.NODE_ENV === "development" && (
         <div className="mt-4 p-3 bg-gray-100 rounded-md text-xs overflow-auto">
           <h3 className="font-bold mb-1">디버깅 정보:</h3>
           <div>사용자 ID: {userId}</div>
+          <div>상대방 ID: {otherUser.id}</div>
           <div>대화 ID: {conversationId}</div>
           <div>연결 상태: {isConnected ? "연결됨 ✅" : "연결 안됨 ❌"}</div>
           {socketError && <div>웹소켓 오류: {socketError}</div>}

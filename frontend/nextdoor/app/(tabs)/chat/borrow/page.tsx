@@ -7,23 +7,28 @@ import ChatRoomList from "@/components/chats/list/ChatRoomList";
 import MainHeader from "@/components/common/Header/ReservationHeader";
 import { ChatRoomUI } from "@/types/chats/chat";
 import { getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
-import useUserStore from "@/lib/store/useUserStore"; 
+import useUserStore from "@/lib/store/useUserStore";
 
 export default function ChatBorrowPage() {
   const router = useRouter();
   const [chatRooms, setChatRooms] = useState<ChatRoomUI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false); // 마운트 상태 추가
 
-  const userId = useUserStore((state) => state.userId);
+  // useUserStore에서 사용자 정보 가져오기
+  const { userId } = useUserStore();
+
+  // 컴포넌트 마운트 상태 설정
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    const fetchChatRooms = async () => {
-      if (!userId) {
-        console.log("userId가 없어 채팅방을 불러올 수 없습니다.");
-        return;
-      }
+    // 컴포넌트가 마운트되었고 userId가 있을 때만 데이터 가져오기
+    if (!mounted || !userId) return;
 
+    const fetchChatRooms = async () => {
       try {
         setIsLoading(true);
         console.log(`채팅방 목록 조회: userId=${userId}`);
@@ -44,7 +49,18 @@ export default function ChatBorrowPage() {
     };
 
     fetchChatRooms();
-  }, [userId]);
+  }, [userId, mounted]);
+
+  // 마운트되기 전에는 간단한 로딩 표시
+  if (!mounted) {
+    return (
+      <main>
+        <MainHeader title="Messages" />
+        <ChatsHeader />
+        <div className="p-4">로딩 중...</div>
+      </main>
+    );
+  }
 
   return (
     <main>

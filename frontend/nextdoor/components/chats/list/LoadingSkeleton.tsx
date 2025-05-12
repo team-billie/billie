@@ -1,6 +1,10 @@
 // 로딩중일때 
 
 // src/components/chats/list/LoadingSkeleton.tsx
+
+"use client"
+
+
 import React from 'react';
 
 interface LoadingSkeletonProps {
