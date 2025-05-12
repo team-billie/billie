@@ -1,4 +1,5 @@
 "use client";
+import LoadingSpinner from "@/components/common/LoadingSpinner.tsx";
 import ProductInfos from "@/components/posts/detail/ProductInfos";
 import ProductPhotos from "@/components/posts/detail/ProductPhotos";
 import ProductReservation from "@/components/posts/detail/ProductReservation";
@@ -25,17 +26,15 @@ export default function PostDetailPage() {
   }, [feedId]);
 
   if (!product) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p>로딩 중...</p>
-      </main>
-    );
+    return <LoadingSpinner />;
   }
+
   return (
     <main className="relative">
       <div className="min-h-screen flex flex-col pb-24">
         {/* 물품 사진 */}
         <ProductPhotos images={product.productImage} />
+
         {/* 상세정보 */}
         <ProductInfos
           title={product.title}
@@ -54,8 +53,9 @@ export default function PostDetailPage() {
         <div className="flex justify-end">
           <MessageCircle className="bg-gradient-to-r from-blue300 to-blue400 text-white rounded-full p-2 w-10 h-10 m-2 " />
         </div>
+
         {/* 예약 버튼 */}
-        <div className=" bg-white p-2 border-t shadow-md">
+        <div className="bg-white p-2 border-t shadow-md">
           <ProductReservation feedId={feedId} />
         </div>
       </div>

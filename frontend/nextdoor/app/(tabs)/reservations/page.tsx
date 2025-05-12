@@ -9,6 +9,9 @@ import { RentalProcess, RentalStatus } from "@/types/rental";
 import useUserStore from "@/lib/store/useUserStore";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import EmptyState from "@/components/chats/list/EmptyState";
+import LoadingSpinner from "@/components/common/LoadingSpinner.tsx";
+import ErrorMessage from "@/components/common/ErrorMessage";
 
 interface ReservationItem {
   id: number;
@@ -28,8 +31,9 @@ export default function ReservationPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { userId } = useUserStore();
+  const [condition, setCondition] = useState<string>("ALL");
+
   const userRole: "OWNER" | "RENTER" = "RENTER";
-  const condition = "ALL";
 
   const stompClient = new Client({
     webSocketFactory: () =>
@@ -102,13 +106,20 @@ export default function ReservationPage() {
     <main className="flex flex-col">
       <div>
         <MainHeader title="Reservations" />
-        <ReservationStatusTabs />
+        <ReservationStatusTabs
+          selectedCondition={condition}
+          onChangeCondition={(newCondition) => setCondition(newCondition)}
+        />
       </div>
       <div className="flex flex-col m-4">
-        {loading && <p>불러오는 중입니다...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {loading && <LoadingSpinner />}
+        {error && <ErrorMessage message={error} />}
+        {!loading && !error && reservations.length === 0 && (
+          <EmptyState userRole={"borrower"} />
+        )}
         {!loading &&
           !error &&
+          reservations &&
           reservations.map((reservation) => (
             <div key={reservation.id}>
               <RentalCard
