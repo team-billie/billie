@@ -12,6 +12,7 @@ import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.RegistAccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -29,6 +30,8 @@ public class DepositService {
     private final DepositRepository depositRepository;
     private final RegistAccountRepository registAccountRepository;
     private final FintechUserRepository fintechUserRepository;
+
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     // 보증금 보관(홀딩)
