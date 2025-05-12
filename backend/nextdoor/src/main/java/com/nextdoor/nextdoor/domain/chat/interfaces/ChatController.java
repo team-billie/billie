@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.nextdoor.nextdoor.domain.chat.application.ConversationService;
 import com.nextdoor.nextdoor.domain.chat.application.dto.CreateConversationRequest;
 import com.nextdoor.nextdoor.domain.chat.domain.Conversation;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.nextdoor.nextdoor.domain.chat.application.ChatService;
@@ -43,6 +44,17 @@ public class ChatController {
     @GetMapping
     public List<ChatRoomDto> getChatRooms(@RequestParam Long memberId) {
         return chatQueryService.getChatRooms(memberId);
+    }
+
+    /**
+     * 빌리기(렌터) 채팅방 목록 조회
+     * GET /api/chats/borrowings?memberId=123
+     */
+    @GetMapping("/borrowings")
+    public ResponseEntity<List<ChatRoomDto>> getBorrowingChatRooms(
+            @RequestParam Long memberId) {
+        List<ChatRoomDto> rooms = chatQueryService.getBorrowingChatRooms(memberId);
+        return ResponseEntity.ok(rooms);
     }
 
     /**

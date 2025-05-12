@@ -44,7 +44,7 @@ public class RegistAccount {
     private Boolean primary;
 
     @Column(nullable = false)
-    private Integer balance;
+    private Long balance;
 
     @Column(name = "registered_at", nullable = false)
     private LocalDateTime registeredAt;
