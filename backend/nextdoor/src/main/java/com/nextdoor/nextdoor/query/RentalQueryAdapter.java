@@ -154,7 +154,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
         }
 
         if (condition.contains("ACTIVE")) {
-            return rental.rentalProcess.eq(RentalProcess.RENTAL_IN_ACTIVE);
+            return rental.rentalProcess.ne(RentalProcess.RENTAL_COMPLETED);
         } else if (condition.contains("COMPLETED")) {
             return rental.rentalProcess.eq(RentalProcess.RENTAL_COMPLETED);
         }
