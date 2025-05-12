@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.rental.port;
 
+import com.nextdoor.nextdoor.domain.rental.service.dto.ManagedRentalCountResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
@@ -11,4 +12,5 @@ public interface RentalQueryPort {
 
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     Optional<RequestRemittanceResult> findRemittanceRequestViewData(Long rentalId);
+    ManagedRentalCountResult countManagedRentals(Long ownerId);
 }

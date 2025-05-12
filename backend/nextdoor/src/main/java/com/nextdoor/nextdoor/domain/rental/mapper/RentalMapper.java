@@ -5,6 +5,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRental
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.ManagedRentalCountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UpdateAccountResponse;
@@ -97,6 +98,12 @@ public class RentalMapper {
                 .rentalId(result.getRentalId())
                 .accountNo(result.getAccountNo())
                 .bankCode(result.getBankCode())
+                .build();
+    }
+
+    public ManagedRentalCountResponse toManagedRentalCountResponse(ManagedRentalCountResult result) {
+        return ManagedRentalCountResponse.builder()
+                .managedRentalCount(result.getManagedRentalCount())
                 .build();
     }
 }
