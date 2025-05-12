@@ -24,11 +24,12 @@ public class ConversationService {
      * @param participantIds 두 명의 사용자 ID (owner, renter)
      */
     @Transactional
-    public Conversation createConversation(List<Long> participantIds) {
+    public Conversation createConversation(List<Long> participantIds, Long postId) {
         Conversation conv = Conversation.builder()
                 .conversationId(UUID.randomUUID())
                 .participantIds(participantIds)
                 .createdAt(Instant.now())
+                .postId(postId)             
                 .build();
         return conversationRepository.save(conv);
     }

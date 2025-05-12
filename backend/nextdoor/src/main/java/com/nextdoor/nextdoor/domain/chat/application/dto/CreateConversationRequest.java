@@ -13,4 +13,5 @@ import lombok.*;
 public class CreateConversationRequest {
     /** 참여자 리스트 (2명) */
     private List<Long> participantIds;
+    private Long postId;
 }

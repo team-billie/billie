@@ -24,4 +24,7 @@ public class Conversation {
 
     @Column("created_at")
     private Instant createdAt;
+
+    @Column("post_id")
+    private Long postId;
 }

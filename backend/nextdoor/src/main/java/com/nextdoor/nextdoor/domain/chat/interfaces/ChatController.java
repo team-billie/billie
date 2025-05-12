@@ -30,7 +30,8 @@ public class ChatController {
     @PostMapping("/create")
     public Conversation createChatRoom(@RequestBody CreateConversationRequest req) {
         return conversationService.createConversation(
-                req.getParticipantIds()
+                req.getParticipantIds(),
+                req.getPostId()
         );
     }
 
