@@ -41,7 +41,8 @@ type GetPaymentDataResponseDto = {
     ownerNickname: string;
     rentalFee: number;
     deposit: number;
-    // 계좌 번호 추가
+    accountNo: string;
+    bankCode: string;
 }
 
 export type { 

@@ -18,7 +18,7 @@ export default function TestLoginPage() {
 
     const form = useForm<GetFinUserRequestDto>({
         defaultValues: {
-            apiKey: "7d2b3859c5b844b0b1ba73392407effa",
+            apiKey: "c65e002a7f5343cd93b5f578d512e400",
             userId: "",
         },
     });
