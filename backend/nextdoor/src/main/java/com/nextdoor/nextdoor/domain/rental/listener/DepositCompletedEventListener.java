@@ -7,12 +7,11 @@ import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -22,8 +21,7 @@ public class DepositCompletedEventListener {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Async("asyncExecutor")
-    @EventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleDepositCompletedEvent(DepositCompletedEvent event) {
         rentalService.completeDepositProcessing(event);
 

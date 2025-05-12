@@ -5,6 +5,7 @@ import com.nextdoor.nextdoor.domain.fintech.domain.*;
 import com.nextdoor.nextdoor.domain.fintech.dto.DepositResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.ReturnDepositRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
+import com.nextdoor.nextdoor.domain.fintech.event.DepositHeldEvent;
 import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.DepositRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
@@ -29,7 +30,7 @@ public class DepositService {
     private final DepositRepository depositRepository;
     private final RegistAccountRepository registAccountRepository;
     private final FintechUserRepository fintechUserRepository;
-    private final TransactionTemplate transactionTemplate; // 명시적 트랜잭션 관리를 위해 추가
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -42,38 +43,51 @@ public class DepositService {
             int amount
     ) {
         // 보증금 보관이라 summary는 따로 없으니 null
-        //Reactive WebFlux에서 JPA는 Schedulers.boundedElastic() 같은 스케줄러로 분리해 주는 게 안전
         return client.withdrawAccount(userKey, accountNo, amount, null)
                 .flatMap(resp ->
                         Mono.fromCallable(() -> {
-                            // 1) 핀테크 사용자 유효성 검사, fintechUser 를 userKey 로 조회
-                            FintechUser fu = fintechUserRepository.findById(userKey)
-                                    .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
+                            // 명시적 트랜잭션 내에서 DB 업데이트와 이벤트 발행을 함께 처리
+                            return transactionTemplate.execute(status -> {
+                                try {
+                                    // 1) 핀테크 사용자 유효성 검사
+                                    FintechUser fu = fintechUserRepository.findById(userKey)
+                                            .orElseThrow(() -> new RuntimeException("핀테크 사용자 없음"));
 
-                            // 2) 등록된 계좌(RegistAccount) 조회, RegistAccount 를 user.userKey + accountNo 로 조회
-                            RegistAccount ra = registAccountRepository
-                                    .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
-                                    .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
+                                    // 2) 등록된 계좌(RegistAccount) 조회
+                                    RegistAccount ra = registAccountRepository
+                                            .findByUser_UserKeyAndAccount_AccountNo(userKey, accountNo)
+                                            .orElseThrow(() -> new RuntimeException("등록 계좌 없음"));
 
-                            // 여기에 로컬 balance 차감 로직 추가
-                            // 2-1) account 테이블에서 balance 차감
-                            Account acct = ra.getAccount();
-                            acct.setBalance(acct.getBalance() - amount);
-                            accountRepository.save(acct);
+                                    // 2-1) account 테이블에서 balance 차감
+                                    Account acct = ra.getAccount();
+                                    acct.setBalance(acct.getBalance() - amount);
+                                    accountRepository.save(acct);
 
-                            // 2-2) regist_account 테이블에서도 balance 차감
-                            ra.setBalance(ra.getBalance() - amount);
-                            registAccountRepository.save(ra);
+                                    // 2-2) regist_account 테이블에서도 balance 차감
+                                    ra.setBalance(ra.getBalance() - amount);
+                                    registAccountRepository.save(ra);
 
-                            // 3) Deposit 생성·저장
-                            Deposit d = Deposit.builder()
-                                    .rentalId(rentalId)
-                                    .registAccount(ra)
-                                    .amount(amount)
-                                    .status(DepositStatus.HELD)
-                                    .heldAt(LocalDateTime.now())
-                                    .build();
-                            return depositRepository.save(d);
+                                    // 3) Deposit 생성·저장
+                                    Deposit d = Deposit.builder()
+                                            .rentalId(rentalId)
+                                            .registAccount(ra)
+                                            .amount(amount)
+                                            .status(DepositStatus.HELD)
+                                            .heldAt(LocalDateTime.now())
+                                            .build();
+                                    Deposit savedDeposit = depositRepository.save(d);
+
+                                    eventPublisher.publishEvent(DepositHeldEvent.builder()
+                                            .rentalId(rentalId)
+                                            .depositId(savedDeposit.getDepositId())
+                                            .build());
+
+                                    return savedDeposit;
+                                } catch (Exception e) {
+                                    status.setRollbackOnly();
+                                    throw e;
+                                }
+                            });
                         }).subscribeOn(Schedulers.boundedElastic())
                 );
     }
