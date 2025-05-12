@@ -29,7 +29,7 @@ public class ConversationService {
                 .conversationId(UUID.randomUUID())
                 .participantIds(participantIds)
                 .createdAt(Instant.now())
-                .postId(postId)             
+                .postId(postId)
                 .build();
         return conversationRepository.save(conv);
     }

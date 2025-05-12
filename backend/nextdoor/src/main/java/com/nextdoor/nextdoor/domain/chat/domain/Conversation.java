@@ -19,8 +19,11 @@ public class Conversation {
     @Column("conversation_id")
     private UUID conversationId;
 
-    @Column("participant_ids")
-    private List<Long> participantIds;
+    @Column("owner_id")
+    private Long ownerId;
+
+    @Column("renter_id")
+    private Long renterId;
 
     @Column("created_at")
     private Instant createdAt;

@@ -15,4 +15,7 @@ public interface ConversationRepository extends CassandraRepository<Conversation
      */
     @Query("SELECT * FROM conversation WHERE participant_ids CONTAINS :memberId ALLOW FILTERING")
     List<Conversation> findByParticipantIdsContains(Long memberId);
+
+    //빌리기 전용 채팅 목록 조회
+    List<Conversation> findByRenterId(Long renterId);
 }
