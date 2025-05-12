@@ -176,5 +176,20 @@ INSERT INTO ai_image (rental_id, type, image_url, mime_type) VALUES
 -- Rental 10 (REMITTANCE_CONFIRMED)
 (10, 'BEFORE', 'https://example.com/ai/rental10_before1.jpg', 'image/jpeg');
 
+
+INSERT INTO fintech_user (created_at, user_id, user_key) VALUES
+                                                             ('2025-05-12 10:33:18.369177', 1, '5b4e4cb4-c670-4ba9-96c9-ec191910005b'),
+                                                             ('2025-05-12 10:33:26.789068', 2, '092ef68d-5a10-4b92-b323-b6db7c009e76');
+
+INSERT INTO account (balance, account_id, created_at, bank_code, account_no, user_key) VALUES
+                                                                                           (0, 1, '2025-05-12 10:33:18.577802', '999', '9990439285272673', '5b4e4cb4-c670-4ba9-96c9-ec191910005b'),
+                                                                                           (0, 2, '2025-05-12 10:33:26.905820', '999', '9991329456396744', '092ef68d-5a10-4b92-b323-b6db7c009e76');
+
+INSERT INTO regist_account
+(balance, is_primary, account_id, regist_account_id, registered_at, user_key, alias, account_type)
+VALUES
+    (0, 0, 1, 1, '2025-05-12 10:33:18.596775', '5b4e4cb4-c670-4ba9-96c9-ec191910005b', '빌리페이', 'BILI_PAY'),
+    (0, 0, 2, 2, '2025-05-12 10:33:26.909828', '092ef68d-5a10-4b92-b323-b6db7c009e76', '빌리페이', 'BILI_PAY');
+
 -- 외래키 제약조건 다시 활성화
 SET FOREIGN_KEY_CHECKS = 1;
