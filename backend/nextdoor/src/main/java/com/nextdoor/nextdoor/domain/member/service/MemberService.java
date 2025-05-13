@@ -1,8 +1,9 @@
 package com.nextdoor.nextdoor.domain.member.service;
 
-import com.nextdoor.nextdoor.domain.member.dto.MemberSaveDto;
+import com.nextdoor.nextdoor.domain.member.controller.dto.request.MemberExtraInfoSaveRequestDto;
+import com.nextdoor.nextdoor.domain.member.controller.dto.response.MemberResponseDto;
 
 public interface MemberService {
 
-    void createMember(MemberSaveDto memberSaveDto);
+    MemberResponseDto updateMember(Long memberId, MemberExtraInfoSaveRequestDto memberDto);
 }
