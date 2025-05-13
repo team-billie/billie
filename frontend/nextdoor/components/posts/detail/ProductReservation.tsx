@@ -7,13 +7,18 @@ import useUserStore from "@/lib/store/useUserStore";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import { formatKoreanDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { formatNumberWithCommas } from "@/lib/utils/money";
 
 interface ProductReservationProps {
   feedId: number;
+  rentalFee: number;
+  deposit: number;
 }
 
 export default function ProductReservation({
   feedId,
+  rentalFee,
+  deposit,
 }: ProductReservationProps) {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -118,12 +123,17 @@ export default function ProductReservation({
       <div className="w-full h-full  flex justify-between p-3 bg-white">
         <div>
           <div>
-            <span className="text-xl">₩ 20,000</span>
+            <span className="text-xl">
+              ₩ {formatNumberWithCommas(rentalFee)}
+            </span>
             <span> / 일 </span>
           </div>
           <div>
             <span>보증금</span>
-            <span className="text-xl"> ₩ 100,000</span>
+            <span className="text-xl">
+              {" "}
+              ₩ {formatNumberWithCommas(deposit)}
+            </span>
           </div>
         </div>
         <div
@@ -143,6 +153,8 @@ export default function ProductReservation({
           selectedDates={selectedDates}
           onDateSelect={handleDateSelect}
           onConfirm={handleConfirmReservation}
+          rentalFee={rentalFee}
+          deposit={deposit}
         />
       )}
     </div>
