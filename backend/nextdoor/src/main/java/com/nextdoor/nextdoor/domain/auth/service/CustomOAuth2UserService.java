@@ -45,7 +45,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             default:
                 throw new UnsupportedOAuth2ProviderException("지원하지 않는 OAuth2 제공자입니다.");
         }
-        MemberQueryDto member = authMemberQueryPort.findByEmail(email).orElse(
+        MemberQueryDto member = authMemberQueryPort.findByEmailAndAuthProvider(email, authProvider).orElse(
                 authMemberCommandPort.save(new MemberCommandDto(authProvider, nickname, email, profileImageUrl))
         );
         return new CustomOAuth2User(member.getId().toString(), oAuth2User.getAttributes());

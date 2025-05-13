@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface AuthMemberQueryPort {
 
-    Optional<MemberQueryDto> findByEmail(String email);
+    Optional<MemberQueryDto> findByEmailAndAuthProvider(String email, String authProvider);
 }
