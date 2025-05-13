@@ -28,8 +28,11 @@ interface UserStore {
   username: string;
   userId: number | null;
   userKey: string;
+  profileImage: string;
   setUserKey: (userKey: string) => void;
   setUserId: (userId: number) => void;
+  setUser: (id: number, name: string, profileImage: string) => void; // 통합 함수 추가
+  setProfileImage: (profileImage: string) => void; // 아바타 설정 함수 추가
   billyAccount: AddAccountResponseDto | null;
   mainAccount: AddAccountResponseDto | null;
   setBillyAccount: (billyAccount: AddAccountResponseDto) => void;
@@ -45,11 +48,15 @@ const useUserStore = create<UserStore>()(
       username: "",
       userKey: "",
       userId: null,
+      profileImage: "/images/profileimg.png", // 기본 아바타 URL
       billyAccount: test,
       mainAccount: test2,
       addedAccounts: [],
       setUserKey: (userKey: string) => set({ userKey }),
       setUserId: (userId: number) => set({ userId }),
+      setUser: (id: number, name: string, profileImage: string) =>
+        set({ userId: id, username: name, profileImage }), // 통합 함수 구현
+      setProfileImage: (profileImage: string) => set({ profileImage }), // 아바타 설정 함수 구현
       setBillyAccount: (billyAccount: AddAccountResponseDto) =>
         set({ billyAccount }),
       setMainAccount: (mainAccount: AddAccountResponseDto) =>
@@ -61,6 +68,7 @@ const useUserStore = create<UserStore>()(
           username: "",
           userKey: "",
           userId: null,
+          profileImage: "/images/profileimg.png",
           billyAccount: null,
           mainAccount: null,
           addedAccounts: [],
@@ -72,6 +80,7 @@ const useUserStore = create<UserStore>()(
         username: state.username,
         userKey: state.userKey,
         userId: state.userId,
+        profileImage: state.profileImage,
         billyAccount: state.billyAccount,
         mainAccount: state.mainAccount,
         addedAccounts: state.addedAccounts,

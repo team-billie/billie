@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { ChatMessageDto } from '@/types/chats/chat';
+import useUserStore from '@/lib/store/useUserStore'; 
 
 interface UseWebSocketProps {
-  userId: number;
   conversationId: string;
   onMessage?: (message: ChatMessageDto) => void;
 }
 
 /**
- * WebSocket 연결 훅훅
+ * WebSocket 연결 훅
  */
-export const useWebSocket = ({ userId, conversationId, onMessage }: UseWebSocketProps) => {
+export const useWebSocket = ({ conversationId, onMessage }: UseWebSocketProps) => {
+  const userId = useUserStore(state => state.userId);
+  
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -19,15 +21,13 @@ export const useWebSocket = ({ userId, conversationId, onMessage }: UseWebSocket
   const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://k12e205.p.ssafy.io:8081';
   
   const getUrlsToTry = useCallback(() => {
+    if (!userId) return [];
+    
     return [
       `${WS_BASE_URL}/ws/chat?user=${userId}&conv=${conversationId}`,
-      
       `${WS_BASE_URL}/chat?user=${userId}&conv=${conversationId}`,
-      
       `${WS_BASE_URL}/ws/chat?userId=${userId}&conversationId=${conversationId}`,
-      
       `${WS_BASE_URL}/chat?userId=${userId}&conversationId=${conversationId}`,
-      
       `${WS_BASE_URL}?user=${userId}&conv=${conversationId}`,
     ];
   }, [WS_BASE_URL, userId, conversationId]);
@@ -130,6 +130,8 @@ export const useWebSocket = ({ userId, conversationId, onMessage }: UseWebSocket
     }
     
     const urlsToTry = getUrlsToTry();
+    if (urlsToTry.length === 0) return;
+    
     attemptedUrls.current = [urlsToTry[0]];
     socketRef.current = tryConnectWithUrl(urlsToTry[0]);
   }, [userId, conversationId, getUrlsToTry, tryConnectWithUrl]);
@@ -142,6 +144,12 @@ export const useWebSocket = ({ userId, conversationId, onMessage }: UseWebSocket
   }, []);
   
   const sendMessage = useCallback((content: string) => {
+    if (!userId) {
+      console.error('userId가 없습니다.');
+      setError('사용자 정보가 없습니다');
+      return false;
+    }
+    
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       console.error('WebSocket 연결 상태:', socketRef.current?.readyState);
       setError('연결이 활성화되지 않았습니다');
