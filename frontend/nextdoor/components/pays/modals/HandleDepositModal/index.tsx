@@ -27,7 +27,6 @@ export default function HandleDepositModal({charge, rentalImg, renterId, rentalI
             userKey: userKey,
             rentalId: rentalId,
             deductedAmount: deductedAmount,
-            depositId: 1,
             accountNo: billyAccount?.accountNo || "",
             renterId: renterId,
         }
