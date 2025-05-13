@@ -33,7 +33,7 @@ export default function ReservationPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { userId } = useUserStore();
-  const [condition, setCondition] = useState<string>("ALL");
+  const [condition, setCondition] = useState<string>("ACTIVE");
 
   const userRole: "OWNER" | "RENTER" = "RENTER";
 
@@ -71,8 +71,8 @@ export default function ReservationPage() {
             id: item.rentalId,
             img: item.productImageUrl,
             title: item.title,
+            date: diffDays + 1,
             cost: item.rentalFee,
-            date: diffDays,
             renterId: item.renterId,
             startDate: item.startDate,
             deposit: item.deposit,

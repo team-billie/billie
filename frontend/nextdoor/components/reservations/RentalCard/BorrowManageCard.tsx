@@ -10,6 +10,7 @@ interface LendManageCardProps {
   cost: number;
   date: number;
   startDate: string;
+  deposit: number;
   endDate: string;
   onReload: () => void;
 }
@@ -21,6 +22,7 @@ export default function BorrowManageCard({
   date,
   startDate,
   endDate,
+  deposit,
   onReload,
 }: LendManageCardProps) {
   return (
@@ -29,7 +31,13 @@ export default function BorrowManageCard({
       <RentalPeriod startDate={startDate} endDate={endDate} />
 
       {/* 내용 */}
-      <RentalContent img={img} title={postTitle} cost={cost} date={date} />
+      <RentalContent
+        img={img}
+        title={postTitle}
+        cost={cost}
+        deposit={deposit}
+        date={date}
+      />
 
       {/* 버튼들 */}
       <div className="flex divide-x border rounded-md overflow-hidden text-center text-sm">
