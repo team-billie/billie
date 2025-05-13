@@ -10,6 +10,8 @@ interface CalendarModalProps {
   startDate: Date | null;
   endDate: Date | null;
   selectedDates: Date[];
+  rentalFee: number;
+  deposit: number;
   onDateSelect: (year: number, month: number, day: number) => void;
   onConfirm: () => void;
 }
@@ -20,6 +22,8 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
   startDate,
   endDate,
   selectedDates,
+  rentalFee,
+  deposit,
   onDateSelect,
   onConfirm,
 }) => {
@@ -66,8 +70,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
 
   // (이용료*일수) 가격 측정
   const selectedDaysCount = selectedDates.length;
-  const dailyPrice = 20000;
-  const totalPrice = selectedDaysCount * dailyPrice;
+  const totalPrice = selectedDaysCount * rentalFee + deposit;
 
   const getInstructionMessage = () => {
     if (!startDate) return "대여 시작일을 선택해주세요.";

@@ -135,7 +135,7 @@ public class RentalServiceImpl implements RentalService {
 
         rentalDomainService.processAfterImageRegistration(rental, reservationDto.getDeposit());
 
-        if(rental.getRentalStatus().equals(RentalStatus.AFTER_PHOTO_REGISTERED)){
+        if(rental.getRentalStatus().equals(RentalStatus.DEPOSIT_REQUESTED)){
             eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());

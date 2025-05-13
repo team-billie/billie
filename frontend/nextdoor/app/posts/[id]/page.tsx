@@ -60,7 +60,11 @@ export default function PostDetailPage() {
 
         {/* 예약 버튼 */}
         <div className="bg-white p-2 border-t shadow-md">
-          <ProductReservation feedId={feedId} />
+          <ProductReservation
+            feedId={feedId}
+            rentalFee={product.rentalFee}
+            deposit={product.deposit}
+          />
         </div>
       </div>
     </main>

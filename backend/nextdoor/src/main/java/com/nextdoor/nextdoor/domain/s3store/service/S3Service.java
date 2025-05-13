@@ -38,16 +38,6 @@ public class S3Service {
     public FileUploadResponseDto uploadFile(FileUploadRequestDto request) {
         MultipartFile file = request.getFile();
 
-        // 기존 파일이 있는지 확인
-        fileMetadataRepository.findByServiceIdAndResourceIdAndResourceType(
-                        request.getServiceId(), request.getResourceId(), request.getResourceType())
-                .ifPresent(existingFile -> {
-//                    // 기존 S3 파일 삭제
-//                    amazonS3.deleteObject(new DeleteObjectRequest(bucketName, existingFile.getFileName()));
-//                    // 메타데이터 삭제 (업데이트를 위해)
-//                    fileMetadataRepository.delete(existingFile);
-                });
-
         // 파일 이름 생성 (UUID)
         String fileName = createFileName(request.getDirectory(), file.getOriginalFilename());
 

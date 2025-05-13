@@ -34,7 +34,7 @@ export default function ReservationLendPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { userId } = useUserStore();
-  const [condition, setCondition] = useState<string>("ALL");
+  const [condition, setCondition] = useState<string>("ACTIVE");
   console.log("ReservationLendPage userId:", userId);
 
   const userRole: "OWNER" | "RENTER" = "OWNER";
@@ -66,7 +66,7 @@ export default function ReservationLendPage() {
             img: item.productImageUrl,
             title: item.title,
             cost: item.rentalFee,
-            date: diffDays,
+            date: diffDays + 1,
             startDate: item.startDate,
             renterId: item.renterId,
             endDate: item.endDate,

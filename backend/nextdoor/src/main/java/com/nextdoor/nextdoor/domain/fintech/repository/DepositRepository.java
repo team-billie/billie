@@ -9,11 +9,9 @@ import java.util.Optional;
 
 public interface DepositRepository extends JpaRepository<Deposit, Long> {
 
-    @Query("SELECT d FROM Deposit d "
-            + " JOIN FETCH d.registAccount ra"
-            + " JOIN FETCH ra.account a"
-            + " WHERE d.rentalId = :rentalId")
+    @Query("SELECT DISTINCT d FROM Deposit d "
+            + "JOIN FETCH d.registAccount ra "
+            + "JOIN FETCH ra.account a "
+            + "WHERE d.rentalId = :rentalId")
     Optional<Deposit> findByRentalId(@Param("rentalId") Long rentalId);
-
-    Optional<Long> findIdByRentalId(Long rentalId);
 }

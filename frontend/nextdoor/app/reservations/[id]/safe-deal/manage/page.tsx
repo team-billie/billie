@@ -5,7 +5,7 @@ import SafeDealNavbar from "@/components/reservations/safe-deal/SafeDealNavbar";
 import { fetchAiAnalysis } from "@/lib/api/ai-analysis/request";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface AiAnalysisData {
@@ -22,7 +22,7 @@ export default function SafeDealManage() {
   const [result, setResult] = useState<any>(null);
   const [serverData, setServerData] = useState<AiAnalysisData | null>(null);
   const { id } = useParams();
-
+  const router = useRouter();
   // 컴포넌트 마운트 시 서버에서 데이터 가져오기
   useEffect(() => {
     if (!userId || !id) return;
@@ -68,6 +68,7 @@ export default function SafeDealManage() {
       alert("AI 분석 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
+      router.push(`/reservations/${id}/safe-deal/result`);
     }
   };
 

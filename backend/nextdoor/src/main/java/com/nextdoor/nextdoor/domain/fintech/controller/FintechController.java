@@ -20,6 +20,7 @@ public class FintechController {
     private final FintechUserService userService;
     private final AccountService accountService;
     private final DepositService depositService;
+    private final AccountVerificationService accountVerificationService;
 
     //계정 생성
     @PostMapping("/users")
@@ -169,5 +170,15 @@ public class FintechController {
                                 .body(null)
                         )
                 );
+    }
+
+    //계좌 확인
+    @PostMapping("/accounts/verify")
+    public ResponseEntity<AccountVerificationResponseDto> verifyAccount(
+            @RequestBody AccountVerificationRequestDto req
+    ) {
+        return accountVerificationService.verifyAccount(req)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

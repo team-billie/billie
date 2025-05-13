@@ -60,10 +60,10 @@ export default function OwnerActionBtn({
         return "대여 진행중";
 
       case RENTAL_PROCESS.RETURNED:
+        //대여 기간이 끝남
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
           return "사진 등록 대기중";
-        } else if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
-          return "보증금 처리";
+          //안심 사진 등록이 끝나서 보증금 처리 가능 상태
         } else if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
           return "보증금 처리";
         }
@@ -90,7 +90,7 @@ export default function OwnerActionBtn({
         return !(status === RENTAL_STATUS.REMITTANCE_REQUESTED);
 
       case RENTAL_PROCESS.RETURNED:
-        return status !== RENTAL_STATUS.AFTER_PHOTO_REGISTERED;
+        return status !== RENTAL_STATUS.DEPOSIT_REQUESTED;
 
       default:
         return true;
@@ -124,10 +124,9 @@ export default function OwnerActionBtn({
           });
         } //보증금 처리
       } else if (process === RENTAL_PROCESS.RETURNED) {
-        if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
+        if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
           setIsDepositModal(true);
-          console.log("보증금 처리");
-          alert("보증금 처리");
+          return;
         }
       }
 
