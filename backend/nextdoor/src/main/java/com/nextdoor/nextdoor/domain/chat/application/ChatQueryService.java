@@ -153,6 +153,9 @@ public class ChatQueryService {
                             .otherNickname(otherMember.getNickname())
                             .otherProfileImageUrl(otherMember.getProfileImageUrl())
                             .postImageUrl(post.getImageUrl())
+                            .ownerId(conv.getOwnerId())
+                            .renterId(conv.getRenterId())
+                            .postId(conv.getPostId())
                             .build();
                 })
                 .collect(Collectors.toList());
