@@ -42,7 +42,7 @@ function RenterActionBtn({
         if (status === RENTAL_STATUS.CREATED) {
           return "사진 등록 대기 중"; // Renter 버튼 - 대여 시작 등록 후 (비활성화)
         } else if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
-          return "결제 대기"; // Renter 버튼 - 소유자가 안심 사진 등록 후
+          return "결제"; // Renter 버튼 - 소유자가 안심 사진 등록 후
         } else if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
           return "결제";
         }
@@ -56,14 +56,9 @@ function RenterActionBtn({
       case RENTAL_PROCESS.RETURNED:
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
           return "안심 사진 등록"; // Renter 버튼 - 대여 시간 끝난 후
-        } else if (
-          status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED ||
-          status === RENTAL_STATUS.DEPOSIT_REQUESTED
-        ) {
+        } else if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
           return "보증금 처리 중"; // Renter 버튼 - 반납 사진 등록 후 또는 보증금 처리 요청됨
         }
-        return "보증금 처리 중";
-
       case RENTAL_PROCESS.RENTAL_COMPLETED:
         return "거래 완료"; // Renter 버튼 - 모든 과정 완료
 
