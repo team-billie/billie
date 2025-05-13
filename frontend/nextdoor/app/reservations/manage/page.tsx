@@ -1,5 +1,6 @@
 "use client";
 
+import EmptyState from "@/components/chats/list/EmptyState";
 import MainDock from "@/components/common/Dock/MainDock";
 import LendManageCard from "@/components/reservations/RentalCard/LendManageCard";
 import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
@@ -65,6 +66,7 @@ export default function ReservationManagePage() {
     <main>
       <ReservationManageNavbar />
       <div className="h-screen flex flex-col p-4 gap-4">
+        {items.length === 0 && <EmptyState userRole={"lender"} />}
         {items.map((item) => (
           <div key={item.id}>
             <LendManageCard
