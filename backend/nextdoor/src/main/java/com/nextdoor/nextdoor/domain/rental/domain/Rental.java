@@ -113,8 +113,7 @@ public class Rental {
     }
 
     public void processDepositCompletion(){
-        if (rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED
-                && rentalStatus != RentalStatus.DEPOSIT_REQUESTED) {
+        if (rentalStatus != RentalStatus.DEPOSIT_REQUESTED) {
             throw new InvalidRentalStatusException(this.rentalStatus.name() + ": 보증금을 처리가 불가능한 대여 상태입니다");
         }
 
