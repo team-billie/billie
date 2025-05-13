@@ -125,7 +125,7 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                 qReservation.status.stringValue(),
                 qReservation.rentalId,
                 qReservation.ownerId,
-                qMember.name,
+                qMember.nickname,
                 qMember.profileImageUrl,
                 qReservation.renterId,
                 qReservation.postId,

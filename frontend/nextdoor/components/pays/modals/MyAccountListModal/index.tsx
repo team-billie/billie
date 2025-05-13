@@ -12,7 +12,7 @@ interface AccountListModalProps {
     type?: "small";
 }
 
-export default function MyAccountListModal({ setIsModalOpen, setSelectedAccount, type }: AccountListModalProps) {
+export default function MyAccountListModal({ setIsModalOpen, setSelectedAccount, type = "small" }: AccountListModalProps) {
     const [isVisible, setIsVisible] = useState(false);
     const { addedAccounts } = useUserStore();
 

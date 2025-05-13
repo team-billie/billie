@@ -1,36 +1,38 @@
 -- 외래키 제약조건 일시 비활성화
 SET FOREIGN_KEY_CHECKS = 0;
 
--- 1. Member 더미 데이터 (Rental 주체들만 - 대여자, 빌려주는 사람)
-INSERT INTO member (member_id, name, email, birth, gender, address, profile_image_url, account, nickname, created_at) VALUES
-                                                                                                                          (1, '홍길동', 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', 1, '홍길동', '2024-01-01T10:00:00'),
-                                                                                                                          (2, '김영희', 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg', 2, '김영희', '2024-01-02T10:00:00'),
-                                                                                                                          (3, '박철수', 'park@example.com', '1992-03-20', 'MALE', '서울시 송파구', 'profile3.jpg', 3, '박철수', '2024-01-03T10:00:00'),
-                                                                                                                          (4, '이민지', 'lee@example.com', '1993-04-25', 'FEMALE', '경기도 성남시', 'profile4.jpg', 4, '이민지', '2024-01-04T10:00:00'),
-                                                                                                                          (5, '최성훈', 'choi@example.com', '1994-05-30', 'MALE', '경기도 수원시', 'profile5.jpg', 5, '최성훈', '2024-01-05T10:00:00'),
-                                                                                                                          (6, '정유리', 'jung@example.com', '1995-06-15', 'FEMALE', '인천시 부평구', 'profile6.jpg', 6, '정유리', '2024-01-06T10:00:00'),
-                                                                                                                          (7, '강준혁', 'kang@example.com', '1996-07-10', 'MALE', '부산시 해운대구', 'profile7.jpg', 7, '강준혁', '2024-01-07T10:00:00'),
-                                                                                                                          (8, '서상은', 'seo@example.com', '1997-08-05', 'FEMALE', '대구시 수성구', 'profile8.jpg', 8, '서상은', '2024-01-08T10:00:00'),
-                                                                                                                          (9, '임재형', 'lim@example.com', '1998-09-20', 'MALE', '광주시 남구', 'profile9.jpg', 9, '임재형', '2024-01-09T10:00:00'),
-                                                                                                                          (10, '윤소연', 'yoon@example.com', '1999-10-15', 'FEMALE', '대전시 유성구', 'profile10.jpg', 10, '윤소연', '2024-01-10T10:00:00'),
-                                                                                                                          (11, '김민수', 'kim2@example.com', '1989-11-30', 'MALE', '서울시 종로구', 'profile11.jpg', 11, '김민수', '2024-01-11T10:00:00'),
-                                                                                                                          (12, '이수진', 'lee2@example.com', '1988-12-25', 'FEMALE', '서울시 중구', 'profile12.jpg', 12, '이수진', '2024-01-12T10:00:00'),
-                                                                                                                          (13, '박지훈', 'park2@example.com', '1987-01-10', 'MALE', '경기도 고양시', 'profile13.jpg', 13, '박지훈', '2024-01-13T10:00:00'),
-                                                                                                                          (14, '조현아', 'cho@example.com', '1986-02-28', 'FEMALE', '경기도 안산시', 'profile14.jpg', 14, '조현아', '2024-01-14T10:00:00'),
-                                                                                                                          (15, '송태호', 'song@example.com', '1985-03-15', 'MALE', '인천시 계양구', 'profile15.jpg', 15, '송태호', '2024-01-15T10:00:00'),
-                                                                                                                          (16, '오예원', 'oh@example.com', '1984-04-20', 'FEMALE', '부산시 금정구', 'profile16.jpg', 16, '오예원', '2024-01-16T10:00:00'),
-                                                                                                                          (17, '하동민', 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg', 17, '하동민', '2024-01-17T10:00:00'),
-                                                                                                                          (18, '신혜진', 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg', 18, '신혜진', '2024-01-18T10:00:00'),
-                                                                                                                          (19, '안준서', 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg', 19, '안준서', '2024-01-19T10:00:00'),
-                                                                                                                          (20, '양서현', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', 20, '양서현', '2024-01-20T10:00:00');
+-- 1. Member 더미 데이터 (40명의 사용자 생성)
+INSERT INTO member (
+    member_id, email, birth, gender, address, profile_image_url, account, nickname, created_at
+) VALUES
+      (1, 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', 1, '홍길동', '2024-01-01T10:00:00'),
+      (2, 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg', 2, '김영희', '2024-01-02T10:00:00'),
+      (3, 'park@example.com', '1992-03-20', 'MALE', '서울시 송파구', 'profile3.jpg', 3, '박철수', '2024-01-03T10:00:00'),
+      (4, 'lee@example.com', '1993-04-25', 'FEMALE', '경기도 성남시', 'profile4.jpg', 4, '이민지', '2024-01-04T10:00:00'),
+      (5, 'choi@example.com', '1994-05-30', 'MALE', '경기도 수원시', 'profile5.jpg', 5, '최성훈', '2024-01-05T10:00:00'),
+      (6, 'jung@example.com', '1995-06-15', 'FEMALE', '인천시 부평구', 'profile6.jpg', 6, '정유리', '2024-01-06T10:00:00'),
+      (7, 'kang@example.com', '1996-07-10', 'MALE', '부산시 해운대구', 'profile7.jpg', 7, '강준혁', '2024-01-07T10:00:00'),
+      (8, 'seo@example.com', '1997-08-05', 'FEMALE', '대구시 수성구', 'profile8.jpg', 8, '서상은', '2024-01-08T10:00:00'),
+      (9, 'lim@example.com', '1998-09-20', 'MALE', '광주시 남구', 'profile9.jpg', 9, '임재형', '2024-01-09T10:00:00'),
+      (10, 'yoon@example.com', '1999-10-15', 'FEMALE', '대전시 유성구', 'profile10.jpg', 10, '윤소연', '2024-01-10T10:00:00'),
+      (11, 'kim2@example.com', '1989-11-30', 'MALE', '서울시 종로구', 'profile11.jpg', 11, '김민수', '2024-01-11T10:00:00'),
+      (12, 'lee2@example.com', '1988-12-25', 'FEMALE', '서울시 중구', 'profile12.jpg', 12, '이수진', '2024-01-12T10:00:00'),
+      (13, 'park2@example.com', '1987-01-10', 'MALE', '경기도 고양시', 'profile13.jpg', 13, '박지훈', '2024-01-13T10:00:00'),
+      (14, 'cho@example.com', '1986-02-28', 'FEMALE', '경기도 안산시', 'profile14.jpg', 14, '조현아', '2024-01-14T10:00:00'),
+      (15, 'song@example.com', '1985-03-15', 'MALE', '인천시 계양구', 'profile15.jpg', 15, '송태호', '2024-01-15T10:00:00'),
+      (16, 'oh@example.com', '1984-04-20', 'FEMALE', '부산시 금정구', 'profile16.jpg', 16, '오예원', '2024-01-16T10:00:00'),
+      (17, 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg', 17, '하동민', '2024-01-17T10:00:00'),
+      (18, 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg', 18, '신혜진', '2024-01-18T10:00:00'),
+      (19, 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg', 19, '안준서', '2024-01-19T10:00:00'),
+      (20, 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', 20, '양서현', '2024-01-20T10:00:00');
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE member AUTO_INCREMENT = 21;
 
 -- 2. Post 더미 데이터 (10개의 게시글)
 INSERT INTO post (post_id, title, content, rental_fee, deposit, address, location, category, author_id, created_at) VALUES
-                                                                                                                        (1, 'iPhone 15 Pro 대여', '완전 새 제품! 액정 보호필름 포함', 30000, 300000, '서울시 강남구 대치동', ST_GeomFromText('POINT(37.49794 127.05902)', 4326), 'DIGITAL_DEVICE', 1, '2024-02-01T10:00:00'),
-                                                                                                                        (2, '에어컨 대여해요', '삼성 무풍 에어컨 18평형', 50000, 500000, '서울시 송파구 잠실동', ST_GeomFromText('POINT(37.51133 127.08298)', 4326), 'HOME_APPLIANCE', 2, '2024-02-02T10:00:00'),
+                                                                                                                        (1, 'iPhone 15 Pro 대여', '완전 새 제품! 액정 보호필름 포함', 30000, 300000, '서울시 강남구', ST_GeomFromText('POINT(37.49794 127.05902)', 4326), 'DIGITAL_DEVICE', 1, '2024-02-01T10:00:00'),
+                                                                                                                        (2, '에어컨 대여해요', '삼성 무풍 에어컨 18평형', 50000, 500000, '서울시 강남구', ST_GeomFromText('POINT(37.51133 127.08298)', 4326), 'HOME_APPLIANCE', 2, '2024-02-02T10:00:00'),
                                                                                                                         (3, '이사용 트럭 대여', '1톤 트럭, 운전기사 포함', 80000, 800000, '경기도 성남시 분당구', ST_GeomFromText('POINT(37.35944 127.11794)', 4326), 'SPORTS_LEISURE', 3, '2024-02-03T10:00:00'),
                                                                                                                         (4, '닌텐도 스위치 대여', '모든 액세서리 포함, 게임 10개', 20000, 200000, '인천시 부평구 청천동', ST_GeomFromText('POINT(37.49444 126.71667)', 4326), 'HOBBY_GAMES_MUSIC', 4, '2024-02-04T10:00:00'),
                                                                                                                         (5, '카메라 대여합니다', '캐논 5D Mark IV + 렌즈 3개', 40000, 400000, '부산시 해운대구 좌동', ST_GeomFromText('POINT(35.16361 129.17944)', 4326), 'DIGITAL_DEVICE', 5, '2024-02-05T10:00:00'),
@@ -122,7 +124,7 @@ ALTER TABLE reservation AUTO_INCREMENT = 11;
 
 -- 6. Rental 더미 데이터 (10개) - account_no, bank_code 필드 추가
 INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, damage_analysis, deal_count, account_no, bank_code, created_at) VALUES
-                                                                                                                                                  (1, 1, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
+                                                                                                                                                  (1, 1, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
                                                                                                                                                   (2, 2, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '경미한 스크래치 발견', 1, '234-567-890123', '020', '2024-03-17T10:00:00'),
                                                                                                                                                   (3, 3, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '345-678-901234', '032', '2024-03-18T10:00:00'),
                                                                                                                                                   (4, 4, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '컨트롤러 버튼 불량', 1, '456-789-012345', '034', '2024-03-20T10:00:00'),

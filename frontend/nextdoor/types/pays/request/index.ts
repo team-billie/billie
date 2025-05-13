@@ -72,7 +72,11 @@ type WithdrawDepositRequestDto = {
 //보증금 반환
 type ReturnDepositRequestDto = {
     userKey: string;
+    accountNo: string;
     depositId: number;
+    deductedAmount: number;
+    renterId: number;
+    rentalId: number;
 }
 
 //Owner 계좌 선택

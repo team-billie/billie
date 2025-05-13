@@ -1,22 +1,25 @@
 package com.nextdoor.nextdoor.domain.post.service.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PostDetailResult {
     private String title;
     private String content;
-    private Long rentalFee;
-    private Long deposit;
+    private int rentalFee;
+    private int deposit;
     private String address;
-    private String location;
+    private LocationDto location;
     private List<String> productImages;
     private String category;
+    private Long authorId;
     private String nickname;
 }

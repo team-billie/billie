@@ -169,6 +169,15 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
+    public void updateRentalDepositId(Long rentalId, Long depositId) {
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateDepositId(depositId);
+    }
+
+    @Override
     public AiAnalysisResult getAiAnalysis(Long rentalId) {
         rentalRepository.findByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
@@ -191,12 +200,17 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
-        rental.updateAccountInfo(command.getAccountNo(), command.getBankCode());
+        rental.processUpdateAccountInfo(command.getAccountNo(), command.getBankCode());
 
         return UpdateAccountResult.builder()
                 .rentalId(rental.getRentalId())
                 .accountNo(rental.getAccountNo())
                 .bankCode(rental.getBankCode())
                 .build();
+    }
+
+    @Override
+    public ManagedRentalCountResult countManagedRentals(Long ownerId) {
+        return rentalQueryPort.countManagedRentals(ownerId);
     }
 }

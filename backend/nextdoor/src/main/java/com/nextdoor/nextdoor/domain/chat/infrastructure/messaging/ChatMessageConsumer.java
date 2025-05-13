@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -46,17 +47,23 @@ public class ChatMessageConsumer {
         UUID convId = chatMessage.getKey().getConversationId();
         Conversation conv = conversationRepository.findById(convId)
                 .orElseThrow(() -> new IllegalStateException("Conversation not found: " + convId));
-        // 발신자(senderId) 제외한 상대 목록
-        List<Long> recipients = conv.getParticipantIds().stream()
-                .filter(id -> !id.equals(chatMessage.getSenderId()))
+
+        Long sender = chatMessage.getSenderId();
+        Long owner  = conv.getOwnerId();
+        Long renter = conv.getRenterId();
+
+        // 발신자를 제외한 상대(1:1이므로 한 명)
+        List<Long> recipients = Stream.of(owner, renter)
+                .filter(id -> !id.equals(sender))
                 .toList();
+
         // 실제 카운터 업데이트
         unreadCounterService.incrementUnread(convId, recipients);
 
         // 3) WebSocket 사용자에게 즉시 푸시할 DTO 생성
         ChatMessageDto dto = ChatMessageDto.builder()
                 .conversationId(convId)
-                .senderId       (chatMessage.getSenderId())
+                .senderId       (sender)
                 .content        (chatMessage.getContent())
                 .sentAt         (chatMessage.getKey().getSentAt())
                 .build();

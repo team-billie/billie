@@ -8,12 +8,11 @@ import com.nextdoor.nextdoor.domain.post.domain.QPostLike;
 import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
+import com.nextdoor.nextdoor.domain.post.service.dto.LocationDto;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +21,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Adapter
 @RequiredArgsConstructor
@@ -45,6 +46,7 @@ public class PostQueryAdapter implements PostQueryPort {
         JPAQuery<SearchPostResult> query = queryFactory
                 .select(Projections.constructor(
                         SearchPostResult.class,
+                        post.id,
                         post.title,
                         queryFactory
                                 .select(productImage.imageUrl.min())
@@ -72,14 +74,6 @@ public class PostQueryAdapter implements PostQueryPort {
         return new PageImpl<>(results, pageable, total);
     }
 
-    private JPQLQuery<Integer> getLikeCountQuery(NumberExpression<Long> postId) {
-        return queryFactory
-                .select(postLike.count().intValue())
-                .from(postLike)
-                .where(postLike.post.id.eq(postId));
-    }
-
-    @Override
     public PostDetailResult getPostDetail(Long postId) {
         Post postEntity = queryFactory
                 .selectFrom(post)
@@ -102,16 +96,46 @@ public class PostQueryAdapter implements PostQueryPort {
                 .where(productImage.post.id.eq(postId))
                 .fetch();
 
+        String locationStr = queryFactory
+                .select(Expressions.stringTemplate("ST_AsText({0})", post.location))
+                .from(post)
+                .where(post.id.eq(postId))
+                .fetchOne();
+
+        LocationDto locationDto = parseLocationPoint(locationStr);
+
         return PostDetailResult.builder()
                 .title(postEntity.getTitle())
                 .content(postEntity.getContent())
-                .rentalFee(postEntity.getRentalFee())
-                .deposit(postEntity.getDeposit())
+                .rentalFee(Math.toIntExact(postEntity.getRentalFee()))
+                .deposit(Math.toIntExact(postEntity.getDeposit()))
                 .address(postEntity.getAddress())
-                .location(postEntity.getLocation())
+                .location(locationDto)
                 .productImages(productImages)
                 .category(postEntity.getCategory().toString())
+                .authorId(postEntity.getAuthorId())
                 .nickname(nickname)
                 .build();
+    }
+
+    private LocationDto parseLocationPoint(String pointStr) {
+        if (pointStr == null || pointStr.isEmpty()) {
+            return null;
+        }
+
+        Pattern pattern = Pattern.compile("POINT\\((\\S+)\\s+(\\S+)\\)");
+        Matcher matcher = pattern.matcher(pointStr);
+
+        if (matcher.find()) {
+            try {
+                double latitude = Double.parseDouble(matcher.group(1));
+                double longitude = Double.parseDouble(matcher.group(2));
+                return new LocationDto(latitude, longitude);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }
