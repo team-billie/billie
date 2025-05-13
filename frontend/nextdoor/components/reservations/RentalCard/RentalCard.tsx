@@ -48,7 +48,7 @@ export default function RentalCard({
   if (!userId) {
     return null;
   }
-
+  const totalCost = cost * date;
   return (
     <div className="w-full border rounded-lg flex flex-col">
       {/* 대여기간 */}
@@ -56,7 +56,13 @@ export default function RentalCard({
 
       <div className="relative">
         {/* 내용 */}
-        <RentalContent img={img} title={title} cost={cost} date={date} />
+        <RentalContent
+          deposit={deposit}
+          img={img}
+          title={title}
+          cost={totalCost}
+          date={date}
+        />
 
         {/* AI 안심거래 버튼 */}
         {(pathname === "/reservations" ||

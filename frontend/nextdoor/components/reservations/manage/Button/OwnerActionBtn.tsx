@@ -126,8 +126,7 @@ export default function OwnerActionBtn({
       } else if (process === RENTAL_PROCESS.RETURNED) {
         if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
           setIsDepositModal(true);
-          console.log("보증금 처리");
-          alert("보증금 처리");
+          return;
         }
       }
 

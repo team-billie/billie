@@ -6,6 +6,7 @@ interface RentalPeriodProps {
   img: string;
   title: string;
   cost: number;
+  deposit: number;
   date: number;
 }
 
@@ -14,6 +15,7 @@ export default function RentalContent({
   title,
   cost,
   date,
+  deposit,
 }: RentalPeriodProps) {
   const pathname = usePathname();
 
@@ -32,9 +34,9 @@ export default function RentalContent({
             <span className="text-l text-gray900 font-semibold">
               {cost.toLocaleString()}원
             </span>
-            <span className="text-gray700"> /</span>
-            <span className="text-gray700 font-semibold"> {date}</span>
-            <span className="text-gray700">일</span>
+            <span className="text-gray700"> </span>
+            <span className="text-gray700 font-semibold">({date}</span>
+            <span className="text-gray700">일)</span>
           </div>
         </div>
       </div>

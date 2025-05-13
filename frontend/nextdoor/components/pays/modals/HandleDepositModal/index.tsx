@@ -6,6 +6,7 @@ import CheckDeposit from "./CheckDeposit";
 import { ReturnDepositRequest } from "@/lib/api/pays";
 import { ReturnDepositRequestDto } from "@/types/pays/request";
 import useUserStore from "@/lib/store/useUserStore";
+import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 
 interface HandleDepositModalProps {
   charge: number;
@@ -26,18 +27,20 @@ export default function HandleDepositModal({
   const [deductedAmount, setDeductedAmount] = useState(0);
   const [payCharge, setPayCharge] = useState(charge);
   const { userKey, billyAccount } = useUserStore();
+  const { showAlert } = useAlertModal();
+  const handleSubmit = () => {
+    const requestBody: ReturnDepositRequestDto = {
+      userKey: userKey,
+      rentalId: rentalId,
+      deductedAmount: deductedAmount,
+      accountNo: billyAccount?.accountNo || "",
+      renterId: renterId,
+    };
+    ReturnDepositRequest(requestBody);
+    showAlert("보증금 처리", "보증금 반환이 완료되었습니다", "success");
 
-    const handleSubmit = () => {
-        const requestBody: ReturnDepositRequestDto = {
-            userKey: userKey,
-            rentalId: rentalId,
-            deductedAmount: deductedAmount,
-            accountNo: billyAccount?.accountNo || "",
-            renterId: renterId,
-        }
-        ReturnDepositRequest(requestBody)
-        setIsModalOpen(false)
-    }
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const amount = charge - payCharge;
