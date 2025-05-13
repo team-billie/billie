@@ -6,7 +6,7 @@ import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
 import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
 import { ChatMessageDto, Message, Product } from "@/types/chats/chat";
-import { getChatMessages, getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
+import { getChatMessages, getBorrowingChatRooms, convertToChatRoomUI, getLendingChatRooms } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore"; // useUserStore 사용
 
 export default function ChatDetailPage() {
@@ -39,41 +39,82 @@ export default function ChatDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 채팅방 정보와 참가자 정보 가져오기
-  useEffect(() => {
-    const fetchChatRoomInfo = async () => {
-      if (!userId) return;
+  // // 채팅방 정보와 참가자 정보 가져오기
+  // useEffect(() => {
+  //   const fetchChatRoomInfo = async () => {
+  //     if (!userId) return;
       
-      try {
-        // 모든 채팅방 가져오기
-        const rooms = await getChatRooms(userId);
+  //     try {
+  //       // 모든 채팅방 가져오기
+  //       const rooms = await getBorrowingChatRooms(userId);
         
-        // 현재 conversationId와 일치하는 채팅방 찾기
-        const currentRoom = rooms.find(room => room.conversationId === conversationId);
+  //       // 현재 conversationId와 일치하는 채팅방 찾기
+  //       const currentRoom = rooms.find(room => room.conversationId === conversationId);
         
-        if (currentRoom) {
-          // 채팅방 UI 데이터로 변환
-          const roomUI = convertToChatRoomUI(currentRoom);
+  //       if (currentRoom) {
+  //         // 채팅방 UI 데이터로 변환
+  //         const roomUI = convertToChatRoomUI(currentRoom);
           
-          // 상대방 찾기 (내 ID가 아닌 참가자)
-          if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
-            const other = roomUI.participants.find(p => p.id !== userId);
-            if (other) {
-              setOtherUser({
-                id: other.id,
-                name: other.name || '상대방',
-                avatar: other.avatar || '/images/profileimg.png'
-              });
-            }
+  //         // 상대방 찾기 (내 ID가 아닌 참가자)
+  //         if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
+  //           const other = roomUI.participants.find(p => p.id !== userId);
+  //           if (other) {
+  //             setOtherUser({
+  //               id: other.id,
+  //               name: other.name || '상대방',
+  //               avatar: other.avatar || '/images/profileimg.png'
+  //             });
+  //           }
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.error("채팅방 정보 조회 오류:", err);
+  //     }
+  //   };
+    
+  //   fetchChatRoomInfo();
+  // }, [conversationId, userId]);
+
+// 채팅방 정보와 참가자 정보 가져오기
+useEffect(() => {
+  const fetchChatRoomInfo = async () => {
+    if (!userId) return;
+    
+    try {
+      // 두 API 모두 호출
+      const borrowingRooms = await getBorrowingChatRooms(userId);
+      const lendingRooms = await getLendingChatRooms(userId);
+      
+      // 모든 채팅방 합치기
+      const allRooms = [...borrowingRooms, ...lendingRooms];
+      
+      // 현재 conversationId와 일치하는 채팅방 찾기
+      const currentRoom = allRooms.find(room => room.conversationId === conversationId);
+      
+      if (currentRoom) {
+        // 채팅방 UI 데이터로 변환
+        const roomUI = convertToChatRoomUI(currentRoom, userId);
+        
+        // 상대방 찾기 (내 ID가 아닌 참가자)
+        if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
+          const other = roomUI.participants.find(p => p.id !== userId);
+          if (other) {
+            setOtherUser({
+              id: other.id,
+              name: other.name || '상대방',
+              avatar: other.avatar || '/images/profileimg.png'
+            });
           }
         }
-      } catch (err) {
-        console.error("채팅방 정보 조회 오류:", err);
       }
-    };
-    
-    fetchChatRoomInfo();
-  }, [conversationId, userId]);
+    } catch (err) {
+      console.error("채팅방 정보 조회 오류:", err);
+    }
+  };
+  
+  fetchChatRoomInfo();
+}, [conversationId, userId]);
+
 
   // WebSocket 연결 설정
   useEffect(() => {
@@ -289,7 +330,7 @@ export default function ChatDetailPage() {
         </div>
       )}
 
-      {/* 디버깅깅  -- 나중에 삭제 하기 */}
+      {/* 디버깅  -- 나중에 삭제 하기 */}
       {process.env.NODE_ENV === "development" && (
         <div className="mt-4 p-3 bg-gray-100 rounded-md text-xs overflow-auto">
           <h3 className="font-bold mb-1">디버깅 정보:</h3>

@@ -14,27 +14,12 @@ interface ChatRoomItemProps {
 const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
   const { userId } = useUserStore();
   
-  // 상대방 사용자 찾기 - 현재 로그인한 사용자가 아닌 다른 참가자를 찾음
-  const otherParticipantId = Array.isArray(chat.participants) && chat.participants.length > 0
-    ? chat.participants.find(p => p.id !== userId)?.id  // 내 ID가 아닌 다른 ID 찾기
-    : null;
-    
-  // 상대방 정보 - 기본값 설정
-  const otherUser = {
-    id: otherParticipantId || 0,
-    name: '상대방',
-    avatar: '/images/profileimg.png'
+  // 상대방 정보 찾기
+  const otherUser = chat.participants.find(p => p.id !== userId) || {
+    id: 0,
+    name: chat.participants[1]?.name || '상대방',
+    avatar: chat.participants[1]?.avatar || '/images/profileimg.png'
   };
-  
-  // 참가자 목록에서 상대방 찾기
-  if (Array.isArray(chat.participants)) {
-    const other = chat.participants.find(p => p.id !== userId);
-    if (other) {
-      otherUser.id = other.id;
-      otherUser.name = other.name || '상대방';
-      otherUser.avatar = other.avatar || '/images/profileimg.png';
-    }
-  }
 
   const chatDate = chat.lastMessage?.timestamp 
     ? formatTime(new Date(chat.lastMessage.timestamp))

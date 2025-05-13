@@ -6,7 +6,7 @@ import ChatsHeader from "@/components/chats/list/ChatsHeader";
 import ChatRoomList from "@/components/chats/list/ChatRoomList";
 import MainHeader from "@/components/common/Header/ReservationHeader";
 import { ChatRoomUI } from "@/types/chats/chat";
-import { getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
+import { getBorrowingChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
 
 export default function ChatBorrowPage() {
@@ -31,11 +31,12 @@ export default function ChatBorrowPage() {
     const fetchChatRooms = async () => {
       try {
         setIsLoading(true);
-        console.log(`채팅방 목록 조회: userId=${userId}`);
+        console.log(`빌리기 채팅방 목록 조회: userId=${userId}`);
 
-        const rooms = await getChatRooms(userId);
+        const rooms = await getBorrowingChatRooms(userId);
+        
         const uiRooms = rooms.map((room) => ({
-          ...convertToChatRoomUI(room),
+          ...convertToChatRoomUI(room, userId),
           lastSentAt: room.lastSentAt
         }));
         setChatRooms(uiRooms);

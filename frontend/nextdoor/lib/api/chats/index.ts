@@ -4,13 +4,11 @@ import {
   CreateChatRequest,
   Conversation,
 } from "@/types/chats/chat";
+import useUserStore from "@/lib/store/useUserStore";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
-/**
- * 채팅방 생성 API
- * @param data 채팅방 생성 요청 데이터
- */
+// 채팅방 생성
 export const createChatRoom = async (
   data: CreateChatRequest
 ): Promise<Conversation> => {
@@ -20,7 +18,9 @@ export const createChatRoom = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      participantIds: data.participantIds,
+      ownerId: data.ownerId,
+      renterId: data.renterId,
+      postId: data.postId,
     }),
     credentials: "include",
   });
@@ -33,13 +33,12 @@ export const createChatRoom = async (
   return response.json();
 };
 
-/**
- * 채팅방 목록 조회 API
- * @param memberId 사용자 ID
- */
-export const getChatRooms = async (memberId: number): Promise<ChatRoom[]> => {
+// 빌리기(렌터) 채팅방 목록 조회 API
+export const getBorrowingChatRooms = async (
+  memberId: number
+): Promise<ChatRoom[]> => {
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/chats?memberId=${memberId}`,
+    `${API_BASE_URL}/api/v1/chats/borrowings?memberId=${memberId}`,
     {
       method: "GET",
       headers: {
@@ -51,23 +50,38 @@ export const getChatRooms = async (memberId: number): Promise<ChatRoom[]> => {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "채팅방 목록 조회에 실패했습니다.");
+    throw new Error(
+      errorData.message || "빌리기 채팅방 목록 조회에 실패했습니다."
+    );
   }
 
   return response.json();
 };
 
-// // 상대방 유저아이디 가져오는 API 
-// // import axios from "@/lib/api/axiosInstance";
-// import axios from "axios";
-// import { ChatRoomUI } from "@/types/chats/chat";
+// 빌려주기(오너) 채팅방 목록 조회 API
+export const getLendingChatRooms = async (
+  memberId: number
+): Promise<ChatRoom[]> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/chats/lendings?memberId=${memberId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }
+  );
 
-// export const getChatRoomByMember = async (memberId: number) => {
-//   const res = await axios.get<ChatRoomUI[]>(
-//     `/api/v1/chats?memberId=${memberId}`
-//   );
-//   return res.data;
-// };
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message || "빌려주기 채팅방 목록 조회에 실패했습니다."
+    );
+  }
+
+  return response.json();
+};
 
 /**
  * 메시지 목록 조회 API
@@ -98,7 +112,7 @@ export const getChatMessages = async (
 };
 
 /**
- * 백엔드 ChatMessageDto ->>>> 프론트엔드 Message 타입 바꾸기 
+ * 백엔드 ChatMessageDto ->>>> 프론트엔드 Message 타입 바꾸기
  */
 export const convertToMessage = (
   dto: ChatMessageDto,
@@ -116,33 +130,102 @@ export const convertToMessage = (
 /**
  * 백엔드 ChatRoom ->>>> 프론트엔드 UI에 맞게 바꿈 
  */
-export const convertToChatRoomUI = (room: ChatRoom) => {
+export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
+  // 이미지 URL 형식 맞추기
+  const formatImageUrl = (url: string) => {
+    if (!url) return "/images/profileimg.png";
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    return url.startsWith("/") ? url : `/${url}`;
+  };
+
+  // 상대방 ID 결정 (ownerId, renterId 정보 활용)
+  const otherId = currentUserId === room.ownerId ? room.renterId : room.ownerId;
+
   return {
     conversationId: room.conversationId,
     lastMessage: {
       text: room.lastMessage || "",
       timestamp: new Date(room.lastSentAt),
     },
+    lastSentAt: room.lastSentAt,
     unreadCount: room.unreadCount,
-    // 임시 참가자 정보 (실제구현시 추가 API 호출 필요)
     participants: [
       {
-        id: 1, // 현재 사용자
-        name: "나요",
+        id: currentUserId,
+        name: "나", 
         avatar: "/images/profileimg.png",
       },
       {
-        id: 2, // 상대방 (임시)
-        name: "renter name",
-        avatar: "/images/profileimg.png",
+        id: otherId,
+        name: room.otherNickname || "상대방",
+        avatar: formatImageUrl(room.otherProfileImageUrl),
       },
     ],
-    // 임시 상품 정보 (실제로는 추가 API 호출 필요)
     product: {
-      id: 1,
-      name: "꿍꿍꿍",
-      image: "/images/profileimg.png",
+      id: room.postId || 1,
+      name: "상품", 
+      image: formatImageUrl(room.postImageUrl),
       price: "20,000원/일",
     },
+    ownerId: room.ownerId,
+    renterId: room.renterId,
+    postId: room.postId
   };
+};
+
+/**
+ * 채팅방 생성 또는 기존 채팅방 찾기
+ * @param ownerId 소유자 ID
+ * @param renterId 렌터 ID
+ * @param postId 게시물 ID
+ */
+export const findOrCreateChatRoom = async (
+  ownerId: number,
+  renterId: number,
+  postId: number
+): Promise<string> => {
+  try {
+    const currentUserId = useUserStore.getState().userId;
+    
+    // 현재 사용자가 렌터인 경우
+    if (currentUserId === renterId) {
+      const borrowingRooms = await getBorrowingChatRooms(currentUserId);
+      
+      // 같은 소유자, 같은 게시물의 채팅방 찾기
+      const existingRoom = borrowingRooms.find(room => 
+        room.postId === postId && room.ownerId === ownerId
+      );
+      
+      if (existingRoom) {
+        return existingRoom.conversationId;
+      }
+    } 
+    // 현재 사용자가 소유자인 경우
+    else if (currentUserId === ownerId) {
+      const lendingRooms = await getLendingChatRooms(currentUserId);
+      
+      // 같은 렌터, 같은 게시물의 채팅방 찾기
+      const existingRoom = lendingRooms.find(room => 
+        room.postId === postId && room.renterId === renterId
+      );
+      
+      if (existingRoom) {
+        return existingRoom.conversationId;
+      }
+    }
+    
+    // 기존 채팅방이 없으면 새로 생성
+    const response = await createChatRoom({
+      ownerId,
+      renterId,
+      postId
+    });
+    
+    return response.conversationId;
+  } catch (error) {
+    console.error('채팅방 생성 오류:', error);
+    throw error;
+  }
 };
