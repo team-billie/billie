@@ -61,8 +61,8 @@ type PayItemRequestDto = {
     rentalId: number;
 }
 
-//보증금 출금
-type WithdrawDepositRequestDto = {
+//보증금 보관
+type HoldDepositRequestDto = {
     userKey: string;
     rentalId: number;
     accountNo: string;
@@ -73,7 +73,6 @@ type WithdrawDepositRequestDto = {
 type ReturnDepositRequestDto = {
     userKey: string;
     accountNo: string;
-    depositId: number;
     deductedAmount: number;
     renterId: number;
     rentalId: number;
@@ -91,7 +90,7 @@ export type { CreateFinUserRequestDto,
     AddAccountRequestDto, 
     GetAddedListRequestDto, 
     TransferAccountRequestDto, 
-    WithdrawDepositRequestDto, 
+    HoldDepositRequestDto, 
     ReturnDepositRequestDto,
     CheckAccountRequestDto,
     GetFinUserRequestDto,

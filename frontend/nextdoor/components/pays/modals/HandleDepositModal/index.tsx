@@ -27,18 +27,17 @@ export default function HandleDepositModal({
   const [payCharge, setPayCharge] = useState(charge);
   const { userKey, billyAccount } = useUserStore();
 
-  const handleSubmit = () => {
-    const requestBody: ReturnDepositRequestDto = {
-      userKey: userKey,
-      rentalId: rentalId,
-      deductedAmount: deductedAmount,
-      depositId: 1,
-      accountNo: billyAccount?.accountNo || "",
-      renterId: renterId,
-    };
-    ReturnDepositRequest(requestBody);
-    setIsModalOpen(false);
-  };
+    const handleSubmit = () => {
+        const requestBody: ReturnDepositRequestDto = {
+            userKey: userKey,
+            rentalId: rentalId,
+            deductedAmount: deductedAmount,
+            accountNo: billyAccount?.accountNo || "",
+            renterId: renterId,
+        }
+        ReturnDepositRequest(requestBody)
+        setIsModalOpen(false)
+    }
 
   useEffect(() => {
     const amount = charge - payCharge;
