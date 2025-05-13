@@ -49,11 +49,14 @@ public class Rental {
     @Column(name = "bank_code", nullable = false, length = 10)
     private String bankCode;
 
+    @Column(name = "deposit_id")
+    private Long depositId;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Builder
-    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis, LocalDateTime createdAt, String accountNo, String bankCode) {
+    public Rental(List<AiImage> aiImages, Long reservationId, RentalStatus rentalStatus, RentalProcess rentalProcess, String damageAnalysis, LocalDateTime createdAt, String accountNo, String bankCode, Long depositId) {
         this.aiImages = aiImages;
         this.reservationId = reservationId;
         this.rentalStatus = rentalStatus;
@@ -63,6 +66,7 @@ public class Rental {
         this.dealCount = 0;
         this.accountNo = accountNo != null ? accountNo : "";
         this.bankCode = bankCode != null ? bankCode : "";
+        this.depositId = depositId;
     }
 
     public static Rental createFromReservation(Long reservationId) {
@@ -80,7 +84,7 @@ public class Rental {
     }
 
     public void processRemittanceCompletion() {
-        if(rentalStatus != RentalStatus.BEFORE_PHOTO_REGISTERED){
+        if(rentalStatus != RentalStatus.REMITTANCE_REQUESTED){
             throw new InvalidRentalStatusException("결제 완료 처리가 불가능한 대여 상태입니다");
         }
 
@@ -99,17 +103,19 @@ public class Rental {
         this.damageAnalysis = damageAnalysis;
     }
 
-    public void updateAccountInfo(String accountNo, String bankCode) {
+    public void processUpdateAccountInfo(String accountNo, String bankCode) {
         validateNotBlank(accountNo, "accountNo");
         validateNotBlank(bankCode, "bankCode");
         this.accountNo = accountNo;
         this.bankCode = bankCode;
+
+        updateStatus(RentalStatus.REMITTANCE_REQUESTED);
     }
 
     public void processDepositCompletion(){
         if (rentalStatus != RentalStatus.AFTER_PHOTO_REGISTERED
                 && rentalStatus != RentalStatus.DEPOSIT_REQUESTED) {
-            throw new InvalidRentalStatusException("보증금을 처리가 불가능한 대여 상태입니다");
+            throw new InvalidRentalStatusException(this.rentalStatus.name() + ": 보증금을 처리가 불가능한 대여 상태입니다");
         }
 
         updateDealCount();
@@ -118,6 +124,10 @@ public class Rental {
 
     public void updateDealCount() {
         this.dealCount = dealCount + 1;
+    }
+
+    public void updateDepositId(Long depositId) {
+        this.depositId = depositId;
     }
 
     public void validateRemittancePendingState() {

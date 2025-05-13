@@ -7,6 +7,7 @@ import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
+import com.nextdoor.nextdoor.domain.rental.service.dto.ManagedRentalCountResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceResult;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
 import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
@@ -154,11 +155,28 @@ public class RentalQueryAdapter implements RentalQueryPort {
         }
 
         if (condition.contains("ACTIVE")) {
-            return rental.rentalProcess.eq(RentalProcess.RENTAL_IN_ACTIVE);
+            return rental.rentalProcess.ne(RentalProcess.RENTAL_COMPLETED);
         } else if (condition.contains("COMPLETED")) {
             return rental.rentalProcess.eq(RentalProcess.RENTAL_COMPLETED);
         }
 
         return null;
+    }
+
+    @Override
+    public ManagedRentalCountResult countManagedRentals(Long ownerId) {
+        Long count = queryFactory
+                .select(rental.count())
+                .from(rental)
+                .join(reservation).on(rental.reservationId.eq(reservation.id))
+                .where(
+                    reservation.ownerId.eq(ownerId),
+                    rental.rentalProcess.ne(RentalProcess.RENTAL_COMPLETED)
+                )
+                .fetchOne();
+
+        return ManagedRentalCountResult.builder()
+                .managedRentalCount(count != null ? count : 0L)
+                .build();
     }
 }

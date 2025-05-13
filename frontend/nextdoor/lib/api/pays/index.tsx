@@ -1,6 +1,6 @@
 import axios from "axios";
 import axiosInstance from "../instance";
-import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, WithdrawDepositRequestDto, ReturnDepositRequestDto, GetFinUserRequestDto, SelectOwnerAccountRequestDto, PayItemRequestDto } from "@/types/pays/request/index";
+import { CreateFinUserRequestDto, CreateFinAccountRequestDto, GetAccountListRequestDto, AddAccountRequestDto, GetAddedListRequestDto, TransferAccountRequestDto, HoldDepositRequestDto, ReturnDepositRequestDto, GetFinUserRequestDto, SelectOwnerAccountRequestDto, PayItemRequestDto } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
 const handleApiError = (error: any, name: string) => {
@@ -63,9 +63,9 @@ export const TransferAccountRequest = (requestBody: TransferAccountRequestDto) =
 export const PayItemRequest = (requestBody: PayItemRequestDto) => 
   apiCall("/api/v1/fintechs/payments", requestBody, "물품 결제하기");
 
-//보증금 출금
-export const WithdrawDepositRequest = (requestBody: WithdrawDepositRequestDto) => 
-  apiCall("/api/v1/fintechs/deposits/withdraw", requestBody, "보증금 출금");
+//보증금 보관
+export const HoldDepositRequest = (requestBody: HoldDepositRequestDto) => 
+  apiCall("/api/v1/fintechs/deposits/hold", requestBody, "보증금 보관");
 
 //보증금 반환
 export const ReturnDepositRequest = (requestBody: ReturnDepositRequestDto) => 

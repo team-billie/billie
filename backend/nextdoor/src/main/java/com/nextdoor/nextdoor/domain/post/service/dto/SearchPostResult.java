@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchPostResult {
 
+    private Long postId;
     private String title;
     private String productImage;
     private Long rentalFee;

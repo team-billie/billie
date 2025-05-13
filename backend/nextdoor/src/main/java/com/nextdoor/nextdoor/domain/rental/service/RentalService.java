@@ -18,7 +18,9 @@ public interface RentalService {
     UploadImageResult registerAfterPhoto(UploadImageCommand command);
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
+    void updateRentalDepositId(Long rentalId, Long depositId);
     AiAnalysisResult getAiAnalysis(Long rentalId);
     void updateDamageAnalysis(Long rentalId, String damageAnalysis);
     UpdateAccountResult updateAccount(UpdateAccountCommand command);
+    ManagedRentalCountResult countManagedRentals(Long ownerId);
 }

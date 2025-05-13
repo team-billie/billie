@@ -1,3 +1,4 @@
+"use client";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import {
@@ -6,11 +7,17 @@ import {
   RentalProcess,
   RentalStatus,
 } from "@/types/rental";
+import { useState } from "react";
+import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
+import HandleDepositModal from "@/components/pays/modals/HandleDepositModal";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
   process: RentalProcess;
   rentalId: number;
+  charge: number;
+  renterId: number;
+  deposit: number;
   onSuccess?: () => void;
 }
 
@@ -18,11 +25,16 @@ export default function OwnerActionBtn({
   status,
   rentalId,
   process,
+  charge,
+  renterId,
+  deposit,
   onSuccess,
 }: OwnerActionBtnProps) {
   const { userId } = useUserStore();
+  const [isModal, setModal] = useState(false);
+  const [isDepositModal, setIsDepositModal] = useState(false);
   console.log("OwnerActionBtn userId:", userId);
-
+  console.log("OWner버튼", process);
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
     return null;
@@ -37,8 +49,8 @@ export default function OwnerActionBtn({
           return "안심 사진 등록";
         } else if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
           return "결제 요청";
-        } else {
-          return "취소됨";
+        } else if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
+          return "결제 대기 중";
         }
 
       case RENTAL_PROCESS.RENTAL_IN_ACTIVE:
@@ -99,25 +111,23 @@ export default function OwnerActionBtn({
 
     try {
       if (process === RENTAL_PROCESS.BEFORE_RENTAL) {
+        //결제 요청
         if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
-          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-            status: RENTAL_STATUS.REMITTANCE_REQUESTED,
-            userId: userId,
-          });
-        }
+          setModal(true);
+          return;
+        } //물품 결제 완료
       } else if (process === RENTAL_PROCESS.RENTAL_IN_ACTIVE) {
-        if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
+        if (status === RENTAL_STATUS.REMITTANCE_CONFIRMED) {
           await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
             status: RENTAL_STATUS.REMITTANCE_CONFIRMED,
             userId: userId,
           });
-        }
+        } //보증금 처리
       } else if (process === RENTAL_PROCESS.RETURNED) {
         if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
-          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-            status: RENTAL_STATUS.DEPOSIT_REQUESTED,
-            userId: userId,
-          });
+          setIsDepositModal(true);
+          console.log("보증금 처리");
+          alert("보증금 처리");
         }
       }
 
@@ -132,11 +142,29 @@ export default function OwnerActionBtn({
   const label = getLabel();
 
   return (
-    <div
-      className={disabled ? "action-btn-disabled" : "action-btn-enabled"}
-      onClick={disabled ? undefined : handleClick}
-    >
-      {label}
-    </div>
+    <>
+      <div
+        className={disabled ? "action-btn-disabled" : "action-btn-enabled"}
+        onClick={disabled ? undefined : handleClick}
+      >
+        {label}
+      </div>
+      {isModal && (
+        <PaymentApplyModal
+          charge={charge}
+          rentalId={rentalId.toString()}
+          setIsModalOpen={setModal}
+        />
+      )}
+      {isDepositModal && (
+        <HandleDepositModal
+          charge={deposit}
+          rentalImg=""
+          rentalId={rentalId}
+          renterId={renterId}
+          setIsModalOpen={setIsDepositModal}
+        />
+      )}
+    </>
   );
 }

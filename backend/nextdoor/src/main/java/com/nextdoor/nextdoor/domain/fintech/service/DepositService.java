@@ -72,9 +72,8 @@ public class DepositService {
     //보증금 반환
     public Mono<DepositResponseDto> returnDeposit(ReturnDepositRequestDto req) {
         return Mono.fromCallable(() -> {
-                    Deposit d = depositRepository
-                            .findWithAccount(req.getDepositId())      // @Query JOIN FETCH 적용된 메서드
-                            .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
+                    Deposit d = depositRepository.findByRentalId(req.getRentalId())
+                            .orElseThrow(() -> new RuntimeException("해당 렌탈에 대한 보증금 내역이 없습니다"));
 
                     // 세션이 열려 있을 때, 연관 필드에서 직접 꺼내 두기
                     String accountNo = d.getRegistAccount().getAccount().getAccountNo();
@@ -129,7 +128,7 @@ public class DepositService {
 
                                         // 프록시 대신 미리 꺼내 둔 accountNo, bankCode 사용
                                         return DepositResponseDto.builder()
-                                                .id(d.getId())
+                                                .depositId(d.getDepositId())
                                                 .rentalId(d.getRentalId())
                                                 .amount(d.getAmount())
                                                 .status(d.getStatus())

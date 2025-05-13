@@ -34,8 +34,14 @@ public class ChatService {
         // 1) Conversation 존재 및 참여자 검증
         Conversation conv = conversationRepository.findById(dto.getConversationId())
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found: " + dto.getConversationId()));
-        if (!conv.getParticipantIds().contains(dto.getSenderId())) {
-            throw new IllegalArgumentException("Sender not a participant: " + dto.getSenderId());
+
+        // 2) 참여자 검증 (owner 또는 renter 여야만 메시지 전송 가능)
+        Long sender = dto.getSenderId();
+        boolean isOwner  = sender.equals(conv.getOwnerId());
+        boolean isRenter = sender.equals(conv.getRenterId());
+        if (!isOwner && !isRenter) {
+            throw new IllegalArgumentException(
+                    "Sender not a participant: " + sender);
         }
 
         // 2) 엔티티로 변환

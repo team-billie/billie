@@ -8,10 +8,13 @@ import { useState } from "react"
 type CheckDepositProps = {
     payCharge: number;
     setChangeBtnClicked: React.Dispatch<React.SetStateAction<boolean>>;
+    rentalImg: string;
+    rentalId: number;
+    handleSubmit: () => void;
   };
 
 
-export default function CheckDeposit({setChangeBtnClicked, payCharge}: CheckDepositProps){
+export default function CheckDeposit({setChangeBtnClicked, payCharge, rentalImg, rentalId, handleSubmit}: CheckDepositProps){
     const bankInfo = getBankInfo('090')
     const [billySelected, setBillySelected] = useState(true)
     const btnClickHandler = () => {
@@ -29,7 +32,7 @@ export default function CheckDeposit({setChangeBtnClicked, payCharge}: CheckDepo
         </div>
         <div className="flex gap-3 mt-5">
             <Button onClick={() => setChangeBtnClicked(true)}  txt="부분 환불" state={false}/>
-            <Button txt="확인" state={true}/>           
+            <Button onClick={handleSubmit} txt="확인" state={true}/>           
         </div>
         </>
     )

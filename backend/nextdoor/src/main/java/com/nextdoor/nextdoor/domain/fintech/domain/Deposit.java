@@ -12,7 +12,7 @@ public class Deposit {
     @Id
     @Column(name = "deposit_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long depositId;
 
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "rental_id", nullable = false)

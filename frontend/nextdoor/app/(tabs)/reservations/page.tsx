@@ -9,6 +9,9 @@ import { RentalProcess, RentalStatus } from "@/types/rental";
 import useUserStore from "@/lib/store/useUserStore";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import EmptyState from "@/components/chats/list/EmptyState";
+import LoadingSpinner from "@/components/common/LoadingSpinner.tsx";
+import ErrorMessage from "@/components/common/ErrorMessage";
 
 interface ReservationItem {
   id: number;
@@ -17,9 +20,11 @@ interface ReservationItem {
   cost: number;
   date: number;
   startDate: string;
+  renterId: number;
   endDate: string;
   status: RentalStatus;
   process: RentalProcess;
+  deposit: number;
   userType: "OWNER" | "RENTER";
 }
 
@@ -28,8 +33,9 @@ export default function ReservationPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { userId } = useUserStore();
+  const [condition, setCondition] = useState<string>("ALL");
+
   const userRole: "OWNER" | "RENTER" = "RENTER";
-  const condition = "ALL";
 
   const stompClient = new Client({
     webSocketFactory: () =>
@@ -53,7 +59,7 @@ export default function ReservationPage() {
           page: 0,
           size: 10,
         });
-
+        console.log(data);
         const formattedData: ReservationItem[] = data.map((item) => {
           const start = new Date(item.startDate);
           const end = new Date(item.endDate);
@@ -67,7 +73,9 @@ export default function ReservationPage() {
             title: item.title,
             cost: item.rentalFee,
             date: diffDays,
+            renterId: item.renterId,
             startDate: item.startDate,
+            deposit: item.deposit,
             endDate: item.endDate,
             status: item.rentalStatus as RentalStatus,
             process: item.rentalProcess as RentalProcess,
@@ -87,7 +95,7 @@ export default function ReservationPage() {
     if (userId) {
       fetchReservationData();
     }
-  }, [userId, userRole, condition]);
+  }, [userId, userRole, condition, process]);
   const handleActionSuccess = (rentalId: number) => {
     console.log(`예약 ID ${rentalId}의 상태가 변경되었습니다.`);
   };
@@ -102,13 +110,20 @@ export default function ReservationPage() {
     <main className="flex flex-col">
       <div>
         <MainHeader title="Reservations" />
-        <ReservationStatusTabs />
+        <ReservationStatusTabs
+          selectedCondition={condition}
+          onChangeCondition={(newCondition) => setCondition(newCondition)}
+        />
       </div>
       <div className="flex flex-col m-4">
-        {loading && <p>불러오는 중입니다...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {loading && <LoadingSpinner />}
+        {error && <ErrorMessage message={error} />}
+        {!loading && !error && reservations.length === 0 && (
+          <EmptyState userRole={"borrower"} />
+        )}
         {!loading &&
           !error &&
+          reservations &&
           reservations.map((reservation) => (
             <div key={reservation.id}>
               <RentalCard
@@ -117,7 +132,9 @@ export default function ReservationPage() {
                 cost={reservation.cost}
                 date={reservation.date}
                 startDate={reservation.startDate}
+                renterId={reservation.renterId}
                 endDate={reservation.endDate}
+                deposit={reservation.deposit}
                 status={reservation.status}
                 process={reservation.process}
                 userType={reservation.userType}

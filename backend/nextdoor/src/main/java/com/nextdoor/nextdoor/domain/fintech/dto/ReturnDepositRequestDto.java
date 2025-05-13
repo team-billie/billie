@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class ReturnDepositRequestDto {
     private String userKey;            // 렌터의 SSAFY userKey
-    private Long depositId;
     private Long deductedAmount;       // 차감액 (없으면 0 또는 null)
     private String ownerUserKey;       // 오너의 SSAFY userKey 추가
     private String ownerAccountNo; //차감액을 받을 오너 계좌번호

@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -27,6 +29,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
     private final RegistAccountRepository registAccountRepository;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -130,7 +133,8 @@ public class AccountService {
                                             });
 
                                     // 4) regist_account balance 동기화 (입금측)
-                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(userKey, depositAccountNo)
+                                    String depositUserKey = depositAcct.getUser().getUserKey();// 또는 depositAcct.getUser().getUserKey()
+                                    registAccountRepository.findByUser_UserKeyAndAccount_AccountNo(depositUserKey, depositAccountNo)
                                             .ifPresent(ra -> {
                                                 ra.setBalance(newDepositBalance);
                                                 registAccountRepository.save(ra);
@@ -185,26 +189,33 @@ public class AccountService {
             String withdrawalTransactionSummary,
             Long rentalId
     ) {
-        return transferAccount(
-                userKey,
-                depositAccountNo,
-                transactionBalance,
-                withdrawalAccountNo,
-                depositTransactionSummary,
-                withdrawalTransactionSummary
-        )
+        return client.transferAccount(
+                        userKey,
+                        depositAccountNo,
+                        transactionBalance,
+                        withdrawalAccountNo,
+                        depositTransactionSummary,
+                        withdrawalTransactionSummary
+                )
                 .flatMap(ssafyResp ->
                         // 블로킹 작업은 boundedElastic 스케줄러에서 처리
                         Mono.fromCallable(() -> {
+                                    // 명시적 트랜잭션 내에서 DB 업데이트와 이벤트 발행을 함께 처리
+                                    return transactionTemplate.execute(status -> {
+                                        try {
+                                            // 송금 완료 후 이벤트 발행
+                                            RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
+                                            eventPublisher.publishEvent(event);
 
-                                // 송금 완료 후 이벤트 발행
-                                RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
-                                eventPublisher.publishEvent(event);
-
-                                log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
-                                return ssafyResp;
-                            })
-                            .subscribeOn(Schedulers.boundedElastic())
+                                            log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
+                                            return ssafyResp;
+                                        } catch (Exception e) {
+                                            status.setRollbackOnly();
+                                            throw e;
+                                        }
+                                    });
+                                })
+                                .subscribeOn(Schedulers.boundedElastic())
                 );
     }
 }

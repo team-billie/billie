@@ -51,7 +51,7 @@ export default function ProfilePage() {
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
             </div>
-            <div className="mt-3 text-center text-gray500 text-sm">예약 요청중인 물품수</div>
+            <div className="mt-3 text-center text-gray500 text-sm">예약 요청받은 물품수</div>
           </div>
         </div>
 
