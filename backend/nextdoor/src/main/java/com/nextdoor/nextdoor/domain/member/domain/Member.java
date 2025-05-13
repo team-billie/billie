@@ -36,4 +36,20 @@ public class Member extends TimestampedEntity {
     private String nickname;
 
     private String authProvider;
+
+    public void updateBirth(String birth) {
+        this.birth = birth;
+    }
+
+    public void updateGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public void updateAddress(String address) {
+        this.address = address;
+    }
+
+    public void updateAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
 }
