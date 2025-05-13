@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import {
@@ -27,6 +27,7 @@ function RenterActionBtn({
   const { userId } = useUserStore();
   const router = useRouter();
   console.log("RenterActionBtn userId:", userId);
+  console.log("RENTER버튼", process);
 
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
@@ -41,12 +42,16 @@ function RenterActionBtn({
         if (status === RENTAL_STATUS.CREATED) {
           return "사진 등록 대기 중"; // Renter 버튼 - 대여 시작 등록 후 (비활성화)
         } else if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
-          return "결제"; // Renter 버튼 - 소유자가 안심 사진 등록 후
+          return "결제 대기"; // Renter 버튼 - 소유자가 안심 사진 등록 후
+        } else if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
+          return "결제";
         }
-        return "취소됨"; // 취소 상태
 
       case RENTAL_PROCESS.RENTAL_IN_ACTIVE:
-        return "물품 결제 완료"; // Renter 버튼 - 결제 완료 후
+        if (status === RENTAL_STATUS.REMITTANCE_CONFIRMED) {
+          return "물품 결제 완료";
+        }
+        return "대여 진행중";
 
       case RENTAL_PROCESS.RETURNED:
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
@@ -68,35 +73,30 @@ function RenterActionBtn({
   };
   const isButtonDisabled = () => {
     return !(
-      (process === RENTAL_PROCESS.BEFORE_RENTAL &&
-        status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) ||
       (process === RENTAL_PROCESS.RETURNED &&
-        status === RENTAL_STATUS.RENTAL_PERIOD_ENDED)
+        status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) ||
+      (process === RENTAL_PROCESS.BEFORE_RENTAL &&
+        status === RENTAL_STATUS.REMITTANCE_REQUESTED)
     );
   };
 
   const handleClick = async () => {
     if (isButtonDisabled()) return;
-
+    //렌터 입장에서 해야할 일들
+    if (
+      process === RENTAL_PROCESS.RETURNED &&
+      status === RENTAL_STATUS.RENTAL_PERIOD_ENDED
+    ) {
+      // 안심 사진 등록은 axios 요청 없이 이동만 하면 되므로, try-catch 밖에서 바로 실행
+      window.location.href = `/reservations/${rentalId}/safe-deal/manage`;
+      return;
+    }
     try {
+      //결제하기
       if (process === RENTAL_PROCESS.BEFORE_RENTAL) {
-        if (status === RENTAL_STATUS.BEFORE_PHOTO_REGISTERED) {
+        if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
           router.push(`/pays/payment/${rentalId}`);
           return;
-        }
-      } else if (process === RENTAL_PROCESS.RENTAL_IN_ACTIVE) {
-        if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
-          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-            status: RENTAL_STATUS.AFTER_PHOTO_REGISTERED,
-            userId: userId,
-          });
-        }
-      } else if (process === RENTAL_PROCESS.RETURNED) {
-        if (status === RENTAL_STATUS.DEPOSIT_REQUESTED) {
-          await axiosInstance.patch(`/api/v1/rentals/${rentalId}/status`, {
-            status: RENTAL_STATUS.RENTAL_COMPLETED,
-            userId: userId,
-          });
         }
       }
 
@@ -121,5 +121,5 @@ function RenterActionBtn({
 
 // dynamic import로 컴포넌트를 감싸서 클라이언트 사이드에서만 렌더링되도록 설정
 export default dynamic(() => Promise.resolve(RenterActionBtn), {
-  ssr: false
+  ssr: false,
 });
