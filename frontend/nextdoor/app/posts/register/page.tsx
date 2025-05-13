@@ -1,30 +1,5 @@
-// "use client";
-
-// import ProductRegisterHeader from "@/components/posts/register/ProductRegisterHeader";
-// import ProductRegisterAiToggle from "@/components/posts/register/ProductRegisterAiToggle";
-// import ProductRegisterFormGroup from "@/components/posts/register/ProductRegisterFormGroup";
-// import ProductRegisterImageUpload from "@/components/posts/register/ProductRegisterImageUpload";
-// import ProductRegisterSubmitButton from "@/components/posts/register/ProductRegisterSubmitButton";
-// export default function PostRegisterPage() {
-//   return (
-//     <main>
-//       <ProductRegisterHeader />
-//       <ProductRegisterAiToggle />
-//       <ProductRegisterImageUpload />
-//       <ProductRegisterFormGroup title="제목" children={<div>제목</div>} />
-//       <ProductRegisterFormGroup title="설명" children={<div>설명</div>} />
-//       <ProductRegisterFormGroup title="1일 대여금" children={<div>1일 대여금</div>} />
-//       <ProductRegisterFormGroup title="보증금" children={<div>보증금</div>} />
-//       <ProductRegisterFormGroup title="카테고리" children={<div>카테고리</div>} />
-//       <ProductRegisterFormGroup title="위치" children={<div>위치</div>} />
-//       <ProductRegisterSubmitButton onClick={() => {}} />
-//     </main>
-//   );
-// }
-
 "use client";
 
-import { useState } from "react";
 import ProductRegisterHeader from "@/components/posts/register/ProductRegisterHeader";
 import ProductRegisterAiToggle from "@/components/posts/register/ProductRegisterAiToggle";
 import ProductRegisterFormGroup from "@/components/posts/register/ProductRegisterFormGroup";
@@ -36,85 +11,90 @@ import ProductRegisterCategorySelector from "@/components/posts/register/Product
 import ProductRegisterLocationSelector from "@/components/posts/register/ProductRegisterLocationSelector";
 import { postCreateRequest } from "@/lib/api/posts/request";
 import useUserStore from "@/lib/store/useUserStore";
+import useProductRegisterStore from "@/lib/store/posts/useProductRegisterStore";
 
 export default function PostRegisterPage() {
-  // 상품 정보 상태 관리
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [rentalFee, setRentalFee] = useState("");
-  const [deposit, setDeposit] = useState("");
-  const [category, setCategory] = useState("");
-  const [preferredLocation, setPreferredLocation] = useState("");
-  const [isAiMode, setIsAiMode] = useState(false);
-  const [images, setImages] = useState(null);
+  // 전역 상태 관리 훅 사용
+  const {
+    title,
+    content,
+    rentalFee,
+    deposit,
+    category,
+    preferredLocation,
+    isAiMode,
+    images,
+    setTitle,
+    setContent,
+    setRentalFee,
+    setDeposit,
+    setCategory,
+    setPreferredLocation,
+    setIsAiMode,
+    setImages,
+    handleAiToggle,
+  } = useProductRegisterStore();
   const { userId } = useUserStore();
-
+  console.log("userId", userId);
   const handleSubmit = async () => {
-    // 필수 입력값
-    if (!title) {
-      alert("제목을 입력해주세요");
-      return;
-    }
+    try {
+      // 필수 입력값 검증
+      if (!title) {
+        alert("제목을 입력해주세요");
+        return;
+      }
 
-    if (!content) {
-      alert("설명을 입력해주세요");
-      return;
-    }
+      if (!content) {
+        alert("설명을 입력해주세요");
+        return;
+      }
 
-    if (!rentalFee) {
-      alert("1일 대여금을 입력해주세요");
-      return;
-    }
+      if (!rentalFee) {
+        alert("1일 대여금을 입력해주세요");
+        return;
+      }
 
-    if (!category) {
-      alert("카테고리를 선택해주세요");
-      return;
-    }
+      if (!category) {
+        alert("카테고리를 선택해주세요");
+        return;
+      }
 
-    if (!preferredLocation) {
-      alert("거래 희망 장소를 선택해주세요");
-      return;
-    }
+      if (!preferredLocation) {
+        alert("거래 희망 장소를 선택해주세요");
+        return;
+      }
 
-    // 상품 등록 데이터
-    const productData = {
-      title,
-      content,
-      category,
-      rentalFee: Number(rentalFee),
-      deposit: Number(deposit),
-      preferredLocation,
-    };
+      // 상품 등록 데이터
+      const productData = {
+        title,
+        content,
+        category,
+        rentalFee: Number(rentalFee),
+        deposit: Number(deposit),
+        preferredLocation,
+      };
 
-    console.log("상품 등록 데이터:", productData);
+      // FileList를 File[]로 변환
+      const imageFiles = images ? Array.from(images) : null;
 
-    // 여기에 백엔드 API 연동 로직 추가 예정이이임이미임임임ㅇㅁㅁ
-    const res = await postCreateRequest(productData, images, userId);
+      // API 호출
+      const res = await postCreateRequest(productData, imageFiles, userId);
+      // 성공 처리
+      alert("상품 등록이 완료되었습니다!");
 
-    // 임시 알림 ---
-    alert("상품 등록이 완료되었습니다!");
-
-    // 실제 구현시 사용할꺼다
-    // router.push('/home');
-  };
-
-  // AI 모드 전환 핸들러
-  const handleAiToggle = (value: boolean) => {
-    setIsAiMode(value);
-
-    // AI 모드가 켜지면 더미로 채우기 임시임  (추후에 AI API 호출)
-    if (value) {
-      setTitle("삼성 노트북 갤럭시북3");
-      setContent(
-        "거의 새 제품이며 상태 좋습니다. 단기 대여 가능합니다. 배터리 성능 좋고 충전기 함께 대여됩니다."
-      );
-      setRentalFee("20000");
-      setDeposit("20000");
-      setCategory("디지털/가전");
-      setPreferredLocation("부산광역시 부산진구");
+      // 폼 데이터 초기화
+      useProductRegisterStore.getState().resetForm();
+      // TODO: 성공 후 리다이렉트 처리
+      // router.push('/home');
+    } catch (error) {
+      console.error("상품 등록 실패:", error);
+      alert("상품 등록에 실패했습니다. 다시 시도해주세요.");
     }
   };
-
+  // 카테고리 선택 핸들러
+  const handleCategoryChange = (selectedCategory: CategoryType) => {
+    setCategory(selectedCategory);
+  };
   return (
     <main className="pb-20">
       <ProductRegisterHeader />
@@ -170,7 +150,7 @@ export default function PostRegisterPage() {
       <ProductRegisterFormGroup title="카테고리">
         <ProductRegisterCategorySelector
           value={category}
-          onChange={setCategory}
+          onChange={handleCategoryChange}
         />
       </ProductRegisterFormGroup>
 

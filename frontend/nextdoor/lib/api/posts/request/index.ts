@@ -20,6 +20,7 @@ export const postCreateRequest = async (
   userId: number | null
 ) => {
   try {
+    console.log("post", post);
     const formData = new FormData();
 
     const postBlob = new Blob([JSON.stringify(post)], {
