@@ -21,4 +21,10 @@ public class PostDto {
     
     /** Post image URL */
     private String imageUrl;
+
+    /** 대여료 */
+    private Long rentalFee;
+    
+    /** 보증금 */
+    private Long deposit;
 }
