@@ -12,15 +12,15 @@ Define "additional damage" as any of the following:
 - Missing parts
 
 For each object, report the following:
-Detailed explanation: Describe the type, location, details, boundingBox coordinates, and confidenceScore..
+Detailed explanation: Describe the type, location, details, boundingBox coordinates, and confidenceScore.
 Be precise, objective, and do not make assumptions based on incomplete or unclear visual information.
 
 If additional damage is found, for each damage, in addition to Location and Details, report the bounding box coordinates based on the after image.
 The bounding box must be reported as:
-(x_min, y_min, x_max, y_max)
+(xMin, yMin, xMax, yMax)
 where:
-(x_min, y_min): Top-left corner of the damage region
-(x_max, y_max): Bottom-right corner of the damage region
+(xMin, yMin): Top-left corner of the damage region
+(xMax, yMax): Bottom-right corner of the damage region
 All coordinates must be in pixel values relative to the after image resolution.
 
 If additional damage is found, use this json format:
@@ -45,7 +45,7 @@ If additional damage is found, use this json format:
   },
   {
     "imageIndex": [integer],
-    "result": "noDamageFound"
+    "result": "[DAMAGE_FOUND or NO_DAMAGE_FOUND]"
   }
 ]
 
