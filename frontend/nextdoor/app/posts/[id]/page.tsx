@@ -1,4 +1,5 @@
 "use client";
+import ChatButton from "@/components/common/ChatButton/ChatButton";
 import LoadingSpinner from "@/components/common/LoadingSpinner.tsx";
 import ProductInfos from "@/components/posts/detail/ProductInfos";
 import ProductPhotos from "@/components/posts/detail/ProductPhotos";
@@ -29,6 +30,9 @@ export default function PostDetailPage() {
     return <LoadingSpinner />;
   }
 
+   // authorId가 null인 경우 대비 (옵셔널 체이닝 사용)
+   const authorId = product.authorId ?? 0;
+
   return (
     <main className="relative">
       <div className="min-h-screen flex flex-col pb-24">
@@ -51,7 +55,7 @@ export default function PostDetailPage() {
       <div className="fixed bottom-0 w-full max-w-md mx-auto z-50">
         {/* 채팅버튼 */}
         <div className="flex justify-end">
-          <MessageCircle className="bg-gradient-to-r from-blue300 to-blue400 text-white rounded-full p-2 w-10 h-10 m-2 " />
+          <ChatButton ownerId={authorId} postId={feedId} className="m-2" />
         </div>
 
         {/* 예약 버튼 */}
