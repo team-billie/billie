@@ -30,4 +30,9 @@ public class MemberServiceImpl implements MemberService {
         }
         return MemberResponseDto.from(member);
     }
+
+    @Override
+    public MemberResponseDto retrieveMember(Long memberId) {
+        return MemberResponseDto.from(memberRepository.findById(memberId).orElseThrow());
+    }
 }

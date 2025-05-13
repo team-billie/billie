@@ -6,4 +6,6 @@ import com.nextdoor.nextdoor.domain.member.controller.dto.response.MemberRespons
 public interface MemberService {
 
     MemberResponseDto updateMember(Long memberId, MemberExtraInfoSaveRequestDto memberDto);
+
+    MemberResponseDto retrieveMember(Long memberId);
 }
