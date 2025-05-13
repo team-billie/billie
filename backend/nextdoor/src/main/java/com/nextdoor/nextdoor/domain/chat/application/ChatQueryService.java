@@ -112,6 +112,9 @@ public class ChatQueryService {
                             .ownerId(conv.getOwnerId())
                             .renterId(conv.getRenterId())
                             .postId(conv.getPostId())
+                            .title(post.getTitle())
+                            .rentalFee(post.getRentalFee())
+                            .deposit(post.getDeposit())
                             .build();
                 })
                 .collect(Collectors.toList());
