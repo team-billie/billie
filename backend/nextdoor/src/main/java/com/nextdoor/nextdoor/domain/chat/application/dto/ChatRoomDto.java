@@ -27,4 +27,10 @@ public class ChatRoomDto {
     private String otherProfileImageUrl;
     /** 채팅 대상 게시물 대표 이미지 URL */
     private String postImageUrl;
+    /** 오너 ID */
+    private Long ownerId;
+    /** 렌터 ID */
+    private Long renterId;
+    /** 게시글 ID */
+    private Long postId;
 }
