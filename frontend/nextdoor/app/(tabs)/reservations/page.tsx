@@ -24,6 +24,7 @@ interface ReservationItem {
   endDate: string;
   status: RentalStatus;
   process: RentalProcess;
+  deposit: number;
   userType: "OWNER" | "RENTER";
 }
 
@@ -74,6 +75,7 @@ export default function ReservationPage() {
             date: diffDays,
             renterId: item.renterId,
             startDate: item.startDate,
+            deposit: item.deposit,
             endDate: item.endDate,
             status: item.rentalStatus as RentalStatus,
             process: item.rentalProcess as RentalProcess,
@@ -132,6 +134,7 @@ export default function ReservationPage() {
                 startDate={reservation.startDate}
                 renterId={reservation.renterId}
                 endDate={reservation.endDate}
+                deposit={reservation.deposit}
                 status={reservation.status}
                 process={reservation.process}
                 userType={reservation.userType}
