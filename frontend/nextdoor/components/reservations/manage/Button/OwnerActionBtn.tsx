@@ -9,12 +9,15 @@ import {
 } from "@/types/rental";
 import { useState } from "react";
 import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
+import HandleDepositModal from "@/components/pays/modals/HandleDepositModal";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
   process: RentalProcess;
   rentalId: number;
   charge: number;
+  renterId: number;
+  deposit: number;
   onSuccess?: () => void;
 }
 
@@ -23,11 +26,13 @@ export default function OwnerActionBtn({
   rentalId,
   process,
   charge,
+  renterId,
+  deposit,
   onSuccess,
 }: OwnerActionBtnProps) {
   const { userId } = useUserStore();
   const [isModal, setModal] = useState(false);
-
+  const [isDepositModal, setIsDepositModal] = useState(false);
   console.log("OwnerActionBtn userId:", userId);
   console.log("OWner버튼", process);
   // userId가 없으면 렌더링하지 않음
@@ -120,6 +125,7 @@ export default function OwnerActionBtn({
         } //보증금 처리
       } else if (process === RENTAL_PROCESS.RETURNED) {
         if (status === RENTAL_STATUS.AFTER_PHOTO_REGISTERED) {
+          setIsDepositModal(true);
           console.log("보증금 처리");
           alert("보증금 처리");
         }
@@ -148,6 +154,15 @@ export default function OwnerActionBtn({
           charge={charge}
           rentalId={rentalId.toString()}
           setIsModalOpen={setModal}
+        />
+      )}
+      {isDepositModal && (
+        <HandleDepositModal
+          charge={deposit}
+          rentalImg=""
+          rentalId={rentalId}
+          renterId={renterId}
+          setIsModalOpen={setIsDepositModal}
         />
       )}
     </>

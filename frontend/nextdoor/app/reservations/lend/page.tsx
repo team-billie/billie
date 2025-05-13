@@ -25,6 +25,7 @@ interface ReservationItem {
   status: RentalStatus;
   renterId: number;
   process: RentalProcess;
+  deposit: number;
   userType: "OWNER" | "RENTER";
 }
 
@@ -69,6 +70,7 @@ export default function ReservationLendPage() {
             startDate: item.startDate,
             renterId: item.renterId,
             endDate: item.endDate,
+            deposit: item.deposit,
             status: item.rentalStatus as RentalStatus,
             process: item.rentalProcess as RentalProcess,
             userType: userRole,
@@ -150,6 +152,7 @@ export default function ReservationLendPage() {
                 process={reservation.process}
                 userType={reservation.userType}
                 rentalId={reservation.id}
+                deposit={reservation.deposit}
                 onActionSuccess={() => handleActionSuccess(reservation.id)}
               />
             </div>

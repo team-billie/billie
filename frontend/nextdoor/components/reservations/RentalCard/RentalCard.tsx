@@ -21,6 +21,7 @@ interface RentalCardProps {
   userType: UserType;
   rentalId: number;
   renterId: number;
+  deposit: number;
   onActionSuccess?: () => void;
 }
 
@@ -36,6 +37,7 @@ export default function RentalCard({
   userType,
   rentalId,
   renterId,
+  deposit,
   onActionSuccess,
 }: RentalCardProps) {
   const pathname = usePathname();
@@ -80,6 +82,8 @@ export default function RentalCard({
             process={process}
             rentalId={rentalId}
             onSuccess={onActionSuccess}
+            renterId={renterId}
+            deposit={deposit}
           />
         ) : (
           <RenterActionBtn
