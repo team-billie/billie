@@ -39,4 +39,6 @@ public class ChatRoomDto {
     private Long rentalFee;
     /** 보증금 */
     private Long deposit;
+    /** 채팅방 상태 (예약중, 거래중, 상태없음) */
+    private String chatStatus;
 }
