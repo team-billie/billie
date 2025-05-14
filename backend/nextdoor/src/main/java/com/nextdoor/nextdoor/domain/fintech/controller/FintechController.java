@@ -181,4 +181,21 @@ public class FintechController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    // 신규: 계좌 거래 내역 조회
+    @PostMapping("/accounts/transactions/history")
+    public Mono<ResponseEntity<Map<String,Object>>> inquireTransactionHistory(
+            @RequestBody InquireTransactionHistoryRequestDto req
+    ) {
+        return accountService
+                .inquireTransactionHistory(req)
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("계좌 거래 내역 조회 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(ex.getErrorBody())
+                        )
+                );
+    }
 }
