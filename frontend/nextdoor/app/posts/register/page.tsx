@@ -12,6 +12,7 @@ import ProductRegisterLocationSelector from "@/components/posts/register/Product
 import { postCreateRequest } from "@/lib/api/posts/request";
 import useUserStore from "@/lib/store/useUserStore";
 import useProductRegisterStore from "@/lib/store/posts/useProductRegisterStore";
+import { useRouter } from "next/navigation";
 
 export default function PostRegisterPage() {
   // 전역 상태 관리 훅 사용
@@ -35,6 +36,7 @@ export default function PostRegisterPage() {
     handleAiToggle,
   } = useProductRegisterStore();
   const { userId } = useUserStore();
+  const router=useRouter();
   console.log("userId", userId);
   const handleSubmit = async () => {
     try {
@@ -71,21 +73,23 @@ export default function PostRegisterPage() {
         category,
         rentalFee: Number(rentalFee),
         deposit: Number(deposit),
-        preferredLocation,
+        preferredLocation :
+        {
+          latitude: 35.108985,
+          longitude: 128.921072,
+        },
       };
 
-      // FileList를 File[]로 변환
-      const imageFiles = images ? Array.from(images) : null;
-
+     
       // API 호출
-      const res = await postCreateRequest(productData, imageFiles, userId);
+      const res = await postCreateRequest(productData, images, userId);
       // 성공 처리
       alert("상품 등록이 완료되었습니다!");
-
+      router.push('/home');
       // 폼 데이터 초기화
       useProductRegisterStore.getState().resetForm();
       // TODO: 성공 후 리다이렉트 처리
-      // router.push('/home');
+      router.push('/home');
     } catch (error) {
       console.error("상품 등록 실패:", error);
       alert("상품 등록에 실패했습니다. 다시 시도해주세요.");
@@ -106,7 +110,7 @@ export default function PostRegisterPage() {
       />
 
       {/* 이미지 업로드 컴포넌트 */}
-      <ProductRegisterImageUpload />
+      <ProductRegisterImageUpload value={images} onChange={setImages}/>
 
       {/* 제목 입력 폼 */}
       <ProductRegisterFormGroup title="제목">

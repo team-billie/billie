@@ -11,7 +11,7 @@ interface ProductRegisterState {
   category: CategoryType;
   preferredLocation: string;
   isAiMode: boolean;
-  images: FileList | null;
+  images: File[];
 
   setTitle: (title: string) => void;
   setContent: (content: string) => void;
@@ -20,11 +20,13 @@ interface ProductRegisterState {
   setCategory: (category: CategoryType) => void;
   setPreferredLocation: (preferredLocation: string) => void;
   setIsAiMode: (isAiMode: boolean) => void;
-  setImages: (images: FileList | null) => void;
+  setImages: (images: File[]) => void;
   handleAiToggle: (value: boolean) => void;
   resetForm: () => void;
 }
 
+// Zustand의 persist middleware는 File 객체를 직렬화할 수 없으므로,
+// 이미지 상태만 제외하고 저장하도록 설정
 const useProductRegisterStore = create<ProductRegisterState>()(
   persist(
     (set) => ({
@@ -36,7 +38,7 @@ const useProductRegisterStore = create<ProductRegisterState>()(
       category: "" as CategoryType,
       preferredLocation: "",
       isAiMode: false,
-      images: null,
+      images: [],
 
       // 상태 업데이트 함수들
       setTitle: (title) => set({ title }),
@@ -74,11 +76,21 @@ const useProductRegisterStore = create<ProductRegisterState>()(
           category: "" as CategoryType,
           preferredLocation: "",
           isAiMode: false,
-          images: null,
+          images: [],
         }),
     }),
     {
       name: "product-register-storage", // 로컬 스토리지에 저장될 키 이름
+      partialize: (state) => ({
+        // images를 제외한 나머지 상태만 저장
+        title: state.title,
+        content: state.content,
+        rentalFee: state.rentalFee,
+        deposit: state.deposit,
+        category: state.category,
+        preferredLocation: state.preferredLocation,
+        isAiMode: state.isAiMode
+      }),
     }
   )
 );
