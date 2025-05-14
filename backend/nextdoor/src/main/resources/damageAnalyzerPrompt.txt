@@ -10,6 +10,7 @@ Define "damage" as any of the following:
 - Dents
 - Deformations
 - Missing parts
+- Discoloration
 
 For each object, report the following:
 Detailed explanation: Describe the type, location, details, boundingBox coordinates, and confidenceScore.
