@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.auth.service;
 
+import com.nextdoor.nextdoor.domain.auth.event.OAuth2UserCreatedEvent;
 import com.nextdoor.nextdoor.domain.auth.port.AuthMemberQueryPort;
 import com.nextdoor.nextdoor.domain.auth.CustomOAuth2User;
 import com.nextdoor.nextdoor.domain.auth.exception.UnsupportedOAuth2ProviderException;
@@ -25,6 +26,8 @@ import java.util.Optional;
 @Transactional
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
+    private final ApplicationEventPublisher eventPublisher;
+
     private final AuthMemberCommandPort authMemberCommandPort;
     private final AuthMemberQueryPort authMemberQueryPort;
 
@@ -44,9 +47,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             default:
                 throw new UnsupportedOAuth2ProviderException("지원하지 않는 OAuth2 제공자입니다.");
         }
-        MemberQueryDto member = authMemberQueryPort.findByEmailAndAuthProvider(email, authProvider)
-                .orElseGet(() -> authMemberCommandPort.save(
-                        new MemberCommandDto(authProvider, nickname, email, profileImageUrl)));
+        MemberQueryDto member = authMemberQueryPort.findByEmailAndAuthProvider(email, authProvider).orElseGet(() -> {
+            MemberQueryDto newMember = authMemberCommandPort.save(
+                    new MemberCommandDto(authProvider, nickname, email, profileImageUrl));
+            eventPublisher.publishEvent(new OAuth2UserCreatedEvent(newMember.getId(), newMember.getEmail()));
+            return newMember;
+        });
         return new CustomOAuth2User(member.getId().toString(), oAuth2User.getAttributes());
     }
 }
