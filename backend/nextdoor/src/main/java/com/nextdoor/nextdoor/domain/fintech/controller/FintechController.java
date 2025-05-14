@@ -182,7 +182,7 @@ public class FintechController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 신규: 계좌 거래 내역 조회
+    // 계좌 거래 내역 조회
     @PostMapping("/accounts/transactions/history")
     public Mono<ResponseEntity<Map<String,Object>>> inquireTransactionHistory(
             @RequestBody InquireTransactionHistoryRequestDto req
