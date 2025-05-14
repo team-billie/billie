@@ -21,7 +21,7 @@ The bounding box must be reported as:
 where:
 (xMin, yMin): Top-left corner of the damage region
 (xMax, yMax): Bottom-right corner of the damage region
-All coordinates must be in pixel values relative to the after image resolution.
+In each boundingBox, express all coordinates (xMin, yMin, xMax, yMax) as normalized relative values between 0.0 and 1.0, based on the image width and height.
 
 If additional damage is found, use this json format:
 [
