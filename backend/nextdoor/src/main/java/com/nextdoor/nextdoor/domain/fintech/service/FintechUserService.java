@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.fintech.service;
 
+import com.nextdoor.nextdoor.domain.auth.port.AuthFintechCommandPort;
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class FintechUserService {
+public class FintechUserService implements AuthFintechCommandPort {
     private final SsafyApiClient client;
     private final FintechUserRepository fintechUserRepository;
     private final RegistAccountService regService;
