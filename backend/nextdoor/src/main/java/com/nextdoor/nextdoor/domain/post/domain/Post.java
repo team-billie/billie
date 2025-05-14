@@ -32,8 +32,11 @@ public class Post extends TimestampedEntity{
     @Column(name = "address")
     private String address;
 
-    @Column(name = "location", columnDefinition = "POINT")
-    private String location;
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @Column(name = "product_image")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -78,14 +81,15 @@ public class Post extends TimestampedEntity{
     }
 
     @Builder
-    public Post(Long id, String title, String content, Long rentalFee, Long deposit, String address, String location, List<ProductImage> productImages, Category category, Long authorId) {
+    public Post(Long id, String title, String content, Long rentalFee, Long deposit, String address, Double latitude, Double longitude, List<ProductImage> productImages, Category category, Long authorId) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.rentalFee = rentalFee;
         this.deposit = deposit;
         this.address = address;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.productImages = productImages;
         this.category = category;
         this.authorId = authorId;

@@ -12,6 +12,10 @@ import java.util.Optional;
 public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long> {
 
     Optional<FileMetadata> findByServiceIdAndResourceIdAndResourceType(
+
+
+
+
             String serviceId, String resourceId, String resourceType);
 
     List<FileMetadata> findAllByServiceIdAndResourceId(String serviceId, String resourceId);

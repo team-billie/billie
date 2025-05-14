@@ -21,8 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Adapter
 @RequiredArgsConstructor
@@ -96,13 +94,10 @@ public class PostQueryAdapter implements PostQueryPort {
                 .where(productImage.post.id.eq(postId))
                 .fetch();
 
-        String locationStr = queryFactory
-                .select(Expressions.stringTemplate("ST_AsText({0})", post.location))
-                .from(post)
-                .where(post.id.eq(postId))
-                .fetchOne();
-
-        LocationDto locationDto = parseLocationPoint(locationStr);
+        LocationDto locationDto = null;
+        if (postEntity.getLatitude() != null && postEntity.getLongitude() != null) {
+            locationDto = new LocationDto(postEntity.getLatitude(), postEntity.getLongitude());
+        }
 
         return PostDetailResult.builder()
                 .title(postEntity.getTitle())
@@ -118,24 +113,4 @@ public class PostQueryAdapter implements PostQueryPort {
                 .build();
     }
 
-    private LocationDto parseLocationPoint(String pointStr) {
-        if (pointStr == null || pointStr.isEmpty()) {
-            return null;
-        }
-
-        Pattern pattern = Pattern.compile("POINT\\((\\S+)\\s+(\\S+)\\)");
-        Matcher matcher = pattern.matcher(pointStr);
-
-        if (matcher.find()) {
-            try {
-                double latitude = Double.parseDouble(matcher.group(1));
-                double longitude = Double.parseDouble(matcher.group(2));
-                return new LocationDto(latitude, longitude);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-
-        return null;
-    }
 }
