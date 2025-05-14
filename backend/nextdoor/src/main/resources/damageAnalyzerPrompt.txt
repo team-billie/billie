@@ -49,4 +49,5 @@ If damage is found, use this json format:
   }
 ]
 
-Only response in this json format without any additional sentence.
+Only respond in this json format without any additional sentence.
+Respond location and details fields in Korean while keeping all other keys and values in English and JSON format.
