@@ -220,7 +220,7 @@ public class AccountService {
                 );
     }
 
-    // 거래 내역 조회
+    // 계좌 거래 내역 조회
     public Mono<Map<String,Object>> inquireTransactionHistory(
             InquireTransactionHistoryRequestDto req
     ) {
