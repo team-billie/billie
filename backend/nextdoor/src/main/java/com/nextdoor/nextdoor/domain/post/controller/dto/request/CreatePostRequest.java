@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.post.controller.dto.request;
 
 import com.nextdoor.nextdoor.domain.post.domain.Category;
+import com.nextdoor.nextdoor.domain.post.service.dto.LocationDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -25,6 +26,6 @@ public class CreatePostRequest {
     @NotNull(message = "보증금은 필수입니다")
     private Integer deposit;
 
-    @NotBlank(message = "거래 희망 장소는 필수입니다")
-    private String preferredLocation;
+    @NotNull(message = "거래 희망 장소는 필수입니다")
+    private LocationDto preferredLocation;
 }
