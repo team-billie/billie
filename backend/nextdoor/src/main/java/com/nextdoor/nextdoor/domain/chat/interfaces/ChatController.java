@@ -7,6 +7,7 @@ import com.nextdoor.nextdoor.domain.chat.application.ConversationService;
 import com.nextdoor.nextdoor.domain.chat.application.dto.CreateConversationRequest;
 import com.nextdoor.nextdoor.domain.chat.domain.Conversation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.nextdoor.nextdoor.domain.chat.application.ChatService;
@@ -51,8 +52,8 @@ public class ChatController {
      */
     @GetMapping("/borrowings")
     public ResponseEntity<List<ChatRoomDto>> getBorrowingChatRooms(
-            @RequestParam Long memberId) {
-        List<ChatRoomDto> rooms = chatQueryService.getBorrowingChatRooms(memberId);
+            @AuthenticationPrincipal Long userid) {
+        List<ChatRoomDto> rooms = chatQueryService.getBorrowingChatRooms(userid);
         return ResponseEntity.ok(rooms);
     }
 
@@ -62,8 +63,8 @@ public class ChatController {
      */
     @GetMapping("/lendings")
     public ResponseEntity<List<ChatRoomDto>> getLendingChatRooms(
-            @RequestParam Long memberId) {
-        List<ChatRoomDto> rooms = chatQueryService.getLendingChatRooms(memberId);
+            @AuthenticationPrincipal Long userid) {
+        List<ChatRoomDto> rooms = chatQueryService.getLendingChatRooms(userid);
         return ResponseEntity.ok(rooms);
     }
 
