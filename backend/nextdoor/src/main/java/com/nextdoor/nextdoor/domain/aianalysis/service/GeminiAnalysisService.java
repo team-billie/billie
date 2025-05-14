@@ -77,7 +77,6 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .toList();
         return Content.newBuilder()
                 .addAllParts(imageParts)
-                .addParts(Part.newBuilder().setText("These are before images.").build())
                 .addParts(damageAnalyzerPromptPart)
                 .setRole("user")
                 .build();
