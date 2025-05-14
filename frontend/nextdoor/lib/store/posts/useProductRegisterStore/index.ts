@@ -1,4 +1,5 @@
 // lib/store/useProductRegisterStore.ts
+import { LocationType } from "@/types/posts/request";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -61,7 +62,7 @@ const useProductRegisterStore = create<ProductRegisterState>()(
             rentalFee: "20000",
             deposit: "20000",
             category: "디지털기기",
-            preferredLocation: "부산광역시 강서구 명지동",
+            preferredLocation: "부산광역시 강서구 명지동 ",
           });
         }
       },
@@ -89,7 +90,7 @@ const useProductRegisterStore = create<ProductRegisterState>()(
         deposit: state.deposit,
         category: state.category,
         preferredLocation: state.preferredLocation,
-        isAiMode: state.isAiMode
+        isAiMode: state.isAiMode,
       }),
     }
   )

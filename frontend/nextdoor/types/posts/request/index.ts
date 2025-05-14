@@ -1,7 +1,6 @@
-
-interface LocationType{
-  latitude:number;
-  longitude:number;
+export interface LocationType {
+  latitude: number;
+  longitude: number;
 }
 export interface PostCreateRequestDTO {
   title: string;
@@ -9,5 +8,5 @@ export interface PostCreateRequestDTO {
   category: string;
   rentalFee: number;
   deposit: number;
-  preferredLocation: LocationType
+  preferredLocation: LocationType;
 }
