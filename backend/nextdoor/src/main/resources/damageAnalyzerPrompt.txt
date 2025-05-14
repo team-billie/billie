@@ -33,10 +33,10 @@ If damage is found, use this json format:
         "location": "[Short location description, e.g., 'Upper left side']",
         "details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']",
         "boundingBox": {
-          "xMin": [integer],
-          "yMin": [integer],
-          "xMax": [integer],
-          "yMax": [integer]
+          "xMin": [float between 0.0 and 1.0],
+          "yMin": [float between 0.0 and 1.0],
+          "xMax": [float between 0.0 and 1.0],
+          "yMax": [float between 0.0 and 1.0]
         },
         "confidenceScore": [float between 0.0 and 1.0]
       },
