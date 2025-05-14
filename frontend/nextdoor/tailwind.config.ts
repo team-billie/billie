@@ -29,10 +29,12 @@ const config: Config = {
       },
       backgroundImage: {
         bluegradient: "linear-gradient(to right,#66A3FF,#A8CCFF)",
+        bluegradient2: "linear-gradient(to right,#66A3FF,#0074FF)",
       },
       boxShadow: {
-        'popup': '-1px -1px 10px rgba(255, 255, 255, 0.3), 1px 1px 10px rgba(0, 0, 0, 0.2)'
-      }
+        popup:
+          "-1px -1px 10px rgba(255, 255, 255, 0.3), 1px 1px 10px rgba(0, 0, 0, 0.2)",
+      },
     },
   },
   //base layer와 utilities layerㅇ와 components layer를 확장하는 역할

@@ -35,8 +35,8 @@ export default function MainDock() {
   ];
 
   return (
-    <div className="fixed bottom-0 w-full max-w-md mx-auto bg-white border-t shadow-lg z-50 rounded-t-3xl">
-      <div className="flex justify-around items-center py-4 pt-5 ">
+    <div className="fixed bottom-0 w-full max-w-md mx-auto bg-white border-t shadow-lg rounded-t-3xl">
+      <div className="flex justify-around items-center py-4 ">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
