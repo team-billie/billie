@@ -52,8 +52,8 @@ public class ChatController {
      */
     @GetMapping("/borrowings")
     public ResponseEntity<List<ChatRoomDto>> getBorrowingChatRooms(
-            @AuthenticationPrincipal Long userid) {
-        List<ChatRoomDto> rooms = chatQueryService.getBorrowingChatRooms(userid);
+            @AuthenticationPrincipal Long userId) {
+        List<ChatRoomDto> rooms = chatQueryService.getBorrowingChatRooms(userId);
         return ResponseEntity.ok(rooms);
     }
 
@@ -63,8 +63,8 @@ public class ChatController {
      */
     @GetMapping("/lendings")
     public ResponseEntity<List<ChatRoomDto>> getLendingChatRooms(
-            @AuthenticationPrincipal Long userid) {
-        List<ChatRoomDto> rooms = chatQueryService.getLendingChatRooms(userid);
+            @AuthenticationPrincipal Long userId) {
+        List<ChatRoomDto> rooms = chatQueryService.getLendingChatRooms(userId);
         return ResponseEntity.ok(rooms);
     }
 
@@ -75,7 +75,7 @@ public class ChatController {
     @GetMapping("/{conversationId}/messages")
     public List<ChatMessageDto> getChatHistory(
             @PathVariable UUID conversationId,
-            @RequestParam Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return chatQueryService.getChatHistory(conversationId, userId);
     }
 }

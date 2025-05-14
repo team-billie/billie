@@ -31,7 +31,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // 예: ws://…/ws/chat?user=123&conv=abc
-        String userId = getParam(session, "user");
+        String userId = getParam(session, "userId");
         sessions.put(userId, session);
         log.debug("WS 연결: user={} 세션등록 (total={})", userId, sessions.size());
     }
