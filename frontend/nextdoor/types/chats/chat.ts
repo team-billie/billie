@@ -21,6 +21,10 @@ export interface ChatRoomUI {
   ownerId: number;
   renterId: number;
   postId: number;
+  title: string;
+  rentalFee: number;
+  deposit: number;
+  chatStatus: string; // 상태없음 or 예약중 or 거래중
 }
 
 // 사용자
@@ -76,6 +80,10 @@ export interface ChatRoom {
   ownerId: number;
   renterId: number;
   postId: number;
+  title: string;
+  rentalFee: number;
+  deposit: number;
+  chatStatus: string; // 상태없음 or 예약중 or 거래중
 }
 
 // 사용자 역할

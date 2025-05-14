@@ -127,9 +127,7 @@ export const convertToMessage = (
   };
 };
 
-/**
- * 백엔드 ChatRoom ->>>> 프론트엔드 UI에 맞게 바꿈 
- */
+// lib/api/chats/index.ts의 convertToChatRoomUI 함수 수정
 export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
   // 이미지 URL 형식 맞추기
   const formatImageUrl = (url: string) => {
@@ -165,16 +163,19 @@ export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
     ],
     product: {
       id: room.postId || 1,
-      name: "상품", 
+      name: room.title || "상품", 
       image: formatImageUrl(room.postImageUrl),
-      price: "20,000원/일",
+      price: `${room.rentalFee?.toLocaleString()}원/일`, 
     },
     ownerId: room.ownerId,
     renterId: room.renterId,
-    postId: room.postId
+    postId: room.postId,
+    title: room.title || "",             
+    rentalFee: room.rentalFee || 0,      
+    deposit: room.deposit || 0,          
+    chatStatus: room.chatStatus || "상태없음"  
   };
 };
-
 /**
  * 채팅방 생성 또는 기존 채팅방 찾기
  * @param ownerId 소유자 ID
