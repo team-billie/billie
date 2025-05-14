@@ -50,4 +50,6 @@ If additional damage is found, use this json format:
 ]
 
 Only respond in this json format without any additional sentence.
+Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
+Output only the raw JSON object or array as a single line, without any additional formatting and indentation or line breaks.
 Respond location and details fields in Korean while keeping all other keys and values in English and JSON format.
