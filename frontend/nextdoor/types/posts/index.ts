@@ -1,5 +1,5 @@
 // 카테고리 표시 이름 타입 정의
-type CategoryDisplayName =
+type CategoryType =
   | "디지털기기"
   | "생활가전"
   | "가구/인테리어"
@@ -20,24 +20,3 @@ type CategoryDisplayName =
   | "식물"
   | "기타 중고물품"
   | "";
-
-type CategoryType =
-  | "DIGITAL_DEVICE"
-  | "HOME_APPLIANCE"
-  | "FURNITURE_INTERIOR"
-  | "LIVING_KITCHEN"
-  | "BABY_CHILDREN"
-  | "BABY_BOOK"
-  | "WOMEN_CLOTHING"
-  | "WOMEN_ACCESSORIES"
-  | "MEN_FASHION_ACCESSORIES"
-  | "BEAUTY"
-  | "SPORTS_LEISURE"
-  | "HOBBY_GAMES_MUSIC"
-  | "BOOK"
-  | "TICKET_VOUCHER"
-  | "PROCESSED_FOOD"
-  | "HEALTH_SUPPLEMENT"
-  | "PET_SUPPLIES"
-  | "PLANT"
-  | "ETC_USED_GOODS";

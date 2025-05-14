@@ -17,7 +17,6 @@ interface ProductRegisterCategorySelectorProps {
 
 interface CategoryInfo {
   type: CategoryType;
-  displayName: CategoryDisplayName;
 }
 
 export default function ProductRegisterCategorySelector({
@@ -40,33 +39,26 @@ export default function ProductRegisterCategorySelector({
 
   // 카테고리 목록
   const categories: CategoryInfo[] = [
-    { type: "DIGITAL_DEVICE", displayName: "디지털기기" },
-    { type: "HOME_APPLIANCE", displayName: "생활가전" },
-    { type: "FURNITURE_INTERIOR", displayName: "가구/인테리어" },
-    { type: "LIVING_KITCHEN", displayName: "생활/주방" },
-    { type: "BABY_CHILDREN", displayName: "유아동" },
-    { type: "BABY_BOOK", displayName: "유아도서" },
-    { type: "WOMEN_CLOTHING", displayName: "여성의류" },
-    { type: "WOMEN_ACCESSORIES", displayName: "여성잡화" },
-    { type: "MEN_FASHION_ACCESSORIES", displayName: "남성패션/잡화" },
-    { type: "BEAUTY", displayName: "뷰티/미용" },
-    { type: "SPORTS_LEISURE", displayName: "스포츠/레저" },
-    { type: "HOBBY_GAMES_MUSIC", displayName: "취미/게임/음반" },
-    { type: "BOOK", displayName: "도서" },
-    { type: "TICKET_VOUCHER", displayName: "티켓/교환권" },
-    { type: "PROCESSED_FOOD", displayName: "가공식품" },
-    { type: "HEALTH_SUPPLEMENT", displayName: "건강기능식품" },
-    { type: "PET_SUPPLIES", displayName: "반려동물용품" },
-    { type: "PLANT", displayName: "식물" },
-    { type: "ETC_USED_GOODS", displayName: "기타 중고물품" },
+    { type: "디지털기기" },
+    { type: "생활가전" },
+    { type: "가구/인테리어" },
+    { type: "생활/주방" },
+    { type: "유아동" },
+    { type: "유아도서" },
+    { type: "여성의류" },
+    { type: "여성잡화" },
+    { type: "남성패션/잡화" },
+    { type: "뷰티/미용" },
+    { type: "스포츠/레저" },
+    { type: "취미/게임/음반" },
+    { type: "도서" },
+    { type: "티켓/교환권" },
+    { type: "가공식품" },
+    { type: "건강기능식품" },
+    { type: "반려동물용품" },
+    { type: "식물" },
+    { type: "기타 중고물품" },
   ];
-  // 선택된 카테고리의 표시 이름 가져오기
-  const getDisplayName = (categoryType: string): string => {
-    const found = categories.find(
-      (cat) => cat.type === categoryType || cat.displayName === categoryType
-    );
-    return found ? found.displayName : "";
-  };
 
   // 카테고리 선택 화면 열기
   const handleOpenCategorySelector = () => {
@@ -98,7 +90,7 @@ export default function ProductRegisterCategorySelector({
       >
         {/* 선택된 카테고리 또는 안내 메시지 - 화면에는 한글로 표시 */}
         <span className={`${localValue ? "text-gray-900" : "text-gray-500"}`}>
-          {localValue ? getDisplayName(localValue) : "카테고리 선택"}
+          {localValue ? category : "카테고리 선택"}
         </span>
 
         {/* 화살표 아이콘 */}
@@ -123,7 +115,7 @@ export default function ProductRegisterCategorySelector({
                   role="option"
                   aria-selected={localValue === category.type}
                 >
-                  {category.displayName}
+                  {category.type}
                 </li>
               ))}
             </ul>

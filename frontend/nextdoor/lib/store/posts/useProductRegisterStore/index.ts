@@ -58,7 +58,7 @@ const useProductRegisterStore = create<ProductRegisterState>()(
               "거의 새 제품이며 상태 좋습니다. 단기 대여 가능합니다. 배터리 성능 좋고 충전기 함께 대여됩니다.",
             rentalFee: "20000",
             deposit: "20000",
-            category: "DIGITAL_DEVICE",
+            category: "디지털기기",
             preferredLocation: "부산광역시 강서구 명지동",
           });
         }
