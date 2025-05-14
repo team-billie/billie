@@ -8,7 +8,6 @@ public interface RentalImageStrategy {
 
     void updateRentalImage(Rental rental, String imageUrl, String mimeType);
     AiImageType getImageType();
-    RentalStatus getTargetStatus();
     String createImagePath(String rentalId);
     public void validateImageUploadAllowed(Rental rental);
 }

@@ -21,6 +21,7 @@ public interface RentalService {
     void updateRentalDepositId(Long rentalId, Long depositId);
     AiAnalysisResult getAiAnalysis(Long rentalId);
     void updateDamageAnalysis(Long rentalId, String damageAnalysis);
+    void updateComparedAnalysis(Long rentalId, String comparedAnalysis);
     UpdateAccountResult updateAccount(UpdateAccountCommand command);
     ManagedRentalCountResult countManagedRentals(Long ownerId);
 }

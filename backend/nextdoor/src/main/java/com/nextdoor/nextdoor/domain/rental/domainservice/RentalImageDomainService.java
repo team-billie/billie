@@ -28,9 +28,7 @@ public class RentalImageDomainService {
 
     public void processRentalImage(Rental rental, String imageUrl, String mimeType, AiImageType imageType) {
         RentalImageStrategy strategy = rentalImageStrategies.get(imageType);
-        strategy.validateImageUploadAllowed(rental);
-        rental.saveAiImage(imageType, imageUrl, mimeType);
-        rental.updateStatus(strategy.getTargetStatus());
+        strategy.updateRentalImage(rental, imageUrl, mimeType);
     }
 
     public String createImagePath(String rentalId, AiImageType imageType) {

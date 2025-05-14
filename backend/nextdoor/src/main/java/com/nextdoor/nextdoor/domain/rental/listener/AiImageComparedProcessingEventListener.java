@@ -15,7 +15,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class AfterImageProcessingEventListener {
+public class AiImageComparedProcessingEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -38,7 +38,7 @@ public class AfterImageProcessingEventListener {
                 "/topic/rental/" + event.getRentalId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalProcess.RETURNED.name())
-                        .detailStatus(RentalStatus.DEPOSIT_REQUESTED.name())
+                        .detailStatus(RentalStatus.BEFORE_AND_AFTER_COMPARED.name())
                         .build()
         );
     }

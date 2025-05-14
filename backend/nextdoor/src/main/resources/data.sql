@@ -122,19 +122,17 @@ INSERT INTO reservation (reservation_id, start_date, end_date, rental_fee, depos
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE reservation AUTO_INCREMENT = 11;
 
--- 6. Rental 더미 데이터 (10개) - account_no, bank_code 필드 추가
-INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, damage_analysis, deal_count, account_no, bank_code, created_at) VALUES
-                                                                                                                                                  (1, 1, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
-                                                                                                                                                  (2, 2, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '경미한 스크래치 발견', 1, '234-567-890123', '020', '2024-03-17T10:00:00'),
-                                                                                                                                                  (3, 3, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '345-678-901234', '032', '2024-03-18T10:00:00'),
-                                                                                                                                                  (4, 4, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '컨트롤러 버튼 불량', 1, '456-789-012345', '034', '2024-03-20T10:00:00'),
-                                                                                                                                                  (5, 5, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '567-890-123456', '090', '2024-03-22T10:00:00'),
-                                                                                                                                                  (6, 6, 'DEPOSIT_REQUESTED', 'RETURNED', '안전벨트 오염', 0, '678-901-234567', '002', '2024-03-25T10:00:00'),
-                                                                                                                                                  (7, 7, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', 0, '789-012-345678', '023', '2024-03-27T10:00:00'),
-                                                                                                                                                  (8, 8, 'AFTER_PHOTO_REGISTERED', 'RETURNED', '건반 1개 미작동', 0, '890-123-456789', '088', '2024-03-30T10:00:00'),
-                                                                                                                                                  (9, 9, 'RENTAL_PERIOD_ENDED', 'RETURNED', NULL, 0, '901-234-567890', '081', '2024-04-01T10:00:00'),
-                                                                                                                                                  (10, 10, 'REMITTANCE_CONFIRMED', 'RENTAL_IN_ACTIVE', NULL, 0, '012-345-678901', '003', '2024-04-03T10:00:00');
-
+INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, damage_analysis, compared_analysis, deal_count, account_no, bank_code, created_at) VALUES
+                                                                                                                                                                     (1, 1, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', '이전 사진과 일치합니다. 손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
+                                                                                                                                                                     (2, 2, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '경미한 스크래치 발견', '이전 상태 대비 스크래치가 추가됨', 1, '234-567-890123', '020', '2024-03-17T10:00:00'),
+                                                                                                                                                                     (3, 3, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', '이전 사진과 일치합니다. 변화 없음', 1, '345-678-901234', '032', '2024-03-18T10:00:00'),
+                                                                                                                                                                     (4, 4, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '컨트롤러 버튼 불량', '이전 상태 정상에서 컨트롤러 버튼 불량 발생', 1, '456-789-012345', '034', '2024-03-20T10:00:00'),
+                                                                                                                                                                     (5, 5, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', '이전과 비교 결과 동일한 상태', 1, '567-890-123456', '090', '2024-03-22T10:00:00'),
+                                                                                                                                                                     (6, 6, 'DEPOSIT_REQUESTED', 'RETURNED', '안전벨트 오염', '반납 시 안전벨트에 오염 발생 확인', 0, '678-901-234567', '002', '2024-03-25T10:00:00'),
+                                                                                                                                                                     (7, 7, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', '대여 전후 사진 비교 시 차이 없음', 0, '789-012-345678', '023', '2024-03-27T10:00:00'),
+                                                                                                                                                                     (8, 8, 'BEFORE_AND_AFTER_COMPARED', 'RETURNED', '건반 1개 미작동', '대여 시 정상이었으나 반납 시 건반 1개 작동 안함', 0, '890-123-456789', '088', '2024-03-30T10:00:00'),
+                                                                                                                                                                     (9, 9, 'RENTAL_PERIOD_ENDED', 'RETURNED', NULL, NULL, 0, '901-234-567890', '081', '2024-04-01T10:00:00'),
+                                                                                                                                                                     (10, 10, 'REMITTANCE_CONFIRMED', 'RENTAL_IN_ACTIVE', NULL, NULL, 0, '012-345-678901', '003', '2024-04-03T10:00:00');
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE rental AUTO_INCREMENT = 11;
 

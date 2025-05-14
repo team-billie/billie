@@ -5,10 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 @Builder
 public class UploadImageCommand {
+
+    private Long userId;
     private Long rentalId;
-    private MultipartFile file;
+    private List<MultipartFile> images;
 }

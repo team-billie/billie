@@ -15,6 +15,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,12 +32,13 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort;
 
     @Override
+    @Transactional(readOnly = true)
     public InspectDamageResponseDto inspectDamage(Long loginUserId, InspectDamageRequestDto inspectDamageRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
         if (rental.getDamageAnalysis() != null) {
             throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
         }
-        List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
+        List<RentalDto.AiImageDto> aiImages = rental.getAiImages(); //ai image 존재 여부 검증
         GenerateContentResponse response;
         try {
             response = generativeModel.generateContent(createContent(aiImages));

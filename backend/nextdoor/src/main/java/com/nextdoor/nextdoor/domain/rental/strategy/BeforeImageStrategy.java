@@ -13,17 +13,11 @@ public class BeforeImageStrategy implements RentalImageStrategy {
     public void updateRentalImage(Rental rental, String imageUrl, String mimeType) {
         validateImageUploadAllowed(rental);
         rental.saveAiImage(getImageType(), imageUrl, mimeType);
-        rental.updateStatus(getTargetStatus());
     }
 
     @Override
     public AiImageType getImageType() {
         return AiImageType.BEFORE;
-    }
-
-    @Override
-    public RentalStatus getTargetStatus() {
-        return RentalStatus.BEFORE_PHOTO_REGISTERED;
     }
 
     @Override
@@ -33,7 +27,7 @@ public class BeforeImageStrategy implements RentalImageStrategy {
 
     @Override
     public void validateImageUploadAllowed(Rental rental) {
-        if(rental.getRentalStatus() != RentalStatus.CREATED) {
+        if(rental.getRentalStatus() != RentalStatus.REMITTANCE_REQUESTED) {
             throw new InvalidRentalStatusException("이미지 업로드가 불가능한 대여 상태입니다");
         }
     }

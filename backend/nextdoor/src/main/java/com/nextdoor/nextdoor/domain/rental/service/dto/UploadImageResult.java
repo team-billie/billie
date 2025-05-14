@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -13,6 +14,6 @@ public class UploadImageResult {
 
     private Long rentalId;
     private String type;
-    private String imageUrl;
+    private List<String> imageUrls;
     private LocalDateTime uploadedAt;
 }

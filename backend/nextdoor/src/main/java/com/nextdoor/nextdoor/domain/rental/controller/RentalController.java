@@ -18,8 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/rentals")
@@ -47,14 +50,15 @@ public class RentalController {
 
     @PostMapping("/{rentalId}/before/photos")
     public ResponseEntity<UploadImageResponse> registerBeforePhoto(
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long rentalId,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") List<MultipartFile> images) {
 
         UploadImageRequest request = UploadImageRequest.builder()
-                .file(file)
+                .images(images)
                 .build();
 
-        UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
+        UploadImageCommand command = rentalMapper.toUploadImageCommand(userId, rentalId, request);
         UploadImageResult result = rentalService.registerBeforePhoto(command);
         UploadImageResponse response = rentalMapper.toUploadImageResponse(result);
 
@@ -72,14 +76,15 @@ public class RentalController {
 
     @PostMapping("/{rentalId}/after/photos")
     public ResponseEntity<UploadImageResponse> registerAfterPhoto(
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long rentalId,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") List<MultipartFile> images) {
 
         UploadImageRequest request = UploadImageRequest.builder()
-                .file(file)
+                .images(images)
                 .build();
 
-        UploadImageCommand command = rentalMapper.toUploadImageCommand(rentalId, request);
+        UploadImageCommand command = rentalMapper.toUploadImageCommand(userId, rentalId, request);
         UploadImageResult result = rentalService.registerAfterPhoto(command);
         UploadImageResponse response = rentalMapper.toUploadImageResponse(result);
 
