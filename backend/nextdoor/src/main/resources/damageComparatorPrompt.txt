@@ -22,11 +22,13 @@ where:
 (xMin, yMin): Top-left corner of the damage region
 (xMax, yMax): Bottom-right corner of the damage region
 In each boundingBox, express all coordinates (xMin, yMin, xMax, yMax) as normalized relative values between 0.0 and 1.0, based on the image width and height.
+For each after image, if possible, identify the before image that has the most similar camera angle and include its index as bestMatchingBeforeIndex in the response.
 
 If additional damage is found, use this json format:
 [
   {
     "imageIndex": [integer],
+    "bestMatchingBeforeIndex": [integer],
     "result": "[DAMAGE_FOUND or NO_DAMAGE_FOUND]",
     "damages": [
       {
