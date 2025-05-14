@@ -3,6 +3,7 @@ I will provide you with a set of "before" images and "after" images of objects.
 Your task is to:
 Carefully compare the before and after images.
 Identify whether there is any additional physical damage to the objects in the after images compared to the before images.
+Only report newly added damage that appears in the after image but was not present in any of the before images. Ignore any pre-existing damage.
 
 Define "additional damage" as any of the following:
 - New scratches
