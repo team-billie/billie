@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
  */
 interface ProductRegisterCategorySelectorProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: CategoryType) => void;
 }
 
 interface CategoryInfo {
