@@ -153,9 +153,9 @@ export default function PhotoManager({
   const totalImages = serverImageUrls.length + photos.length;
 
   return (
-    <div className="w-full p-3">
+    <div className="w-full p-5">
       <div className="flex justify-between flex-col">
-        <div className="text-xl text-gray900">{status}</div>
+        <div className="text-xl text-gray900 font-semibold">{status}</div>
         <div className="text-sm text-gray600">
           {" "}
           {isLoading ? "로딩 중..." : `${totalImages}장 등록됨 (최대 10장)`}
@@ -181,47 +181,51 @@ export default function PhotoManager({
               <p className="text-gray-500">로딩 중...</p>
             </div>
           </div>
-        ) : totalImages > 0 ? (
-          <div className="grid grid-cols-2 gap-2">
-            {/* 서버 이미지 표시 */}
-            {serverImageUrls.map((imageUrl, index) => (
-              <ImagePreview
-                key={`server-${index}-${imageUrl}`}
-                preview={imageUrl}
-                status={status}
-                isMultiple
-                isServerImage
-              />
-            ))}
-
-            {/* 로컬 이미지 표시 */}
-            {previews.map((preview, index) => (
-              <ImagePreview
-                key={`local-${index}-${preview}`}
-                preview={preview}
-                status={status}
-                onDelete={() => handleDelete(index)}
-                isMultiple
-              />
-            ))}
-          </div>
         ) : (
-          <div className="w-full flex justify-center items-center pt-3">
-            <div className="w-1/2 h-40 flex items-center justify-center bg-gray-100 rounded-md border-2 border-dashed border-gray-300">
-              <p className="text-gray-500 text-3xl">+</p>
+          <div>
+            <div className="grid grid-cols-2 gap-2">
+              {/* 서버 이미지 표시 */}
+              {serverImageUrls.map((imageUrl, index) => (
+                <ImagePreview
+                  key={`server-${index}-${imageUrl}`}
+                  preview={imageUrl}
+                  status={status}
+                  isMultiple
+                  isServerImage
+                />
+              ))}
+
+              {/* 로컬 이미지 표시 */}
+              {previews.map((preview, index) => (
+                <ImagePreview
+                  key={`local-${index}-${preview}`}
+                  preview={preview}
+                  status={status}
+                  onDelete={() => handleDelete(index)}
+                  isMultiple
+                />
+              ))}
+
+              {totalImages < 10 ? (
+                <FileUpload
+                  onChange={handleFileChange}
+                  multiple
+                  disabled={uploading}
+                />
+              ) : (
+                <div className="text-sm text-red-500 mt-2">
+                  최대 업로드 수(10장)에 도달했습니다.
+                </div>
+              )}
+              {/* <div className="h-32 flex items-center justify-center bg-gray-100 rounded-md border-2 border-dashed border-gray-300">
+                <p className="text-gray-500 text-3xl">+</p>
+              </div> */}
             </div>
           </div>
         )}
       </div>
 
       {/* 파일 업로드 (10장 제한) */}
-      {totalImages < 10 ? (
-        <FileUpload onChange={handleFileChange} multiple disabled={uploading} />
-      ) : (
-        <div className="text-sm text-red-500 mt-2">
-          최대 업로드 수(10장)에 도달했습니다.
-        </div>
-      )}
     </div>
   );
 }

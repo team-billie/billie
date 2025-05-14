@@ -18,21 +18,33 @@ export default function FileUpload({
   const { userId } = useUserStore();
   console.log("FileUpload userId:", userId);
 
-  // userId가 없으면 렌더링하지 않음
   if (!userId) {
     return null;
   }
 
   return (
-    <div className="mt-2">
+    <div className="w-full h-28 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors duration-200">
       <label
-        className={`flex items-center justify-center w-full px-4 py-2 border ${
-          disabled
-            ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "border-blue-300 bg-blue-50 text-blue-500 hover:bg-blue-100 cursor-pointer"
-        } rounded-md transition-colors`}
+        className={`flex flex-col items-center justify-center w-full h-full cursor-pointer rounded-lg transition-all
+          ${
+            disabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "hover:bg-blue-50 text-gray-500"
+          }
+        `}
       >
-        <span className="mr-2">{disabled ? "업로드 불가" : "파일 선택"}</span>
+        <svg
+          className="w-8 h-8 mb-2 text-gray500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
         <input
           type="file"
           accept={accept}
@@ -42,9 +54,6 @@ export default function FileUpload({
           className="hidden"
         />
       </label>
-      <p className="text-xs text-gray-500 mt-1 text-center">
-        {multiple ? `최대 ${maxFiles}장까지 업로드 가능합니다` : ""}
-      </p>
     </div>
   );
 }
