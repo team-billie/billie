@@ -52,7 +52,6 @@ public class GeminiAnalysisService implements AiAnalysisService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public InspectDamageResponseDto analyzeDamage(Long loginUserId, DamageAnalysisRequestDto damageAnalysisRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(damageAnalysisRequestDto.getRentalId());
 //        if (rental.getDamageAnalysis() != null) {
