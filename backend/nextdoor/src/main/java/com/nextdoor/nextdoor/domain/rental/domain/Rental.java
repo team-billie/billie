@@ -37,10 +37,12 @@ public class Rental {
     @Column(name = "rental_process", nullable = false, length = 50)
     private RentalProcess rentalProcess;
 
-    @Column(name = "damage_analysis")
+    @Lob
+    @Column(name = "damage_analysis", columnDefinition = "TEXT")
     private String damageAnalysis;
 
-    @Column(name = "compared_analysis")
+    @Lob
+    @Column(name = "compared_analysis", columnDefinition = "TEXT")
     private String comparedAnalysis;
 
     @Column(name = "deal_count")
