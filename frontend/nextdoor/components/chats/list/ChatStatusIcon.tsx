@@ -41,7 +41,7 @@ const ChatStatusIcon: React.FC<ChatStatusIconProps> = ({
     >
       <Image 
         src={statusInfo.imageSrc}
-        alt={statusInfo.tooltip}
+        alt={status}
         width={40}
         height={40}
         className="object-contain"

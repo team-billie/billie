@@ -15,7 +15,7 @@ export default function ChatDetailPage() {
   const conversationId = params.id as string;
 
   // useUserStore에서 사용자 정보 가져오기
-  const { userId, username, profileImage } = useUserStore();
+  const { userId, username, profileImageUrl } = useUserStore();
   
   // 상대방 정보 상태
   const [otherUser, setOtherUser] = useState({
@@ -39,42 +39,6 @@ export default function ChatDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // // 채팅방 정보와 참가자 정보 가져오기
-  // useEffect(() => {
-  //   const fetchChatRoomInfo = async () => {
-  //     if (!userId) return;
-      
-  //     try {
-  //       // 모든 채팅방 가져오기
-  //       const rooms = await getBorrowingChatRooms(userId);
-        
-  //       // 현재 conversationId와 일치하는 채팅방 찾기
-  //       const currentRoom = rooms.find(room => room.conversationId === conversationId);
-        
-  //       if (currentRoom) {
-  //         // 채팅방 UI 데이터로 변환
-  //         const roomUI = convertToChatRoomUI(currentRoom);
-          
-  //         // 상대방 찾기 (내 ID가 아닌 참가자)
-  //         if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
-  //           const other = roomUI.participants.find(p => p.id !== userId);
-  //           if (other) {
-  //             setOtherUser({
-  //               id: other.id,
-  //               name: other.name || '상대방',
-  //               avatar: other.avatar || '/images/profileimg.png'
-  //             });
-  //           }
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error("채팅방 정보 조회 오류:", err);
-  //     }
-  //   };
-    
-  //   fetchChatRoomInfo();
-  // }, [conversationId, userId]);
-
 // 채팅방 정보와 참가자 정보 가져오기
 useEffect(() => {
   const fetchChatRoomInfo = async () => {
@@ -82,8 +46,8 @@ useEffect(() => {
     
     try {
       // 두 API 모두 호출
-      const borrowingRooms = await getBorrowingChatRooms(userId);
-      const lendingRooms = await getLendingChatRooms(userId);
+      const borrowingRooms = await getBorrowingChatRooms();
+      const lendingRooms = await getLendingChatRooms();
       
       // 모든 채팅방 합치기
       const allRooms = [...borrowingRooms, ...lendingRooms];
@@ -134,7 +98,7 @@ useEffect(() => {
         const WS_URL = "ws://k12e205.p.ssafy.io:8081";
 
         const socket = new WebSocket(
-          `${WS_URL}/ws/chat?user=${userId}&conversation=${conversationId}&conv=${conversationId}`
+          `${WS_URL}/ws/chat?userId=${userId}&conv=${conversationId}`
         );
 
         socket.onopen = () => {
@@ -226,12 +190,11 @@ useEffect(() => {
       try {
         setIsLoading(true);
         console.log(
-          `메시지 이력 조회: conversationId=${conversationId}, userId=${userId}`
+          `메시지 이력 조회: conversationId=${conversationId}`
         );
 
         const chatMessages = await getChatMessages(
           conversationId,
-          userId
         );
 
         const formattedMessages = chatMessages.map((msg) => ({
@@ -318,7 +281,7 @@ useEffect(() => {
 
       {/* 채팅 목록 */}
       <ChatList
-        messages={messages}
+        messages={messages} 
         username={otherUser.name} // 상대방 이름 표시
         userAvatar={otherUser.avatar} // 상대방 아바타 표시
       />

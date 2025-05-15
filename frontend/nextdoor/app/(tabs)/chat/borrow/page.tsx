@@ -33,7 +33,8 @@ export default function ChatBorrowPage() {
         setIsLoading(true);
         console.log(`빌리기 채팅방 목록 조회: userId=${userId}`);
 
-        const rooms = await getBorrowingChatRooms(userId);
+        // userId 파라미터 제거 - 토큰 기반 인증으로 변경
+        const rooms = await getBorrowingChatRooms();
         
         const uiRooms = rooms.map((room) => ({
           ...convertToChatRoomUI(room, userId),

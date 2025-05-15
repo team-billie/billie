@@ -60,8 +60,7 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
         <div className="flex items-center space-x-0"> {/* space-x-0으로 설정 */}
         <h3 className="text-md font-medium truncate flex items-center">
   {otherUser.name || '상대방'} 
-  {/* transform 값을 음수로 변경하여 위로 올림 */}
-  <ChatStatusIcon status={chat.chatStatus} className="inline-block ml-1" style={{ transform: 'translateY(-20px)' }} />
+  <ChatStatusIcon status={chat.chatStatus} className="inline-block ml-1" />
 </h3>
           </div>
           <span className="text-sm text-gray-500 flex-shrink-0">

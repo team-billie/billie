@@ -26,7 +26,8 @@ export default function ChatLendPage() {
         setIsLoading(true);
         console.log(`빌려주기 채팅방 목록 조회: userId=${userId}`);
         
-        const rooms = await getLendingChatRooms(userId);
+        // userId 파라미터 제거 - 토큰 기반 인증으로 변경
+        const rooms = await getLendingChatRooms();
         
         const uiRooms = rooms.map(room => ({
           ...convertToChatRoomUI(room, userId),
