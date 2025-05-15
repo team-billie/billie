@@ -39,7 +39,7 @@ const useUserStore = create<UserStore>()(
       email: "",
       birth: "",
       gender: "",
-      profileImageUrl: "",
+      profileImageUrl: "/images/profileimg.png",
 
       setUser: (user: GetUserInfoResponse) => set({
         username: user.nickname,
@@ -64,7 +64,6 @@ const useUserStore = create<UserStore>()(
           username: "",
           userKey: "",
           userId: null,
-          profileImage: "/images/profileimg.png",
           billyAccount: null,
           mainAccount: null,
           addedAccounts: [],
@@ -81,7 +80,6 @@ const useUserStore = create<UserStore>()(
         username: state.username,
         userKey: state.userKey,
         userId: state.userId,
-        profileImage: state.profileImage,
         billyAccount: state.billyAccount,
         mainAccount: state.mainAccount,
         addedAccounts: state.addedAccounts,
