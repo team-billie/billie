@@ -23,9 +23,10 @@ public class RentalDomainService {
 
     public void processAfterImageRegistration(Rental rental, BigDecimal depositAmount) {
         if (depositAmount != null && depositAmount.compareTo(BigDecimal.ZERO) > 0) {
-            rental.updateStatus(RentalStatus.DEPOSIT_REQUESTED);
+            rental.updateStatus(RentalStatus.BEFORE_AND_AFTER_COMPARED);
         } else {
             rental.updateStatus(RentalStatus.RENTAL_COMPLETED);
+            rental.updateDealCount();
         }
     }
 }

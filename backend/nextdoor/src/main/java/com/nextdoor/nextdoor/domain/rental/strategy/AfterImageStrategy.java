@@ -13,17 +13,11 @@ public class AfterImageStrategy implements RentalImageStrategy {
     public void updateRentalImage(Rental rental, String imageUrl, String mimeType) {
         validateImageUploadAllowed(rental);
         rental.saveAiImage(getImageType(), imageUrl, mimeType);
-        rental.updateStatus(getTargetStatus());
     }
 
     @Override
     public AiImageType getImageType() {
         return AiImageType.AFTER;
-    }
-
-    @Override
-    public RentalStatus getTargetStatus() {
-        return RentalStatus.AFTER_PHOTO_REGISTERED;
     }
 
     @Override

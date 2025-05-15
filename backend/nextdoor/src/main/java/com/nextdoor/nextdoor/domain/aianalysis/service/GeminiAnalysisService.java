@@ -51,6 +51,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public InspectDamageResponseDto analyzeDamage(Long loginUserId, DamageAnalysisRequestDto damageAnalysisRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(damageAnalysisRequestDto.getRentalId());
         if (rental.getDamageAnalysis() != null) {
@@ -87,7 +88,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         if (rental.getDamageAnalysis() != null) {
             throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
         }
-        List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
+        List<RentalDto.AiImageDto> aiImages = rental.getAiImages(); //ai image 존재 여부 검증
         GenerateContentResponse response;
         try {
             response = generativeModel.generateContent(createComparisonContent(aiImages));
