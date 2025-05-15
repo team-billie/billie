@@ -18,6 +18,7 @@ public class Member extends TimestampedEntity {
     private Long id;
 
     @NotNull
+    @Column(length = 50)
     private String email;
 
     private String birth;
@@ -33,8 +34,10 @@ public class Member extends TimestampedEntity {
     private Long accountId;
 
     @NotNull
+    @Column(length = 50)
     private String nickname;
 
+    @Column(length = 50)
     private String authProvider;
 
     public void updateBirth(String birth) {

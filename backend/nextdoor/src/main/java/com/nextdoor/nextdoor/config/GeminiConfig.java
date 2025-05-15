@@ -24,8 +24,11 @@ public class GeminiConfig {
     @Value("${custom.google.ai.gemini.project-id}")
     private String geminiProjectId;
 
-    @Value("${custom.prompt-location}")
-    private String promptLocation;
+    @Value("${custom.damage-analyzer-prompt-location}")
+    private String damageAnalyzerPromptLocation;
+
+    @Value("${custom.damage-comparator-prompt-location}")
+    private String damageComparatorPromptLocation;
 
     @Bean
     public VertexAI vertexAI() {
@@ -37,15 +40,23 @@ public class GeminiConfig {
         return new GenerativeModel(geminiModel, vertexAI);
     }
 
-    @Bean
-    public Part promptPart(ResourceLoader resourceLoader) {
-        Resource resource = resourceLoader.getResource("classpath:" + promptLocation);
-        String prompt;
+    @Bean(name = "damageAnalyzerPromptPart")
+    public Part afterImageDamageAnalyzerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, damageAnalyzerPromptLocation);
+    }
+
+    @Bean(name = "damageComparatorPromptPart")
+    public Part imageComparisonDamageAnalyzerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, damageComparatorPromptLocation);
+    }
+
+    private Part loadPromptPart(ResourceLoader resourceLoader, String location) {
+        Resource resource = resourceLoader.getResource("classpath:" + location);
         try {
-            prompt = resource.getContentAsString(StandardCharsets.UTF_8);
+            String prompt = resource.getContentAsString(StandardCharsets.UTF_8);
+            return Part.newBuilder().setText(prompt).build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Failed to load prompt from " + location, e);
         }
-        return Part.newBuilder().setText(prompt).build();
     }
 }

@@ -11,12 +11,18 @@ import com.nextdoor.nextdoor.domain.chat.application.dto.ChatMessageDto;
 import com.nextdoor.nextdoor.domain.chat.application.dto.ChatRoomDto;
 import com.nextdoor.nextdoor.domain.chat.application.dto.MemberDto;
 import com.nextdoor.nextdoor.domain.chat.application.dto.PostDto;
+import com.nextdoor.nextdoor.domain.chat.application.dto.RentalDto;
+import com.nextdoor.nextdoor.domain.chat.application.dto.ReservationDto;
 import com.nextdoor.nextdoor.domain.chat.domain.ChatMessage;
 import com.nextdoor.nextdoor.domain.chat.infrastructure.persistence.ChatMessageRepository;
 import com.nextdoor.nextdoor.domain.chat.infrastructure.persistence.ConversationRepository;
 import com.nextdoor.nextdoor.domain.chat.domain.Conversation;
 import com.nextdoor.nextdoor.domain.chat.port.ChatMemberQueryPort;
 import com.nextdoor.nextdoor.domain.chat.port.ChatPostQueryPort;
+import com.nextdoor.nextdoor.domain.chat.port.ChatRentalQueryPort;
+import com.nextdoor.nextdoor.domain.chat.port.ChatReservationQueryPort;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
+import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +35,8 @@ public class ChatQueryService {
     private final UnreadCounterService unreadCounterService;
     private final ChatMemberQueryPort chatMemberQueryPort;
     private final ChatPostQueryPort chatPostQueryPort;
+    private final ChatReservationQueryPort chatReservationQueryPort;
+    private final ChatRentalQueryPort chatRentalQueryPort;
 
 //    /**
 //     * 1:1 채팅방 목록 조회 (마지막 메시지 + 안 읽은 개수)
@@ -55,7 +63,7 @@ public class ChatQueryService {
 //                    Long otherMemberId = conv.getOwnerId().equals(memberId) ? conv.getRenterId() : conv.getOwnerId();
 //                    MemberDto otherMember = chatMemberQueryPort.findById(otherMemberId)
 //                            .orElse(MemberDto.builder().nickname("").profileImageUrl("").build());
-//                    
+//
 //                    // 게시물 이미지 URL 조회
 //                    PostDto post = chatPostQueryPort.findById(conv.getPostId())
 //                            .orElse(PostDto.builder().imageUrl("").build());
@@ -101,6 +109,9 @@ public class ChatQueryService {
                     PostDto post = chatPostQueryPort.findById(conv.getPostId())
                             .orElse(PostDto.builder().imageUrl("").build());
 
+                    // 채팅방 상태 결정
+                    String chatStatus = determineChatStatus(conv.getPostId(), conv.getOwnerId(), conv.getRenterId());
+
                     return ChatRoomDto.builder()
                             .conversationId(cid)
                             .lastMessage(last != null ? last.getContent() : "")
@@ -112,6 +123,10 @@ public class ChatQueryService {
                             .ownerId(conv.getOwnerId())
                             .renterId(conv.getRenterId())
                             .postId(conv.getPostId())
+                            .title(post.getTitle())
+                            .rentalFee(post.getRentalFee())
+                            .deposit(post.getDeposit())
+                            .chatStatus(chatStatus)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -145,6 +160,9 @@ public class ChatQueryService {
                     PostDto post = chatPostQueryPort.findById(conv.getPostId())
                             .orElse(PostDto.builder().imageUrl("").build());
 
+                    // 채팅방 상태 결정
+                    String chatStatus = determineChatStatus(conv.getPostId(), conv.getOwnerId(), conv.getRenterId());
+
                     return ChatRoomDto.builder()
                             .conversationId(cid)
                             .lastMessage(last != null ? last.getContent() : "")
@@ -156,9 +174,55 @@ public class ChatQueryService {
                             .ownerId(conv.getOwnerId())
                             .renterId(conv.getRenterId())
                             .postId(conv.getPostId())
+                            .title(post.getTitle())
+                            .rentalFee(post.getRentalFee())
+                            .deposit(post.getDeposit())
+                            .chatStatus(chatStatus)
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 채팅방 상태 결정 로직
+     * @param postId 게시글 ID
+     * @param ownerId 오너 ID
+     * @param renterId 렌터 ID
+     * @return 채팅방 상태 (예약중, 거래중, 상태없음)
+     */
+    private String determineChatStatus(Long postId, Long ownerId, Long renterId) {
+        // 예약 정보 조회
+        ReservationDto reservation = chatReservationQueryPort.findByPostIdAndOwnerIdAndRenterId(postId, ownerId, renterId)
+                .orElse(null);
+
+        // 예약 정보가 없으면 "상태없음"
+        if (reservation == null) {
+            return "상태없음";
+        }
+
+        // 예약 상태가 PENDING이면 "예약중"
+        if (reservation.getStatus() == ReservationStatus.PENDING) {
+            return "예약중";
+        }
+
+        // 렌탈 정보 조회
+        Long rentalId = reservation.getRentalId();
+        if (rentalId == null) {
+            return "상태없음";
+        }
+
+        RentalDto rental = chatRentalQueryPort.findById(rentalId).orElse(null);
+        if (rental == null) {
+            return "상태없음";
+        }
+
+        // 렌탈 프로세스가 RENTAL_COMPLETED가 아니면 "거래중"
+        if (rental.getRentalProcess() != RentalProcess.RENTAL_COMPLETED) {
+            return "거래중";
+        }
+
+        // 그 외에는 "상태없음"
+        return "상태없음";
     }
 
     /**

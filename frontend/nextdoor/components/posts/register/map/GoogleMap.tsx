@@ -88,7 +88,21 @@ export default function GoogleMapComponent({
           { location: position },
           (results, status) => {
             if (status === "OK" && results && results[0]) {
-              onAddressSelect(results[0].formatted_address);
+              const fullAddress = results[0].formatted_address;
+              const addressParts = fullAddress.split(' ');
+              let dongAddress = '';
+              
+              for (let i = 0; i < addressParts.length; i++) {
+                if (addressParts[i] === '대한민국') continue;
+                dongAddress += addressParts[i] + ' ';
+                if (addressParts[i].endsWith('동') || 
+                    addressParts[i].endsWith('읍') || 
+                    addressParts[i].endsWith('면')) {
+                  break;
+                }
+              }
+              
+              onAddressSelect(dongAddress.trim());
               lastAddressUpdate.current = Date.now();
             }
           }

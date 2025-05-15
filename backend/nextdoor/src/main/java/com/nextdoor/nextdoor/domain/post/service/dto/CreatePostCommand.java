@@ -16,6 +16,7 @@ public class CreatePostCommand {
     private Long rentalFee;
     private Long deposit;
     private String preferredLocation;
+    private LocationDto locationDto;
     private Long authorId;
     private List<MultipartFile> productImages;
 }

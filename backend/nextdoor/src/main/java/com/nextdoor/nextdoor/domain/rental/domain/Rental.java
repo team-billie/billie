@@ -30,15 +30,20 @@ public class Rental {
     private Long reservationId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rental_status", nullable = false)
+    @Column(name = "rental_status", nullable = false, length = 50)
     private RentalStatus rentalStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rental_process", nullable = false)
+    @Column(name = "rental_process", nullable = false, length = 50)
     private RentalProcess rentalProcess;
 
-    @Column(name = "damage_analysis")
+    @Lob
+    @Column(name = "damage_analysis", columnDefinition = "TEXT")
     private String damageAnalysis;
+
+    @Lob
+    @Column(name = "compared_analysis", columnDefinition = "TEXT")
+    private String comparedAnalysis;
 
     @Column(name = "deal_count")
     private Integer dealCount;
@@ -101,6 +106,11 @@ public class Rental {
 
     public void updateDamageAnalysis(String damageAnalysis) {
         this.damageAnalysis = damageAnalysis;
+        updateStatus(RentalStatus.REMITTANCE_REQUESTED);
+    }
+
+    public void updateComparedAnalysis(String comparedAnalysis) {
+        this.comparedAnalysis = comparedAnalysis;
     }
 
     public void processUpdateAccountInfo(String accountNo, String bankCode) {
@@ -113,7 +123,7 @@ public class Rental {
     }
 
     public void processDepositCompletion(){
-        if (rentalStatus != RentalStatus.DEPOSIT_REQUESTED) {
+        if (rentalStatus != RentalStatus.BEFORE_AND_AFTER_COMPARED) {
             throw new InvalidRentalStatusException(this.rentalStatus.name() + ": 보증금을 처리가 불가능한 대여 상태입니다");
         }
 
@@ -192,14 +202,14 @@ public class Rental {
 
         switch (status) {
             case CREATED:
-            case BEFORE_PHOTO_REGISTERED:
+            case BEFORE_PHOTO_ANALYZED:
             case REMITTANCE_REQUESTED:
             case CANCELLED:
                 return RentalProcess.BEFORE_RENTAL;
             case REMITTANCE_CONFIRMED:
                 return RentalProcess.RENTAL_IN_ACTIVE;
             case RENTAL_PERIOD_ENDED:
-            case AFTER_PHOTO_REGISTERED:
+            case BEFORE_AND_AFTER_COMPARED:
             case DEPOSIT_REQUESTED:
                 return RentalProcess.RETURNED;
             case RENTAL_COMPLETED:

@@ -5,11 +5,7 @@ import com.nextdoor.nextdoor.domain.post.controller.dto.response.CreatePostRespo
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostDetailResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostListResponse;
 import com.nextdoor.nextdoor.domain.post.domain.Post;
-import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostCommand;
-import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostResult;
-import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
-import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
-import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
+import com.nextdoor.nextdoor.domain.post.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -63,7 +59,8 @@ public class PostMapper {
                 .category(request.getCategory())
                 .rentalFee(request.getRentalFee().longValue())
                 .deposit(request.getDeposit().longValue())
-                .preferredLocation(request.getPreferredLocation())
+                .preferredLocation(request.getPreferredLocation().toString())
+                .locationDto(request.getPreferredLocation())
                 .authorId(authorId)
                 .productImages(productImages)
                 .build();
@@ -84,6 +81,11 @@ public class PostMapper {
     }
 
     public CreatePostResult toCreateResult(Post post, List<String> imageUrls) {
+        LocationDto location = LocationDto.builder()
+                .latitude(post.getLatitude())
+                .longitude(post.getLongitude())
+                .build();
+
         return CreatePostResult.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -91,7 +93,7 @@ public class PostMapper {
                 .category(post.getCategory())
                 .rentalFee(post.getRentalFee())
                 .deposit(post.getDeposit())
-                .preferredLocation(post.getAddress())
+                .preferredLocation(location)
                 .authorId(post.getAuthorId())
                 .productImageUrls(imageUrls)
                 .build();
