@@ -34,7 +34,7 @@ public class ReservationWebSocketConfig implements WebSocketMessageBrokerConfigu
                 .withSockJS();
     }
 
-    @Bean
+    @Bean(name = "ReservationHeartBeatScheduler")
     public ThreadPoolTaskScheduler heartBeatScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setThreadNamePrefix("ws-heartbeat-thread-");
