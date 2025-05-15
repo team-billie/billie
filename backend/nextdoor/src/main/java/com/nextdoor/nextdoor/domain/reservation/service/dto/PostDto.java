@@ -24,6 +24,7 @@ public class PostDto {
     private List<String> productImages;
     private String category;
     private Long authorId;
+    private String authorUuid;
     private String authorName;
     private String authorProfileImageUrl;
 }
