@@ -52,6 +52,7 @@ public class ReservationPostQueryAdapter implements ReservationPostQueryPort {
                 Expressions.constant(Collections.emptyList()),
                 qPost.category.stringValue(),
                 qPost.authorId,
+                qMember.uuid,
                 qMember.nickname,
                 qMember.profileImageUrl
         );

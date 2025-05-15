@@ -7,6 +7,7 @@ import com.nextdoor.nextdoor.domain.rental.domain.Rental;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
+import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
@@ -23,8 +24,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,31 +57,8 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    @Transactional
-    public UploadImageResult registerBeforePhoto(UploadImageCommand command) {
-        Rental rental = rentalRepository.findByRentalId(command.getRentalId())
-                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
-
-        String path = rentalImageDomainService.createImagePath(
-                String.valueOf(rental.getRentalId()),
-                AiImageType.BEFORE
-        );
-
-        S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), path);
-
-        rentalImageDomainService.processRentalImage(
-                rental,
-                imageUploadResult.getUrl(),
-                command.getFile().getContentType(),
-                AiImageType.BEFORE
-        );
-
-        LocalDateTime uploadedAt = LocalDateTime.now();
-        return UploadImageResult.builder()
-                .rentalId(rental.getRentalId())
-                .imageUrl(imageUploadResult.getUrl())
-                .uploadedAt(uploadedAt)
-                .build();
+    public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
+        return rentalQueryPort.searchRentals(command);
     }
 
     @Override
@@ -90,6 +71,45 @@ public class RentalServiceImpl implements RentalService {
 
         return rentalQueryPort.findRemittanceRequestViewData(command.getRentalId())
                 .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+    }
+
+    @Override
+    @Transactional
+    public UploadImageResult registerBeforePhoto(UploadImageCommand command) {
+        Rental rental = rentalRepository.findByRentalId(command.getRentalId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        ReservationDto reservation = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+
+        if (!reservation.getRenterId().equals(command.getUserId())) {
+            throw new InvalidRenterIdException("요청한 Renter ID가 실제 Renter ID와 일치하지 않습니다.");
+        }
+
+        String path = rentalImageDomainService.createImagePath(
+                String.valueOf(rental.getRentalId()),
+                AiImageType.BEFORE
+        );
+
+        List<String> imageUrls = new ArrayList<>();
+        for(MultipartFile image : command.getImages()){
+            S3UploadResult imageUploadResult = s3ImageUploadService.upload(image, path);
+            imageUrls.add(imageUploadResult.getUrl());
+
+            rentalImageDomainService.processRentalImage(
+                    rental,
+                    imageUploadResult.getUrl(),
+                    image.getContentType(),
+                    AiImageType.BEFORE
+            );
+        }
+
+        LocalDateTime uploadedAt = LocalDateTime.now();
+        return UploadImageResult.builder()
+                .rentalId(rental.getRentalId())
+                .imageUrls(imageUrls)
+                .uploadedAt(uploadedAt)
+                .build();
     }
 
     @Override
@@ -116,47 +136,37 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
+        ReservationDto reservation = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+
+        if (!reservation.getOwnerId().equals(command.getUserId())) {
+            throw new InvalidRenterIdException("요청한 Owner ID가 실제 Owner ID와 일치하지 않습니다.");
+        }
+
         String path = rentalImageDomainService.createImagePath(
                 String.valueOf(rental.getRentalId()),
                 AiImageType.AFTER
         );
 
-        S3UploadResult imageUploadResult = s3ImageUploadService.upload(command.getFile(), path);
+        List<String> imageUrls = new ArrayList<>();
+        for(MultipartFile image : command.getImages()){
+            S3UploadResult imageUploadResult = s3ImageUploadService.upload(image, path);
+            imageUrls.add(imageUploadResult.getUrl());
 
-        rentalImageDomainService.processRentalImage(
-                rental,
-                imageUploadResult.getUrl(),
-                command.getFile().getContentType(),
-                AiImageType.AFTER
-        );
-
-        ReservationDto reservationDto = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
-                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
-
-        rentalDomainService.processAfterImageRegistration(rental, reservationDto.getDeposit());
-
-        if(rental.getRentalStatus().equals(RentalStatus.DEPOSIT_REQUESTED)){
-            eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
-                    .rentalId(rental.getRentalId())
-                    .build());
-        } else if(rental.getRentalStatus().equals(RentalStatus. RENTAL_COMPLETED)){
-            rental.updateDealCount();
-            eventPublisher.publishEvent(RentalCompletedEvent.builder()
-                    .rentalId(rental.getRentalId())
-                    .build());
+            rentalImageDomainService.processRentalImage(
+                    rental,
+                    imageUploadResult.getUrl(),
+                    image.getContentType(),
+                    AiImageType.AFTER
+            );
         }
 
         LocalDateTime uploadedAt = LocalDateTime.now();
         return UploadImageResult.builder()
                 .rentalId(rental.getRentalId())
-                .imageUrl(imageUploadResult.getUrl())
+                .imageUrls(imageUrls)
                 .uploadedAt(uploadedAt)
                 .build();
-    }
-
-    @Override
-    public Page<SearchRentalResult> searchRentals(SearchRentalCommand command) {
-        return rentalQueryPort.searchRentals(command);
     }
 
     @Override
@@ -192,6 +202,31 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.updateDamageAnalysis(damageAnalysis);
+    }
+
+    @Override
+    @Transactional
+    public void updateComparedAnalysis(Long rentalId, String comparedAnalysis) {
+        Rental rental = rentalRepository.findByRentalId(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        rental.updateComparedAnalysis(comparedAnalysis);
+
+        ReservationDto reservationDto = reservationQueryPort.getReservationByRentalId(rental.getRentalId())
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+
+        rentalDomainService.processAfterImageRegistration(rental, reservationDto.getDeposit());
+
+        if(rental.getRentalStatus().equals(RentalStatus.BEFORE_AND_AFTER_COMPARED)){
+            eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
+                    .rentalId(rental.getRentalId())
+                    .build());
+        } else if(rental.getRentalStatus().equals(RentalStatus. RENTAL_COMPLETED)){
+            rental.updateDealCount();
+            eventPublisher.publishEvent(RentalCompletedEvent.builder()
+                    .rentalId(rental.getRentalId())
+                    .build());
+        }
     }
 
     @Override

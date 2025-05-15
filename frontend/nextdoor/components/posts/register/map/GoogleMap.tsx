@@ -88,7 +88,21 @@ export default function GoogleMapComponent({
           { location: position },
           (results, status) => {
             if (status === "OK" && results && results[0]) {
-              onAddressSelect(results[0].formatted_address);
+              const fullAddress = results[0].formatted_address;
+              const addressParts = fullAddress.split(' ');
+              let dongAddress = '';
+              
+              for (let i = 0; i < addressParts.length; i++) {
+                if (addressParts[i] === '대한민국') continue;
+                dongAddress += addressParts[i] + ' ';
+                if (addressParts[i].endsWith('동') || 
+                    addressParts[i].endsWith('읍') || 
+                    addressParts[i].endsWith('면')) {
+                  break;
+                }
+              }
+              
+              onAddressSelect(dongAddress.trim());
               lastAddressUpdate.current = Date.now();
             }
           }
@@ -153,7 +167,8 @@ export default function GoogleMapComponent({
 
     const map = mapRef.current;
 
-    const clickListener = map.addListener(
+    const clickListener = google.maps.event.addListener(
+      map,
       "click",
       (event: google.maps.MapMouseEvent) => {
         if (!event.latLng) return;
@@ -169,7 +184,9 @@ export default function GoogleMapComponent({
       }
     );
 
-    const dragEndListener = map.addListener("dragend", () => {
+    const dragEndListener = google.maps.event.addListener(
+      map,
+      "dragend", () => {
       const center = mapRef.current?.getCenter();
       if (!center) return;
 
@@ -182,7 +199,9 @@ export default function GoogleMapComponent({
       updateAddress(position);
     });
 
-    const centerChangedListener = map.addListener("center_changed", () => {
+    const centerChangedListener = google.maps.event.addListener(
+      map,
+      "center_changed", () => {
       const center = mapRef.current?.getCenter();
       center && markerRef.current?.setPosition(center);
     });

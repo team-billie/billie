@@ -15,6 +15,7 @@ public class CreatePostResponse {
     private String category;
     private String rentalFee;
     private String deposit;
+    private String address;
     private LocationDto preferredLocation;
     private Long authorId;
     private List<String> productImageUrls;

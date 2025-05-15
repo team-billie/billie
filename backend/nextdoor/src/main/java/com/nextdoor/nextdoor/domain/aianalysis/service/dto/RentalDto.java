@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.aianalysis.service.dto;
 
+import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,14 +24,9 @@ public class RentalDto {
     public static class AiImageDto {
 
         private Long aiImageId;
-        private Type type;
+        private AiImageType type;
         private String imageUrl;
         private String mimeType;
         private Long rentalId;
-
-        public enum Type {
-
-            BEFORE, AFTER
-        }
     }
 }

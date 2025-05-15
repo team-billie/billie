@@ -32,7 +32,7 @@ export default function TestLoginPage() {
       .then((res: GetFinUserResponseDto) => {
         console.log(res);
         setUserKey(res.userKey);
-        setUserId(Number(userIdValue));
+        setUserId(Number(res.userId));
 
         GetAddedListRequest(res.userKey).then(
           (res: AddAccountResponseDto[]) => {

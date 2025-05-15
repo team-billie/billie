@@ -41,13 +41,21 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public CreatePostResult createPost(CreatePostCommand command) {
+        Double latitude = null;
+        Double longitude = null;
+        if (command.getPreferredLocation() != null) {
+            latitude = command.getPreferredLocation().getLatitude();
+            longitude = command.getPreferredLocation().getLongitude();
+        }
+
         Post post = Post.builder()
                 .title(command.getTitle())
                 .content(command.getContent())
                 .rentalFee(command.getRentalFee())
                 .deposit(command.getDeposit())
-                .address(command.getPreferredLocation())
-                .location(command.getPreferredLocation()) 
+                .address(command.getAddress())
+                .latitude(latitude)
+                .longitude(longitude)
                 .category(command.getCategory())
                 .authorId(command.getAuthorId())
                 .productImages(new ArrayList<>())

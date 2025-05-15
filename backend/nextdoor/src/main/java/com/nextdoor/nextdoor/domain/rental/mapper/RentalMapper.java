@@ -17,17 +17,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class RentalMapper {
 
-    public UploadImageCommand toUploadImageCommand(Long rentalId, UploadImageRequest request) {
+    public UploadImageCommand toUploadImageCommand(Long userId, Long rentalId, UploadImageRequest request) {
         return new UploadImageCommand(
+                userId,
                 rentalId,
-                request.getFile()
+                request.getImages()
         );
     }
 
     public UploadImageResponse toUploadImageResponse(UploadImageResult result) {
         return UploadImageResponse.builder()
                 .rentalId(result.getRentalId())
-                .imageUrl(result.getImageUrl())
+                .imageUrls(result.getImageUrls())
                 .uploadedAt(result.getUploadedAt())
                 .build();
     }

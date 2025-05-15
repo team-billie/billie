@@ -15,7 +15,6 @@ const BillyPayBox = ({ type }: PayBoxProps) => {
   const { billyAccount, userKey, setBillyAccount, setAddedAccounts } = useUserStore();
 
   useEffect(() => {
-    if (billyAccount) {
       GetAddedListRequest(userKey).then((res: AddAccountResponseDto[]) => {
         console.log(res);
         setBillyAccount(res[0]);
@@ -24,7 +23,6 @@ const BillyPayBox = ({ type }: PayBoxProps) => {
           setAddedAccounts(res.slice(1));
         }
       });
-    }
   }, []);
 
   return (

@@ -22,6 +22,6 @@ public class AuthMemberCommandAdapter implements AuthMemberCommandPort {
                 .email(command.getEmail())
                 .profileImageUrl(command.getProfileImageUrl())
                 .build());
-        return new MemberQueryDto(member.getId(), member.getEmail());
+        return new MemberQueryDto(member.getId(), member.getUuid(), member.getEmail());
     }
 }

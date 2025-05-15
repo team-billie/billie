@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.dto.InquireTransactionHistoryRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
 import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
@@ -217,5 +218,12 @@ public class AccountService {
                                 })
                                 .subscribeOn(Schedulers.boundedElastic())
                 );
+    }
+
+    // 계좌 거래 내역 조회
+    public Mono<Map<String,Object>> inquireTransactionHistory(
+            InquireTransactionHistoryRequestDto req
+    ) {
+        return client.inquireTransactionHistoryList(req);
     }
 }
