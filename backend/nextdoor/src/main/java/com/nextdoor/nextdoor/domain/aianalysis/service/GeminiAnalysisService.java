@@ -9,6 +9,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.DamageAnal
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.DamageComparisonRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDamageResponseDto;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
+import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
@@ -96,7 +97,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
             throw new ExternalApiException(e);
         }
         String damageAnalysis = response.getCandidates(0).getContent().getParts(0).getText();
-        eventPublisher.publishEvent(new AiAnalysisCompletedEvent(inspectDamageRequestDto.getRentalId(), damageAnalysis));
+        eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(inspectDamageRequestDto.getRentalId(), damageAnalysis));
         return new InspectDamageResponseDto(damageAnalysis);
     }
 
