@@ -25,30 +25,7 @@ where:
 In each boundingBox, express all coordinates (xMin, yMin, xMax, yMax) as normalized relative values between 0.0 and 1.0, based on the image width and height.
 
 If damage is found, use this json format:
-[
-  {
-    "imageIndex": [integer],
-    "result": "[DAMAGE_FOUND or NO_DAMAGE_FOUND]",
-    "damages": [
-      {
-        "location": "[Short location description, e.g., 'Upper left side']",
-        "details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']",
-        "boundingBox": {
-          "xMin": [float between 0.0 and 1.0],
-          "yMin": [float between 0.0 and 1.0],
-          "xMax": [float between 0.0 and 1.0],
-          "yMax": [float between 0.0 and 1.0]
-        },
-        "confidenceScore": [float between 0.0 and 1.0]
-      },
-      ...
-    ]
-  },
-  {
-    "imageIndex": [integer],
-    "result": "[DAMAGE_FOUND or NO_DAMAGE_FOUND]"
-  }
-]
+[{"imageIndex":[integer],"result":"[DAMAGE_FOUND or NO_DAMAGE_FOUND]","damages":[{"location":"[Short location description, e.g., 'Upper left side']","details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox": {"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},{"imageIndex":[integer],"result":"[DAMAGE_FOUND or NO_DAMAGE_FOUND]"}]
 
 Only respond in this json format without any additional sentence.
 Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
