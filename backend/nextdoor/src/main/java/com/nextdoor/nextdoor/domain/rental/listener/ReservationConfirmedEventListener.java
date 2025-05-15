@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -14,7 +16,7 @@ public class ReservationConfirmedEventListener {
     private final RentalService rentalService;
 
     @Async("asyncExecutor")
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleReservationConfirmedEvent(ReservationConfirmedEvent reservationConfirmedEvent) {
         rentalService.createFromReservation(reservationConfirmedEvent);
     }
