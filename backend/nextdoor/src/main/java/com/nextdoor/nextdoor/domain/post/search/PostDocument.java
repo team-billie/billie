@@ -14,10 +14,20 @@ public class PostDocument {
   @Id
   private Long id;
 
-  @Field(type = FieldType.Text, analyzer = "korean")
+  @MultiField(
+          mainField = @Field(type = FieldType.Text, analyzer = "korean"),
+          otherFields = {
+                  @InnerField(suffix = "keyword", type = FieldType.Keyword, ignoreAbove = 256)
+          }
+  )
   private String title;
 
-  @Field(type = FieldType.Text, analyzer = "korean")
+  @MultiField(
+          mainField = @Field(type = FieldType.Text, analyzer = "korean"),
+          otherFields = {
+                  @InnerField(suffix = "keyword", type = FieldType.Keyword, ignoreAbove = 256)
+          }
+  )
   private String content;
 
   @Field(type = FieldType.Long)
@@ -26,7 +36,12 @@ public class PostDocument {
   @Field(type = FieldType.Long)
   private Long deposit;
 
-  @Field(type = FieldType.Keyword)
+  @MultiField(
+          mainField = @Field(type = FieldType.Text, analyzer = "korean"),
+          otherFields = {
+                  @InnerField(suffix = "keyword", type = FieldType.Keyword, ignoreAbove = 256)
+          }
+  )
   private String address;
 
   @GeoPointField
