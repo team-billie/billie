@@ -58,8 +58,11 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	implementation 'io.jsonwebtoken:jjwt-gson:0.12.6'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-	implementation 'co.elastic.clients:elasticsearch-java:8.13.4'
+	// Elasticsearch 관련 의존성 수정
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+// 8.x 클라이언트만 사용
+	implementation 'co.elastic.clients:elasticsearch-java:8.13.4'
+	implementation 'jakarta.json:jakarta.json-api:2.1.2'
 }
 
 tasks.named('test') {
