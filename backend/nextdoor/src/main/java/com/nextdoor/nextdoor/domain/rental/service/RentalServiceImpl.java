@@ -4,10 +4,12 @@ import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
+import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
@@ -22,6 +24,7 @@ import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +45,7 @@ public class RentalServiceImpl implements RentalService {
     private final RentalDomainService rentalDomainService;
     private final RentalImageDomainService rentalImageDomainService;
     private final ApplicationEventPublisher eventPublisher;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional
@@ -202,6 +206,14 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.updateDamageAnalysis(damageAnalysis);
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + rentalId + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.BEFORE_RENTAL.name())
+                        .detailStatus(RentalStatus.BEFORE_PHOTO_ANALYZED.name())
+                        .build()
+        );
     }
 
     @Override
@@ -227,6 +239,14 @@ public class RentalServiceImpl implements RentalService {
                     .rentalId(rental.getRentalId())
                     .build());
         }
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + rentalId + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.RETURNED.name())
+                        .detailStatus(RentalStatus.BEFORE_AND_AFTER_COMPARED.name())
+                        .build()
+        );
     }
 
     @Override
