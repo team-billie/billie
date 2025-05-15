@@ -5,7 +5,7 @@ Carefully analyze images.
 Identify whether there is any physical damage to the objects in the images.
 
 Define "damage" as any of the following:
-- New scratches
+- Scratches
 - Cracks
 - Dents
 - Deformations
