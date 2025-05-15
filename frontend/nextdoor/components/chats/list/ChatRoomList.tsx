@@ -1,4 +1,7 @@
 // src/components/chats/list/ChatRoomList.tsx
+
+"use client"
+
 import React from 'react';
 import { ChatRoomUI } from '@/types/chats/chat';
 import ChatRoomItem from '@/components/chats/list/ChatRoomItem';

@@ -27,7 +27,9 @@ public class ChatPostQueryAdapter implements ChatPostQueryPort {
                     PostDto.class,
                     qPost.id,
                     qPost.title,
-                    qProductImage.imageUrl
+                    qProductImage.imageUrl,
+                    qPost.rentalFee,
+                    qPost.deposit
                 ))
                 .from(qPost)
                 .leftJoin(qProductImage).on(qPost.id.eq(qProductImage.post.id))

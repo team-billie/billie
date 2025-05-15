@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request;
 import lombok.Getter;
 
 @Getter
-public class InspectDamageRequestDto {
+public class DamageComparisonRequestDto {
 
     private Long rentalId;
 }

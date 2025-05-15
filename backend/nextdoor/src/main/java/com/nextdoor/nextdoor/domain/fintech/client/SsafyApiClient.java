@@ -1,5 +1,6 @@
 package com.nextdoor.nextdoor.domain.fintech.client;
 
+import com.nextdoor.nextdoor.domain.fintech.dto.InquireTransactionHistoryRequestDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -226,6 +227,45 @@ public class SsafyApiClient {
                         // 오류일 땐 SSAFY error JSON(Map)으로 파싱 후 커스텀 익셉션
                         return resp.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>() {})
                                 .flatMap(err -> Mono.error(new SsafyApiException((HttpStatus) resp.statusCode(), err)));
+                    }
+                });
+    }
+
+    // 계좌 거래 내역 조회
+    public Mono<Map<String,Object>> inquireTransactionHistoryList(
+            InquireTransactionHistoryRequestDto req
+    ) {
+        Map<String,Object> body = new HashMap<>();
+        // 1) 공통 헤더
+        body.put("Header", buildHeader(
+                "inquireTransactionHistoryList",
+                apiKey,
+                req.getUserKey()
+        ));
+        // 2) 페이로드
+        body.put("accountNo",        req.getAccountNo());
+        body.put("startDate",        req.getStartDate());
+        body.put("endDate",          req.getEndDate());
+        body.put("transactionType",  req.getTransactionType());
+        if (req.getOrderByType() != null) {
+            body.put("orderByType", req.getOrderByType());
+        }
+
+        return webClient.post()
+                .uri("/edu/demandDeposit/inquireTransactionHistoryList")
+                .bodyValue(body)
+                .exchangeToMono(resp -> {
+                    if (resp.statusCode().is2xxSuccessful()) {
+                        return resp.bodyToMono(
+                                new ParameterizedTypeReference<Map<String,Object>>() {}
+                        );
+                    } else {
+                        return resp.bodyToMono(
+                                        new ParameterizedTypeReference<Map<String,Object>>() {}
+                                )
+                                .flatMap(err -> Mono.error(
+                                        new SsafyApiException((HttpStatus)resp.statusCode(), err)
+                                ));
                     }
                 });
     }

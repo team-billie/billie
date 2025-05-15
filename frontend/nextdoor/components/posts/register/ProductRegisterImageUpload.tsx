@@ -3,26 +3,47 @@
 import { Camera, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
+interface ProductRegisterImageUploadProps {
+  value: File[];
+  onChange: (images: File[]) => void;
+}
 
-export default function ProductRegisterImageUpload() {
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+export default function ProductRegisterImageUpload({
+  value,
+  onChange,
+}: ProductRegisterImageUploadProps) {
+  const [selectedImages, setSelectedImages] = useState<File[]>(value);
   
   // 이미지 미리보기 URL 관리
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+ // 컴포넌트 마운트 시 또는 value prop이 변경될 때 상태 초기화
   useEffect(() => {
+    if (value) {
+      setSelectedImages(value);
+    }
+  }, [value]);
+  
+
+  // 이미지가 변경될 때마다 미리보기 URL 업데이트
+  useEffect(() => {
+    // 기존 URL 정리
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     
     // 새 미리보기 URL 생성
     const newUrls = selectedImages.map(file => URL.createObjectURL(file));
     setPreviewUrls(newUrls);
     
+    // 상위 컴포넌트에 변경사항 전달
+    onChange(selectedImages);
+    
+    // 컴포넌트 언마운트 시 URL 정리
     return () => {
       newUrls.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [selectedImages]);
+  }, [selectedImages, onChange]);
   
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {

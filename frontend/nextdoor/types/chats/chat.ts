@@ -18,6 +18,9 @@ export interface ChatRoomUI {
   unreadCount: number;
   participants: Participant[];
   product?: Product | null;
+  ownerId: number;
+  renterId: number;
+  postId: number;
 }
 
 // 사용자
@@ -45,17 +48,12 @@ export interface ChatMessageDto {
   sentAt: string;
 }
 
-// ChatRoomDto
-export interface ChatRoom {
-  conversationId: string;
-  lastMessage: string;
-  lastSentAt: string;
-  unreadCount: number;
-}
 
 // 채팅방 생성 요청
 export interface CreateChatRequest {
-  participantIds: number[];
+  ownerId: number;
+  renterId: number;
+  postId: number;
 }
 
 // 채팅방 생성 응답
@@ -63,6 +61,21 @@ export interface Conversation {
   conversationId: string;
   participantIds: number[];
   createdAt: string;
+}
+
+
+
+export interface ChatRoom {
+  conversationId: string;
+  lastMessage: string;
+  lastSentAt: string;
+  unreadCount: number;
+  otherNickname: string;
+  otherProfileImageUrl: string;
+  postImageUrl: string;
+  ownerId: number;
+  renterId: number;
+  postId: number;
 }
 
 // 사용자 역할

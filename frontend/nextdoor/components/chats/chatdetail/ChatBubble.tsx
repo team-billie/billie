@@ -2,6 +2,7 @@ import React from "react";
 import ProfileIcon from "@/components/common/Profile/icon";
 import { Message } from "@/types/chats/chat";
 import { formatTime } from "@/lib/utils/date/formatDate";
+import useUserStore from '@/lib/store/useUserStore'; // useUserStore 추가
 
 interface ChatBubbleProps {
   message: Message;
@@ -16,11 +17,18 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   message,
   showProfileIcon = true,
   showUsername = true,
-  username = "username",
+  username,
   profileIcon,
   className = "",
 }) => {
   const isUser = message.sender === "user";
+  
+  // useUserStore에서 사용자 정보 가져오기
+  const userStoreData = useUserStore();
+  
+  // props로 전달받은 값이 없는 경우 useUserStore의 값 사용
+  const displayName = username || userStoreData.username || 'username';
+  const displayIcon = profileIcon || userStoreData.profileImage || '/images/profileimg.png';
 
   return (
     <div
@@ -30,13 +38,13 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
     >
       {!isUser && showProfileIcon && (
         <div className="mr-2 mt-auto">
-          <ProfileIcon src={profileIcon} alt={username} size={50} />
+          <ProfileIcon src={displayIcon} alt={displayName} size={50} />
         </div>
       )}
 
       <div className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}>
         {!isUser && showUsername && (
-          <span className="text-sm text-gray-700 mb-1">{username}</span>
+          <span className="text-sm text-gray-700 mb-1">{displayName}</span>
         )}
 
         <div className="flex items-end">

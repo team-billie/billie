@@ -6,20 +6,23 @@ import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
 import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
 import { ChatMessageDto, Message, Product } from "@/types/chats/chat";
-import { getChatMessages } from "@/lib/api/chats";
-import { useChatStore } from "@/lib/store/useChatStore";
-
-
-// 현재 테스트 중인 사용자 ID를 명확하게 정의
-const CURRENT_USER_ID = 100;
+import { getChatMessages, getBorrowingChatRooms, convertToChatRoomUI, getLendingChatRooms } from "@/lib/api/chats";
+import useUserStore from "@/lib/store/useUserStore"; // useUserStore 사용
 
 export default function ChatDetailPage() {
   const params = useParams();
   const router = useRouter();
   const conversationId = params.id as string;
 
-  // 챗 스토어에서 사용자 정보 가져오기
-  const { setUser } = useChatStore();
+  // useUserStore에서 사용자 정보 가져오기
+  const { userId, username, profileImage } = useUserStore();
+  
+  // 상대방 정보 상태
+  const [otherUser, setOtherUser] = useState({
+    id: 0,
+    name: '상대방',
+    avatar: '/images/profileimg.png'
+  });
 
   // WebSocket 연결 상태 
   const [isConnected, setIsConnected] = useState(false);
@@ -36,17 +39,86 @@ export default function ChatDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    console.log("사용자 ID를 100으로 고정합니다.");
-    setUser(CURRENT_USER_ID, "꿍얼꿍얼얼", "/images/profileimg.png");
+  // // 채팅방 정보와 참가자 정보 가져오기
+  // useEffect(() => {
+  //   const fetchChatRoomInfo = async () => {
+  //     if (!userId) return;
+      
+  //     try {
+  //       // 모든 채팅방 가져오기
+  //       const rooms = await getBorrowingChatRooms(userId);
+        
+  //       // 현재 conversationId와 일치하는 채팅방 찾기
+  //       const currentRoom = rooms.find(room => room.conversationId === conversationId);
+        
+  //       if (currentRoom) {
+  //         // 채팅방 UI 데이터로 변환
+  //         const roomUI = convertToChatRoomUI(currentRoom);
+          
+  //         // 상대방 찾기 (내 ID가 아닌 참가자)
+  //         if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
+  //           const other = roomUI.participants.find(p => p.id !== userId);
+  //           if (other) {
+  //             setOtherUser({
+  //               id: other.id,
+  //               name: other.name || '상대방',
+  //               avatar: other.avatar || '/images/profileimg.png'
+  //             });
+  //           }
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.error("채팅방 정보 조회 오류:", err);
+  //     }
+  //   };
+    
+  //   fetchChatRoomInfo();
+  // }, [conversationId, userId]);
 
-    // 로컬 스토리지 저장함 .
-    localStorage.setItem("testUserId", CURRENT_USER_ID.toString());
-  }, [setUser]);
+// 채팅방 정보와 참가자 정보 가져오기
+useEffect(() => {
+  const fetchChatRoomInfo = async () => {
+    if (!userId) return;
+    
+    try {
+      // 두 API 모두 호출
+      const borrowingRooms = await getBorrowingChatRooms(userId);
+      const lendingRooms = await getLendingChatRooms(userId);
+      
+      // 모든 채팅방 합치기
+      const allRooms = [...borrowingRooms, ...lendingRooms];
+      
+      // 현재 conversationId와 일치하는 채팅방 찾기
+      const currentRoom = allRooms.find(room => room.conversationId === conversationId);
+      
+      if (currentRoom) {
+        // 채팅방 UI 데이터로 변환
+        const roomUI = convertToChatRoomUI(currentRoom, userId);
+        
+        // 상대방 찾기 (내 ID가 아닌 참가자)
+        if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
+          const other = roomUI.participants.find(p => p.id !== userId);
+          if (other) {
+            setOtherUser({
+              id: other.id,
+              name: other.name || '상대방',
+              avatar: other.avatar || '/images/profileimg.png'
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error("채팅방 정보 조회 오류:", err);
+    }
+  };
+  
+  fetchChatRoomInfo();
+}, [conversationId, userId]);
+
 
   // WebSocket 연결 설정
   useEffect(() => {
-    if (!conversationId) return;
+    if (!conversationId || !userId) return;
 
     const connectWebSocket = () => {
       try {
@@ -56,13 +128,13 @@ export default function ChatDetailPage() {
         }
 
         console.log(
-          `WebSocket 연결 시도: userId=${CURRENT_USER_ID}, conversationId=${conversationId}`
+          `WebSocket 연결 시도: userId=${userId}, conversationId=${conversationId}`
         );
 
         const WS_URL = "ws://k12e205.p.ssafy.io:8081";
 
         const socket = new WebSocket(
-          `${WS_URL}/ws/chat?user=${CURRENT_USER_ID}&conversation=${conversationId}&conv=${conversationId}`
+          `${WS_URL}/ws/chat?user=${userId}&conversation=${conversationId}&conv=${conversationId}`
         );
 
         socket.onopen = () => {
@@ -86,7 +158,7 @@ export default function ChatDetailPage() {
                 id: `${data.conversationId}_${data.senderId}_${Date.now()}`,
                 text: data.content,
                 sender:
-                  Number(data.senderId) === CURRENT_USER_ID ? "user" : "other",
+                  Number(data.senderId) === Number(userId) ? "user" : "other",
                 timestamp: new Date(data.sentAt || Date.now()),
                 read: false,
               };
@@ -142,24 +214,24 @@ export default function ChatDetailPage() {
         socketRef.current = null;
       }
     };
-  }, [conversationId]);
+  }, [conversationId, userId]);
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!conversationId) {
-        console.log("conversationId가 없어 메시지를 불러올 수 없습니다.");
+      if (!conversationId || !userId) {
+        console.log("conversationId나 userId가 없어 메시지를 불러올 수 없습니다.");
         return;
       }
 
       try {
         setIsLoading(true);
         console.log(
-          `메시지 이력 조회: conversationId=${conversationId}, userId=${CURRENT_USER_ID}`
+          `메시지 이력 조회: conversationId=${conversationId}, userId=${userId}`
         );
 
         const chatMessages = await getChatMessages(
           conversationId,
-          CURRENT_USER_ID
+          userId
         );
 
         const formattedMessages = chatMessages.map((msg) => ({
@@ -167,7 +239,7 @@ export default function ChatDetailPage() {
             msg.sentAt
           ).getTime()}`,
           text: msg.content,
-          sender: Number(msg.senderId) === CURRENT_USER_ID ? "user" : "other",
+          sender: Number(msg.senderId) === Number(userId) ? "user" : "other",
           timestamp: new Date(msg.sentAt),
           read: false,
         }));
@@ -182,17 +254,17 @@ export default function ChatDetailPage() {
       }
     };
 
-    if (conversationId) {
+    if (conversationId && userId) {
       fetchMessages();
     }
-  }, [conversationId]);
+  }, [conversationId, userId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
   const handleSend = (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim() || !userId) return;
 
     if (!isConnected || !socketRef.current) {
       console.log("WebSocket 연결이 끊어짐. 메시지를 보낼 수 없음");
@@ -203,7 +275,7 @@ export default function ChatDetailPage() {
     try {
       const message = {
         conversationId,
-        senderId: CURRENT_USER_ID,
+        senderId: userId,
         content,
         sentAt: new Date().toISOString(),
       };
@@ -214,7 +286,7 @@ export default function ChatDetailPage() {
       setValue("");
 
       const newMessage: Message = {
-        id: `${conversationId}_${CURRENT_USER_ID}_${Date.now()}`,
+        id: `${conversationId}_${userId}_${Date.now()}`,
         text: content,
         sender: "user",
         timestamp: new Date(),
@@ -234,7 +306,7 @@ export default function ChatDetailPage() {
 
   return (
     <ChatLayout
-      username="테스트사용자"
+      username={otherUser.name} // 상대방 이름 표시
       value={value}
       onChange={handleChange}
       onSendMessage={handleSend}
@@ -247,8 +319,8 @@ export default function ChatDetailPage() {
       {/* 채팅 목록 */}
       <ChatList
         messages={messages}
-        username="테스트사용자"
-        userAvatar="/images/profileimg.png"
+        username={otherUser.name} // 상대방 이름 표시
+        userAvatar={otherUser.avatar} // 상대방 아바타 표시
       />
 
       {/* 연결 상태 표시 */}
@@ -258,11 +330,12 @@ export default function ChatDetailPage() {
         </div>
       )}
 
-      {/* 디버그 정보  -- 나중에 삭제 하기 */}
+      {/* 디버깅  -- 나중에 삭제 하기 */}
       {process.env.NODE_ENV === "development" && (
         <div className="mt-4 p-3 bg-gray-100 rounded-md text-xs overflow-auto">
           <h3 className="font-bold mb-1">디버깅 정보:</h3>
-          <div>사용자 ID: {CURRENT_USER_ID} (고정 값)</div>
+          <div>사용자 ID: {userId}</div>
+          <div>상대방 ID: {otherUser.id}</div>
           <div>대화 ID: {conversationId}</div>
           <div>연결 상태: {isConnected ? "연결됨 ✅" : "연결 안됨 ❌"}</div>
           {socketError && <div>웹소켓 오류: {socketError}</div>}
