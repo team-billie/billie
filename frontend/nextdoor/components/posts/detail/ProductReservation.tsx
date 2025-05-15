@@ -4,13 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
 import { createReservation } from "@/lib/api/reservations/request";
 import useUserStore from "@/lib/store/useUserStore";
+import useAlertModal from "@/lib/hooks/alert/useAlertModal";
+import { formatKoreanDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { formatNumberWithCommas } from "@/lib/utils/money";
 
 interface ProductReservationProps {
   feedId: number;
+  rentalFee: number;
+  deposit: number;
 }
 
 export default function ProductReservation({
   feedId,
+  rentalFee,
+  deposit,
 }: ProductReservationProps) {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -18,7 +26,10 @@ export default function ProductReservation({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
   const { userId } = useUserStore();
+  const { showAlert } = useAlertModal();
+  const router = useRouter();
   console.log("❤️❤️❤️", userId);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -92,12 +103,16 @@ export default function ProductReservation({
     try {
       const result = await createReservation(reservation, userId);
       console.log("예약 성공:", result);
-      alert(
-        `${formatDate(startDate)}부터 ${formatDate(
+      showAlert(
+        "옆집 물건 예약",
+        `${formatKoreanDate(startDate)}부터 ${formatKoreanDate(
           endDate
-        )}까지 예약이 완료되었습니다.`
+        )}까지 예약이 완료되었습니다.`,
+        "success"
       );
+
       setShowCalendar(false);
+      router.push("/reservations");
     } catch (e) {
       console.log("예약 실패", e);
     }
@@ -108,12 +123,17 @@ export default function ProductReservation({
       <div className="w-full h-full  flex justify-between p-3 bg-white">
         <div>
           <div>
-            <span className="text-xl">₩ 20,000</span>
+            <span className="text-xl">
+              ₩ {formatNumberWithCommas(rentalFee)}
+            </span>
             <span> / 일 </span>
           </div>
           <div>
             <span>보증금</span>
-            <span className="text-xl"> ₩ 100,000</span>
+            <span className="text-xl">
+              {" "}
+              ₩ {formatNumberWithCommas(deposit)}
+            </span>
           </div>
         </div>
         <div
@@ -133,6 +153,8 @@ export default function ProductReservation({
           selectedDates={selectedDates}
           onDateSelect={handleDateSelect}
           onConfirm={handleConfirmReservation}
+          rentalFee={rentalFee}
+          deposit={deposit}
         />
       )}
     </div>

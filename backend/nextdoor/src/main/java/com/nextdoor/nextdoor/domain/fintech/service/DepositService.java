@@ -95,10 +95,9 @@ public class DepositService {
     //보증금 반환
     public Mono<DepositResponseDto> returnDeposit(ReturnDepositRequestDto req) {
         return Mono.fromCallable(() -> {
-                    // 1) 보증금 내역 + 연관 RegistAccount(fetch join) 조회
-                    Deposit d = depositRepository
-                            .findWithAccount(req.getDepositId())      // @Query JOIN FETCH 적용된 메서드
-                            .orElseThrow(() -> new RuntimeException("보증금 내역 없음"));
+                    // 1) 보증금 내역
+                    Deposit d = depositRepository.findByRentalId(req.getRentalId())
+                            .orElseThrow(() -> new RuntimeException("해당 렌탈에 대한 보증금 내역이 없습니다"));
 
                     // 2) renterId → FintechUser.userKey 조회
                     FintechUser renterUser = fintechUserRepository

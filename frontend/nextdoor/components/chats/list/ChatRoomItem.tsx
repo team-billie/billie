@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChatRoomUI } from '@/types/chats/chat';
 import { formatTime } from '@/lib/utils/date/formatDate';
-import { useChatStore } from '@/lib/store/useChatStore';
+import useUserStore from '@/lib/store/useUserStore';
 
 interface ChatRoomItemProps {
   chat: ChatRoomUI;
@@ -12,11 +12,14 @@ interface ChatRoomItemProps {
 }
 
 const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
-  const { userId } = useChatStore();
-  // 상대방 사용자 찾기
-  const otherUser = Array.isArray(chat.participants)
-  ? chat.participants.find((p: { id: number }) => p.id !== userId) // 현재 사용자 제외
-  : null;
+  const { userId } = useUserStore();
+  
+  // 상대방 정보 찾기
+  const otherUser = chat.participants.find(p => p.id !== userId) || {
+    id: 0,
+    name: chat.participants[1]?.name || '상대방',
+    avatar: chat.participants[1]?.avatar || '/images/profileimg.png'
+  };
 
   const chatDate = chat.lastMessage?.timestamp 
     ? formatTime(new Date(chat.lastMessage.timestamp))
@@ -39,11 +42,11 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
           />
         </div>
         
-        {/* 사용자 프로필 이미지 */}
+        {/* 상대방 프로필 이미지 */}
         <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full overflow-hidden border-2 border-white bg-gray-200">
           <Image 
-            src={otherUser?.avatar || '/images/profileimg.png'} 
-            alt={otherUser?.name || '사용자'}
+            src={otherUser.avatar || '/images/profileimg.png'} 
+            alt={otherUser.name || '사용자'}
             width={40}
             height={40}
             className="object-cover"
@@ -54,7 +57,7 @@ const ChatRoomItem: React.FC<ChatRoomItemProps> = ({ chat, userRole }) => {
       <div className="flex-1 min-w-0">
         <div className="flex justify-between">
           <h3 className="text-md font-medium truncate">
-            {otherUser?.name || 'renter name'}
+            {otherUser.name || '상대방'}
           </h3>
           <span className="text-sm text-gray-500">
             {chatDate}

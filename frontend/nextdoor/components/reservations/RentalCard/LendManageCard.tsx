@@ -8,6 +8,7 @@ interface LendManageCardProps {
   id: number;
   img: string;
   cost: number;
+  deposit: number;
   date: number;
   startDate: string;
   endDate: string;
@@ -18,6 +19,7 @@ export default function LendManageCard({
   id,
   img,
   cost,
+  deposit,
   date,
   startDate,
   endDate,
@@ -29,7 +31,13 @@ export default function LendManageCard({
       <RentalPeriod startDate={startDate} endDate={endDate} />
 
       {/* 내용 */}
-      <RentalContent img={img} title={postTitle} cost={cost} date={date} />
+      <RentalContent
+        deposit={deposit}
+        img={img}
+        title={postTitle}
+        cost={cost}
+        date={date}
+      />
 
       {/* 버튼들 */}
       <div className="flex divide-x border rounded-md overflow-hidden text-center text-sm">

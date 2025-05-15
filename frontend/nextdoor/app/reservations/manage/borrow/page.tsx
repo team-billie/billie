@@ -1,5 +1,6 @@
 "use client";
 
+import EmptyState from "@/components/chats/list/EmptyState";
 import MainDock from "@/components/common/Dock/MainDock";
 import BorrowManageCard from "@/components/reservations/RentalCard/BorrowManageCard";
 import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
@@ -15,6 +16,7 @@ interface ReservationItem {
   img: string;
   postTitle: string;
   cost: number;
+  deposit: number;
   date: number;
   startDate: string;
   endDate: string;
@@ -34,16 +36,17 @@ export default function ReservationBorrowManagePage() {
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
         const end = new Date(item.endDate);
-        const duration = Math.ceil((+end - +start) / (1000 * 60 * 60 * 24));
+        const duration = Math.ceil((+end - +start) / (1000 * 60 * 60 * 24)) + 1;
 
         return {
           id: item.reservationId,
           img: "https://picsum.photos/seed/picsum/200/300",
           postTitle: item.postTitle,
-          cost: item.rentalFee,
+          cost: item.rentalFee * duration,
           date: duration,
           startDate: item.startDate,
           endDate: item.endDate,
+          deposit: item.deposit,
         };
       });
 
@@ -66,6 +69,7 @@ export default function ReservationBorrowManagePage() {
     <main>
       <ReservationManageNavbar />
       <div className="h-screen flex flex-col p-4 gap-4">
+        {items.length === 0 && <EmptyState userRole={"borrower"} />}
         {items.map((item) => (
           <div key={item.id}>
             <BorrowManageCard
@@ -73,6 +77,7 @@ export default function ReservationBorrowManagePage() {
               postTitle={item.postTitle}
               img={item.img}
               cost={item.cost}
+              deposit={item.deposit}
               date={item.date}
               startDate={item.startDate}
               endDate={item.endDate}

@@ -20,6 +20,8 @@ interface RentalCardProps {
   process: RentalProcess;
   userType: UserType;
   rentalId: number;
+  renterId: number;
+  deposit: number;
   onActionSuccess?: () => void;
 }
 
@@ -34,6 +36,8 @@ export default function RentalCard({
   process,
   userType,
   rentalId,
+  renterId,
+  deposit,
   onActionSuccess,
 }: RentalCardProps) {
   const pathname = usePathname();
@@ -44,7 +48,7 @@ export default function RentalCard({
   if (!userId) {
     return null;
   }
-
+  const totalCost = cost * date;
   return (
     <div className="w-full border rounded-lg flex flex-col">
       {/* 대여기간 */}
@@ -52,7 +56,13 @@ export default function RentalCard({
 
       <div className="relative">
         {/* 내용 */}
-        <RentalContent img={img} title={title} cost={cost} date={date} />
+        <RentalContent
+          deposit={deposit}
+          img={img}
+          title={title}
+          cost={totalCost}
+          date={date}
+        />
 
         {/* AI 안심거래 버튼 */}
         {(pathname === "/reservations" ||
@@ -73,10 +83,13 @@ export default function RentalCard({
         {/* 사용자 타입에 따라 다른 버튼 컴포넌트 렌더링 */}
         {userType === "OWNER" ? (
           <OwnerActionBtn
+            charge={cost}
             status={status}
             process={process}
             rentalId={rentalId}
             onSuccess={onActionSuccess}
+            renterId={renterId}
+            deposit={deposit}
           />
         ) : (
           <RenterActionBtn

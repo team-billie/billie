@@ -12,7 +12,7 @@ export default function SafeDealNavbar() {
   return (
     <main>
       <div className="navbar bg-blue400 text-primary-content flex items-center justify-between px-4 h-16">
-        <Link href="/home">
+        <Link href="/reservations">
           <ChevronLeft className="w-6 h-6 text-white" />
         </Link>
         <span className="absolute left-1/2 transform -translate-x-1/2 text-xl text-white">

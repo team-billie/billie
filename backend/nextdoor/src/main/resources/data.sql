@@ -30,17 +30,17 @@ INSERT INTO member (
 ALTER TABLE member AUTO_INCREMENT = 21;
 
 -- 2. Post 더미 데이터 (10개의 게시글)
-INSERT INTO post (post_id, title, content, rental_fee, deposit, address, location, category, author_id, created_at) VALUES
-                                                                                                                        (1, 'iPhone 15 Pro 대여', '완전 새 제품! 액정 보호필름 포함', 30000, 300000, '서울시 강남구', ST_GeomFromText('POINT(37.49794 127.05902)', 4326), 'DIGITAL_DEVICE', 1, '2024-02-01T10:00:00'),
-                                                                                                                        (2, '에어컨 대여해요', '삼성 무풍 에어컨 18평형', 50000, 500000, '서울시 강남구', ST_GeomFromText('POINT(37.51133 127.08298)', 4326), 'HOME_APPLIANCE', 2, '2024-02-02T10:00:00'),
-                                                                                                                        (3, '이사용 트럭 대여', '1톤 트럭, 운전기사 포함', 80000, 800000, '경기도 성남시 분당구', ST_GeomFromText('POINT(37.35944 127.11794)', 4326), 'SPORTS_LEISURE', 3, '2024-02-03T10:00:00'),
-                                                                                                                        (4, '닌텐도 스위치 대여', '모든 액세서리 포함, 게임 10개', 20000, 200000, '인천시 부평구 청천동', ST_GeomFromText('POINT(37.49444 126.71667)', 4326), 'HOBBY_GAMES_MUSIC', 4, '2024-02-04T10:00:00'),
-                                                                                                                        (5, '카메라 대여합니다', '캐논 5D Mark IV + 렌즈 3개', 40000, 400000, '부산시 해운대구 좌동', ST_GeomFromText('POINT(35.16361 129.17944)', 4326), 'DIGITAL_DEVICE', 5, '2024-02-05T10:00:00'),
-                                                                                                                        (6, '아기 유모차 대여', '조이 파렌트 시리즈', 10000, 100000, '대구시 수성구 범어동', ST_GeomFromText('POINT(35.84667 128.62639)', 4326), 'BABY_CHILDREN', 6, '2024-02-06T10:00:00'),
-                                                                                                                        (7, '캠핑 텐트 세트', '4인용 원터치 텐트 + 체어 + 테이블', 25000, 250000, '광주시 남구 봉선동', ST_GeomFromText('POINT(35.14222 126.89722)', 4326), 'SPORTS_LEISURE', 7, '2024-02-07T10:00:00'),
-                                                                                                                        (8, '전자 피아노 대여', 'Yamaha 디지털 피아노', 35000, 350000, '대전시 유성구 봉명동', ST_GeomFromText('POINT(36.35167 127.33611)', 4326), 'HOBBY_GAMES_MUSIC', 8, '2024-02-08T10:00:00'),
-                                                                                                                        (9, '업무용 모니터 대여', 'LG 울트라와이드 34인치', 15000, 150000, '서울시 종로구 신문로', ST_GeomFromText('POINT(37.57028 126.96806)', 4326), 'DIGITAL_DEVICE', 9, '2024-02-09T10:00:00'),
-                                                                                                                        (10, '파티용 프로젝터', '엡손 풀HD 프로젝터 + 스크린', 30000, 300000, '서울시 마포구 홍대', ST_GeomFromText('POINT(37.55694 126.92639)', 4326), 'DIGITAL_DEVICE', 10, '2024-02-10T10:00:00');
+INSERT INTO post (post_id, title, content, rental_fee, deposit, address, latitude, longitude, category, author_id, created_at) VALUES
+                                                                                                                                   (1, 'iPhone 15 Pro 대여', '완전 새 제품! 액정 보호필름 포함', 30000, 300000, '서울시 강남구', 37.49794, 127.05902, 'DIGITAL_DEVICE', 1, '2024-02-01T10:00:00'),
+                                                                                                                                   (2, '에어컨 대여해요', '삼성 무풍 에어컨 18평형', 50000, 500000, '서울시 강남구', 37.51133, 127.08298, 'HOME_APPLIANCE', 2, '2024-02-02T10:00:00'),
+                                                                                                                                   (3, '이사용 트럭 대여', '1톤 트럭, 운전기사 포함', 80000, 800000, '경기도 성남시 분당구', 37.35944, 127.11794, 'SPORTS_LEISURE', 3, '2024-02-03T10:00:00'),
+                                                                                                                                   (4, '닌텐도 스위치 대여', '모든 액세서리 포함, 게임 10개', 20000, 200000, '인천시 부평구 청천동', 37.49444, 126.71667, 'HOBBY_GAMES_MUSIC', 4, '2024-02-04T10:00:00'),
+                                                                                                                                   (5, '카메라 대여합니다', '캐논 5D Mark IV + 렌즈 3개', 40000, 400000, '부산시 해운대구 좌동', 35.16361, 129.17944, 'DIGITAL_DEVICE', 5, '2024-02-05T10:00:00'),
+                                                                                                                                   (6, '아기 유모차 대여', '조이 파렌트 시리즈', 10000, 100000, '대구시 수성구 범어동', 35.84667, 128.62639, 'BABY_CHILDREN', 6, '2024-02-06T10:00:00'),
+                                                                                                                                   (7, '캠핑 텐트 세트', '4인용 원터치 텐트 + 체어 + 테이블', 25000, 250000, '광주시 남구 봉선동', 35.14222, 126.89722, 'SPORTS_LEISURE', 7, '2024-02-07T10:00:00'),
+                                                                                                                                   (8, '전자 피아노 대여', 'Yamaha 디지털 피아노', 35000, 350000, '대전시 유성구 봉명동', 36.35167, 127.33611, 'HOBBY_GAMES_MUSIC', 8, '2024-02-08T10:00:00'),
+                                                                                                                                   (9, '업무용 모니터 대여', 'LG 울트라와이드 34인치', 15000, 150000, '서울시 종로구 신문로', 37.57028, 126.96806, 'DIGITAL_DEVICE', 9, '2024-02-09T10:00:00'),
+                                                                                                                                   (10, '파티용 프로젝터', '엡손 풀HD 프로젝터 + 스크린', 30000, 300000, '서울시 마포구 홍대', 37.55694, 126.92639, 'DIGITAL_DEVICE', 10, '2024-02-10T10:00:00');
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE post AUTO_INCREMENT = 11;
@@ -122,19 +122,17 @@ INSERT INTO reservation (reservation_id, start_date, end_date, rental_fee, depos
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE reservation AUTO_INCREMENT = 11;
 
--- 6. Rental 더미 데이터 (10개) - account_no, bank_code 필드 추가
-INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, damage_analysis, deal_count, account_no, bank_code, created_at) VALUES
-                                                                                                                                                  (1, 1, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
-                                                                                                                                                  (2, 2, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '경미한 스크래치 발견', 1, '234-567-890123', '020', '2024-03-17T10:00:00'),
-                                                                                                                                                  (3, 3, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '345-678-901234', '032', '2024-03-18T10:00:00'),
-                                                                                                                                                  (4, 4, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '컨트롤러 버튼 불량', 1, '456-789-012345', '034', '2024-03-20T10:00:00'),
-                                                                                                                                                  (5, 5, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', 1, '567-890-123456', '090', '2024-03-22T10:00:00'),
-                                                                                                                                                  (6, 6, 'DEPOSIT_REQUESTED', 'RETURNED', '안전벨트 오염', 0, '678-901-234567', '002', '2024-03-25T10:00:00'),
-                                                                                                                                                  (7, 7, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', 0, '789-012-345678', '023', '2024-03-27T10:00:00'),
-                                                                                                                                                  (8, 8, 'AFTER_PHOTO_REGISTERED', 'RETURNED', '건반 1개 미작동', 0, '890-123-456789', '088', '2024-03-30T10:00:00'),
-                                                                                                                                                  (9, 9, 'RENTAL_PERIOD_ENDED', 'RETURNED', NULL, 0, '901-234-567890', '081', '2024-04-01T10:00:00'),
-                                                                                                                                                  (10, 10, 'REMITTANCE_CONFIRMED', 'RENTAL_IN_ACTIVE', NULL, 0, '012-345-678901', '003', '2024-04-03T10:00:00');
-
+INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, damage_analysis, compared_analysis, deal_count, account_no, bank_code, created_at) VALUES
+                                                                                                                                                                     (1, 1, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', '이전 사진과 일치합니다. 손상 없음', 1, '123-456-789012', '011', '2024-03-15T10:00:00'),
+                                                                                                                                                                     (2, 2, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '경미한 스크래치 발견', '이전 상태 대비 스크래치가 추가됨', 1, '234-567-890123', '020', '2024-03-17T10:00:00'),
+                                                                                                                                                                     (3, 3, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', '이전 사진과 일치합니다. 변화 없음', 1, '345-678-901234', '032', '2024-03-18T10:00:00'),
+                                                                                                                                                                     (4, 4, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '컨트롤러 버튼 불량', '이전 상태 정상에서 컨트롤러 버튼 불량 발생', 1, '456-789-012345', '034', '2024-03-20T10:00:00'),
+                                                                                                                                                                     (5, 5, 'RENTAL_COMPLETED', 'RENTAL_COMPLETED', '손상 없음', '이전과 비교 결과 동일한 상태', 1, '567-890-123456', '090', '2024-03-22T10:00:00'),
+                                                                                                                                                                     (6, 6, 'DEPOSIT_REQUESTED', 'RETURNED', '안전벨트 오염', '반납 시 안전벨트에 오염 발생 확인', 0, '678-901-234567', '002', '2024-03-25T10:00:00'),
+                                                                                                                                                                     (7, 7, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', '대여 전후 사진 비교 시 차이 없음', 0, '789-012-345678', '023', '2024-03-27T10:00:00'),
+                                                                                                                                                                     (8, 8, 'BEFORE_AND_AFTER_COMPARED', 'RETURNED', '건반 1개 미작동', '대여 시 정상이었으나 반납 시 건반 1개 작동 안함', 0, '890-123-456789', '088', '2024-03-30T10:00:00'),
+                                                                                                                                                                     (9, 9, 'RENTAL_PERIOD_ENDED', 'RETURNED', NULL, NULL, 0, '901-234-567890', '081', '2024-04-01T10:00:00'),
+                                                                                                                                                                     (10, 10, 'REMITTANCE_COMPLETED', 'RENTAL_IN_ACTIVE', NULL, NULL, 0, '012-345-678901', '003', '2024-04-03T10:00:00');
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE rental AUTO_INCREMENT = 11;
 
@@ -175,7 +173,7 @@ INSERT INTO ai_image (rental_id, type, image_url, mime_type) VALUES
 -- Rental 9 (RENTAL_PERIOD_ENDED)
 (9, 'BEFORE', 'https://example.com/ai/rental9_before1.jpg', 'image/jpeg'),
 (9, 'BEFORE', 'https://example.com/ai/rental9_before2.jpg', 'image/jpeg'),
--- Rental 10 (REMITTANCE_CONFIRMED)
+-- Rental 10 (REMITTANCE_COMPLETED)
 (10, 'BEFORE', 'https://example.com/ai/rental10_before1.jpg', 'image/jpeg');
 
 

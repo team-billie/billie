@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.member.enums.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -16,6 +17,9 @@ public class Member extends TimestampedEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
+
+    @UuidGenerator
+    private String uuid;
 
     @NotNull
     private String email;
@@ -36,4 +40,20 @@ public class Member extends TimestampedEntity {
     private String nickname;
 
     private String authProvider;
+
+    public void updateBirth(String birth) {
+        this.birth = birth;
+    }
+
+    public void updateGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public void updateAddress(String address) {
+        this.address = address;
+    }
+
+    public void updateAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
 }

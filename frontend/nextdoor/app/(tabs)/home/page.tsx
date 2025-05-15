@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import PostList from "@/components/(tabs)/home/PostList";
+import CreatePost from "@/components/(tabs)/home/CreatePost";
 
 export function generateMetadata(): Metadata {
   return {
@@ -10,9 +11,14 @@ export function generateMetadata(): Metadata {
 
 export default function HomePage() {
   return (
-    <main className="p-4">
-      <h1 className="text-4xl font-bold mb-2 text-blue400">Home</h1>
-      <PostList />
-    </main>
+    <>
+      <main className="p-4">
+        <h1 className="text-4xl font-bold mb-2 text-blue400">Home</h1>
+        <PostList />
+      </main>
+      <div>
+        <CreatePost />
+      </div>
+    </>
   );
 }

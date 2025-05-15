@@ -20,6 +20,7 @@ public class FintechController {
     private final FintechUserService userService;
     private final AccountService accountService;
     private final DepositService depositService;
+    private final AccountVerificationService accountVerificationService;
 
     //계정 생성
     @PostMapping("/users")
@@ -167,6 +168,33 @@ public class FintechController {
                         Mono.just(ResponseEntity
                                 .status(ex.getStatus())
                                 .body(null)
+                        )
+                );
+    }
+
+    //계좌 확인
+    @PostMapping("/accounts/verify")
+    public ResponseEntity<AccountVerificationResponseDto> verifyAccount(
+            @RequestBody AccountVerificationRequestDto req
+    ) {
+        return accountVerificationService.verifyAccount(req)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // 계좌 거래 내역 조회
+    @PostMapping("/accounts/transactions/history")
+    public Mono<ResponseEntity<Map<String,Object>>> inquireTransactionHistory(
+            @RequestBody InquireTransactionHistoryRequestDto req
+    ) {
+        return accountService
+                .inquireTransactionHistory(req)
+                .map(ResponseEntity::ok)
+                .doOnError(e -> log.error("계좌 거래 내역 조회 오류", e))
+                .onErrorResume(SsafyApiException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatus())
+                                .body(ex.getErrorBody())
                         )
                 );
     }

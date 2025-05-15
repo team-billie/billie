@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class ReturnDepositRequestDto {
     private Long renterId;           // 렌터의 내부 PK
-    private Long depositId;          // 보증금 내역 PK
     private Long deductedAmount;     // 차감액 (없으면 0 또는 null)
     private String userKey;     // 오너의 SSAFY userKey
     private String accountNo;   // 오너가 받을 계좌번호

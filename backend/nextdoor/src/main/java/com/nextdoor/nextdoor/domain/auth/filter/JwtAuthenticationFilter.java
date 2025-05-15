@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 요청에서 토큰 가져요기
             String token = parseBearerToken(request);
             if (token != null && !token.equalsIgnoreCase("null")) {
-                String userId = jwtProvider.validateAndGetUserId(token);
+                Long userId = Long.valueOf(jwtProvider.validateAndGetUserId(token));
                 AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userId,
                         null,

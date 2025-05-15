@@ -1,5 +1,6 @@
 "use client";
 
+import EmptyState from "@/components/chats/list/EmptyState";
 import MainDock from "@/components/common/Dock/MainDock";
 import LendManageCard from "@/components/reservations/RentalCard/LendManageCard";
 import ReservationManageNavbar from "@/components/reservations/manage/ReservationManageNavbar";
@@ -14,6 +15,7 @@ interface ReservationItem {
   cost: number;
   date: number;
   startDate: string;
+  deposit: number;
   endDate: string;
 }
 
@@ -31,16 +33,17 @@ export default function ReservationManagePage() {
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
         const end = new Date(item.endDate);
-        const duration = Math.ceil((+end - +start) / (1000 * 60 * 60 * 24));
-
+        const duration = Math.ceil((+end - +start) / (1000 * 60 * 60 * 24)) + 1;
+        console.log("❤️❤️❤️", duration);
         return {
           id: item.reservationId,
           img:
             // item.feedProductImage ??
             "https://picsum.photos/seed/picsum/200/300",
           postTitle: item.postTitle,
-          cost: item.rentalFee,
+          cost: item.rentalFee * duration,
           date: duration,
+          deposit: item.deposit,
           startDate: item.startDate,
           endDate: item.endDate,
         };
@@ -65,6 +68,7 @@ export default function ReservationManagePage() {
     <main>
       <ReservationManageNavbar />
       <div className="h-screen flex flex-col p-4 gap-4">
+        {items.length === 0 && <EmptyState userRole={"lender"} />}
         {items.map((item) => (
           <div key={item.id}>
             <LendManageCard
@@ -74,6 +78,7 @@ export default function ReservationManagePage() {
               cost={item.cost}
               date={item.date}
               startDate={item.startDate}
+              deposit={item.deposit}
               endDate={item.endDate}
               onReload={loadReservations}
             />
