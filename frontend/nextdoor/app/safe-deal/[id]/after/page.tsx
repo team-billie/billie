@@ -1,12 +1,13 @@
 "use client";
 
 import Header from "@/components/pays/common/Header";
+import AfterPayment from "@/components/safe-deal/AfterPayment";
 import BeforePayment from "@/components/safe-deal/BeforePayment";
 import Payment from "@/components/safe-deal/Payment";
 import { RENTAL_PROCESS, RentalProcess } from "@/types/rental";
 import { useEffect, useState } from "react";
 
-export default function SafeDeal() {
+export default function SafeDealAfter() {
   const [step, setStep] = useState<RentalProcess>();
   const steps = [
     { value: RENTAL_PROCESS.BEFORE_RENTAL },
@@ -22,12 +23,12 @@ export default function SafeDeal() {
 
   //AI분석 확인 후 결제 창
   useEffect(() => {
-    setStep(RENTAL_PROCESS.RENTAL_IN_ACTIVE);
+    setStep(RENTAL_PROCESS.BEFORE_RENTAL);
   });
   return (
     <main className="relative min-h-[100dvh]">
-      <Header txt={"결제하기"} x={true} />
-      {step === RENTAL_PROCESS.BEFORE_RENTAL && <BeforePayment />}
+      <Header txt={"반납하기"} x={true} />
+      {step === RENTAL_PROCESS.BEFORE_RENTAL && <AfterPayment />}
       {step === RENTAL_PROCESS.RENTAL_IN_ACTIVE && <Payment />}
     </main>
   );

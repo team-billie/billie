@@ -217,15 +217,10 @@ export default function PhotoManager({
                   최대 업로드 수(10장)에 도달했습니다.
                 </div>
               )}
-              {/* <div className="h-32 flex items-center justify-center bg-gray-100 rounded-md border-2 border-dashed border-gray-300">
-                <p className="text-gray-500 text-3xl">+</p>
-              </div> */}
             </div>
           </div>
         )}
       </div>
-
-      {/* 파일 업로드 (10장 제한) */}
     </div>
   );
 }

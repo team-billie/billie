@@ -6,7 +6,7 @@ import Payment from "@/components/safe-deal/Payment";
 import { RENTAL_PROCESS, RentalProcess } from "@/types/rental";
 import { useEffect, useState } from "react";
 
-export default function SafeDeal() {
+export default function SafeDealBefore() {
   const [step, setStep] = useState<RentalProcess>();
   const steps = [
     { value: RENTAL_PROCESS.BEFORE_RENTAL },

@@ -15,7 +15,7 @@ interface AiAnalysisData {
   analysis: any | null;
 }
 
-export default function BeforePayment() {
+export default function AfterPayment() {
   const { userId } = useUserStore();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
   const [returnPhotos, setReturnPhotos] = useState<File[]>([]);
@@ -78,14 +78,10 @@ export default function BeforePayment() {
     <main>
       <div className="p-5 mt-2">
         <div className="font-bold text-xl  text-gray900">
-          나의 대여 물품의 상태는 어떨까?
+          나의 반납 물품의 상태는 어떨까?
         </div>
         <div className="text-gray600 mt-2">
-          <div>AI를 통해 대여전 물품의 상태를 체크해 보세요</div>
-          <div>
-            해당 사진은 대여 전후 물품 상태를 비교하는데 활용되므로, 신중하게
-            촬영해 주시기 바랍니다
-          </div>
+          <div>AI를 통해 대여 전후 물품의 상태를 체크해 보세요</div>
         </div>
       </div>
       <div className="h-screen flex flex-col items-center gap-4 ">
@@ -97,10 +93,24 @@ export default function BeforePayment() {
           photos={rentalPhotos}
           serverImages={serverData?.beforeImages || []}
         />
+        <PhotoManager
+          rentalId={Number(id)}
+          status="반납일 물품 사진"
+          uploadType="after"
+          onPhotoChange={setRentalPhotos}
+          photos={rentalPhotos}
+          serverImages={serverData?.beforeImages || []}
+        />
         <div className="flex-1 w-full px-4">
           {isResult ? <ResultSummary /> : <PhotoNotFound />}
         </div>
         <div className="px-4 w-full">
+          {/* <button
+            className="btn w-full h-14 bg-gradient-to-r from-blue200 to-blue400 text-white"
+            onClick={handleAnalysis}
+          >
+            AI 물품 상태 확인
+          </button> */}
           <Button txt="AI 물품 상태 확인" onClick={() => handleAnalysis()} />
         </div>
       </div>
