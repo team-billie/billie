@@ -1,13 +1,13 @@
 import axiosInstance from "@/lib/api/instance";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import useUserStore from "@/lib/store/useUserStore";
+import { useRouter } from "next/navigation";
 
 interface ReservationBtnProps {
   status: "update" | "cancel" | "confirm";
   reservationId: number; // 예약 식별자 필요
   onSuccess?: () => void; // 요청 성공 후 콜백
 }
-
 export default function ReservationActionBtn({
   status,
   reservationId,
@@ -15,6 +15,7 @@ export default function ReservationActionBtn({
 }: ReservationBtnProps) {
   const { userId } = useUserStore();
   const { showAlert } = useAlertModal(); // ✅ 모달 훅 사용
+  const router = useRouter();
   const getLabel = (status: ReservationBtnProps["status"]) => {
     switch (status) {
       case "update":
@@ -52,6 +53,8 @@ export default function ReservationActionBtn({
             }
           );
           showAlert("예약 확정", "예약이 확정되었습니다.", "success");
+          router.push("/reservations/lend");
+
           break;
         case "cancel":
           await axiosInstance.delete(`/api/v1/reservations/${reservationId}`, {

@@ -22,7 +22,7 @@ export default function SafeDealBefore() {
 
   //AI분석 확인 후 결제 창
   useEffect(() => {
-    setStep(RENTAL_PROCESS.RENTAL_IN_ACTIVE);
+    setStep(RENTAL_PROCESS.BEFORE_RENTAL);
   });
   return (
     <main className="relative min-h-[100dvh]">
