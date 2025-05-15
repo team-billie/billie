@@ -6,7 +6,6 @@ import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ public class AiAnalysisCompletedEventListener {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Async("asyncExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
     public void handleAiAnalysisCompletedEvent(AiAnalysisCompletedEvent aiAnalysisCompletedEvent) {
         rentalService.updateDamageAnalysis(
                 aiAnalysisCompletedEvent.getRentalId(),
