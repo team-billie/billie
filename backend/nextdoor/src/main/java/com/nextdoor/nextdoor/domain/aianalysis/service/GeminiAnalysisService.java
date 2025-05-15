@@ -15,6 +15,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentEx
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class GeminiAnalysisService implements AiAnalysisService {
@@ -74,6 +76,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
+        aiImages.forEach(aiImageDto -> log.info("Before image URL: {}", aiImageDto.getImageUrl()));
         return Content.newBuilder()
                 .addAllParts(imageParts)
                 .addParts(damageAnalyzerPromptPart)
@@ -108,6 +111,10 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
+        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
+                .forEach(aiImageDto -> log.info("Before image URL: {}", aiImageDto.getImageUrl()));
+        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
+                .forEach(aiImageDto -> log.info("After image URL: {}", aiImageDto.getImageUrl()));
         return Content.newBuilder()
                 .addAllParts(beforeImageParts)
                 .addParts(Part.newBuilder().setText("These are before images.").build())
