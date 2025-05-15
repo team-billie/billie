@@ -51,7 +51,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 redirectUrl.orElseThrow(() -> new InvalidRedirectUrlException("Redirect URL이 유효하지 않습니다."))
                 + "/social-login?accessToken=" + accessToken +
                 "&userKey=" + authFintechQueryPort.findByUserId(userId).getUserKey() +
-                "&uuid=" + authMemberQueryPort.findById(userId));
+                "&uuid=" + authMemberQueryPort.findById(userId).orElseThrow().getUuid());
         clearAuthenticationAttributes(request, response);
     }
 
