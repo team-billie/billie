@@ -44,7 +44,7 @@ declare namespace google {
         position: LatLng | LatLngLiteral;
         map?: Map;
         title?: string;
-        icon?: string;
+        icon?: string | google.maps.Icon;
         draggable?: boolean;
       }
   

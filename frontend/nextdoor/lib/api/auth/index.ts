@@ -1,4 +1,5 @@
-import axiosInstance2 from "../axiosInstance";
+import axiosInstance from "../instance";
+import { GetUserInfoResponse } from "@/types/auth/response";
 
 const handleApiError = (error: any, name: string) => {
     console.error(`${name} API 요청 중 오류가 발생했습니다.`, error);
@@ -6,8 +7,8 @@ const handleApiError = (error: any, name: string) => {
   };
 
 const getUserInfo = () => {
-    return axiosInstance2.get("/api/v1/members").then((res) => {
-        return res.data;
+    return axiosInstance.get("/api/v1/members").then((res) => {
+        return res.data
     }).catch((error) => {
         handleApiError(error, "getUserInfo");
     });

@@ -19,7 +19,7 @@ interface GoogleMapComponentProps {
   initialAddress?: string;
 }
 
-export default function GoogleMapComponent({
+export default function VerifyGoogleMap({
   onAddressSelect,
   initialAddress,
 }: GoogleMapComponentProps) {
@@ -153,53 +153,53 @@ export default function GoogleMapComponent({
 
     const map = mapRef.current;
 
-    const clickListener = google.maps.event.addListener(
-      map,
-      "click",
-      (event: google.maps.MapMouseEvent) => {
-        if (!event.latLng) return;
+    // const clickListener = google.maps.event.addListener(
+    //   map,
+    //   "click",
+    //   (event: google.maps.MapMouseEvent) => {
+    //     if (!event.latLng) return;
 
-        const position = {
-          lat: event.latLng.lat(),
-          lng: event.latLng.lng(),
-        };
+    //     const position = {
+    //       lat: event.latLng.lat(),
+    //       lng: event.latLng.lng(),
+    //     };
 
-        markerRef.current?.setPosition(event.latLng);
-        mapRef.current?.panTo(event.latLng);
-        updateAddress(position);
-      }
-    );
+    //     markerRef.current?.setPosition(event.latLng);
+    //     mapRef.current?.panTo(event.latLng);
+    //     updateAddress(position);
+    //   }
+    // );
 
-    const dragEndListener = google.maps.event.addListener(
-      map,
-      "dragend", () => {
-      const center = mapRef.current?.getCenter();
-      if (!center) return;
+    // const dragEndListener = google.maps.event.addListener(
+    //   map,
+    //   "dragend", () => {
+    //   const center = mapRef.current?.getCenter();
+    //   if (!center) return;
 
-      const position = {
-        lat: center.lat(),
-        lng: center.lng(),
-      };
+    //   const position = {
+    //     lat: center.lat(),
+    //     lng: center.lng(),
+    //   };
 
-      markerRef.current?.setPosition(center);
-      updateAddress(position);
-    });
+    //   markerRef.current?.setPosition(center);
+    //   updateAddress(position);
+    // });
 
-    const centerChangedListener = google.maps.event.addListener(
-      map,
-      "center_changed", () => {
-      const center = mapRef.current?.getCenter();
-      center && markerRef.current?.setPosition(center);
-    });
+    // const centerChangedListener = google.maps.event.addListener(
+    //   map,
+    //   "center_changed", () => {
+    //   const center = mapRef.current?.getCenter();
+    //   center && markerRef.current?.setPosition(center);
+    // });
 
     return () => {
-      google.maps.event.removeListener(clickListener);
-      google.maps.event.removeListener(dragEndListener);
-      google.maps.event.removeListener(centerChangedListener);
+      // google.maps.event.removeListener(clickListener);
+      // google.maps.event.removeListener(dragEndListener);
+      // google.maps.event.removeListener(centerChangedListener);
       if (addressUpdateTimeout.current)
         clearTimeout(addressUpdateTimeout.current);
     };
-  }, [loaded, updateAddress]);
+  }, [loaded]);
 
   return (
     <div className="w-full h-full relative">
@@ -218,7 +218,10 @@ export default function GoogleMapComponent({
           onLoad={onLoad}
           onUnmount={onUnmount}
           options={{
-            zoomControl: true,
+            gestureHandling: "none",         
+            disableDefaultUI: true,          
+            draggable: false,
+            zoomControl: false,
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: false,
@@ -226,13 +229,7 @@ export default function GoogleMapComponent({
         />
       </LoadScript>
 
-      {showPopup && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 bg-opacity-70 text-white px-4 py-3 rounded-md text-center mb-2 whitespace-nowrap">
-          지도를 움직여서 선택해보세용가리리
-        </div>
-      )}
-
-      <button
+      {/* <button
         className="absolute bottom-4 right-4 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md"
         aria-label="현재 위치로 이동"
         onClick={moveToCurrentLocation}
@@ -249,7 +246,7 @@ export default function GoogleMapComponent({
             fill="#2196F3"
           />
         </svg>
-      </button>
+      </button> */}
     </div>
   );
 }
