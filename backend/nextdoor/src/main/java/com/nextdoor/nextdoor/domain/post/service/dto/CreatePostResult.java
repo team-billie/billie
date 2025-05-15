@@ -15,6 +15,7 @@ public class CreatePostResult {
     private Category category;
     private Long rentalFee;
     private Long deposit;
+    private String address;
     private LocationDto preferredLocation;
     private Long authorId;
     private List<String> productImageUrls;
