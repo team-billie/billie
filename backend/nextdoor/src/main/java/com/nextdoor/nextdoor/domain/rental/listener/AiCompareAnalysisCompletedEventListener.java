@@ -23,7 +23,7 @@ public class AiCompareAnalysisCompletedEventListener {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Async("asyncExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
     public void handleAiAnalysisCompletedEvent(AiCompareAnalysisCompletedEvent aiCompareAnalysisCompletedEvent) {
         rentalService.updateDamageAnalysis(
                 aiCompareAnalysisCompletedEvent.getRentalId(),
