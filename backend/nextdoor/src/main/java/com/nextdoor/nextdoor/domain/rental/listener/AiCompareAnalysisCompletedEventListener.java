@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.rental.listener;
 
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
+import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
@@ -10,29 +11,30 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class AiAnalysisCompletedEventListener {
+public class AiCompareAnalysisCompletedEventListener {
 
     private final RentalService rentalService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Async("asyncExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleAiAnalysisCompletedEvent(AiAnalysisCompletedEvent aiAnalysisCompletedEvent) {
+    public void handleAiAnalysisCompletedEvent(AiCompareAnalysisCompletedEvent aiCompareAnalysisCompletedEvent) {
         rentalService.updateDamageAnalysis(
-                aiAnalysisCompletedEvent.getRentalId(),
-                aiAnalysisCompletedEvent.getDamageAnalysis()
+                aiCompareAnalysisCompletedEvent.getRentalId(),
+                aiCompareAnalysisCompletedEvent.getDamageAnalysis()
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + aiAnalysisCompletedEvent.getRentalId() + "/status",
+                "/topic/rental/" + aiCompareAnalysisCompletedEvent.getRentalId() + "/status",
                 RentalStatusMessage.builder()
-                        .process(RentalProcess.BEFORE_RENTAL.name())
-                        .detailStatus(RentalStatus.BEFORE_PHOTO_ANALYZED.name())
+                        .process(RentalProcess.RETURNED.name())
+                        .detailStatus(RentalStatus.BEFORE_AND_AFTER_COMPARED.name())
                         .build()
         );
     }

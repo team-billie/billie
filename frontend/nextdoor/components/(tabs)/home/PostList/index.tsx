@@ -8,11 +8,11 @@ import PostListItem from "../PostListItem";
 import Link from "next/link";
 
 export default function PostList(){
-    const { userId } = useUserStore();
+    const { userId, address } = useUserStore();
     const [postList, setPostList] = useState<PostListItemDto[] | null>(null);
 
     useEffect(() => {
-        if(userId){
+        if(userId && address){
             GetPostListRequest(String(userId)).then((res) => {
                 console.log(res.content);
                 setPostList(res.content);

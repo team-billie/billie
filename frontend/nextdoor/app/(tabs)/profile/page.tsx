@@ -12,6 +12,8 @@ export default function ProfilePage() {
 
     const handleLogout = () => {
         reset();
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userKey");
         router.push("/login");
     }
 
