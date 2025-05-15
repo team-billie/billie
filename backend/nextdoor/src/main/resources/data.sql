@@ -132,7 +132,7 @@ INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, da
                                                                                                                                                                      (7, 7, 'DEPOSIT_REQUESTED', 'RETURNED', '손상 없음', '대여 전후 사진 비교 시 차이 없음', 0, '789-012-345678', '023', '2024-03-27T10:00:00'),
                                                                                                                                                                      (8, 8, 'BEFORE_AND_AFTER_COMPARED', 'RETURNED', '건반 1개 미작동', '대여 시 정상이었으나 반납 시 건반 1개 작동 안함', 0, '890-123-456789', '088', '2024-03-30T10:00:00'),
                                                                                                                                                                      (9, 9, 'RENTAL_PERIOD_ENDED', 'RETURNED', NULL, NULL, 0, '901-234-567890', '081', '2024-04-01T10:00:00'),
-                                                                                                                                                                     (10, 10, 'REMITTANCE_CONFIRMED', 'RENTAL_IN_ACTIVE', NULL, NULL, 0, '012-345-678901', '003', '2024-04-03T10:00:00');
+                                                                                                                                                                     (10, 10, 'REMITTANCE_COMPLETED', 'RENTAL_IN_ACTIVE', NULL, NULL, 0, '012-345-678901', '003', '2024-04-03T10:00:00');
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE rental AUTO_INCREMENT = 11;
 
@@ -173,7 +173,7 @@ INSERT INTO ai_image (rental_id, type, image_url, mime_type) VALUES
 -- Rental 9 (RENTAL_PERIOD_ENDED)
 (9, 'BEFORE', 'https://example.com/ai/rental9_before1.jpg', 'image/jpeg'),
 (9, 'BEFORE', 'https://example.com/ai/rental9_before2.jpg', 'image/jpeg'),
--- Rental 10 (REMITTANCE_CONFIRMED)
+-- Rental 10 (REMITTANCE_COMPLETED)
 (10, 'BEFORE', 'https://example.com/ai/rental10_before1.jpg', 'image/jpeg');
 
 
