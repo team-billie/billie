@@ -16,6 +16,7 @@ import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ReservationServiceImpl implements ReservationService {
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 

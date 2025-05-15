@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -21,8 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/reservations")
 public class ReservationController {
-
-    private final SimpMessagingTemplate simpMessagingTemplate;
 
     private final ReservationService reservationService;
     private final ReservationQueryService reservationQueryService;
@@ -39,7 +36,6 @@ public class ReservationController {
 
     @PutMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
-            HttpServletRequest request,
             @AuthenticationPrincipal Long loginUserId,
             @PathVariable Long reservationId,
             @RequestBody ReservationUpdateRequestDto reservationUpdateRequestDto
