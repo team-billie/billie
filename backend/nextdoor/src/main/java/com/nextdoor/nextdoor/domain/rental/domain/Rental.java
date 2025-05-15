@@ -93,11 +93,11 @@ public class Rental {
             throw new InvalidRentalStatusException("결제 완료 처리가 불가능한 대여 상태입니다");
         }
 
-        updateStatus(RentalStatus.REMITTANCE_CONFIRMED);
+        updateStatus(RentalStatus.REMITTANCE_COMPLETED);
     }
 
     public void processRentalPeriodEnd() {
-        if(rentalStatus != RentalStatus.REMITTANCE_CONFIRMED){
+        if(rentalStatus != RentalStatus.REMITTANCE_COMPLETED){
             throw new InvalidRentalStatusException("대여 기간 종료가 불가능한 대여 상태입니다");
         }
 
@@ -206,7 +206,7 @@ public class Rental {
             case REMITTANCE_REQUESTED:
             case CANCELLED:
                 return RentalProcess.BEFORE_RENTAL;
-            case REMITTANCE_CONFIRMED:
+            case REMITTANCE_COMPLETED:
                 return RentalProcess.RENTAL_IN_ACTIVE;
             case RENTAL_PERIOD_ENDED:
             case BEFORE_AND_AFTER_COMPARED:

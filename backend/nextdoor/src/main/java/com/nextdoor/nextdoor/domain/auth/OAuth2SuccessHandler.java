@@ -2,6 +2,7 @@ package com.nextdoor.nextdoor.domain.auth;
 
 import com.nextdoor.nextdoor.domain.auth.exception.InvalidRedirectUrlException;
 import com.nextdoor.nextdoor.domain.auth.port.AuthFintechQueryPort;
+import com.nextdoor.nextdoor.domain.auth.port.AuthMemberQueryPort;
 import com.nextdoor.nextdoor.domain.auth.service.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -34,6 +35,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JwtProvider jwtProvider;
 
+    private final AuthMemberQueryPort authMemberQueryPort;
     private final AuthFintechQueryPort authFintechQueryPort;
 
     @Override
@@ -48,7 +50,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.sendRedirect(
                 redirectUrl.orElseThrow(() -> new InvalidRedirectUrlException("Redirect URL이 유효하지 않습니다."))
                 + "/social-login?accessToken=" + accessToken +
-                "&userKey=" + authFintechQueryPort.findByUserId(userId).getUserKey());
+                "&userKey=" + authFintechQueryPort.findByUserId(userId).getUserKey() +
+                "&uuid=" + authMemberQueryPort.findById(userId).orElseThrow().getUuid());
         clearAuthenticationAttributes(request, response);
     }
 

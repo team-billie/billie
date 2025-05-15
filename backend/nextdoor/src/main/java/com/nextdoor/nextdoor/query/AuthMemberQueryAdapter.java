@@ -19,10 +19,24 @@ public class AuthMemberQueryAdapter implements AuthMemberQueryPort {
     private final QMember qMember = QMember.member;
 
     @Override
+    public Optional<MemberQueryDto> findById(Long id) {
+        return Optional.ofNullable(jpaQueryFactory.select(Projections.constructor(
+                        MemberQueryDto.class,
+                        qMember.id,
+                        qMember.uuid,
+                        qMember.email
+                ))
+                .from(qMember)
+                .where(qMember.id.eq(id))
+                .fetchOne());
+    }
+
+    @Override
     public Optional<MemberQueryDto> findByEmailAndAuthProvider(String email, String authProvider) {
         return Optional.ofNullable(jpaQueryFactory.select(Projections.constructor(
                         MemberQueryDto.class,
                         qMember.id,
+                        qMember.uuid,
                         qMember.email
                 ))
                 .from(qMember)

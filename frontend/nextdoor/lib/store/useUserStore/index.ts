@@ -1,43 +1,27 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { AddAccountResponseDto } from "@/types/pays/response";
-
-const test = {
-  id: 2,
-  accountNo: "9999647556029016",
-  bankCode: "999",
-  accountType: "BILI_PAY",
-  alias: "빌리페이",
-  isPrimary: false,
-  balance: 0,
-  registeredAt: "2025-05-09T12:00:09.567865",
-};
-
-const test2 = {
-  id: 2,
-  accountNo: "0234094711070771",
-  bankCode: "023",
-  accountType: "제일은행",
-  alias: "제일은행 계좌",
-  isPrimary: true,
-  balance: 1000000,
-  registeredAt: "2025-05-09T12:00:09.567865",
-};
+import { GetUserInfoResponse } from "@/types/auth/response";
 
 interface UserStore {
-  username: string;
+  username: string | null;
+  profileImageUrl: string | null;
   userId: number | null;
   userKey: string;
-  profileImage: string;
+  address: string | null;
+  email: string | null;
+  birth: string | null;
+  gender: string | null;
+
   setUserKey: (userKey: string) => void;
   setUserId: (userId: number) => void;
-  setUser: (id: number, name: string, profileImage: string) => void; // 통합 함수 추가
-  setProfileImage: (profileImage: string) => void; // 아바타 설정 함수 추가
+  setUser: (user: GetUserInfoResponse) => void;
+  
   billyAccount: AddAccountResponseDto | null;
   mainAccount: AddAccountResponseDto | null;
+  addedAccounts: AddAccountResponseDto[];
   setBillyAccount: (billyAccount: AddAccountResponseDto) => void;
   setMainAccount: (mainAccount: AddAccountResponseDto) => void;
-  addedAccounts: AddAccountResponseDto[];
   setAddedAccounts: (addedAccounts: AddAccountResponseDto[]) => void;
   reset: () => void;
 }
@@ -48,15 +32,27 @@ const useUserStore = create<UserStore>()(
       username: "",
       userKey: "",
       userId: null,
-      profileImage: "/images/profileimg.png", // 기본 아바타 URL
-      billyAccount: test,
-      mainAccount: test2,
+      billyAccount: null,
+      mainAccount: null,
       addedAccounts: [],
-      setUserKey: (userKey: string) => set({ userKey }),
+      address: null,
+      email: "",
+      birth: "",
+      gender: "",
+      profileImageUrl: "/images/profileimg.png",
+
+      setUser: (user: GetUserInfoResponse) => set({
+        username: user.nickname,
+        profileImageUrl: user.profileImageUrl,
+        userId: user.id,
+        address: user.address,
+        email: user.email,
+        birth: user.birth,
+        gender: user.gender,
+      }),
+      
       setUserId: (userId: number) => set({ userId }),
-      setUser: (id: number, name: string, profileImage: string) =>
-        set({ userId: id, username: name, profileImage }), // 통합 함수 구현
-      setProfileImage: (profileImage: string) => set({ profileImage }), // 아바타 설정 함수 구현
+      setUserKey: (userKey: string) => set({ userKey }),
       setBillyAccount: (billyAccount: AddAccountResponseDto) =>
         set({ billyAccount }),
       setMainAccount: (mainAccount: AddAccountResponseDto) =>
@@ -68,10 +64,14 @@ const useUserStore = create<UserStore>()(
           username: "",
           userKey: "",
           userId: null,
-          profileImage: "/images/profileimg.png",
           billyAccount: null,
           mainAccount: null,
           addedAccounts: [],
+          address: null,
+          email: "",
+          birth: "",
+          gender: "",
+          profileImageUrl: "",
         }),
     }),
     {
@@ -80,13 +80,17 @@ const useUserStore = create<UserStore>()(
         username: state.username,
         userKey: state.userKey,
         userId: state.userId,
-        profileImage: state.profileImage,
         billyAccount: state.billyAccount,
         mainAccount: state.mainAccount,
         addedAccounts: state.addedAccounts,
+        address: state.address,
+        email: state.email,
+        birth: state.birth,
+        gender: state.gender,
+        profileImageUrl: state.profileImageUrl,
       }),
     }
   )
 );
 
-export default useUserStore;
+export default useUserStore;  
