@@ -137,36 +137,38 @@ INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, da
 ALTER TABLE rental AUTO_INCREMENT = 11;
 
 -- 7. AiImage 더미 데이터 (Rental에 따른 이미지 생성)
-INSERT INTO ai_image (rental_id, type, image_url, mime_type) VALUES
--- Rental 1 (RENTAL_COMPLETED)
-(1, 'BEFORE', 'https://example.com/ai/rental1_before1.jpg', 'image/jpeg'),
-(1, 'BEFORE', 'https://example.com/ai/rental1_before2.jpg', 'image/jpeg'),
-(1, 'AFTER', 'https://example.com/ai/rental1_after1.jpg', 'image/jpeg'),
-(1, 'AFTER', 'https://example.com/ai/rental1_after2.jpg', 'image/jpeg'),
--- Rental 2 (RENTAL_COMPLETED)
-(2, 'BEFORE', 'https://example.com/ai/rental2_before1.jpg', 'image/jpeg'),
-(2, 'AFTER', 'https://example.com/ai/rental2_after1.jpg', 'image/jpeg'),
-(2, 'AFTER', 'https://example.com/ai/rental2_after2.jpg', 'image/jpeg'),
--- Rental 3 (RENTAL_COMPLETED)
-(3, 'BEFORE', 'https://example.com/ai/rental3_before1.jpg', 'image/jpeg'),
-(3, 'BEFORE', 'https://example.com/ai/rental3_before2.jpg', 'image/jpeg'),
-(3, 'AFTER', 'https://example.com/ai/rental3_after1.jpg', 'image/jpeg'),
--- Rental 4 (RENTAL_COMPLETED)
-(4, 'BEFORE', 'https://example.com/ai/rental4_before1.jpg', 'image/jpeg'),
-(4, 'AFTER', 'https://example.com/ai/rental4_after1.jpg', 'image/jpeg'),
-(4, 'AFTER', 'https://example.com/ai/rental4_after2.jpg', 'image/jpeg'),
--- Rental 5 (RENTAL_COMPLETED)
-(5, 'BEFORE', 'https://example.com/ai/rental5_before1.jpg', 'image/jpeg'),
-(5, 'BEFORE', 'https://example.com/ai/rental5_before2.jpg', 'image/jpeg'),
-(5, 'AFTER', 'https://example.com/ai/rental5_after1.jpg', 'image/jpeg'),
-(5, 'AFTER', 'https://example.com/ai/rental5_after2.jpg', 'image/jpeg'),
--- Rental 6 (DEPOSIT_REQUESTED)
-(6, 'BEFORE', 'https://example.com/ai/rental6_before1.jpg', 'image/jpeg'),
-(6, 'AFTER', 'https://example.com/ai/rental6_after1.jpg', 'image/jpeg'),
--- Rental 7 (DEPOSIT_REQUESTED)
-(7, 'BEFORE', 'https://example.com/ai/rental7_before1.jpg', 'image/jpeg'),
-(7, 'AFTER', 'https://example.com/ai/rental7_after1.jpg', 'image/jpeg'),
-(7, 'AFTER', 'https://example.com/ai/rental7_after2.jpg', 'image/jpeg'),
+INSERT INTO ai_image(rental_id, type, image_url, mime_type)
+VALUES
+-- 다희
+(1, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_1.jpg", "image/jpeg"),
+(1, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_2.jpg", "image/jpeg"),
+(1, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_3.jpg", "image/jpeg"),
+(1, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_4.jpg", "image/jpeg"),
+(1, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_1.jpg", "image/jpeg"),
+(1, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_2.jpg", "image/jpeg"),
+(1, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_3.jpg", "image/jpeg"),
+-- 재익
+(2, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%9E%AC%EC%9D%B5_1_%EC%A0%84_1.jpg", "image/jpeg"),
+(2, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%9E%AC%EC%9D%B5_1_%EC%A0%84_2.jpg", "image/jpeg"),
+(2, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%9E%AC%EC%9D%B5_1_%EC%A0%84_3.jpg", "image/jpeg"),
+(2, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%9E%AC%EC%9D%B5_1_%ED%9B%84_1.jpg", "image/jpeg"),
+(2, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%9E%AC%EC%9D%B5_1_%ED%9B%84_2.jpg", "image/jpeg"),
+-- 준수 1
+(3, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_1_%EC%A0%84_1.jpg", "image/jpeg"),
+(3, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_1_%ED%9B%84_1.jpg", "image/jpeg"),
+-- 준수 2
+(4, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_2_%EC%A0%84_1.jpg", "image/jpeg"),
+(4, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_2_%ED%9B%84_1.jpg", "image/jpeg"),
+-- 준수 3
+(5, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_3_%EC%A0%84_1.jpg", "image/jpeg"),
+(5, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_3_%ED%9B%84_1.jpg", "image/jpeg"),
+-- 준수 4
+(6, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_4_%EC%A0%84_1.jpg", "image/jpeg"),
+(6, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_4_%ED%9B%84_1.jpg", "image/jpeg"),
+-- 준수 5
+(7, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_5_%EC%A0%84_1.jpg", "image/jpeg"),
+(7, "BEFORE", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_5_%EC%A0%84_2.jpg", "image/jpeg"),
+(7, "AFTER",  "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_5_%ED%9B%84_1.jpg", "image/jpeg"),
 -- Rental 8 (AFTER_PHOTO_REGISTERED)
 (8, 'BEFORE', 'https://example.com/ai/rental8_before1.jpg', 'image/jpeg'),
 (8, 'AFTER', 'https://example.com/ai/rental8_after1.jpg', 'image/jpeg'),
