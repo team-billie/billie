@@ -70,6 +70,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         return new InspectDamageResponseDto(damageAnalysis);
     }
 
+    @Transactional(readOnly = true)
     private Content createAnalysisContent(List<RentalDto.AiImageDto> aiImages, AiImageType aiImageType) {
         List<Part> imageParts = aiImages.stream()
                 .filter(aiImageDto -> aiImageDto.getType().equals(aiImageType))
