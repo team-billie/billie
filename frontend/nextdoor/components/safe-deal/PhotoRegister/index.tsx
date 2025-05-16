@@ -11,6 +11,7 @@ import {
   AiAfterPhotosRequest,
   AiBeforePhotosRequest,
 } from "@/lib/api/ai-analysis/request";
+import axiosInstance from "@/lib/api/instance";
 
 interface PhotoRegisterProps {
   status: "after" | "before";
@@ -28,6 +29,8 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   //상태 값 바꿔주기
   const [serverData, setServerData] = useState<AiAnalysisData | null>(null);
   const [isResult, setIsResult] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasPhotos, setHasPhotos] = useState(false);
   const { id } = useParams();
   const router = useRouter();
 
@@ -36,8 +39,8 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     try {
       console.log("AI분석 요청 시도");
       const res = await AiBeforePhotosRequest(Number(id));
-      router.push(`/safe-deal/${id}/before/payment`);
       setIsResult(true);
+      router.push(`/safe-deal/${id}/before/payment`);
     } catch (error) {
       alert("AI 분석 중 오류가 발생했습니다.");
     }
@@ -49,6 +52,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const handleAfterPhotos = async () => {
     if (!userId) return;
     try {
+      console.log("여기입니다");
       const res = await AiAfterPhotosRequest(Number(id));
       router.push(`/safe-deal/${id}/after/analysis`);
     } catch (error) {
@@ -65,7 +69,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       {status === "before" ? (
         <div>
           <Title status="before" />
-          <div className="h-screen flex flex-col items-center gap-4 ">
+          <div className="h-screen flex flex-col items-center gap-4  ">
             <PhotoManager
               rentalId={Number(id)}
               status="대여일 물품 사진"
@@ -74,15 +78,13 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
               photos={rentalPhotos}
               serverImages={serverData?.beforeImages || []}
             />
-            <div className="flex-1 w-full px-4">
-              {isResult ? <ResultSummary /> : <PhotoNotFound />}
-            </div>
-
-            <div className="px-4 w-full">
-              <Button
-                txt="AI 물품 상태 확인"
-                onClick={() => handleBeforePhotos()}
-              />
+            <div className="fixed bottom-4 left-0 w-full px-4">
+              <div className="max-w-md mx-auto">
+                <Button
+                  txt="AI 물품 상태 확인"
+                  onClick={() => handleBeforePhotos()}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -107,11 +109,6 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
           </div>
         </div>
       )}
-
-      {/* <div className="absolute bottom-5 p-5 mt-2 text-gray600 ">
-        해당 사진은 대여 전후 물품 상태를 비교하는데 활용되므로, 신중하게 촬영해
-        주시기 바랍니다
-      </div> */}
     </main>
   );
 }

@@ -4,12 +4,17 @@ import HandleDepositModal from "@/components/pays/modals/HandleDepositModal";
 import CompareAnalysis from "@/components/safe-deal/CompareAnalysis";
 import GrayButton from "@/components/safe-deal/GrayButton";
 import Header from "@/components/safe-deal/Header";
+import useUserStore from "@/lib/store/useUserStore";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function SafeDealAfter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id } = useParams();
+  const { userId } = useUserStore();
+  if (!userId) {
+    return;
+  }
   return (
     <main className="relative min-h-[100dvh] flex flex-col gap-4">
       <Header txt={"반납하기"} />
@@ -21,7 +26,7 @@ export default function SafeDealAfter() {
             charge={10000}
             rentalImg=""
             rentalId={Number(id)}
-            renterId={1}
+            renterId={userId}
             setIsModalOpen={setIsModalOpen}
           />
         </div>

@@ -28,16 +28,19 @@ export default function HandleDepositModal({
   const [payCharge, setPayCharge] = useState(charge);
   const { userKey, billyAccount } = useUserStore();
   const { showAlert } = useAlertModal();
+
   const handleSubmit = () => {
     const requestBody: ReturnDepositRequestDto = {
       userKey: userKey,
       rentalId: rentalId,
       deductedAmount: deductedAmount,
-      accountNo: billyAccount?.accountNo || "",
+      accountNo: billyAccount?.accountNo ?? "",
       renterId: renterId,
     };
-    ReturnDepositRequest(requestBody);
-    showAlert("보증금 처리", "보증금 반환이 완료되었습니다", "success");
+
+    ReturnDepositRequest(requestBody).then((res) => {
+      showAlert("보증금 처리", "보증금 반환이 완료되었습니다", "success");
+    });
 
     setIsModalOpen(false);
   };

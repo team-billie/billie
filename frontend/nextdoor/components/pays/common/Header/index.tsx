@@ -12,7 +12,7 @@ export default function Header({ txt, x = true }: HeaderProps) {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 flex min-h-[60px] items-center px-4 text-white bg-blue400">
+    <div className="sticky top-0 flex min-h-[60px] items-center px-4 text-gray900 bg-white">
       <button onClick={() => router.back()}>
         {x && <X className="w-6 h-6" />}
       </button>

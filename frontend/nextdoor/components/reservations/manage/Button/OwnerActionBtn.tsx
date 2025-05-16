@@ -91,8 +91,8 @@ export default function OwnerActionBtn({
 
           return;
         } else if (status === RENTAL_STATUS.BEFORE_AND_AFTER_COMPARED) {
-          console.log("❤️❤️라우터 설정하기");
-          // router.push(`/safe-deal/${rentalId}/after/photos-register`);
+          router.push(`/safe-deal/${rentalId}/after/analysis`);
+          return;
         }
       }
 
