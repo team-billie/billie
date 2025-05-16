@@ -45,8 +45,9 @@ public class ReservationServiceImpl implements ReservationService {
                 .renterId(loginUserId)
                 .postId(post.getPostId())
                 .build());
-        simpMessagingTemplate.convertAndSend("/topic/reservation/" + post.getAuthorUuid(), reservation);
-        return ReservationResponseDto.from(reservation, post);
+        ReservationResponseDto response = ReservationResponseDto.from(reservation, post);
+        simpMessagingTemplate.convertAndSend("/topic/reservation/" + post.getAuthorUuid(), response);
+        return response;
     }
 
     @Override
