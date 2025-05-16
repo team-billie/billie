@@ -45,10 +45,17 @@ type GetPaymentDataResponseDto = {
     bankCode: string;
 }
 
+type VerifyAccountResponseDto = {
+    accountNo: string;
+    bankCode: string;
+    nickname: string;
+}
+
 export type { 
     AddAccountResponseDto, 
     CreateFinUserResponseDto, 
     CreateFinAccountResponseDto,
     GetFinUserResponseDto,
-    GetPaymentDataResponseDto
+    GetPaymentDataResponseDto,
+    VerifyAccountResponseDto
 };

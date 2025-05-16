@@ -1,13 +1,17 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
+import com.nextdoor.nextdoor.domain.auth.CustomOAuth2User;
 import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
 import com.nextdoor.nextdoor.domain.rental.domain.Rental;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
+import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
+import com.nextdoor.nextdoor.domain.rental.port.MemberUuidQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
@@ -22,6 +26,8 @@ import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,10 +44,12 @@ public class RentalServiceImpl implements RentalService {
     private final S3ImageUploadPort s3ImageUploadService;
     private final ReservationQueryPort reservationQueryPort;
     private final RentalQueryPort rentalQueryPort;
+    private final MemberUuidQueryPort memberUuidQueryPort;
     private final RentalScheduleService rentalScheduleService;
     private final RentalDomainService rentalDomainService;
     private final RentalImageDomainService rentalImageDomainService;
     private final ApplicationEventPublisher eventPublisher;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional
@@ -54,6 +62,28 @@ public class RentalServiceImpl implements RentalService {
                 .rentalId(createdRental.getRentalId())
                 .reservationId(reservationConfirmedEvent.getReservationId())
                 .build());
+
+        String ownerUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
+                createdRental.getRentalId(),
+                "OWNER"
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + ownerUuid + "/status",
+                RentalStatusMessage.builder()
+                        .rentalId(createdRental.getRentalId())
+                        .process(RentalProcess.BEFORE_RENTAL.name())
+                        .detailStatus(RentalStatus.CREATED.name())
+                        .build()
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + createdRental.getRentalId() + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.BEFORE_RENTAL.name())
+                        .detailStatus(RentalStatus.CREATED.name())
+                        .build()
+        );
     }
 
     @Override
@@ -119,6 +149,27 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.processRemittanceCompletion();
+
+        String ownerUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
+                rental.getRentalId(),
+                "OWNER"
+        );
+
+        messagingTemplate.convertAndSend("/topic/rental/" + ownerUuid + "/status",
+                RentalStatusMessage.builder()
+                        .rentalId(rental.getRentalId())
+                        .process(RentalProcess.RENTAL_IN_ACTIVE.name())
+                        .detailStatus(RentalStatus.REMITTANCE_COMPLETED.name())
+                        .build()
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + rental.getRentalId() + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.BEFORE_RENTAL.name())
+                        .detailStatus(RentalStatus.CREATED.name())
+                        .build()
+        );
     }
 
     @Override
@@ -128,6 +179,27 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.processRentalPeriodEnd();
+
+        String renterUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
+                rental.getRentalId(),
+                "RENTER"
+        );
+
+        messagingTemplate.convertAndSend("/topic/rental/" + renterUuid + "/status"
+                , RentalStatusMessage.builder()
+                        .rentalId(rental.getRentalId())
+                        .process(RentalProcess.RETURNED.name())
+                        .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
+                        .build()
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + rental.getRentalId() + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.RETURNED.name())
+                        .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
+                        .build()
+        );
     }
 
     @Override
@@ -221,7 +293,7 @@ public class RentalServiceImpl implements RentalService {
             eventPublisher.publishEvent(DepositProcessingRequestEvent.builder()
                     .rentalId(rental.getRentalId())
                     .build());
-        } else if(rental.getRentalStatus().equals(RentalStatus. RENTAL_COMPLETED)){
+        } else if(rental.getRentalStatus().equals(RentalStatus.RENTAL_COMPLETED)){
             rental.updateDealCount();
             eventPublisher.publishEvent(RentalCompletedEvent.builder()
                     .rentalId(rental.getRentalId())
@@ -236,6 +308,28 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.processUpdateAccountInfo(command.getAccountNo(), command.getBankCode());
+
+        String renterUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
+                rental.getRentalId(),
+                "RENTER"
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + renterUuid + "/status",
+                RentalStatusMessage.builder()
+                        .rentalId(rental.getRentalId())
+                        .process(RentalProcess.BEFORE_RENTAL.name())
+                        .detailStatus(RentalStatus.REMITTANCE_REQUESTED.name())
+                        .build()
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/rental/" + rental.getRentalId() + "/status",
+                RentalStatusMessage.builder()
+                        .process(RentalProcess.BEFORE_RENTAL.name())
+                        .detailStatus(RentalStatus.REMITTANCE_REQUESTED.name())
+                        .build()
+        );
 
         return UpdateAccountResult.builder()
                 .rentalId(rental.getRentalId())

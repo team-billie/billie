@@ -3,21 +3,21 @@
 import EnterAccount from "@/components/pays/common/EnterAccount";
 import MyAccountItem from "@/components/pays/common/MyAccountItem";
 import useUserStore from "@/lib/store/useUserStore";
-import { CheckAccountRequestDto } from "@/types/pays/request";
+import { VerifyAccountRequestDto } from "@/types/pays/request";
 
 interface AccountCheckProps {
     setIsPossibleAccount: (isPossibleAccount: boolean) => void;
-    setSelectedAccount: (selectedAccount: CheckAccountRequestDto) => void;
+    setSelectedAccount: (selectedAccount: VerifyAccountRequestDto) => void;
+    handleVerifyAccount: (account: VerifyAccountRequestDto) => void;
 }
 
-export default function AccountCheck({setIsPossibleAccount, setSelectedAccount}: AccountCheckProps) {
+export default function AccountCheck({setIsPossibleAccount, setSelectedAccount, handleVerifyAccount}: AccountCheckProps) {
     const { addedAccounts } = useUserStore();
 
-    const handleAccountSelected = (selectedAccount: CheckAccountRequestDto) => {
+    const handleAccountSelected = (selectedAccount: VerifyAccountRequestDto) => {
         // 계좌 정보 확인 코드 백엔드 구현후 작성예정
         console.log(selectedAccount);
-        setIsPossibleAccount(true);
-        setSelectedAccount(selectedAccount);
+        handleVerifyAccount(selectedAccount);
     }
      
     return (

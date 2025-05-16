@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosInstance from "../instance";
 import { GetUserInfoResponse } from "@/types/auth/response";
 
@@ -14,5 +15,19 @@ const getUserInfo = () => {
     });
 }
 
-export { getUserInfo };
+const getRegionInfo = (x: number, y: number) => {
+    return axios.get(`https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${x}&y=${y}`,
+        {
+            headers: {
+                Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY}`,
+            }
+        }
+    ).then((res) => {
+        return res.data.documents.find((doc: any) => doc.region_type === 'B')
+    }).catch((error) => {
+        handleApiError(error, "getRegionInfo");
+    });
+}
+
+export { getUserInfo, getRegionInfo };
 

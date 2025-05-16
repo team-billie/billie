@@ -20,7 +20,7 @@ export default function PostList() {
     }
   }, [userId, address]);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 text-gray900">
       {postList?.map((post: PostListItemDto) => (
         <Link href={`/posts/${post.postId}`} key={post.postId}>
           <PostListItem post={post} />

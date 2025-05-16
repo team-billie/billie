@@ -5,6 +5,7 @@ import PayBox from "@/components/(tabs)/profile/PayBox";
 import useUserStore from "@/lib/store/useUserStore";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ProfilePage() {
     const { username, userKey, userId, reset } = useUserStore();
@@ -38,23 +39,23 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white shadow-popup p-4 rounded-2xl">
+          <Link href="/reservations" className="bg-white shadow-popup p-4 rounded-2xl">
             <LinkHeader type="reservation"/>
             <div className="flex justify-end items-end font-bold px-2 mt-1 text-gray900">
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
             </div>
             <div className="mt-3 text-center text-gray500 text-sm">현재 에약중인 물품수</div>
-          </div>
+          </Link>
 
-          <div className="bg-white shadow-popup p-4 rounded-2xl">
+          <Link href="/reservations/manage" className="bg-white shadow-popup p-4 rounded-2xl">
             <LinkHeader type="apply"/>
             <div className="flex justify-end items-end font-bold px-2 mt-1 text-gray900">
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
             </div>
             <div className="mt-3 text-center text-gray500 text-sm">예약 요청받은 물품수</div>
-          </div>
+          </Link>
         </div>
 
         <div className="flex justify-end">

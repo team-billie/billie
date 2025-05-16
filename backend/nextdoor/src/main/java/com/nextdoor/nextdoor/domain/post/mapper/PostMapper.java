@@ -59,8 +59,8 @@ public class PostMapper {
                 .category(request.getCategory())
                 .rentalFee(request.getRentalFee().longValue())
                 .deposit(request.getDeposit().longValue())
-                .preferredLocation(request.getPreferredLocation().toString())
-                .locationDto(request.getPreferredLocation())
+                .address(request.getAddress())
+                .preferredLocation(request.getPreferredLocation())
                 .authorId(authorId)
                 .productImages(productImages)
                 .build();
@@ -74,6 +74,7 @@ public class PostMapper {
                 .category(result.getCategory().name())
                 .rentalFee(String.valueOf(result.getRentalFee()))
                 .deposit(String.valueOf(result.getDeposit()))
+                .address(result.getAddress())
                 .preferredLocation(result.getPreferredLocation())
                 .authorId(result.getAuthorId())
                 .productImageUrls(result.getProductImageUrls())

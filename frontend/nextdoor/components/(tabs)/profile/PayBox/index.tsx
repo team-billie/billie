@@ -11,12 +11,19 @@ interface PayBoxProps {
   type: "profile" | "pay";
 }
 
+function getPrimaryAccount(accounts: AddAccountResponseDto[]) {
+  return accounts.find(account => account.isPrimary === true);
+}
+
 const BillyPayBox = ({ type }: PayBoxProps) => {
-  const { billyAccount, userKey, setBillyAccount, setAddedAccounts } = useUserStore();
+  const { billyAccount, userKey, setBillyAccount, setMainAccount, setAddedAccounts } = useUserStore();
 
   useEffect(() => {
       GetAddedListRequest(userKey).then((res: AddAccountResponseDto[]) => {
         console.log(res);
+        const primaryAccount = getPrimaryAccount(res);
+        
+        setMainAccount(primaryAccount || null);
         setBillyAccount(res[0]);
 
         if (res.length > 1) {

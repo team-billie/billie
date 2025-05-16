@@ -36,7 +36,6 @@ public class ReservationController {
 
     @PutMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
-            HttpServletRequest request,
             @AuthenticationPrincipal Long loginUserId,
             @PathVariable Long reservationId,
             @RequestBody ReservationUpdateRequestDto reservationUpdateRequestDto

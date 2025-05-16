@@ -21,7 +21,7 @@ interface UserStore {
   mainAccount: AddAccountResponseDto | null;
   addedAccounts: AddAccountResponseDto[];
   setBillyAccount: (billyAccount: AddAccountResponseDto) => void;
-  setMainAccount: (mainAccount: AddAccountResponseDto) => void;
+  setMainAccount: (mainAccount: AddAccountResponseDto | null) => void;
   setAddedAccounts: (addedAccounts: AddAccountResponseDto[]) => void;
   reset: () => void;
 }
@@ -55,7 +55,7 @@ const useUserStore = create<UserStore>()(
       setUserKey: (userKey: string) => set({ userKey }),
       setBillyAccount: (billyAccount: AddAccountResponseDto) =>
         set({ billyAccount }),
-      setMainAccount: (mainAccount: AddAccountResponseDto) =>
+      setMainAccount: (mainAccount: AddAccountResponseDto | null) =>
         set({ mainAccount }),
       setAddedAccounts: (addedAccounts: AddAccountResponseDto[]) =>
         set({ addedAccounts }),

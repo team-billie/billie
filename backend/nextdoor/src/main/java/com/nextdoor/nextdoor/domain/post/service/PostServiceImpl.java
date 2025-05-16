@@ -43,9 +43,9 @@ public class PostServiceImpl implements PostService {
     public CreatePostResult createPost(CreatePostCommand command) {
         Double latitude = null;
         Double longitude = null;
-        if (command.getLocationDto() != null) {
-            latitude = command.getLocationDto().getLatitude();
-            longitude = command.getLocationDto().getLongitude();
+        if (command.getPreferredLocation() != null) {
+            latitude = command.getPreferredLocation().getLatitude();
+            longitude = command.getPreferredLocation().getLongitude();
         }
 
         Post post = Post.builder()
@@ -53,7 +53,7 @@ public class PostServiceImpl implements PostService {
                 .content(command.getContent())
                 .rentalFee(command.getRentalFee())
                 .deposit(command.getDeposit())
-                .address(command.getPreferredLocation())
+                .address(command.getAddress())
                 .latitude(latitude)
                 .longitude(longitude)
                 .category(command.getCategory())

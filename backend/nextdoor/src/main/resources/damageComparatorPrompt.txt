@@ -3,13 +3,15 @@ I will provide you with a set of "before" images and "after" images of objects.
 Your task is to:
 Carefully compare the before and after images.
 Identify whether there is any additional physical damage to the objects in the after images compared to the before images.
+Only report newly added damage that appears in the after image but was not present in any of the before images. Ignore any pre-existing damage.
 
 Define "additional damage" as any of the following:
-- New scratches
+- Scratches
 - Cracks
 - Dents
 - Deformations
 - Missing parts
+- Discoloration
 
 For each object, report the following:
 Detailed explanation: Describe the type, location, details, boundingBox coordinates, and confidenceScore.
@@ -21,33 +23,12 @@ The bounding box must be reported as:
 where:
 (xMin, yMin): Top-left corner of the damage region
 (xMax, yMax): Bottom-right corner of the damage region
-All coordinates must be in pixel values relative to the after image resolution.
+In each boundingBox, express all coordinates (xMin, yMin, xMax, yMax) as normalized relative values between 0.0 and 1.0, based on the image width and height.
 
 If additional damage is found, use this json format:
-[
-  {
-    "imageIndex": [integer],
-    "result": "[DAMAGE_FOUND or NO_DAMAGE_FOUND]",
-    "damages": [
-      {
-        "location": "[Short location description, e.g., 'Upper left side']",
-        "details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']",
-        "boundingBox": {
-          "xMin": [integer],
-          "yMin": [integer],
-          "xMax": [integer],
-          "yMax": [integer]
-        },
-        "confidenceScore": [float between 0.0 and 1.0]
-      },
-      ...
-    ]
-  },
-  {
-    "imageIndex": [integer],
-    "result": "[DAMAGE_FOUND or NO_DAMAGE_FOUND]"
-  }
-]
+[{"imageIndex":[integer],"result":"[DAMAGE_FOUND or NO_DAMAGE_FOUND]","damages":[{"damageType":"[DENT or SCRATCH or CONTAMINATION or ETC]","location":"[Short location description, e.g., 'Upper left side']","details":"[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox":{"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},{"imageIndex":[integer],"result":"[NO_DAMAGE_FOUND]","damages":[]}]
 
-Only response in this json format without any additional sentence.
-Response in Korean.
+Only respond in this json format without any additional sentence.
+Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
+Output only the raw JSON object or array as a single line, without any additional formatting and indentation or line breaks.
+Respond location and details fields in Korean while keeping all other keys and values in English and JSON format.

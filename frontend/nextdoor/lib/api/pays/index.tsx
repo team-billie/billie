@@ -5,13 +5,13 @@ import {
   CreateFinAccountRequestDto,
   GetAccountListRequestDto,
   AddAccountRequestDto,
-  GetAddedListRequestDto,
   TransferAccountRequestDto,
   HoldDepositRequestDto,
   ReturnDepositRequestDto,
   GetFinUserRequestDto,
   SelectOwnerAccountRequestDto,
   PayItemRequestDto,
+  VerifyAccountRequestDto,
 } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
@@ -61,6 +61,7 @@ export const AddAccountRequest = (requestBody: AddAccountRequestDto) =>
   apiCall("/api/v1/fintechs/regist-accounts", requestBody, "계좌 등록");
 
 //등록된 계좌 목록 조회
+
 export const GetAddedListRequest = (userKey: string) =>
   axiosInstance
     .get(`/api/v1/fintechs/regist-accounts?userKey=${userKey}`)
@@ -70,6 +71,10 @@ export const GetAddedListRequest = (userKey: string) =>
     .catch((error) => {
       return handleApiError(error, "등록된 계좌 목록 조회");
     });
+
+// 계좌 확인
+export const VerifyAccountRequest = (requestBody: VerifyAccountRequestDto) =>
+  apiCall("/api/v1/fintechs/accounts/verify", requestBody, "계좌 확인");
 
 //계좌 이체
 export const TransferAccountRequest = (
