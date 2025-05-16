@@ -73,3 +73,9 @@ cloud:
       auto: false
     s3:
       bucket: oneders
+
+elasticsearch:
+  index:
+    posts:
+      name: posts
+      alias: posts-alias

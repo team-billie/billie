@@ -56,9 +56,9 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public InspectDamageResponseDto analyzeDamage(Long loginUserId, DamageAnalysisRequestDto damageAnalysisRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(damageAnalysisRequestDto.getRentalId());
-//        if (rental.getDamageAnalysis() != null) {
-//            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
-//        }
+        // if (rental.getDamageAnalysis() != null) {
+        //     throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
+        // }
         List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
         GenerateContentResponse response;
         try {
@@ -87,10 +87,10 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public InspectDamageResponseDto compareDamage(Long loginUserId, DamageComparisonRequestDto inspectDamageRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
-//        if (rental.getDamageAnalysis() != null) {
-//            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
-//        }
-        List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
+        // if (rental.getDamageAnalysis() != null) {
+        //     throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
+        // }
+        List<RentalDto.AiImageDto> aiImages = rental.getAiImages(); //ai image 존재 여부 검증
         GenerateContentResponse response;
         try {
             response = generativeModel.generateContent(createComparisonContent(aiImages));

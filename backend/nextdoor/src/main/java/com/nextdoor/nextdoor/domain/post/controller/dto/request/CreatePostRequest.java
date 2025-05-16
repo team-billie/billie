@@ -26,6 +26,9 @@ public class CreatePostRequest {
     @NotNull(message = "보증금은 필수입니다")
     private Integer deposit;
 
+    @NotNull(message = "사용자 지역은 필수입니다")
+    private String address;
+
     @NotNull(message = "거래 희망 장소는 필수입니다")
     private LocationDto preferredLocation;
 }
