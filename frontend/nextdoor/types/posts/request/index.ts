@@ -9,4 +9,5 @@ export interface PostCreateRequestDTO {
   rentalFee: number;
   deposit: number;
   preferredLocation: LocationType;
+  address: string;
 }

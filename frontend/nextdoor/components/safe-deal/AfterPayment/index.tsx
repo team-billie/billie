@@ -2,7 +2,6 @@
 import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManager";
 import PhotoNotFound from "@/components/reservations/safe-deal/result/PhotoNotFound";
 import ResultSummary from "@/components/reservations/safe-deal/result/ResultSummary";
-import { fetchAiAnalysis } from "@/lib/api/ai-analysis/request";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import { useParams, useRouter } from "next/navigation";
@@ -47,32 +46,32 @@ export default function AfterPayment() {
     fetchData();
   }, [id, userId]);
 
-  const handleAnalysis = async () => {
-    if (!userId) return;
+  // const handleAnalysis = async () => {
+  //   if (!userId) return;
 
-    const hasBeforeImages =
-      rentalPhotos.length > 0 || (serverData?.beforeImages?.length || 0) > 0;
+  //   const hasBeforeImages =
+  //     rentalPhotos.length > 0 || (serverData?.beforeImages?.length || 0) > 0;
 
-    if (!hasBeforeImages) {
-      alert("대여 물품 사진을 등록해주세요.");
-      return;
-    }
+  //   if (!hasBeforeImages) {
+  //     alert("대여 물품 사진을 등록해주세요.");
+  //     return;
+  //   }
 
-    setLoading(true);
-    try {
-      const res = await fetchAiAnalysis(Number(id));
-      setResult(res);
-      console.log("AI 분석 결과:", res);
-    } catch (error) {
-      alert("AI 분석 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetchAiAnalysis(Number(id));
+  //     setResult(res);
+  //     console.log("AI 분석 결과:", res);
+  //   } catch (error) {
+  //     alert("AI 분석 중 오류가 발생했습니다.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  if (!userId) {
-    return null;
-  }
+  // if (!userId) {
+  //   return null;
+  // }
 
   return (
     <main>
@@ -111,7 +110,8 @@ export default function AfterPayment() {
           >
             AI 물품 상태 확인
           </button> */}
-          <Button txt="AI 물품 상태 확인" onClick={() => handleAnalysis()} />
+          {/* <Button txt="AI 물품 상태 확인" onClick={() => handleAnalysis()} /> */}
+          <Button txt="AI 물품 상태 확인" />
         </div>
       </div>
     </main>

@@ -11,6 +11,7 @@ import { useState } from "react";
 import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
 import HandleDepositModal from "@/components/pays/modals/HandleDepositModal";
 import { useParams, useRouter } from "next/navigation";
+import { useBankStore } from "@/lib/store/useBankStore";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
@@ -35,6 +36,7 @@ export default function OwnerActionBtn({
   const [isModal, setModal] = useState(false);
   const [isDepositModal, setIsDepositModal] = useState(false);
   const router = useRouter();
+  const { receiverBank } = useBankStore();
   console.log("OwnerActionBtn userId:", userId);
   console.log("OWner버튼", process);
   // userId가 없으면 렌더링하지 않음
@@ -64,19 +66,12 @@ export default function OwnerActionBtn({
 
   // 버튼 활성화 여부 - 프로세스와 상태를 모두 고려
   const isButtonDisabled = () => {
-    switch (process) {
-      case RENTAL_PROCESS.BEFORE_RENTAL:
-        return !(status === RENTAL_STATUS.CREATED);
-
-      case RENTAL_PROCESS.RETURNED:
-        return (
-          status !== RENTAL_STATUS.RENTAL_PERIOD_ENDED ||
-          RENTAL_STATUS.BEFORE_AND_AFTER_COMPARED
-        );
-
-      default:
-        return true;
-    }
+    return !(
+      (process === RENTAL_PROCESS.BEFORE_RENTAL &&
+        status === RENTAL_STATUS.CREATED) ||
+      (process === RENTAL_PROCESS.RETURNED &&
+        status === RENTAL_STATUS.RENTAL_PERIOD_ENDED)
+    );
   };
 
   const handleClick = async () => {
@@ -90,7 +85,7 @@ export default function OwnerActionBtn({
         } //물품 결제 완료
       } else if (process === RENTAL_PROCESS.RETURNED) {
         if (status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) {
-          router.push(`/safe-deal/${rentalId}/after`);
+          router.push(`/safe-deal/${rentalId}/after/photos-register`);
 
           return;
         }

@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import {
   RENTAL_PROCESS,
@@ -57,8 +56,10 @@ function RenterActionBtn({
     return !(
       (process === RENTAL_PROCESS.BEFORE_RENTAL &&
         status === RENTAL_STATUS.REMITTANCE_REQUESTED) ||
+      (process === RENTAL_PROCESS.BEFORE_RENTAL &&
+        status === RENTAL_STATUS.BEFORE_PHOTO_ANALYZED) ||
       (process === RENTAL_PROCESS.RETURNED &&
-        status === RENTAL_STATUS.BEFORE_PHOTO_DAMAGE_ANALYZED)
+        status === RENTAL_STATUS.BEFORE_PHOTO_ANALYZED)
     );
   };
 
@@ -70,7 +71,10 @@ function RenterActionBtn({
       //결제하기
       if (process === RENTAL_PROCESS.BEFORE_RENTAL) {
         if (status === RENTAL_STATUS.REMITTANCE_REQUESTED) {
-          router.push(`/safe-deal/${rentalId}/before`);
+          router.push(`/safe-deal/${rentalId}/before/photos-register`);
+          return;
+        } else if (status === RENTAL_STATUS.BEFORE_PHOTO_ANALYZED) {
+          router.push(`/safe-deal/${rentalId}/before/payment`);
           return;
         }
       }
