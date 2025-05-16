@@ -11,6 +11,7 @@ import com.nextdoor.nextdoor.domain.reservation.exception.AlreadyConfirmedExcept
 import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.reservation.exception.UnauthorizedException;
+import com.nextdoor.nextdoor.domain.reservation.port.ReservationMemberQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
@@ -29,8 +30,9 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final ReservationPostQueryPort reservationPostQueryPort;
     private final ReservationRepository reservationRepository;
+    private final ReservationPostQueryPort reservationPostQueryPort;
+    private final ReservationMemberQueryPort reservationMemberQueryPort;
 
     @Override
     public ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto) {
