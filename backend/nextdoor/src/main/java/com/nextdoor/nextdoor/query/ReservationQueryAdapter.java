@@ -30,7 +30,8 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
     private final JPAQueryFactory jpaQueryFactory;
     private final QReservation qReservation = QReservation.reservation;
     private final QPost qPost = QPost.post;
-    private final QMember qMember = QMember.member;
+    private final QMember owner = new QMember("owner");
+    private final QMember renter = new QMember("renter");
     private final QProductImage qProductImage = QProductImage.productImage;
 
     @Override
@@ -39,7 +40,8 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                 jpaQueryFactory.select(createReservationQueryDtoProjection())
                         .from(qReservation)
                         .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
-                        .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
+                        .join(owner).on(qReservation.ownerId.eq(owner.id)).fetchJoin()
+                        .join(renter).on(qReservation.renterId.eq(renter.id)).fetchJoin()
                         .where(qReservation.id.eq(reservationId))
                         .fetchOne());
         optionalReservationQueryDto.ifPresent(reservationQueryDto ->
@@ -55,7 +57,8 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
         List<ReservationQueryDto> reservationQueryDtos = jpaQueryFactory.select(createReservationQueryDtoProjection())
                 .from(qReservation)
                 .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
-                .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
+                .join(owner).on(qReservation.ownerId.eq(owner.id)).fetchJoin()
+                .join(renter).on(qReservation.renterId.eq(renter.id)).fetchJoin()
                 .where(createSentReservationCondition(loginUserId, requestDto))
                 .fetch();
         reservationQueryDtos.forEach(reservationQueryDto ->
@@ -79,7 +82,8 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
         List<ReservationQueryDto> reservationQueryDtos = jpaQueryFactory.select(createReservationQueryDtoProjection())
                 .from(qReservation)
                 .join(qPost).on(qReservation.postId.eq(qPost.id)).fetchJoin()
-                .join(qMember).on(qReservation.ownerId.eq(qMember.id)).fetchJoin()
+                .join(owner).on(qReservation.ownerId.eq(owner.id)).fetchJoin()
+                .join(renter).on(qReservation.renterId.eq(renter.id)).fetchJoin()
                 .where(createReceivedReservationCondition(loginUserId, requestDto))
                 .fetch();
         reservationQueryDtos.forEach(reservationQueryDto ->
@@ -125,9 +129,11 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                 qReservation.status.stringValue(),
                 qReservation.rentalId,
                 qReservation.ownerId,
-                qMember.nickname,
-                qMember.profileImageUrl,
+                owner.nickname,
+                owner.profileImageUrl,
                 qReservation.renterId,
+                renter.nickname,
+                renter.profileImageUrl,
                 qReservation.postId,
                 qPost.title,
                 Expressions.constant(Collections.emptyList())

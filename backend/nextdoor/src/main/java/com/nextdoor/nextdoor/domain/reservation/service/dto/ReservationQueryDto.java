@@ -24,6 +24,8 @@ public class ReservationQueryDto {
     private Long ownerId;
     private String ownerName;
     private String ownerProfileImageUrl;
+    private String renterName;
+    private String renterProfileImageUrl;
     private Long renterId;
     private Long postId;
     private String postTitle;
