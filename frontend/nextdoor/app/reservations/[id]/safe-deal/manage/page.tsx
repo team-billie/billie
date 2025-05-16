@@ -2,7 +2,7 @@
 
 import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManager";
 import SafeDealNavbar from "@/components/reservations/safe-deal/SafeDealNavbar";
-import { AiAnalysisRequest } from "@/lib/api/ai-analysis/request";
+import { AiBeforePhotosRequest } from "@/lib/api/ai-analysis/request";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import { useParams, useRouter } from "next/navigation";
@@ -61,7 +61,7 @@ export default function SafeDealManage() {
 
     setLoading(true);
     try {
-      const res = await AiAnalysisRequest(Number(id));
+      const res = await AiBeforePhotosRequest(Number(id));
       setResult(res);
       console.log("AI 분석 결과:", res);
     } catch (error) {
