@@ -71,8 +71,6 @@ public class PostServiceImpl implements PostService {
             savedPost.addProductImage(imageUrl);
         }
 
-        savedPost = postRepository.save(savedPost);
-
         return postMapper.toCreateResult(savedPost, imageUrls);
     }
 }

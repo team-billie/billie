@@ -57,9 +57,7 @@ public class Post extends TimestampedEntity{
                 .post(this)
                 .build();
 
-        if(productImage.getPost() != this){
-            this.productImages.add(productImage);
-        }
+        this.productImages.add(productImage);
     }
 
     public void addLike(Long memberId) {
