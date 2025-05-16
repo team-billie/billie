@@ -18,10 +18,7 @@ public class PostDto {
     private String content;
     private BigDecimal rentalFee;
     private BigDecimal deposit;
-    // TODO 장소
-
-    @Setter
-    private List<String> productImages;
+    private String productImage;
     private String category;
     private Long authorId;
     private String authorUuid;
