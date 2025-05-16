@@ -70,7 +70,9 @@ export default function OwnerActionBtn({
       (process === RENTAL_PROCESS.BEFORE_RENTAL &&
         status === RENTAL_STATUS.CREATED) ||
       (process === RENTAL_PROCESS.RETURNED &&
-        status === RENTAL_STATUS.RENTAL_PERIOD_ENDED)
+        status === RENTAL_STATUS.RENTAL_PERIOD_ENDED) ||
+      (process === RENTAL_PROCESS.RETURNED &&
+        status === RENTAL_STATUS.BEFORE_AND_AFTER_COMPARED)
     );
   };
 
@@ -88,6 +90,9 @@ export default function OwnerActionBtn({
           router.push(`/safe-deal/${rentalId}/after/photos-register`);
 
           return;
+        } else if (status === RENTAL_STATUS.BEFORE_AND_AFTER_COMPARED) {
+          console.log("❤️❤️라우터 설정하기");
+          // router.push(`/safe-deal/${rentalId}/after/photos-register`);
         }
       }
 

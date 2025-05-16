@@ -34,6 +34,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const handleBeforePhotos = async () => {
     if (!userId) return;
     try {
+      console.log("AI분석 요청 시도");
       const res = await AiBeforePhotosRequest(Number(id));
       router.push(`/safe-deal/${id}/before/payment`);
       setIsResult(true);
@@ -97,10 +98,6 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
               photos={rentalPhotos}
               serverImages={serverData?.beforeImages || []}
             />
-            <div className="flex-1 w-full px-4">
-              {isResult ? <ResultSummary /> : <PhotoNotFound />}
-            </div>
-
             <div className="px-4 w-full">
               <Button
                 txt="AI 물품 상태 확인"

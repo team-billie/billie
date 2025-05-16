@@ -57,8 +57,6 @@ function RenterActionBtn({
       (process === RENTAL_PROCESS.BEFORE_RENTAL &&
         status === RENTAL_STATUS.REMITTANCE_REQUESTED) ||
       (process === RENTAL_PROCESS.BEFORE_RENTAL &&
-        status === RENTAL_STATUS.BEFORE_PHOTO_ANALYZED) ||
-      (process === RENTAL_PROCESS.RETURNED &&
         status === RENTAL_STATUS.BEFORE_PHOTO_ANALYZED)
     );
   };

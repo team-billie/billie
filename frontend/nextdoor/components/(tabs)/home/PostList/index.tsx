@@ -18,7 +18,7 @@ export default function PostList() {
         setPostList(res.content);
       });
     }
-  }, [userId]);
+  }, [userId, address]);
   return (
     <div className="flex flex-col gap-4">
       {postList?.map((post: PostListItemDto) => (
