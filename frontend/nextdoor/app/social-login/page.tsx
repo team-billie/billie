@@ -6,6 +6,7 @@ import { getUserInfo } from '@/lib/api/auth';
 import useUserStore from '@/lib/store/useUserStore';
 import { GetUserInfoResponse } from '@/types/auth/response';
 
+
 export default function OAuthRedirectPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
