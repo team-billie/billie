@@ -67,7 +67,7 @@ export default function ReservationManagePage() {
   return (
     <main>
       <ReservationManageNavbar />
-      <div className="h-screen flex flex-col p-4 gap-4">
+      <div className="h-screen flex flex-col p-4 gap-4 mb-20">
         {items.length === 0 && <EmptyState userRole={"lender"} />}
         {items.map((item) => (
           <div key={item.id}>

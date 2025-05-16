@@ -15,13 +15,13 @@ export default function HomePage() {
     <div className="flex flex-col">
       <div className="flex h-16 items-center justify-between px-4 text-gray900">
         <div className="flex items-center gap-1">
-          <LocationEdit className="w-7 h-7"/>
-          <h1 className="text-2xl font-bold" >전국구</h1>
+          <LocationEdit className="w-7 h-7" />
+          <h1 className="text-2xl font-bold">전국구</h1>
         </div>
-        <Search className="w-7 h-7"/>
+        <Search className="w-7 h-7" />
       </div>
-      <main className="p-4">
-          <PostList />
+      <main className="p-4 mb-20">
+        <PostList />
       </main>
       <div>
         <CreatePost />
