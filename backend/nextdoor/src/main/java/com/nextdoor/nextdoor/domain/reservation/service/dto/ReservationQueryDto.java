@@ -29,7 +29,5 @@ public class ReservationQueryDto {
     private Long renterId;
     private Long postId;
     private String postTitle;
-
-    @Setter
-    private List<String> postProductImages;
+    private String postProductImage;
 }

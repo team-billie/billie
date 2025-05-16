@@ -15,7 +15,7 @@ public class ReservationResponseDto {
 
     private Long reservationId;
     private String postTitle;
-    private List<String> postProductImages;
+    private String postProductImage;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal rentalFee;
@@ -30,7 +30,7 @@ public class ReservationResponseDto {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getId();
         response.postTitle = post.getTitle();
-        response.postProductImages = post.getProductImages();
+        response.postProductImage = post.getProductImage();
         response.startDate = reservation.getStartDate();
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();
@@ -47,7 +47,7 @@ public class ReservationResponseDto {
         ReservationResponseDto response = new ReservationResponseDto();
         response.reservationId = reservation.getReservationId();
         response.postTitle = reservation.getPostTitle();
-        response.postProductImages = reservation.getPostProductImages();
+        response.postProductImage = reservation.getPostProductImage();
         response.startDate = reservation.getStartDate();
         response.endDate = reservation.getEndDate();
         response.rentalFee = reservation.getRentalFee();
