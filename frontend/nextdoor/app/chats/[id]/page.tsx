@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
 import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
-import { ChatMessageDto, Message, Product } from "@/types/chats/chat";
+import { ChatMessageDto, Message } from "@/types/chats/chat";
 import { getChatMessages, getBorrowingChatRooms, convertToChatRoomUI, getLendingChatRooms } from "@/lib/api/chats";
-import useUserStore from "@/lib/store/useUserStore"; // useUserStore 사용
+import useUserStore from "@/lib/store/useUserStore"; 
 
 export default function ChatDetailPage() {
   const params = useParams();
@@ -22,6 +23,24 @@ export default function ChatDetailPage() {
     id: 0,
     name: '상대방',
     avatar: '/images/profileimg.png'
+  });
+  
+  // 제품 정보 상태 - 서버 데이터 형식과 동일하게 맞춤
+  const [productInfo, setProductInfo] = useState({
+    conversationId: "",
+    lastMessage: "",
+    lastSentAt: "",
+    unreadCount: 0,
+    otherNickname: "",
+    otherProfileImageUrl: "",
+    postImageUrl: "/icons/icon72.png",
+    ownerId: 0,
+    renterId: 0,
+    postId: 0,
+    title: "iPhone 15 Pro 대여",
+    rentalFee: 30000,
+    deposit: 300000,
+    chatStatus: "상태없음"
   });
 
   // WebSocket 연결 상태 
@@ -39,45 +58,63 @@ export default function ChatDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-// 채팅방 정보와 참가자 정보 가져오기
-useEffect(() => {
-  const fetchChatRoomInfo = async () => {
-    if (!userId) return;
-    
-    try {
-      // 두 API 모두 호출
-      const borrowingRooms = await getBorrowingChatRooms();
-      const lendingRooms = await getLendingChatRooms();
+  // 채팅방 정보와 참가자 정보 가져오기
+  useEffect(() => {
+    const fetchChatRoomInfo = async () => {
+      if (!userId) return;
       
-      // 모든 채팅방 합치기
-      const allRooms = [...borrowingRooms, ...lendingRooms];
-      
-      // 현재 conversationId와 일치하는 채팅방 찾기
-      const currentRoom = allRooms.find(room => room.conversationId === conversationId);
-      
-      if (currentRoom) {
-        // 채팅방 UI 데이터로 변환
-        const roomUI = convertToChatRoomUI(currentRoom, userId);
+      try {
+        // 두 API 모두 호출
+        const borrowingRooms = await getBorrowingChatRooms();
+        const lendingRooms = await getLendingChatRooms();
         
-        // 상대방 찾기 (내 ID가 아닌 참가자)
-        if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
-          const other = roomUI.participants.find(p => p.id !== userId);
-          if (other) {
-            setOtherUser({
-              id: other.id,
-              name: other.name || '상대방',
-              avatar: other.avatar || '/images/profileimg.png'
-            });
+        // 모든 채팅방 합치기
+        const allRooms = [...borrowingRooms, ...lendingRooms];
+        
+        // 현재 conversationId와 일치하는 채팅방 찾기
+        const currentRoom = allRooms.find(room => room.conversationId === conversationId);
+        
+        if (currentRoom) {
+          // 채팅방 UI 데이터로 변환
+          const roomUI = convertToChatRoomUI(currentRoom, userId);
+          
+          // 상대방 찾기 (내 ID가 아닌 참가자)
+          if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
+            const other = roomUI.participants.find(p => p.id !== userId);
+            if (other) {
+              setOtherUser({
+                id: other.id,
+                name: other.name || '상대방',
+                avatar: other.avatar || '/images/profileimg.png'
+              });
+            }
           }
+          
+          // 서버 데이터 그대로 저장 - currentRoom에 모든 필요한 정보가 있음
+          setProductInfo({
+            conversationId: currentRoom.conversationId,
+            lastMessage: currentRoom.lastMessage || "",
+            lastSentAt: currentRoom.lastSentAt,
+            unreadCount: currentRoom.unreadCount,
+            otherNickname: currentRoom.otherNickname,
+            otherProfileImageUrl: currentRoom.otherProfileImageUrl,
+            postImageUrl: currentRoom.postImageUrl,
+            ownerId: currentRoom.ownerId,
+            renterId: currentRoom.renterId,
+            postId: currentRoom.postId,
+            title: currentRoom.title,
+            rentalFee: currentRoom.rentalFee,
+            deposit: currentRoom.deposit,
+            chatStatus: currentRoom.chatStatus
+          });
         }
+      } catch (err) {
+        console.error("채팅방 정보 조회 오류:", err);
       }
-    } catch (err) {
-      console.error("채팅방 정보 조회 오류:", err);
-    }
-  };
-  
-  fetchChatRoomInfo();
-}, [conversationId, userId]);
+    };
+    
+    fetchChatRoomInfo();
+  }, [conversationId, userId]);
 
 
   // WebSocket 연결 설정
@@ -97,8 +134,11 @@ useEffect(() => {
 
         const WS_URL = "ws://k12e205.p.ssafy.io:8081";
 
+        // 수정된 URL 형식으로 변경
+        const token = localStorage.getItem("accessToken");
+        const tokenParam = token ? `&token=${token}` : '';
         const socket = new WebSocket(
-          `${WS_URL}/ws/chat?userId=${userId}&conv=${conversationId}`
+          `${WS_URL}/ws/chat?userId=${userId}&conv=${conversationId}${tokenParam}`
         );
 
         socket.onopen = () => {
@@ -276,7 +316,34 @@ useEffect(() => {
       onBackClick={handleBackClick}
     >
       <ChatAccordion title="예약 및 제품 정보">
-        <div>실제 상품 렌더링하기</div>
+        <div className="flex items-start p-3">
+          <div className="flex-shrink-0 mr-3 relative">
+            {/* 제품 이미지 */}
+            <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-200">
+              <Image 
+                src={productInfo.postImageUrl}
+                alt={productInfo.title}
+                width={64}
+                height={64}
+                className="object-cover"
+              />
+            </div>
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <h3 className="text-md font-medium">{productInfo.title}</h3>
+            
+            {/* 제품 정보 - 목록 페이지 스타일과 동일하게 */}
+            <p className="text-xs text-gray-400 mt-1">
+              {productInfo.title} • {productInfo.rentalFee.toLocaleString()}원/일
+            </p>
+            
+            {/* 추가 정보 */}
+            <p className="text-xs text-gray-400 mt-1">
+              보증금: {productInfo.deposit.toLocaleString()}원
+            </p>
+          </div>
+        </div>
       </ChatAccordion>
 
       {/* 채팅 목록 */}
