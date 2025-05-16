@@ -131,7 +131,6 @@ public class ReservationQueryAdapter implements ReservationQueryPort {
                 qReservation.ownerId,
                 owner.nickname,
                 owner.profileImageUrl,
-                qReservation.renterId,
                 renter.nickname,
                 renter.profileImageUrl,
                 qReservation.postId,
