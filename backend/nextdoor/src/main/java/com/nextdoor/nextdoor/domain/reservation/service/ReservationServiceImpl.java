@@ -15,6 +15,7 @@ import com.nextdoor.nextdoor.domain.reservation.port.ReservationMemberQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
+import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationMemberQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -47,7 +48,8 @@ public class ReservationServiceImpl implements ReservationService {
                 .renterId(loginUserId)
                 .postId(post.getPostId())
                 .build());
-        ReservationResponseDto response = ReservationResponseDto.from(reservation, post);
+        ReservationMemberQueryDto member = reservationMemberQueryPort.findById(loginUserId).orElseThrow();
+        ReservationResponseDto response = ReservationResponseDto.from(reservation, post, member);
         simpMessagingTemplate.convertAndSend("/topic/reservation/" + post.getAuthorUuid(), response);
         return response;
     }
@@ -62,7 +64,8 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.updateDeposit(reservationUpdateRequestDto.getDeposit());
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());
+                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow(),
+                reservationMemberQueryPort.findById(loginUserId).orElseThrow());
     }
 
     @Override
@@ -77,7 +80,8 @@ public class ReservationServiceImpl implements ReservationService {
         applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId(), reservation.getEndDate()));
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow());
+                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow(),
+                reservationMemberQueryPort.findById(loginUserId).orElseThrow());
     }
 
     @Override
