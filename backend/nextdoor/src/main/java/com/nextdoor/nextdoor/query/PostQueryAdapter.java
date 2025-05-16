@@ -58,8 +58,11 @@ public class PostQueryAdapter implements PostQueryPort {
                 .from(post)
                 .join(member).on(post.authorId.eq(member.id))
                 .leftJoin(postLike).on(postLike.post.id.eq(post.id))
-                .where(post.address.eq(userAddress))
                 .groupBy(post.id);
+
+        if (userAddress != null) {
+            query = query.where(post.address.eq(userAddress));
+        }
 
         long total = query.fetchCount();
 

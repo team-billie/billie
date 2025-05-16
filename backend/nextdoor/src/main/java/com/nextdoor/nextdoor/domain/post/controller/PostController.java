@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +35,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Page<PostListResponse>> getPostsByUserAddress(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal Long userId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
@@ -57,7 +58,7 @@ public class PostController {
     public ResponseEntity<CreatePostResponse> createPost(
             @RequestPart("post") @Valid CreatePostRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestParam Long authorId
+            @AuthenticationPrincipal Long authorId
     ) {
         CreatePostCommand command = postMapper.toCreateCommand(request, images, authorId);
         CreatePostResult result = postService.createPost(command);
