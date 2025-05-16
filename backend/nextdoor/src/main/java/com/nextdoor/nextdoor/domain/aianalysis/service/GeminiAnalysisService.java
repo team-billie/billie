@@ -8,13 +8,14 @@ import com.google.cloud.vertexai.generativeai.PartMaker;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.DamageAnalysisRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.DamageComparisonRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDamageResponseDto;
+import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
-import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class GeminiAnalysisService implements AiAnalysisService {
@@ -60,7 +62,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
         GenerateContentResponse response;
         try {
-            response = generativeModel.generateContent(createAnalysisContent(aiImages, damageAnalysisRequestDto.getAiImageType()));
+            response = generativeModel.generateContent(createAnalysisContent(aiImages));
         } catch (IOException e) {
             throw new ExternalApiException(e);
         }
@@ -69,16 +71,14 @@ public class GeminiAnalysisService implements AiAnalysisService {
         return new InspectDamageResponseDto(damageAnalysis);
     }
 
-
-    @Transactional(readOnly = true)
-    public Content createAnalysisContent(List<RentalDto.AiImageDto> aiImages, AiImageType aiImageType) {
+    private Content createAnalysisContent(List<RentalDto.AiImageDto> aiImages) {
         List<Part> imageParts = aiImages.stream()
-                .filter(aiImageDto -> aiImageDto.getType().equals(aiImageType))
+                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
+        aiImages.forEach(aiImageDto -> log.info("Before image URL: {}", aiImageDto.getImageUrl()));
         return Content.newBuilder()
                 .addAllParts(imageParts)
-                .addParts(Part.newBuilder().setText("These are after images.").build())
                 .addParts(damageAnalyzerPromptPart)
                 .setRole("user")
                 .build();
@@ -111,6 +111,10 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
+        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
+                .forEach(aiImageDto -> log.info("Before image URL: {}", aiImageDto.getImageUrl()));
+        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
+                .forEach(aiImageDto -> log.info("After image URL: {}", aiImageDto.getImageUrl()));
         return Content.newBuilder()
                 .addAllParts(beforeImageParts)
                 .addParts(Part.newBuilder().setText("These are before images.").build())
