@@ -2,7 +2,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AlertModalProvider } from "@/lib/providers/AlertModalProvider";
-import DraggableWidget from "@/components/common/RentalWidget";
+// import DraggableWidget from "@/components/common/RentalWidget";
+import WidgetProvider from "@/lib/providers/WidgetProvider";
+import FloatingWidget from "@/components/common/RentalWidget/FloatingWidget";
 
 export const viewport = {
   themeColor: "#ffffff",
@@ -31,8 +33,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-[100dvh] max-w-md mx-auto bg-white relative">
         <AlertModalProvider>
+          <WidgetProvider>
           {children}
-          <DraggableWidget />
+          </WidgetProvider>
         </AlertModalProvider>
       </body>
     </html>

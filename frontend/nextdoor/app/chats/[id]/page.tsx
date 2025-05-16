@@ -309,7 +309,7 @@ export default function ChatDetailPage() {
 
   return (
     <ChatLayout
-      username={otherUser.name} // 상대방 이름 표시
+      username={otherUser.name} 
       value={value}
       onChange={handleChange}
       onSendMessage={handleSend}
@@ -349,8 +349,8 @@ export default function ChatDetailPage() {
       {/* 채팅 목록 */}
       <ChatList
         messages={messages} 
-        username={otherUser.name} // 상대방 이름 표시
-        userAvatar={otherUser.avatar} // 상대방 아바타 표시
+        username={otherUser.name} 
+        userAvatar={otherUser.avatar} 
       />
 
       {/* 연결 상태 표시 */}
