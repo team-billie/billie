@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Calendar, House, MessageCircle, User } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function MainDock() {
-  const [activeTab, setActiveTab] = useState("home");
+  const pathname = usePathname();
 
   const tabs = [
     {
@@ -38,11 +38,10 @@ export default function MainDock() {
     <div className="fixed bottom-0 w-full max-w-md mx-auto bg-white border-t shadow-lg rounded-t-3xl">
       <div className="flex justify-around items-center py-4 ">
         {tabs.map((tab) => {
-          const isActive = activeTab === tab.key;
+          const isActive = pathname.startsWith(tab.href);
           return (
             <Link key={tab.key} href={tab.href}>
               <div
-                onClick={() => setActiveTab(tab.key)}
                 className={`relative flex flex-col items-center ${
                   isActive
                     ? "text-blue400 font-semibold"
