@@ -22,13 +22,12 @@ export const useWebSocket = ({ conversationId, onMessage }: UseWebSocketProps) =
   
   const getUrlsToTry = useCallback(() => {
     if (!userId) return [];
+
+    // localStorage에서 accessToken 가져오기
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     
     return [
-      `${WS_BASE_URL}/ws/chat?user=${userId}&conv=${conversationId}`,
-      `${WS_BASE_URL}/chat?user=${userId}&conv=${conversationId}`,
-      `${WS_BASE_URL}/ws/chat?userId=${userId}&conversationId=${conversationId}`,
-      `${WS_BASE_URL}/chat?userId=${userId}&conversationId=${conversationId}`,
-      `${WS_BASE_URL}?user=${userId}&conv=${conversationId}`,
+      `${WS_BASE_URL}/ws/chat?userId=${userId}&conv=${conversationId}${token ? `&token=${token}` : ''}`
     ];
   }, [WS_BASE_URL, userId, conversationId]);
   

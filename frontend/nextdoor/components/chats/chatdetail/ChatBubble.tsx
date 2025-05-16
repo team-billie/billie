@@ -28,7 +28,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   
   // props로 전달받은 값이 없는 경우 useUserStore의 값 사용
   const displayName = username || userStoreData.username || 'username';
-  const displayIcon = profileIcon || userStoreData.profileImage || '/images/profileimg.png';
+  const displayIcon = profileIcon || userStoreData.profileImageUrl || '/images/profileimg.png';
 
   return (
     <div
