@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -26,7 +27,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponseDto> createReservation(
             HttpServletRequest request,
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @RequestBody ReservationSaveRequestDto reservationSaveRequestDto
     ) {
         ReservationResponseDto reservationResponseDto = reservationService.createReservation(loginUserId, reservationSaveRequestDto);
@@ -35,8 +36,7 @@ public class ReservationController {
 
     @PutMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
-            HttpServletRequest request,
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @PathVariable Long reservationId,
             @RequestBody ReservationUpdateRequestDto reservationUpdateRequestDto
     ) {
@@ -46,7 +46,7 @@ public class ReservationController {
 
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponseDto> updateReservationStatus(
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @PathVariable Long reservationId,
             @RequestBody ReservationStatusUpdateRequestDto reservationStatusUpdateRequestDto
     ) {
@@ -56,7 +56,7 @@ public class ReservationController {
 
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> deleteReservation(
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @PathVariable Long reservationId
     ) {
         reservationService.deleteReservation(loginUserId, reservationId);
@@ -65,7 +65,7 @@ public class ReservationController {
 
     @GetMapping("/sent")
     public ResponseEntity<List<ReservationResponseDto>> retrieveSentReservations(
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
     ) {
         return ResponseEntity.ok(reservationQueryService.retrieveSentReservations(loginUserId, reservationRetrieveRequestDto));
@@ -73,7 +73,7 @@ public class ReservationController {
 
     @GetMapping("/received")
     public ResponseEntity<List<ReservationResponseDto>> retrieveReceivedReservations(
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
     ) {
         return ResponseEntity.ok(reservationQueryService.retrieveReceivedReservations(loginUserId, reservationRetrieveRequestDto));
@@ -81,7 +81,7 @@ public class ReservationController {
 
     @GetMapping("/calendar")
     public ResponseEntity<ReservationCalendarResponseDto> retrieveReservationCalendar(
-            @RequestHeader("X-User-Id") Long loginUserId,
+            @AuthenticationPrincipal Long loginUserId,
             @ModelAttribute ReservationCalendarRetrieveRequestDto reservationCalendarRetrieveRequestDto
     ) {
         return ResponseEntity.ok(reservationQueryService.retrieveReservationCalendar(loginUserId, reservationCalendarRetrieveRequestDto));

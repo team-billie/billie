@@ -6,6 +6,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDa
 import com.nextdoor.nextdoor.domain.aianalysis.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,17 +21,17 @@ public class AiAnalysisController {
 
     @PostMapping("/analyze")
     public ResponseEntity<InspectDamageResponseDto> analyzeDamage(
+            @AuthenticationPrincipal Long loginUserId,
             @RequestBody DamageAnalysisRequestDto damageAnalysisRequestDto
     ) {
-        Long loginUserId = 1L;
         return ResponseEntity.ok(aiAnalysisService.analyzeDamage(loginUserId, damageAnalysisRequestDto));
     }
 
     @PostMapping("/compare")
     public ResponseEntity<InspectDamageResponseDto> compareDamage(
+            @AuthenticationPrincipal Long loginUserId,
             @RequestBody DamageComparisonRequestDto damageComparisonRequestDto
     ) {
-        Long loginUserId = 1L;
         return ResponseEntity.ok(aiAnalysisService.compareDamage(loginUserId, damageComparisonRequestDto));
     }
 }
