@@ -10,7 +10,12 @@ spring:
       maximum-pool-size: 10
       idle-timeout: 600000
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+      continue-on-error: false
+      separator: ;
   jpa:
     hibernate:
       ddl-auto: update
