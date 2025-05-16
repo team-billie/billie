@@ -54,6 +54,9 @@ export const GetAddedListRequest = (userKey: string) =>
     return handleApiError(error, "등록된 계좌 목록 조회");
 });
 
+// 계좌 확인
+export const VerifyAccountRequest = (requestBody: VerifyAccountRequestDto) => 
+  apiCall("/api/v1/fintechs/accounts/verify", requestBody, "계좌 확인");
 
 //계좌 이체
 export const TransferAccountRequest = (requestBody: TransferAccountRequestDto) => 

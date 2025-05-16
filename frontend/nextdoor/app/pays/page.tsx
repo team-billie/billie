@@ -21,7 +21,7 @@ export default function PayPage() {
       axiosInstance.post("/api/v1/fintechs/accounts/deposit", {
           "userKey": userKey,
           "accountNo": billyAccount?.accountNo,
-          "transactionBalance": 50000,
+          "transactionBalance": 200000,
           "transactionSummary": "(수시입출금) : 빌리 입금"
         }).then((res) => {
           console.log(res);

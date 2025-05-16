@@ -10,22 +10,22 @@ import { TransferAccountRequestDto } from "@/types/pays/request/index";
 import useUserStore from "@/lib/store/useUserStore";
 import { TransferAccountRequest } from "@/lib/api/pays";
 import { useRouter } from "next/navigation";
-import { CheckAccountRequestDto } from "@/types/pays/request";
+import { VerifyAccountResponseDto } from "@/types/pays/response";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
 
 type FormValues = TransferAccountRequestDto;
 
 interface WithdrawAmountProps {
-    selectedAccount: CheckAccountRequestDto | null;
+    verifiedAccount: VerifyAccountResponseDto | null;
 }
 
-export default function WithdrawAmount({selectedAccount}: WithdrawAmountProps) {
+export default function WithdrawAmount({verifiedAccount}: WithdrawAmountProps) {
     const { userKey, billyAccount } = useUserStore();
     const router = useRouter();
     const withdrawForm = useForm<FormValues>({
         defaultValues: {
             userKey: userKey,
-            depositAccountNo: selectedAccount?.accountNo ?? "",  
+            depositAccountNo: verifiedAccount?.accountNo ?? "",  
             // transactionBalance: 0,
             withdrawalAccountNo: billyAccount?.accountNo,
             depositTransactionSummary: "빌리페이 출금",
@@ -45,14 +45,14 @@ export default function WithdrawAmount({selectedAccount}: WithdrawAmountProps) {
     <FormProvider {...withdrawForm}>
         <div className="flex-1 flex flex-col items-center">
             <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
-                <div className="text-gray900 text-lg font-semibold">사용자에게</div>
+                <div className="text-gray900 text-lg font-semibold">{verifiedAccount?.nickname}에게</div>
                 <div className="flex gap-2 items-center justify-center">
                     <img
-                        src={getBankInfo(selectedAccount?.bankCode ?? "000")?.image}
-                        alt={getBankInfo(selectedAccount?.bankCode ?? "000")?.bankName}
+                        src={getBankInfo(verifiedAccount?.bankCode ?? "000")?.image}
+                        alt={getBankInfo(verifiedAccount?.bankCode ?? "000")?.bankName}
                         className="w-7 h-7 rounded-full border border-gray500"
                     />
-                    <div className="text-gray700 font-semibold"><span>{getBankInfo(selectedAccount?.bankCode ?? "000")?.bankName}</span> {selectedAccount?.accountNo}</div>
+                    <div className="text-gray700 font-semibold"><span>{getBankInfo(verifiedAccount?.bankCode ?? "000")?.bankName}</span> {verifiedAccount?.accountNo}</div>
                 </div>
             </div>
             
