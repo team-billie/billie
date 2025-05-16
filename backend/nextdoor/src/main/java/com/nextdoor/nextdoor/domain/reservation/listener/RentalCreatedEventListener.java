@@ -2,6 +2,7 @@ package com.nextdoor.nextdoor.domain.reservation.listener;
 
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
 import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
+import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class RentalCreatedEventListener {
     public void handleRentalCreatedEvent(RentalCreatedEvent rentalCreatedEvent) {
         Reservation reservation = reservationRepository.findById(rentalCreatedEvent.getReservationId())
                 .orElseThrow(NoSuchReservationException::new);
-        
+        reservation.updateStatus(ReservationStatus.CONFIRMED);
         reservation.updateRentalId(rentalCreatedEvent.getRentalId());
     }
 }
