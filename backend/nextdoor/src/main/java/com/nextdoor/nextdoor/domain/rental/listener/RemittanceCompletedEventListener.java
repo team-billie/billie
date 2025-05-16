@@ -23,12 +23,5 @@ public class RemittanceCompletedEventListener {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleRemittanceCompletedEvent(RemittanceCompletedEvent remittanceCompletedEvent){
         rentalService.completeRemittanceProcessing(remittanceCompletedEvent);
-
-        messagingTemplate.convertAndSend("/topic/rental/" + remittanceCompletedEvent.getRentalId() + "/status",
-                RentalStatusMessage.builder()
-                        .process(RentalProcess.RENTAL_IN_ACTIVE.name())
-                        .detailStatus(RentalStatus.REMITTANCE_COMPLETED.name())
-                        .build()
-        );
     }
 }

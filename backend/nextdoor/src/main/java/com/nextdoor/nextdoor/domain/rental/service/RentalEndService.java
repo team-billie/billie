@@ -16,12 +16,5 @@ public class RentalEndService {
 
     public void rentalEnd(Long rentalId) {
         rentalService.completeRentalEndProcessing(rentalId);
-
-        messagingTemplate.convertAndSend("/topic/rental/" + rentalId + "/status"
-            , RentalStatusMessage.builder()
-                    .process(RentalProcess.RETURNED.name())
-                    .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
-                    .build()
-        );
     }
 }

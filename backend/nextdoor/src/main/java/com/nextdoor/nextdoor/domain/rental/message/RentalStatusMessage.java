@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 public class RentalStatusMessage {
 
+    private Long rentalId;
     private String process;
     private String detailStatus;
 }
