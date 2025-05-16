@@ -22,7 +22,7 @@ type GetAccountListRequestDto = {
 }
 
 //계좌 정보 확인
-type CheckAccountRequestDto = {
+type VerifyAccountRequestDto = {
     bankCode: string;
     accountNo: string;
 }
@@ -92,7 +92,7 @@ export type { CreateFinUserRequestDto,
     TransferAccountRequestDto, 
     HoldDepositRequestDto, 
     ReturnDepositRequestDto,
-    CheckAccountRequestDto,
+    VerifyAccountRequestDto,
     GetFinUserRequestDto,
     SelectOwnerAccountRequestDto,
     PayItemRequestDto }; 
