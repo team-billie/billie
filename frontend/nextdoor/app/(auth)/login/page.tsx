@@ -42,20 +42,20 @@ export default function LoginPage() {
             카카오로 3초 만에 시작하기
           </button>
           
-          <button 
+          {/* <button 
             className="w-full py-5 border-2 border-white text-white rounded-lg font-bold hover:bg-white/10 transition-colors"
             onClick={handleGuestStart}
             >
             비회원으로 시작하기
-          </button>
-          <button 
+          </button> */}
+          {/* <button 
             className="w-full py-5 border-2 border-white text-white rounded-lg font-bold hover:bg-white/10 transition-colors"
             onClick={() => {
               router.push('/pays/testlogin');
             }}
             >
             테스트 유저 로그인
-          </button>
+          </button> */}
 
         </div>
       </div>
