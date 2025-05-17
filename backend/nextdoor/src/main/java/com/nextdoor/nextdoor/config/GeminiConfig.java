@@ -30,6 +30,9 @@ public class GeminiConfig {
     @Value("${custom.damage-comparator-prompt-location}")
     private String damageComparatorPromptLocation;
 
+    @Value("${custom.product-analyzer-prompt-location}")
+    private String productAnalyzerPromptLocation;
+
     @Bean
     public VertexAI vertexAI() {
         return new VertexAI(geminiProjectId, geminiLocation);
@@ -48,6 +51,11 @@ public class GeminiConfig {
     @Bean(name = "damageComparatorPromptPart")
     public Part imageComparisonDamageAnalyzerPromptPart(ResourceLoader resourceLoader) {
         return loadPromptPart(resourceLoader, damageComparatorPromptLocation);
+    }
+
+    @Bean(name = "productAnalyzerPromptPart")
+    public Part productAnalyzerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, productAnalyzerPromptLocation);
     }
 
     private Part loadPromptPart(ResourceLoader resourceLoader, String location) {

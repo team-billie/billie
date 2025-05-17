@@ -17,6 +17,7 @@ export default function OAuthRedirectPage() {
     const accessToken = searchParams.get("accessToken");
     const userKey = searchParams.get("userKey");
     const uuid = searchParams.get("uuid");
+    
 
     if (accessToken && userKey) {
       localStorage.setItem("accessToken", accessToken);

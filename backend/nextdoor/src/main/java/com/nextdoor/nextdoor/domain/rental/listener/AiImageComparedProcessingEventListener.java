@@ -6,6 +6,7 @@ import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEve
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
 import com.nextdoor.nextdoor.domain.rental.port.MemberUuidQueryPort;
+import com.nextdoor.nextdoor.domain.rental.port.RentalDetailQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +21,7 @@ public class AiImageComparedProcessingEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final MemberUuidQueryPort memberUuidQueryPort;
+    private final RentalDetailQueryPort rentalDetailQueryPort;
 
     @Async("asyncExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -29,19 +31,26 @@ public class AiImageComparedProcessingEventListener {
                 "RENTER"
         );
 
+        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
+                event.getRentalId(),
+                "OWNER"
+        );
+
         messagingTemplate.convertAndSend(
                 "/topic/rental/" + renterUuid + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalProcess.RENTAL_COMPLETED.name())
                         .detailStatus(RentalStatus.RENTAL_COMPLETED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
 
         messagingTemplate.convertAndSend(
                 "/topic/rental/" + event.getRentalId() + "/status",
                 RentalStatusMessage.builder()
-                        .process(RentalProcess.RETURNED.name())
-                        .detailStatus(RentalStatus.BEFORE_AND_AFTER_COMPARED.name())
+                        .process(RentalProcess.RENTAL_COMPLETED.name())
+                        .detailStatus(RentalStatus.RENTAL_COMPLETED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
     }
