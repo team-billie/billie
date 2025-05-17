@@ -16,7 +16,7 @@ export default function SafeDealAfter() {
     return;
   }
   return (
-    <main className="fixed inset-0 w-full h-full bg-graygradient flex flex-col overflow-hidden">
+    <main className=" max-w-screen-sm mx-auto fixed inset-0  h-full bg-graygradient flex flex-col overflow-hidden">
       {/* Header: 고정 */}
       <div className="z-10">
         <Header txt="반납하기" />
