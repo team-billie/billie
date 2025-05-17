@@ -13,6 +13,7 @@ export default function PostListItem({ post }: PostListItemProps) {
   const handleLikeBtn = () => {
     setIsLiked(!isLiked);
   };
+  
   return (
     <div className="grid grid-cols-[1fr_3fr] gap-4 border-b border-gray-200 pb-4">
       {/* //이미지 사진 */}
@@ -36,7 +37,7 @@ export default function PostListItem({ post }: PostListItemProps) {
         <div className="flex gap-2">
           <div className="flex gap-[6px] items-center text-blue400 border border-blue400 rounded-md px-1 ">
             <Heart className="w-4 h-4" />
-            <div>{post.like}</div>
+            <div>{post.likeCount}</div>
           </div>
           <div className="flex gap-[3px] items-center text-sm text-blue400 border border-blue400 rounded-md px-1 py-[2px]">
             <DollarSign className="w-4 h-4" />
