@@ -24,4 +24,5 @@ public interface RentalService {
     void updateComparedAnalysis(Long rentalId, String comparedAnalysis);
     UpdateAccountResult updateAccount(UpdateAccountCommand command);
     ManagedRentalCountResult countManagedRentals(Long ownerId);
+    SearchRentalResult getRentalById(Long rentalId);
 }

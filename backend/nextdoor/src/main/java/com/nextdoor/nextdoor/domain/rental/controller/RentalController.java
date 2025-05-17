@@ -120,4 +120,14 @@ public class RentalController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{rentalId}")
+    public ResponseEntity<RentalDetailResponse> getRentalById(
+            @PathVariable Long rentalId) {
+
+        SearchRentalResult result = rentalService.getRentalById(rentalId);
+        RentalDetailResponse response = rentalMapper.toResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
 }

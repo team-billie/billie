@@ -26,7 +26,7 @@ public class RentalDetailQueryAdapter implements RentalDetailQueryPort {
     private final QProductImage productImage = QProductImage.productImage;
     private final QMember member = QMember.member;
 
-    public RentalStatusMessage.RentalDetailResult getRentalDetailByRentalIdAndRole(Long rentalId, String userRole) {
+    public RentalStatusMessage.RentalDetailResult getRentalDetailByRentalIdAndRole(Long rentalId) {
         Long reservationId = queryFactory
                 .select(rental.reservationId)
                 .from(rental)
@@ -59,33 +59,37 @@ public class RentalDetailQueryAdapter implements RentalDetailQueryPort {
                 .where(productImage.post.id.eq(postId))
                 .fetchFirst();
 
-        Long partnerId;
-        if ("OWNER".equalsIgnoreCase(userRole)) {
-            partnerId = queryFactory
-                    .select(reservation.renterId)
-                    .from(reservation)
-                    .where(reservation.id.eq(reservationId))
-                    .fetchOne();
-        } else if ("RENTER".equalsIgnoreCase(userRole)) {
-            partnerId = queryFactory
-                    .select(reservation.ownerId)
-                    .from(reservation)
-                    .where(reservation.id.eq(reservationId))
-                    .fetchOne();
-        } else {
-            throw new IllegalArgumentException("유효하지 않은 사용자 역할입니다. userRole: " + userRole);
-        }
 
-        String partnerProfileImageUrl = queryFactory
+        Long renterId = queryFactory
+                .select(reservation.renterId)
+                .from(reservation)
+                .where(reservation.id.eq(reservationId))
+                .fetchOne();
+
+        Long ownerId = queryFactory
+                .select(reservation.ownerId)
+                .from(reservation)
+                .where(reservation.id.eq(reservationId))
+                .fetchOne();
+
+
+        String renterProfileImageUrl = queryFactory
                 .select(member.profileImageUrl)
                 .from(member)
-                .where(member.id.eq(partnerId))
+                .where(member.id.eq(renterId))
+                .fetchOne();
+
+        String ownerProfileImageUrl = queryFactory
+                .select(member.profileImageUrl)
+                .from(member)
+                .where(member.id.eq(ownerId))
                 .fetchOne();
 
         return RentalStatusMessage.RentalDetailResult.builder()
                 .postTitle(postTitle)
                 .representativeImageUrl(representativeImageUrl)
-                .partnerProfileImageUrl(partnerProfileImageUrl)
+                .renterProfileImageUrl(renterProfileImageUrl)
+                .ownerProfileImageUrl(ownerProfileImageUrl)
                 .build();
     }
 }

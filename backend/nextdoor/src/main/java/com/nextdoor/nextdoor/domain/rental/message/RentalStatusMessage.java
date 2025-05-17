@@ -1,12 +1,13 @@
 package com.nextdoor.nextdoor.domain.rental.message;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class RentalStatusMessage {
 
     private Long rentalId;
@@ -21,6 +22,7 @@ public class RentalStatusMessage {
     public static class RentalDetailResult {
         private String postTitle;
         private String representativeImageUrl;
-        private String partnerProfileImageUrl;
+        private String ownerProfileImageUrl;
+        private String renterProfileImageUrl;
     }
 }

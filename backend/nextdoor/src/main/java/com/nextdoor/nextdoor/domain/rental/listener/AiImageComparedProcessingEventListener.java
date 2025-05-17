@@ -32,8 +32,7 @@ public class AiImageComparedProcessingEventListener {
         );
 
         RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                event.getRentalId(),
-                "OWNER"
+                event.getRentalId()
         );
 
         messagingTemplate.convertAndSend(
