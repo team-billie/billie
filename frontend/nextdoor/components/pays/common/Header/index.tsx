@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 interface HeaderProps {
     txt: string;
@@ -14,7 +14,7 @@ export default function Header({txt, x = true}: HeaderProps) {
   return (
     <div className="sticky top-0 flex min-h-[60px] items-center px-4 text-gray900 bg-white">
         <button onClick={() => router.back()}>
-          {x && <X className="w-6 h-6" />}
+          {x && <ChevronLeft className="w-6 h-6" />}
         </button>
         <div className="flex-1 text-center gap-2 ">
             <div className="text-xl font-semibold">{txt}</div>

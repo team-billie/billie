@@ -12,7 +12,7 @@ export default function PostList(){
     const [postList, setPostList] = useState<PostListItemDto[] | null>(null);
 
     useEffect(() => {
-        if(userId && address){
+        if(userId){
             GetPostListRequest(String(userId)).then((res) => {
                 console.log(res.content);
                 setPostList(res.content);
