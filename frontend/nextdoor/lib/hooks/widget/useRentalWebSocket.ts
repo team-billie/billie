@@ -19,6 +19,8 @@ export interface RentalStatusMessage {
     renterId: number;
     ownerId: number;
     productImageUrl: string;
+    ownerProfileImageUrl: string;  
+  renterProfileImageUrl: string;
   };
 }
 
@@ -73,7 +75,13 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
           deposit: rental.deposit,
           renterId: rental.renterId,
           ownerId: rental.ownerId,
-          productImageUrl: rental.productImageUrl,
+          // productImageUrl: rental.productImageUrl,
+          // 배열의 첫 번째 항목 사용
+    productImageUrl: rental.productImageUrls && rental.productImageUrls.length > 0 
+    ? rental.productImageUrls[0] 
+    : rental.productImageUrl || '',
+          ownerProfileImageUrl: rental.ownerProfileImageUrl || '/images/profileimg.png',
+    renterProfileImageUrl: rental.renterProfileImageUrl || '/images/profileimg.png'
         }
       }));
       
