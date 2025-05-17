@@ -52,39 +52,41 @@ const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
       </div>
 
       <div className="flex-1 flex flex-col justify-center min-w-0">
-        <p className="font-semibold text-black text-base mb-1">예약요청</p>
+        <p className="font-semibold text-black text-base mb-1">
+          {isReservation ? "예약요청" : "안심대여"}
+        </p>
         <p className="text-sm text-gray-500 truncate">{detail || title}</p>
       </div>
 
-      {isReservation ? (
-        <div className="flex items-center" style={{ width: "180px" }}>
-          <div className="flex space-x-2 w-full justify-between">
+      {/* 모든 버튼 컨테이너 크기를 동일하게 설정 */}
+      <div className="flex items-center" style={{ width: "170px" }}>
+        {isReservation ? (
+          // 예약 확정/취소 버튼
+          <div className="flex w-full justify-between">
             <button
               onClick={onConfirm}
-              className="bg-blue-500 text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors flex-1"
+              className="bg-blue-500 text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors w-20"
             >
               확정
             </button>
             <button
               onClick={onCancel}
-              className="bg-gray-500 text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-gray-600 transition-colors flex-1"
+              className="bg-gray-500 text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-gray-600 transition-colors w-20"
             >
               취소
             </button>
           </div>
-          <span className="ml-3 text-gray-400">→</span>
-        </div>
-      ) : (
-        <div className="flex items-center" style={{ width: "170px" }}>
+        ) : (
+          // 단일 액션 버튼
           <button
             onClick={onAction}
             className="bg-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors w-full"
           >
             {actionText || "처리하기"}
           </button>
-          <span className="ml-3 text-gray-400">→</span>
-        </div>
-      )}
+        )}
+        <span className="ml-3 text-gray-400">→</span>
+      </div>
     </div>
   );
 };
