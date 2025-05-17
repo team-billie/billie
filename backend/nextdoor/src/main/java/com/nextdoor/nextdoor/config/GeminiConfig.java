@@ -15,8 +15,11 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class GeminiConfig {
 
-    @Value("${custom.google.ai.gemini.model}")
-    private String geminiModel;
+    @Value("${custom.google.ai.gemini.model.flash}")
+    private String geminiFlash;
+
+    @Value("${custom.google.ai.gemini.model.pro}")
+    private String geminiPro;
 
     @Value("${custom.google.ai.gemini.location}")
     private String geminiLocation;
@@ -30,14 +33,22 @@ public class GeminiConfig {
     @Value("${custom.damage-comparator-prompt-location}")
     private String damageComparatorPromptLocation;
 
+    @Value("${custom.product-analyzer-prompt-location}")
+    private String productAnalyzerPromptLocation;
+
     @Bean
     public VertexAI vertexAI() {
         return new VertexAI(geminiProjectId, geminiLocation);
     }
 
-    @Bean
-    public GenerativeModel generativeModel(VertexAI vertexAI) {
-        return new GenerativeModel(geminiModel, vertexAI);
+    @Bean(name = "geminiFlash")
+    public GenerativeModel geminiAnalysisModel(VertexAI vertexAI) {
+        return new GenerativeModel(geminiFlash, vertexAI);
+    }
+
+    @Bean(name = "geminiPro")
+    public GenerativeModel geminiComparisonModel(VertexAI vertexAI) {
+        return new GenerativeModel(geminiPro, vertexAI);
     }
 
     @Bean(name = "damageAnalyzerPromptPart")
@@ -48,6 +59,11 @@ public class GeminiConfig {
     @Bean(name = "damageComparatorPromptPart")
     public Part imageComparisonDamageAnalyzerPromptPart(ResourceLoader resourceLoader) {
         return loadPromptPart(resourceLoader, damageComparatorPromptLocation);
+    }
+
+    @Bean(name = "productAnalyzerPromptPart")
+    public Part productAnalyzerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, productAnalyzerPromptLocation);
     }
 
     private Part loadPromptPart(ResourceLoader resourceLoader, String location) {

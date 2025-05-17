@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 
 interface HeaderProps {
-    txt: string;
-    x?: boolean;
+  txt: string;
+  x?: boolean;
 }
 
-export default function Header({txt, x = true}: HeaderProps) {
+export default function Header({ txt, x = true }: HeaderProps) {
   const router = useRouter();
 
   return (
@@ -23,4 +23,3 @@ export default function Header({txt, x = true}: HeaderProps) {
     </div>
   );
 }
-

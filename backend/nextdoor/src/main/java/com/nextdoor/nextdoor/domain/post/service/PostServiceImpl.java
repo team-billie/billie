@@ -1,8 +1,10 @@
 package com.nextdoor.nextdoor.domain.post.service;
 
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
 import com.nextdoor.nextdoor.domain.post.domain.Post;
 import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
+import com.nextdoor.nextdoor.domain.post.port.ProductImageAnalysisPort;
 import com.nextdoor.nextdoor.domain.post.port.S3ImageUploadPort;
 import com.nextdoor.nextdoor.domain.post.repository.PostRepository;
 import com.nextdoor.nextdoor.domain.post.service.dto.*;
@@ -25,6 +27,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final S3ImageUploadPort s3ImageUploadPort;
     private final PostMapper postMapper;
+    private final ProductImageAnalysisPort productImageAnalysisPort;
 
     @Override
     @Transactional(readOnly = true)
@@ -71,8 +74,12 @@ public class PostServiceImpl implements PostService {
             savedPost.addProductImage(imageUrl);
         }
 
-        savedPost = postRepository.save(savedPost);
-
         return postMapper.toCreateResult(savedPost, imageUrls);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AnalyzeProductImageResponse analyzeProductImage(MultipartFile productImage) {
+        return productImageAnalysisPort.analyzeProductImage(productImage);
     }
 }

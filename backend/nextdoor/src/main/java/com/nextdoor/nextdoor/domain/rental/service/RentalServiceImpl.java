@@ -11,16 +11,13 @@ import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
-import com.nextdoor.nextdoor.domain.rental.port.MemberUuidQueryPort;
+import com.nextdoor.nextdoor.domain.rental.port.*;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
-import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
-import com.nextdoor.nextdoor.domain.rental.port.ReservationQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
-import com.nextdoor.nextdoor.domain.rental.port.S3ImageUploadPort;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +42,7 @@ public class RentalServiceImpl implements RentalService {
     private final ReservationQueryPort reservationQueryPort;
     private final RentalQueryPort rentalQueryPort;
     private final MemberUuidQueryPort memberUuidQueryPort;
+    private final RentalDetailQueryPort rentalDetailQueryPort;
     private final RentalScheduleService rentalScheduleService;
     private final RentalDomainService rentalDomainService;
     private final RentalImageDomainService rentalImageDomainService;
@@ -68,12 +66,18 @@ public class RentalServiceImpl implements RentalService {
                 "OWNER"
         );
 
+        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
+                createdRental.getRentalId(),
+                "OWNER"
+        );
+
         messagingTemplate.convertAndSend(
                 "/topic/rental/" + ownerUuid + "/status",
                 RentalStatusMessage.builder()
                         .rentalId(createdRental.getRentalId())
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.CREATED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
 
@@ -82,6 +86,7 @@ public class RentalServiceImpl implements RentalService {
                 RentalStatusMessage.builder()
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.CREATED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
     }
@@ -155,11 +160,17 @@ public class RentalServiceImpl implements RentalService {
                 "OWNER"
         );
 
+        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
+                rental.getRentalId(),
+                "OWNER"
+        );
+
         messagingTemplate.convertAndSend("/topic/rental/" + ownerUuid + "/status",
                 RentalStatusMessage.builder()
                         .rentalId(rental.getRentalId())
                         .process(RentalProcess.RENTAL_IN_ACTIVE.name())
                         .detailStatus(RentalStatus.REMITTANCE_COMPLETED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
 
@@ -168,6 +179,7 @@ public class RentalServiceImpl implements RentalService {
                 RentalStatusMessage.builder()
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.CREATED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
     }
@@ -185,11 +197,17 @@ public class RentalServiceImpl implements RentalService {
                 "RENTER"
         );
 
+        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
+                rental.getRentalId(),
+                "RENTER"
+        );
+
         messagingTemplate.convertAndSend("/topic/rental/" + renterUuid + "/status"
                 , RentalStatusMessage.builder()
                         .rentalId(rental.getRentalId())
                         .process(RentalProcess.RETURNED.name())
                         .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
 
@@ -198,6 +216,7 @@ public class RentalServiceImpl implements RentalService {
                 RentalStatusMessage.builder()
                         .process(RentalProcess.RETURNED.name())
                         .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
     }
@@ -314,12 +333,18 @@ public class RentalServiceImpl implements RentalService {
                 "RENTER"
         );
 
+        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
+                rental.getRentalId(),
+                "RENTER"
+        );
+
         messagingTemplate.convertAndSend(
                 "/topic/rental/" + renterUuid + "/status",
                 RentalStatusMessage.builder()
                         .rentalId(rental.getRentalId())
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.REMITTANCE_REQUESTED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
 
@@ -328,6 +353,7 @@ public class RentalServiceImpl implements RentalService {
                 RentalStatusMessage.builder()
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.REMITTANCE_REQUESTED.name())
+                        .rentalDetail(rentalDetailResult)
                         .build()
         );
 

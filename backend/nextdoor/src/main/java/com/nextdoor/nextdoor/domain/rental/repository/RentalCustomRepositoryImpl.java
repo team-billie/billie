@@ -54,7 +54,7 @@ public class RentalCustomRepositoryImpl implements RentalCustomRepository {
         AiAnalysisResult result = new AiAnalysisResult();
         result.setBeforeImages(beforeImages);
         result.setAfterImages(afterImages);
-        result.setAnalysis(foundRental.getDamageAnalysis());
+        result.setAnalysis(foundRental.getComparedAnalysis());
         return result;
     }
 }

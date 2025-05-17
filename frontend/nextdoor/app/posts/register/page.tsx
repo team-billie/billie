@@ -36,7 +36,7 @@ export default function PostRegisterPage() {
     handleAiToggle,
   } = useProductRegisterStore();
   const { userId } = useUserStore();
-  const router=useRouter();
+  const router = useRouter();
   console.log("userId", userId);
   const handleSubmit = async () => {
     try {
@@ -73,23 +73,22 @@ export default function PostRegisterPage() {
         category,
         rentalFee: Number(rentalFee),
         deposit: Number(deposit),
-        preferredLocation :
-        {
-          latitude: 35.108985,
-          longitude: 128.921072,
+        preferredLocation: {
+          latitude: 37.517236,
+          longitude: 127.047325,
         },
+        address: "서울시 강남구",
       };
 
-     
       // API 호출
       const res = await postCreateRequest(productData, images, userId);
       // 성공 처리
       alert("상품 등록이 완료되었습니다!");
-      router.push('/home');
+      router.push("/home");
       // 폼 데이터 초기화
       useProductRegisterStore.getState().resetForm();
       // TODO: 성공 후 리다이렉트 처리
-      router.push('/home');
+      router.push("/home");
     } catch (error) {
       console.error("상품 등록 실패:", error);
       alert("상품 등록에 실패했습니다. 다시 시도해주세요.");
@@ -110,7 +109,7 @@ export default function PostRegisterPage() {
       />
 
       {/* 이미지 업로드 컴포넌트 */}
-      <ProductRegisterImageUpload value={images} onChange={setImages}/>
+      <ProductRegisterImageUpload value={images} onChange={setImages} />
 
       {/* 제목 입력 폼 */}
       <ProductRegisterFormGroup title="제목">

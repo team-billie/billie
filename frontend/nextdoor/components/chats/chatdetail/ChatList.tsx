@@ -23,7 +23,7 @@ const ChatList: React.FC<ChatListProps> = ({
   
   // props로 전달받은 값이 없는 경우 useUserStore의 값 사용
   const displayName = username || userStoreData.username || 'username';
-  const displayAvatar = userAvatar || userStoreData.profileImage || '/images/profileimg.png';
+  const displayAvatar = userAvatar || userStoreData.profileImageUrl || '/images/profileimg.png';
 
   useEffect(() => {
     if (messagesEndRef.current) {
