@@ -35,6 +35,7 @@ export default function SafeDealAfter() {
       {/* 모달 */}
       {isModalOpen && (
         <div className="absolute inset-0 bg-gray900 flex items-center justify-center p-10 bg-opacity-70">
+          {/* 보증금 & 이미지 & 렌터아이디 */}
           <HandleDepositModal
             charge={10000}
             rentalImg=""
