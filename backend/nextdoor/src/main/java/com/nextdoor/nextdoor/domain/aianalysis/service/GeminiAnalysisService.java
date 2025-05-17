@@ -78,8 +78,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .toList();
         aiImages.forEach(aiImageDto -> log.info("Before image URL: {}", aiImageDto.getImageUrl()));
         return Content.newBuilder()
-                .addAllParts(imageParts)
                 .addParts(damageAnalyzerPromptPart)
+                .addAllParts(imageParts)
                 .setRole("user")
                 .build();
     }
@@ -116,11 +116,11 @@ public class GeminiAnalysisService implements AiAnalysisService {
         aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
                 .forEach(aiImageDto -> log.info("After image URL: {}", aiImageDto.getImageUrl()));
         return Content.newBuilder()
+                .addParts(damageComparatorPromptPart)
                 .addAllParts(beforeImageParts)
                 .addParts(Part.newBuilder().setText("These are before images.").build())
                 .addAllParts(afterImageParts)
                 .addParts(Part.newBuilder().setText("These are after images.").build())
-                .addParts(damageComparatorPromptPart)
                 .setRole("user")
                 .build();
     }
