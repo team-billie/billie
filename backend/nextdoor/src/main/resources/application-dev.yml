@@ -64,6 +64,7 @@ custom:
         location: us-central1
   damage-analyzer-prompt-location: damageAnalyzerPrompt.txt
   damage-comparator-prompt-location: damageComparatorPrompt.txt
+  product-analyzer-prompt-location: productAnalyzerPrompt.txt
 
 cloud:
   aws:
