@@ -343,10 +343,10 @@ const FloatingWidget: React.FC = () => {
       {isOpen && (
         <div className="absolute inset-0 bg-black bg-opacity-70 z-40 overflow-auto p-2">
           {/* 헤더 */}
-          <div className="px-5 py-4 flex items-center justify-between text-white">
-            <h2 className="text-3xl font-extrabold mt-10">
+          <div className="px-3 md:px-5 py-2 md:py-4 flex items-center justify-between text-white">
+            <h2 className="text-xl md:text-3xl font-extrabold mt-5 md:mt-10">
               원클릭 빌리 매니저
-              <p className="text-blue-300 font-medium text-xl mt-2 mb-8">
+              <p className="text-blue-300 font-medium text-base md:text-xl mt-1 md:mt-2 mb-4 md:mb-8">
                 {totalRequestCount > 0
                   ? "거래가 멈췄어요! 지금 이어가볼까요?"
                   : "현재 처리할 거래가 없습니다."}
@@ -369,8 +369,10 @@ const FloatingWidget: React.FC = () => {
                     id={reservation.reservationId}
                     title={reservation.postTitle}
                     productImage={
-                        reservation.postProductImage || reservation.postProductImages || "/icons/icon72.png"
-                      }
+                      reservation.postProductImage ||
+                      reservation.postProductImages ||
+                      "/icons/icon72.png"
+                    }
                     profileImage={
                       reservation.renterProfileImageUrl ||
                       "/images/profileimg.png"
