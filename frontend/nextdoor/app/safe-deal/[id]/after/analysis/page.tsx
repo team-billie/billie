@@ -16,10 +16,16 @@ export default function SafeDealAfter() {
     return;
   }
   return (
-    <main className="relative min-h-[100dvh] flex flex-col gap-4">
-      <Header txt={"반납하기"} />
-      <CompareAnalysis />
-      <GrayButton txt="보증금 처리" onClick={() => setIsModalOpen(true)} />
+    <main className="fixed inset-0 w-full h-full bg-graygradient flex flex-col">
+      <div className="fixed top-0 left-0 w-full z-10 bg-graygradient">
+        <Header txt={"반납하기"} />
+      </div>
+      <div className=" pt-[64px] flex-1 overflow-y-auto">
+        <CompareAnalysis />
+      </div>
+      <div className="p-4 items-end">
+        <GrayButton txt="보증금 처리" onClick={() => setIsModalOpen(true)} />
+      </div>
       {isModalOpen && (
         <div className="absolute inset-0 bg-gray900 flex-1 flex items-center justify-center p-10 bg-opacity-70">
           <HandleDepositModal
