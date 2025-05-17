@@ -1,6 +1,5 @@
 package com.nextdoor.nextdoor.domain.rental.service;
 
-import com.nextdoor.nextdoor.domain.auth.CustomOAuth2User;
 import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
@@ -9,22 +8,22 @@ import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
-import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
-import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
-import com.nextdoor.nextdoor.domain.rental.port.*;
-import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.event.out.RentalCreatedEvent;
+import com.nextdoor.nextdoor.domain.rental.exception.InvalidRenterIdException;
 import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
-import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
+import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
+import com.nextdoor.nextdoor.domain.rental.message.RequestRemittanceStatusMessage;
+import com.nextdoor.nextdoor.domain.rental.port.*;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
+import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -67,13 +66,12 @@ public class RentalServiceImpl implements RentalService {
         );
 
         RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                createdRental.getRentalId(),
-                "OWNER"
+                createdRental.getRentalId()
         );
 
         messagingTemplate.convertAndSend(
                 "/topic/rental/" + ownerUuid + "/status",
-                RentalStatusMessage.builder()
+                RequestRemittanceStatusMessage.builder()
                         .rentalId(createdRental.getRentalId())
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.CREATED.name())
@@ -161,8 +159,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                rental.getRentalId(),
-                "OWNER"
+                rental.getRentalId()
         );
 
         messagingTemplate.convertAndSend("/topic/rental/" + ownerUuid + "/status",
@@ -198,8 +195,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                rental.getRentalId(),
-                "RENTER"
+                rental.getRentalId()
         );
 
         messagingTemplate.convertAndSend("/topic/rental/" + renterUuid + "/status"
@@ -334,8 +330,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                rental.getRentalId(),
-                "RENTER"
+                rental.getRentalId()
         );
 
         messagingTemplate.convertAndSend(
@@ -367,5 +362,12 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public ManagedRentalCountResult countManagedRentals(Long ownerId) {
         return rentalQueryPort.countManagedRentals(ownerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SearchRentalResult getRentalById(Long rentalId) {
+        return rentalQueryPort.findRentalById(rentalId)
+                .orElseThrow(() -> new NoSuchRentalException("ID가 " + rentalId + "인 대여 정보가 존재하지 않습니다."));
     }
 }

@@ -13,4 +13,5 @@ public interface RentalQueryPort {
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     Optional<RequestRemittanceResult> findRemittanceRequestViewData(Long rentalId);
     ManagedRentalCountResult countManagedRentals(Long ownerId);
+    Optional<SearchRentalResult> findRentalById(Long rentalId);
 }

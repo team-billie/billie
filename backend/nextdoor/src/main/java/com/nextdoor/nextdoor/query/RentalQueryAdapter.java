@@ -179,4 +179,41 @@ public class RentalQueryAdapter implements RentalQueryPort {
                 .managedRentalCount(count != null ? count : 0L)
                 .build();
     }
+
+    @Override
+    public Optional<SearchRentalResult> findRentalById(Long rentalId) {
+        SearchRentalResult result = queryFactory
+                .select(Projections.fields(SearchRentalResult.class,
+                        reservation.id.as("id"),
+                        reservation.startDate.as("startDate"),
+                        reservation.endDate.as("endDate"),
+                        reservation.rentalFee,
+                        reservation.deposit,
+                        reservation.ownerId,
+                        reservation.renterId,
+                        rental.rentalId,
+                        rental.rentalProcess.stringValue().as("rentalProcess"),
+                        rental.rentalStatus.stringValue().as("rentalStatus"),
+                        post.title,
+                        rental.createdAt))
+                .from(rental)
+                .join(reservation).on(rental.reservationId.eq(reservation.id))
+                .join(post).on(reservation.postId.eq(post.id))
+                .where(rental.rentalId.eq(rentalId))
+                .fetchOne();
+
+        if (result != null) {
+            List<String> imageUrls = queryFactory
+                    .select(productImage.imageUrl)
+                    .from(productImage)
+                    .join(productImage.post, post)
+                    .join(reservation).on(reservation.postId.eq(post.id))
+                    .where(reservation.id.eq(result.getId()))
+                    .fetch();
+
+            result.setProductImages(imageUrls);
+        }
+
+        return Optional.ofNullable(result);
+    }
 }
