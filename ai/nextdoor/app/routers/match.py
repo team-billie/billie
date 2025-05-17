@@ -22,8 +22,8 @@ class MatchRequest(BaseModel):
 async def match_images(req: MatchRequest):
     # 1) Download images from S3 URLs
     async with httpx.AsyncClient() as client:
-        tasks_before = [client.get(url) for url in req.before]
-        tasks_after  = [client.get(url) for url in req.after]
+        tasks_before = [client.get(str(url)) for url in req.before]
+        tasks_after  = [client.get(str(url)) for url in req.after]
         # asyncio.gather 으로 코루틴을 병렬 실행
         resp_b = await asyncio.gather(*tasks_before)
         resp_a = await asyncio.gather(*tasks_after)
