@@ -48,13 +48,13 @@ export default function CompareAnalysis() {
   }, [id]);
 
   return (
-    <div className="flex flex-col">
+    <div className="h-screen flex flex-col">
       <div>
         <ReportTitle />
       </div>
       {/* 박스들 */}
       <div className="px-5 flex justify-between gap-2">
-        <ColorBox txt="찌그러짐" num={0} />
+        <ColorBox txt="찌그러짐" num={damageCounts["DENT"] || 0} />
         <ColorBox txt="스크래치" num={damageCounts["SCRATCH"] || 0} />
         <ColorBox txt="오염" num={damageCounts["CONTAMINATION"] || 0} />
         <ColorBox txt="기타" num={damageCounts["OTHER"] || 0} />
@@ -64,9 +64,8 @@ export default function CompareAnalysis() {
       {/* 손상 감지 위치 */}
       <div>{analysis && <DamageLocation damageAnalysis={analysis} />}</div>
       {/* 상세 결과 보고서  */}
-      <div>
-        <DetailReport />
-      </div>
+      <div>{analysis && <DetailReport damageAnalysis={analysis} />}</div>
+
       {/* 전체 사진 확인 */}
       <div>
         <AllPhotos afterPhotos={afterPhotos} beforePhotos={beforePhotos} />

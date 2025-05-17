@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Adapter
@@ -29,6 +31,7 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
     private final ObjectMapper objectMapper;
 
     public GeminiProductImageAnalysisAdapter(
+            @Qualifier("geminiPro")
             GenerativeModel generativeModel,
             @Qualifier("productAnalyzerPromptPart") Part productAnalyzerPromptPart,
             ObjectMapper objectMapper
@@ -44,7 +47,10 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
             GenerateContentResponse response = generativeModel.generateContent(createAnalysisContent(productImage));
             String analysisResult = response.getCandidates(0).getContent().getParts(0).getText();
 
-            Map<String, Object> resultMap = objectMapper.readValue(analysisResult, Map.class);
+            // 마크다운 코드 블록 제거
+            String cleanedResult = cleanMarkdownCodeBlocks(analysisResult);
+
+            Map<String, Object> resultMap = objectMapper.readValue(cleanedResult, Map.class);
 
             return AnalyzeProductImageResponse.builder()
                     .title((String) resultMap.get("title"))
@@ -54,6 +60,17 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
         } catch (IOException e) {
             throw new ExternalApiException(e);
         }
+    }
+
+    private String cleanMarkdownCodeBlocks(String text) {
+        Pattern pattern = Pattern.compile("```(?:json)?\\s*\\n?(.*?)\\n?```", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+
+        return text.trim();
     }
 
     private Content createAnalysisContent(MultipartFile productImage) throws IOException {

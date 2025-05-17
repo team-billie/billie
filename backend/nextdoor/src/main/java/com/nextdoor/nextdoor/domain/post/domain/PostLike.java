@@ -8,7 +8,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "post_likes")
+@Table(
+        name = "post_likes",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_post_like_post_member",
+                columnNames = { "post_id", "member_id" }
+        )
+)
 public class PostLike extends TimestampedEntity {
 
     @Id

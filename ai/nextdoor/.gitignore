@@ -1,0 +1,32 @@
+# ─── Python Bytecode & Cython ──────────────────────────
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+
+# ─── Python Bytecode & Cython ──────────────────────────
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+
+# ─── Test & Coverage ──────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+tests/__pycache__/
+
+# ─── IDE / Editor ─────────────────────────────────────
+.vscode/
+.idea/
+
+# ─── Environment / Secrets ────────────────────────────
+.env
+.env.*         # e.g. .env.local, .env.development
+
+# ─── Logs ────────────────────────────────────────────
+*.log
+
+# ─── macOS / Windows system files ────────────────────
+.DS_Store
+Thumbs.db
