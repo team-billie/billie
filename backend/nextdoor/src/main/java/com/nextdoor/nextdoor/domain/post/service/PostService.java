@@ -46,4 +46,11 @@ public interface PostService {
      * @return The number of likes for the post
      */
     int getPostLikeCount(Long postId);
+
+    /**
+     * Gets all posts liked by a member
+     * @param command The search command containing the member ID and pagination information
+     * @return A page of posts liked by the member
+     */
+    Page<SearchPostResult> getLikedPostsByMember(SearchPostCommand command);
 }

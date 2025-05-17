@@ -2,8 +2,9 @@ package com.nextdoor.nextdoor.domain.post.service;
 
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
 import com.nextdoor.nextdoor.domain.post.domain.Post;
-import com.nextdoor.nextdoor.domain.post.domain.PostLike;
 import com.nextdoor.nextdoor.domain.post.domain.PostLikeCount;
+import com.nextdoor.nextdoor.domain.post.exception.NoSuchPostException;
+import com.nextdoor.nextdoor.domain.post.exception.PostImageUploadException;
 import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
 import com.nextdoor.nextdoor.domain.post.port.ProductImageAnalysisPort;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -75,10 +75,13 @@ public class PostServiceImpl implements PostService {
 
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile image : command.getProductImages()) {
-            String imageUrl = s3ImageUploadPort.uploadProductImage(image, savedPost.getId());
-            imageUrls.add(imageUrl);
-
-            savedPost.addProductImage(imageUrl);
+            try {
+                String imageUrl = s3ImageUploadPort.uploadProductImage(image, savedPost.getId());
+                imageUrls.add(imageUrl);
+                savedPost.addProductImage(imageUrl);
+            } catch (Exception e) {
+                throw new PostImageUploadException("게시물 이미지 업로드에 실패했습니다.", e);
+            }
         }
 
         return postMapper.toCreateResult(savedPost, imageUrls);
@@ -94,7 +97,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public boolean likePost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchPostException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
 
         if (postLikeRepository.existsByPostAndMemberId(post, memberId)) {
             return false;
@@ -114,7 +117,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public boolean unlikePost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchPostException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
 
         if (!postLikeRepository.existsByPostAndMemberId(post, memberId)) {
             return false;
@@ -134,7 +137,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public boolean isPostLikedByMember(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchPostException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
 
         return postLikeRepository.existsByPostAndMemberId(post, memberId);
     }
@@ -146,5 +149,11 @@ public class PostServiceImpl implements PostService {
                 .map(PostLikeCount::getLikeCount)
                 .map(Long::intValue)
                 .orElse(0);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SearchPostResult> getLikedPostsByMember(SearchPostCommand command) {
+        return postQueryPort.searchPostsLikedByMember(command);
     }
 }
