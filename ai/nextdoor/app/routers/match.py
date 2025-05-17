@@ -17,16 +17,27 @@ class MatchRequest(BaseModel):
     after:  List[HttpUrl]
     threshold: float = 0.5  # optional threshold
 
-@router.post("/", response_class=PlainTextResponse)
-async def match_images(
-    before: List[UploadFile] = File(...),
-    after:  List[UploadFile] = File(...)
-) -> str:
-    # 1) Prepare names and embeddings
-    before_names = [f.filename for f in before]
-    after_names  = [f.filename for f in after]
-    before_embs  = [embed_image(await f.read()) for f in before]
-    after_embs   = [embed_image(await f.read()) for f in after]
+@router.post("/", response_class=JSONResponse)
+async def match_images(req: MatchRequest):
+    # 1) Download images from S3 URLs
+    async with httpx.AsyncClient() as client:
+        tasks_before = [client.get(url) for url in req.before]
+        tasks_after  = [client.get(url) for url in req.after]
+        resp_b = await httpx.gather(*tasks_before)
+        resp_a = await httpx.gather(*tasks_after)
+
+    before_embs = []
+    for r in resp_b:
+        if r.status_code != 200:
+            raise HTTPException(status_code=400, detail=f"before images Failed to fetch {r.url}")
+        before_embs.append(embed_image_bytes(r.content))
+
+    after_embs = []
+    for r in resp_a:
+        if r.status_code != 200:
+            raise HTTPException(status_code=400, detail=f"after images Failed to fetch {r.url}")
+        after_embs.append(embed_image_bytes(r.content))
+
 
     # 2) Compute similarity matrix and optimal matching
     sim_matrix = compute_similarity_matrix(before_embs, after_embs)
