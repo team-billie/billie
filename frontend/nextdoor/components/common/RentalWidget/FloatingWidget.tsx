@@ -46,7 +46,7 @@ const FloatingWidget: React.FC = () => {
 
   const { showAlert } = useAlertModal();
 
-  // 위치 정보 저장 함수 - 별도 함수로 분리
+  // 위치 정보 저장 
   const savePosition = (pos: { x: number; y: number }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("widgetPosition", JSON.stringify(pos));
@@ -73,7 +73,7 @@ const FloatingWidget: React.FC = () => {
     },
   ]);
 
-  // 처리가 필요한 대여 항목 필터링
+  // 처리 대여 항목 필터링
   const actionNeededRentals = activeRentals.filter((rental) => {
     const isOwner = userId === rental.rentalDetail?.ownerId;
     const isRenter = userId === rental.rentalDetail?.renterId;
@@ -129,29 +129,22 @@ const FloatingWidget: React.FC = () => {
         try {
           const parsed = JSON.parse(savedPosition);
 
-          // 화면 내부에 위치하도록 조정
           const viewportWidth = window.innerWidth;
           const viewportHeight = window.innerHeight;
 
-          // 기본값이 오른쪽에 오도록 조정 - 화면에 따라 위치 유지
           let safeX, safeY;
 
-          // 저장된 위치가 화면의 왼쪽 절반인지 오른쪽 절반인지 확인
           const isOnRightSide = parsed.x > viewportWidth / 2;
 
           if (isOnRightSide) {
-            // 오른쪽 배치 유지 (화면 너비의 80% 위치에)
             safeX = Math.min(viewportWidth * 0.8, viewportWidth - 60);
           } else {
-            // 왼쪽 배치 유지 (화면 너비의 20% 위치에)
             safeX = Math.max(viewportWidth * 0.2, 60);
           }
 
-          // 높이는 원래 비율 유지
           const heightRatio = parsed.y / viewportHeight;
           safeY = viewportHeight * heightRatio;
 
-          // 화면 경계 확인
           safeY = Math.min(Math.max(20, safeY), viewportHeight - 80);
 
           setPosition({ x: safeX, y: safeY });
@@ -159,11 +152,9 @@ const FloatingWidget: React.FC = () => {
         } catch (e) {
           console.error("위치 정보 파싱 오류:", e);
 
-          // 오류 시 기본 위치는 항상 오른쪽으로
           setPosition({ x: window.innerWidth - 80, y: window.innerHeight / 2 });
         }
       } else {
-        // 처음 위치는 항상 오른쪽으로
         setPosition({ x: window.innerWidth - 80, y: window.innerHeight / 2 });
       }
     }
@@ -173,7 +164,6 @@ const FloatingWidget: React.FC = () => {
   useEffect(() => {
     // 초기 위치 설정
     if (!localStorage.getItem("widgetPosition")) {
-      // 저장된 위치가 없으면 기본값으로 오른쪽에 배치
       const defaultX = window.innerWidth - 80;
       const defaultY = window.innerHeight / 2;
       setPosition({ x: defaultX, y: defaultY });
@@ -185,7 +175,6 @@ const FloatingWidget: React.FC = () => {
     // 화면 크기 변경 감지
     window.addEventListener("resize", updatePosition);
 
-    // 컴포넌트 언마운트 시 정리
     return () => {
       savePosition(position);
       window.removeEventListener("resize", updatePosition);
@@ -211,7 +200,6 @@ const FloatingWidget: React.FC = () => {
       wasDragged.current = true;
     }
 
-    // 화면 밖으로 나가지 않도록 보정
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
@@ -221,9 +209,7 @@ const FloatingWidget: React.FC = () => {
     setPosition({ x: safeX, y: safeY });
   };
 
-  // 드래그 종료
   const handleStop = (e: any, data: { x: number; y: number }) => {
-    // 화면 밖으로 나가지 않도록 보정
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
@@ -430,7 +416,6 @@ const FloatingWidget: React.FC = () => {
         </div>
       </Draggable>
 
-      {/* 오버레이도 Portal 내부에 있어야 함 */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 z-[99998] overflow-auto p-2"
