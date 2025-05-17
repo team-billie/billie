@@ -31,7 +31,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    private final GenerativeModel generativeModel;
+    private final GenerativeModel geminiAnalysisModel;
+    private final GenerativeModel geminiComparisonModel;
     private final Part damageAnalyzerPromptPart;
     private final Part damageComparatorPromptPart;
 
@@ -39,7 +40,10 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     public GeminiAnalysisService(
             ApplicationEventPublisher eventPublisher,
-            GenerativeModel generativeModel,
+            @Qualifier("geminiAnalysisModel")
+            GenerativeModel geminiAnalysisModel,
+            @Qualifier("geminiComparisonModel")
+            GenerativeModel geminiComparisonModel,
             @Qualifier("damageAnalyzerPromptPart")
             Part damageAnalyzerPromptPart,
             @Qualifier("damageComparatorPromptPart")
@@ -47,7 +51,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
             AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort
     ) {
         this.eventPublisher = eventPublisher;
-        this.generativeModel = generativeModel;
+        this.geminiAnalysisModel = geminiAnalysisModel;
+        this.geminiComparisonModel = geminiComparisonModel;
         this.damageAnalyzerPromptPart = damageAnalyzerPromptPart;
         this.damageComparatorPromptPart = damageComparatorPromptPart;
         this.aiAnalysisRentalQueryPort = aiAnalysisRentalQueryPort;
@@ -62,7 +67,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
         GenerateContentResponse response;
         try {
-            response = generativeModel.generateContent(createAnalysisContent(aiImages));
+            response = geminiAnalysisModel.generateContent(createAnalysisContent(aiImages));
         } catch (IOException e) {
             throw new ExternalApiException(e);
         }
@@ -93,7 +98,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         List<RentalDto.AiImageDto> aiImages = rental.getAiImages(); //ai image 존재 여부 검증
         GenerateContentResponse response;
         try {
-            response = generativeModel.generateContent(createComparisonContent(aiImages));
+            response = geminiComparisonModel.generateContent(createComparisonContent(aiImages));
         } catch (IOException e) {
             throw new ExternalApiException(e);
         }

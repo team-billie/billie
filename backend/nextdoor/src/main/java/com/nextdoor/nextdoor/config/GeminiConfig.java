@@ -15,8 +15,11 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class GeminiConfig {
 
-    @Value("${custom.google.ai.gemini.model}")
-    private String geminiModel;
+    @Value("${custom.google.ai.gemini.model.analysis}")
+    private String geminiAnalysisModel;
+
+    @Value("${custom.google.ai.gemini.model.comparison}")
+    private String geminiComparisonModel;
 
     @Value("${custom.google.ai.gemini.location}")
     private String geminiLocation;
@@ -38,9 +41,14 @@ public class GeminiConfig {
         return new VertexAI(geminiProjectId, geminiLocation);
     }
 
-    @Bean
-    public GenerativeModel generativeModel(VertexAI vertexAI) {
-        return new GenerativeModel(geminiModel, vertexAI);
+    @Bean(name = "geminiAnalysisModel")
+    public GenerativeModel geminiAnalysisModel(VertexAI vertexAI) {
+        return new GenerativeModel(geminiAnalysisModel, vertexAI);
+    }
+
+    @Bean(name = "geminiComparisonModel")
+    public GenerativeModel geminiComparisonModel(VertexAI vertexAI) {
+        return new GenerativeModel(geminiComparisonModel, vertexAI);
     }
 
     @Bean(name = "damageAnalyzerPromptPart")
