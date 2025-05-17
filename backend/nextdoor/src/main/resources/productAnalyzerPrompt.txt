@@ -30,7 +30,7 @@ Respond in the following JSON format:
 {
   "title": "A concise and attractive title for the post",
   "content": "A detailed description of the product, including its features, condition, and any other relevant information",
-  "category": "One of the categories from the list above (use the English name, e.g., DIGITAL_DEVICE)"
+  "category": "One of the display names from the list above (e.g., \"디지털기기\")"
 }
 
 Only respond in this JSON format without any additional sentence.
