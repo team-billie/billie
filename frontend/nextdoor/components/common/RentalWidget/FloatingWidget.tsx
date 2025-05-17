@@ -12,10 +12,11 @@ import ReservationActionButton from "./ReservationActionButton";
 import RentalActionButton from "./RentalActionButton";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import useUserStore from "@/lib/store/useUserStore";
+import { Portal } from "@/lib/utils/widget/portal";
 
 const FloatingWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: 500 });
+  const [position, setPosition] = useState({ x: 20, y: 200 });
   const [isShining, setIsShining] = useState(false);
   const [prevRequestCount, setPrevRequestCount] = useState(0);
   const dragStartPos = useRef({ x: 0, y: 0 });
@@ -44,6 +45,14 @@ const FloatingWidget: React.FC = () => {
   } = useRentalWebSocket();
 
   const { showAlert } = useAlertModal();
+
+  // 위치 정보 저장 함수 - 별도 함수로 분리
+  const savePosition = (pos: { x: number; y: number }) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("widgetPosition", JSON.stringify(pos));
+      console.log("위젯 위치 저장:", pos);
+    }
+  };
 
   // 임시 데이터 - 실제 구현 시 API에서 가져와야함
   const [paymentRequests, setPaymentRequests] = useState([
@@ -112,17 +121,81 @@ const FloatingWidget: React.FC = () => {
     setPrevRequestCount(totalRequestCount);
   }, [totalRequestCount, prevRequestCount]);
 
-  // 초기 위치 설정
-  useEffect(() => {
+  // 화면 크기에 관계없이 일관된 위치 유지
+  const updatePosition = () => {
     if (typeof window !== "undefined") {
       const savedPosition = localStorage.getItem("widgetPosition");
       if (savedPosition) {
-        setPosition(JSON.parse(savedPosition));
+        try {
+          const parsed = JSON.parse(savedPosition);
+
+          // 화면 내부에 위치하도록 조정
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+
+          // 기본값이 오른쪽에 오도록 조정 - 화면에 따라 위치 유지
+          let safeX, safeY;
+
+          // 저장된 위치가 화면의 왼쪽 절반인지 오른쪽 절반인지 확인
+          const isOnRightSide = parsed.x > viewportWidth / 2;
+
+          if (isOnRightSide) {
+            // 오른쪽 배치 유지 (화면 너비의 80% 위치에)
+            safeX = Math.min(viewportWidth * 0.8, viewportWidth - 60);
+          } else {
+            // 왼쪽 배치 유지 (화면 너비의 20% 위치에)
+            safeX = Math.max(viewportWidth * 0.2, 60);
+          }
+
+          // 높이는 원래 비율 유지
+          const heightRatio = parsed.y / viewportHeight;
+          safeY = viewportHeight * heightRatio;
+
+          // 화면 경계 확인
+          safeY = Math.min(Math.max(20, safeY), viewportHeight - 80);
+
+          setPosition({ x: safeX, y: safeY });
+          console.log("위젯 위치 조정:", { safeX, safeY });
+        } catch (e) {
+          console.error("위치 정보 파싱 오류:", e);
+
+          // 오류 시 기본 위치는 항상 오른쪽으로
+          setPosition({ x: window.innerWidth - 80, y: window.innerHeight / 2 });
+        }
       } else {
-        setPosition({ x: window.innerWidth - 100, y: 200 });
+        // 처음 위치는 항상 오른쪽으로
+        setPosition({ x: window.innerWidth - 80, y: window.innerHeight / 2 });
       }
     }
+  };
+
+  // 초기 위치 설정 및 화면 크기 변경 감지
+  useEffect(() => {
+    // 초기 위치 설정
+    if (!localStorage.getItem("widgetPosition")) {
+      // 저장된 위치가 없으면 기본값으로 오른쪽에 배치
+      const defaultX = window.innerWidth - 80;
+      const defaultY = window.innerHeight / 2;
+      setPosition({ x: defaultX, y: defaultY });
+      savePosition({ x: defaultX, y: defaultY });
+    } else {
+      updatePosition();
+    }
+
+    // 화면 크기 변경 감지
+    window.addEventListener("resize", updatePosition);
+
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      savePosition(position);
+      window.removeEventListener("resize", updatePosition);
+    };
   }, []);
+
+  // 위치가 변경될 때마다 저장
+  useEffect(() => {
+    savePosition(position);
+  }, [position]);
 
   // 드래그
   const handleStart = (e: any, data: { x: number; y: number }) => {
@@ -138,15 +211,26 @@ const FloatingWidget: React.FC = () => {
       wasDragged.current = true;
     }
 
-    setPosition({ x: data.x, y: data.y });
+    // 화면 밖으로 나가지 않도록 보정
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const safeX = Math.min(Math.max(0, data.x), viewportWidth - 60);
+    const safeY = Math.min(Math.max(0, data.y), viewportHeight - 60);
+
+    setPosition({ x: safeX, y: safeY });
   };
 
   // 드래그 종료
   const handleStop = (e: any, data: { x: number; y: number }) => {
-    localStorage.setItem(
-      "widgetPosition",
-      JSON.stringify({ x: data.x, y: data.y })
-    );
+    // 화면 밖으로 나가지 않도록 보정
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const safeX = Math.min(Math.max(0, data.x), viewportWidth - 60);
+    const safeY = Math.min(Math.max(0, data.y), viewportHeight - 60);
+
+    setPosition({ x: safeX, y: safeY });
 
     if (!wasDragged.current) {
       setIsOpen((prev) => !prev);
@@ -276,7 +360,7 @@ const FloatingWidget: React.FC = () => {
 
   // 드래그 가능 -- 항상 최상단에
   return (
-    <>
+    <Portal>
       <style jsx global>{`
         @keyframes shine {
           0% {
@@ -313,12 +397,19 @@ const FloatingWidget: React.FC = () => {
         onStart={handleStart}
         onDrag={handleDrag}
         onStop={handleStop}
-        bounds="body"
       >
         <div
           ref={nodeRef}
-          className="fixed z-50 cursor-move"
-          style={{ touchAction: "none" }}
+          className="fixed z-[99999]"
+          style={{
+            touchAction: "none",
+            cursor: "move",
+            pointerEvents: "auto",
+            left: position.x,
+            top: position.y,
+            transform: "translate3d(0,0,0)", // 하드웨어 가속 활성화
+            willChange: "transform", // 성능 최적화
+          }}
         >
           <div className="w-14 h-14 flex items-center justify-center">
             <Image
@@ -339,9 +430,18 @@ const FloatingWidget: React.FC = () => {
         </div>
       </Draggable>
 
-      {/* 오버레이 */}
+      {/* 오버레이도 Portal 내부에 있어야 함 */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-40 overflow-auto p-2">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 z-[99998] overflow-auto p-2"
+          style={{
+            width: "100vw",
+            height: "100vh",
+            maxWidth: "none",
+            margin: "0",
+            transform: "translate3d(0,0,0)", // 하드웨어 가속 활성화
+          }}
+        >
           {/* 헤더 */}
           <div className="px-3 md:px-5 py-2 md:py-4 flex items-center justify-between text-white">
             <h2 className="text-xl md:text-3xl font-extrabold mt-5 md:mt-10">
@@ -355,7 +455,7 @@ const FloatingWidget: React.FC = () => {
           </div>
 
           {/* 모달 콘텐츠 */}
-          <div className="px-5 py-2 text-white">
+          <div className="px-5 py-2 text-white max-w-md mx-auto">
             <div className="space-y-4 mb-8">
               {/* 예약 요청 항목 */}
               {loading ? (
@@ -486,7 +586,7 @@ const FloatingWidget: React.FC = () => {
           </div>
         </div>
       )}
-    </>
+    </Portal>
   );
 };
 
