@@ -39,24 +39,21 @@ async def match_images(req: MatchRequest):
         after_embs.append(embed_image_bytes(r.content))
 
 
-    # 2) Compute similarity matrix and optimal matching
+    # 2) Match embeddings
+    idx_pairs = match_embeddings(before_embs, after_embs, req.threshold)
     sim_matrix = compute_similarity_matrix(before_embs, after_embs)
-    idx_pairs  = match_embeddings(before_embs, after_embs)
 
-    # 3) Summary info
-    lines = []
-    lines.append(f"테스트 이미지 수 : before={len(before_names)}, after={len(after_names)}")
-    lines.append(f"매칭된 이미지 쌍 : {len(idx_pairs)}개")
-    lines.append("")  # blank line
+    # 3) Format response
+    results = []
+    for i, j, sim in idx_pairs:
+        results.append({
+            "before_index": i,
+            "after_index": j,
+            "similarity": round(sim, 4)
+        })
 
-    # 4) Detail per match
-    for idx, (i, j) in enumerate(idx_pairs, start=1):
-        sim = sim_matrix[i, j]
-        lines.append(f"매칭 #{idx} :")
-        lines.append(f"  Before 이미지 : {before_names[i]}")
-        lines.append(f"  After 이미지  : {after_names[j]}")
-        lines.append(f"  유사도: {sim:.4f}")
-        lines.append("")  # blank line between entries
-
-    # 5) Return as plain text
-    return "\n".join(lines)
+    return {  
+        "before_count": len(req.before),
+        "after_count":  len(req.after),
+        "matches":     results
+    }
