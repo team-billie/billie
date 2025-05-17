@@ -4,7 +4,7 @@ type PostListItemDto = {
   productImage: string;
   rentalFee: string;
   deposit: string;
-  like: number;
+  likeCount: number;
   dealCount: number;
 };
 
