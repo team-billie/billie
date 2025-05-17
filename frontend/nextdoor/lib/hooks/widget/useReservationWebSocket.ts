@@ -50,7 +50,9 @@ export default function useReservationWebSocket() {
         deposit: reservation.deposit,
         status: reservation.reservationStatus || reservation.status,
         ownerName: reservation.ownerName || '소유자',
-        ownerProfileImageUrl: reservation.ownerProfileImageUrl || '/images/profileimg.png'
+        ownerProfileImageUrl: reservation.ownerProfileImageUrl || '/images/profileimg.png',
+        renterName: reservation.renterName || '렌터',
+        renterProfileImageUrl: reservation.renterProfileImageUrl || '/images/profileimg.png'
       }));
       
       setPendingReservations(formattedReservations);
@@ -106,14 +108,16 @@ export default function useReservationWebSocket() {
             const formattedReservation = {
               reservationId: reservationData.reservationId,
               postTitle: reservationData.postTitle || reservationData.title,
-              postProductImage: reservationData.postProductImage || reservationData.productImageUrl,
+              postProductImage: reservationData.postProductImages || reservationData.productImageUrl,
               startDate: reservationData.startDate,
               endDate: reservationData.endDate,
               rentalFee: reservationData.rentalFee,
               deposit: reservationData.deposit,
               status: reservationData.status || reservationData.reservationStatus,
               ownerName: reservationData.ownerName || '소유자',
-              ownerProfileImageUrl: reservationData.ownerProfileImageUrl || '/images/profileimg.png'
+              ownerProfileImageUrl: reservationData.ownerProfileImageUrl || '/images/profileimg.png',
+              renterName: reservationData.renterName || '렌터',
+              renterProfileImageUrl: reservationData.renterProfileImageUrl || '/images/profileimg.png'
             };
             
             handleReservationUpdate(formattedReservation);
@@ -192,7 +196,7 @@ export default function useReservationWebSocket() {
         }
       );
       
-      // 성공 시 목록에서 해당 예약 제거
+      // 성공하면 목록에서 해당 예약 제거
       setPendingReservations(prev => 
         prev.filter(res => res.reservationId !== reservationId)
       );
@@ -219,7 +223,7 @@ export default function useReservationWebSocket() {
         }
       );
       
-      // 성공 시 목록에서 해당 예약 제거
+      // 성공하면 목록에서 해당 예약 제거
       setPendingReservations(prev => 
         prev.filter(res => res.reservationId !== reservationId)
       );
