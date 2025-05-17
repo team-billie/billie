@@ -1,3 +1,15 @@
+# ─── Python Bytecode & Cython ──────────────────────────
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+
+# ─── Python Bytecode & Cython ──────────────────────────
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+
 # ─── Test & Coverage ──────────────────────────────────
 .pytest_cache/
 .coverage

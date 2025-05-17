@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, HttpUrl
 from typing import List
 import httpx
+import asyncio
 from app.clip_embed import embed_image_bytes
 from app.matcher import match_embeddings, compute_similarity_matrix
 
@@ -23,8 +24,9 @@ async def match_images(req: MatchRequest):
     async with httpx.AsyncClient() as client:
         tasks_before = [client.get(url) for url in req.before]
         tasks_after  = [client.get(url) for url in req.after]
-        resp_b = await httpx.gather(*tasks_before)
-        resp_a = await httpx.gather(*tasks_after)
+        # asyncio.gather 으로 코루틴을 병렬 실행
+        resp_b = await asyncio.gather(*tasks_before)
+        resp_a = await asyncio.gather(*tasks_after)
 
     before_embs = []
     for r in resp_b:
