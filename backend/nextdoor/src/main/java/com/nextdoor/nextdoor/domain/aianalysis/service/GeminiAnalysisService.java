@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -40,7 +42,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     public GeminiAnalysisService(
             ApplicationEventPublisher eventPublisher,
-            @Qualifier("geminiPro")
+            @Qualifier("geminiFlash")
             GenerativeModel geminiAnalysisModel,
             @Qualifier("geminiPro")
             GenerativeModel geminiComparisonModel,
@@ -73,7 +75,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         }
         String damageAnalysis = response.getCandidates(0).getContent().getParts(0).getText();
         eventPublisher.publishEvent(new AiAnalysisCompletedEvent(damageAnalysisRequestDto.getRentalId(), damageAnalysis));
-        return new InspectDamageResponseDto(damageAnalysis);
+        return new InspectDamageResponseDto(cleanMarkdownCodeBlocks(damageAnalysis));
     }
 
     private Content createAnalysisContent(List<RentalDto.AiImageDto> aiImages) {
@@ -104,7 +106,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         }
         String damageAnalysis = response.getCandidates(0).getContent().getParts(0).getText();
         eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(inspectDamageRequestDto.getRentalId(), damageAnalysis));
-        return new InspectDamageResponseDto(damageAnalysis);
+        return new InspectDamageResponseDto(cleanMarkdownCodeBlocks(damageAnalysis));
     }
 
     private Content createComparisonContent(List<RentalDto.AiImageDto> aiImages) {
@@ -126,5 +128,14 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .addParts(Part.newBuilder().setText("These are after images.").build())
                 .setRole("user")
                 .build();
+    }
+
+    private String cleanMarkdownCodeBlocks(String text) {
+        Pattern pattern = Pattern.compile("```(?:json)?\\s*\\n?(.*?)\\n?```", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+        return text.trim();
     }
 }
