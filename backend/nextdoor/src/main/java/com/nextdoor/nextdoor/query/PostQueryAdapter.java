@@ -8,6 +8,7 @@ import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.post.domain.QPostLike;
 import com.nextdoor.nextdoor.domain.post.domain.QPostLikeCount;
 import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
+import com.nextdoor.nextdoor.domain.post.exception.NoSuchPostException;
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.LocationDto;
@@ -77,6 +78,40 @@ public class PostQueryAdapter implements PostQueryPort {
         return new PageImpl<>(results, pageable, total);
     }
 
+    @Override
+    public Page<SearchPostResult> searchPostsLikedByMember(SearchPostCommand command) {
+        Long memberId = command.getUserId();
+
+        JPAQuery<SearchPostResult> query = queryFactory
+                .select(Projections.constructor(
+                        SearchPostResult.class,
+                        post.id,
+                        post.title,
+                        queryFactory
+                                .select(productImage.imageUrl.min())
+                                .from(productImage)
+                                .where(productImage.post.id.eq(post.id)),
+                        post.rentalFee,
+                        post.deposit,
+                        postLikeCount.likeCount.intValue().coalesce(0),
+                        Expressions.constant(0)
+                ))
+                .from(post)
+                .join(postLike).on(postLike.post.eq(post).and(postLike.memberId.eq(memberId)))
+                .leftJoin(postLikeCount).on(postLikeCount.postId.eq(post.id))
+                .groupBy(post.id);
+
+        long total = query.fetchCount();
+
+        Pageable pageable = command.getPageable();
+        List<SearchPostResult> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
     public PostDetailResult getPostDetail(Long postId) {
         Post postEntity = queryFactory
                 .selectFrom(post)
@@ -84,7 +119,7 @@ public class PostQueryAdapter implements PostQueryPort {
                 .fetchOne();
 
         if(postEntity == null){
-            return null;
+            throw new NoSuchPostException("ID가 " + postId + "인 게시물이 존재하지 않습니다.");
         }
 
         String nickname = queryFactory

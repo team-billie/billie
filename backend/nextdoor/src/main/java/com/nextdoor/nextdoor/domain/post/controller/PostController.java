@@ -115,4 +115,17 @@ public class PostController {
         PostLikeResponse response = PostLikeResponse.of(postId, isLiked, likeCount);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/liked")
+    public ResponseEntity<Page<PostListResponse>> getLikedPosts(
+            @AuthenticationPrincipal Long userId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        SearchPostCommand command = postMapper.toCommand(userId, pageable);
+        Page<SearchPostResult> results = postService.getLikedPostsByMember(command);
+        Page<PostListResponse> responsePage = results.map(postMapper::toResponse);
+
+        return ResponseEntity.ok(responsePage);
+    }
 }
