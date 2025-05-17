@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.post.controller;
 
 import com.nextdoor.nextdoor.domain.post.controller.dto.request.CreatePostRequest;
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.CreatePostResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostDetailResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostListResponse;
@@ -64,6 +65,14 @@ public class PostController {
         CreatePostResult result = postService.createPost(command);
         CreatePostResponse response = postMapper.toCreateResponse(result);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/analyze-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AnalyzeProductImageResponse> analyzeProductImage(
+            @RequestPart("image") MultipartFile image
+    ) {
+        AnalyzeProductImageResponse response = postService.analyzeProductImage(image);
         return ResponseEntity.ok(response);
     }
 }
