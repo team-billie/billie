@@ -46,11 +46,8 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
             GenerateContentResponse response = generativeModel.generateContent(createAnalysisContent(productImage));
             String analysisResult = response.getCandidates(0).getContent().getParts(0).getText();
 
-            log.info("원본 분석 결과: {}", analysisResult);
-
             // 마크다운 코드 블록 제거
             String cleanedResult = cleanMarkdownCodeBlocks(analysisResult);
-            log.info("정제된 분석 결과: {}", cleanedResult);
 
             Map<String, Object> resultMap = objectMapper.readValue(cleanedResult, Map.class);
 
@@ -60,7 +57,6 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
                     .category(Category.from((String) resultMap.get("category")))
                     .build();
         } catch (IOException e) {
-            log.error("이미지 분석 중 오류 발생", e);
             throw new ExternalApiException(e);
         }
     }

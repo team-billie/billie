@@ -15,4 +15,35 @@ public interface PostService {
     PostDetailResult getPostDetail(Long postId);
     CreatePostResult createPost(CreatePostCommand command);
     AnalyzeProductImageResponse analyzeProductImage(MultipartFile productImage);
+
+    /**
+     * Adds a like to a post from a member
+     * @param postId The ID of the post to like
+     * @param memberId The ID of the member liking the post
+     * @return true if the post was liked, false if it was already liked
+     */
+    boolean likePost(Long postId, Long memberId);
+
+    /**
+     * Removes a like from a post by a member
+     * @param postId The ID of the post to unlike
+     * @param memberId The ID of the member unliking the post
+     * @return true if the post was unliked, false if it wasn't liked
+     */
+    boolean unlikePost(Long postId, Long memberId);
+
+    /**
+     * Checks if a post is liked by a member
+     * @param postId The ID of the post to check
+     * @param memberId The ID of the member to check
+     * @return true if the post is liked by the member, false otherwise
+     */
+    boolean isPostLikedByMember(Long postId, Long memberId);
+
+    /**
+     * Gets the number of likes for a post
+     * @param postId The ID of the post to get likes for
+     * @return The number of likes for the post
+     */
+    int getPostLikeCount(Long postId);
 }

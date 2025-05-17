@@ -3,8 +3,10 @@ package com.nextdoor.nextdoor.query;
 import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.Post;
+import com.nextdoor.nextdoor.domain.post.domain.PostLikeCount;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.post.domain.QPostLike;
+import com.nextdoor.nextdoor.domain.post.domain.QPostLikeCount;
 import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
@@ -31,6 +33,7 @@ public class PostQueryAdapter implements PostQueryPort {
     private final QMember member = QMember.member;
     private final QProductImage productImage = QProductImage.productImage;
     private final QPostLike postLike = QPostLike.postLike;
+    private final QPostLikeCount postLikeCount = QPostLikeCount.postLikeCount;
 
     @Override
     public Page<SearchPostResult> searchPostsByMemberAddress(SearchPostCommand command) {
@@ -52,12 +55,11 @@ public class PostQueryAdapter implements PostQueryPort {
                                 .where(productImage.post.id.eq(post.id)),
                         post.rentalFee,
                         post.deposit,
-                        postLike.count().intValue(),
+                        postLikeCount.likeCount.intValue().coalesce(0),
                         Expressions.constant(0)
                 ))
                 .from(post)
                 .join(member).on(post.authorId.eq(member.id))
-                .leftJoin(postLike).on(postLike.post.id.eq(post.id))
                 .groupBy(post.id);
 
         if (userAddress != null) {
@@ -102,6 +104,12 @@ public class PostQueryAdapter implements PostQueryPort {
             locationDto = new LocationDto(postEntity.getLatitude(), postEntity.getLongitude());
         }
 
+        Integer likeCount = queryFactory
+                .select(postLikeCount.likeCount.intValue())
+                .from(postLikeCount)
+                .where(postLikeCount.postId.eq(postId))
+                .fetchOne();
+
         return PostDetailResult.builder()
                 .title(postEntity.getTitle())
                 .content(postEntity.getContent())
@@ -113,6 +121,7 @@ public class PostQueryAdapter implements PostQueryPort {
                 .category(postEntity.getCategory().toString())
                 .authorId(postEntity.getAuthorId())
                 .nickname(nickname)
+                .likeCount(likeCount != null ? likeCount : 0)
                 .build();
     }
 

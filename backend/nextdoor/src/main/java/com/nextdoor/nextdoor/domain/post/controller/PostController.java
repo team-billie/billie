@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.post.controller.dto.request.CreatePostReques
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.CreatePostResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostDetailResponse;
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostLikeResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostListResponse;
 import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.service.PostService;
@@ -14,6 +15,7 @@ import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
@@ -73,6 +76,43 @@ public class PostController {
             @RequestPart("image") MultipartFile image
     ) {
         AnalyzeProductImageResponse response = postService.analyzeProductImage(image);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<PostLikeResponse> likePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal Long userId
+    ) {
+        boolean success = postService.likePost(postId, userId);
+        int likeCount = postService.getPostLikeCount(postId);
+        if (success) likeCount++;
+
+        PostLikeResponse response = PostLikeResponse.of(postId, true, likeCount);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{postId}/like")
+    public ResponseEntity<PostLikeResponse> unlikePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal Long userId
+    ) {
+        postService.unlikePost(postId, userId);
+        int likeCount = postService.getPostLikeCount(postId);
+
+        PostLikeResponse response = PostLikeResponse.of(postId, false, likeCount);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{postId}/like")
+    public ResponseEntity<PostLikeResponse> isPostLikedByUser(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal Long userId
+    ) {
+        boolean isLiked = postService.isPostLikedByMember(postId, userId);
+        int likeCount = postService.getPostLikeCount(postId);
+
+        PostLikeResponse response = PostLikeResponse.of(postId, isLiked, likeCount);
         return ResponseEntity.ok(response);
     }
 }
