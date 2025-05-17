@@ -44,6 +44,7 @@ export default function useReservationWebSocket() {
         reservationId: reservation.reservationId,
         postTitle: reservation.title || reservation.postTitle,
         postProductImage: reservation.productImageUrl || reservation.postProductImage,
+        postProductImages: reservation.productImageUrl || reservation.postProductImage,
         startDate: reservation.startDate,
         endDate: reservation.endDate,
         rentalFee: reservation.rentalFee,

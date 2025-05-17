@@ -35,6 +35,7 @@ export default function RootLayout({
         <AlertModalProvider>
           <WidgetProvider>
           {children}
+          {/* <FloatingWidget /> */}
           </WidgetProvider>
         </AlertModalProvider>
       </body>

@@ -13,37 +13,6 @@ import RentalActionButton from "./RentalActionButton";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import useUserStore from "@/lib/store/useUserStore";
 
-// 화면 크기를 감지하는 훅 추가
-const useWindowSize = () => {
-  const [windowSize, setWindowSize] = useState({
-    width: typeof window !== "undefined" ? window.innerWidth : 0,
-    height: typeof window !== "undefined" ? window.innerHeight : 0,
-  });
-
-  useEffect(() => {
-    // window 객체가 있는지 확인 (SSR 대응)
-    if (typeof window === "undefined") return;
-
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    // 컴포넌트 마운트 시 초기 크기 설정
-    handleResize();
-
-    // 리사이즈 이벤트 리스너 추가
-    window.addEventListener("resize", handleResize);
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return windowSize;
-};
-
 const FloatingWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 500 });
@@ -52,7 +21,6 @@ const FloatingWidget: React.FC = () => {
   const dragStartPos = useRef({ x: 0, y: 0 });
   const wasDragged = useRef(false);
   const nodeRef = useRef(null);
-  const { width, height } = useWindowSize();
 
   const { userId } = useUserStore();
 
@@ -144,68 +112,40 @@ const FloatingWidget: React.FC = () => {
     setPrevRequestCount(totalRequestCount);
   }, [totalRequestCount, prevRequestCount]);
 
-  // 초기 위치 설정 - 화면 크기에 따라 동적으로 조정
+  // 초기 위치 설정
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedPosition = localStorage.getItem("widgetPosition");
       if (savedPosition) {
-        try {
-          const parsed = JSON.parse(savedPosition);
-          // 저장된 위치가 화면 범위를 벗어나면 조정
-          const adjustedX = Math.min(Math.max(0, parsed.x), window.innerWidth - 70);
-          const adjustedY = Math.min(Math.max(0, parsed.y), window.innerHeight - 70);
-          setPosition({ x: adjustedX, y: adjustedY });
-        } catch (e) {
-          // 파싱 오류시 기본 위치로 설정
-          setDefaultPosition();
-        }
+        setPosition(JSON.parse(savedPosition));
       } else {
-        setDefaultPosition();
+        setPosition({ x: window.innerWidth - 100, y: 200 });
       }
     }
-  }, [width, height]);
+  }, []);
 
-  // 기본 위치 설정 함수
-  const setDefaultPosition = () => {
-    if (typeof window !== "undefined") {
-      // 모바일 화면에 맞게 조정 (오른쪽 하단)
-      const x = Math.max(20, Math.min(window.innerWidth - 70, window.innerWidth * 0.8));
-      const y = Math.max(100, Math.min(window.innerHeight - 100, window.innerHeight * 0.7));
-      setPosition({ x, y });
-    }
-  };
-
-  // 드래그 시작
+  // 드래그
   const handleStart = (e: any, data: { x: number; y: number }) => {
     dragStartPos.current = { x: data.x, y: data.y };
     wasDragged.current = false;
   };
 
-  // 드래그 중
   const handleDrag = (e: any, data: { x: number; y: number }) => {
-    // 화면 경계를 벗어나지 않도록 제한
-    const newX = Math.max(0, Math.min(data.x, window.innerWidth - 60));
-    const newY = Math.max(0, Math.min(data.y, window.innerHeight - 60));
-    
-    const dx = Math.abs(newX - dragStartPos.current.x);
-    const dy = Math.abs(newY - dragStartPos.current.y);
+    const dx = Math.abs(data.x - dragStartPos.current.x);
+    const dy = Math.abs(data.y - dragStartPos.current.y);
 
     if (dx > 5 || dy > 5) {
       wasDragged.current = true;
     }
 
-    setPosition({ x: newX, y: newY });
+    setPosition({ x: data.x, y: data.y });
   };
 
   // 드래그 종료
   const handleStop = (e: any, data: { x: number; y: number }) => {
-    // 화면 경계 내에서 위치 저장
-    const finalX = Math.max(0, Math.min(data.x, window.innerWidth - 60));
-    const finalY = Math.max(0, Math.min(data.y, window.innerHeight - 60));
-    
     localStorage.setItem(
       "widgetPosition",
-      JSON.stringify({ x: finalX, y: finalY })
+      JSON.stringify({ x: data.x, y: data.y })
     );
 
     if (!wasDragged.current) {
@@ -334,7 +274,7 @@ const FloatingWidget: React.FC = () => {
     ? "drop-shadow-lg select-none w-auto h-auto animate-shine"
     : "drop-shadow-lg select-none w-auto h-auto";
 
-  // 드래그 가능 - 항상 최상단에
+  // 드래그 가능 -- 항상 최상단에
   return (
     <>
       <style jsx global>{`
@@ -373,16 +313,11 @@ const FloatingWidget: React.FC = () => {
         onStart={handleStart}
         onDrag={handleDrag}
         onStop={handleStop}
-        bounds={{
-          left: 0,
-          top: 0,
-          right: width - 60,
-          bottom: height - 60
-        }}
+        bounds="parent"
       >
         <div
           ref={nodeRef}
-          className="fixed z-50 cursor-move"
+          className="absolute z-50 cursor-move"
           style={{ touchAction: "none" }}
         >
           <div className="w-14 h-14 flex items-center justify-center">
@@ -406,20 +341,12 @@ const FloatingWidget: React.FC = () => {
 
       {/* 오버레이 */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-40 overflow-auto" 
-             style={{
-               top: 0,
-               left: 0,
-               width: '100vw',
-               height: '100vh',
-               overflowY: 'auto',
-               WebkitOverflowScrolling: 'touch' // 모바일에서 스크롤 개선
-             }}>
+        <div className="absolute inset-0 bg-black bg-opacity-70 z-40 overflow-auto p-2">
           {/* 헤더 */}
           <div className="px-5 py-4 flex items-center justify-between text-white">
-            <h2 className="text-2xl sm:text-3xl font-extrabold mt-10">
+            <h2 className="text-3xl font-extrabold mt-10">
               원클릭 빌리 매니저
-              <p className="text-blue-300 font-medium text-lg sm:text-xl mt-2 mb-8">
+              <p className="text-blue-300 font-medium text-xl mt-2 mb-8">
                 {totalRequestCount > 0
                   ? "거래가 멈췄어요! 지금 이어가볼까요?"
                   : "현재 처리할 거래가 없습니다."}
@@ -428,7 +355,7 @@ const FloatingWidget: React.FC = () => {
           </div>
 
           {/* 모달 콘텐츠 */}
-          <div className="px-3 sm:px-5 py-2 text-white">
+          <div className="px-5 py-2 text-white">
             <div className="space-y-4 mb-8">
               {/* 예약 요청 항목 */}
               {loading ? (
@@ -442,8 +369,8 @@ const FloatingWidget: React.FC = () => {
                     id={reservation.reservationId}
                     title={reservation.postTitle}
                     productImage={
-                      reservation.postProductImages || "/icons/icon72.png"
-                    }
+                        reservation.postProductImage || reservation.postProductImages || "/icons/icon72.png"
+                      }
                     profileImage={
                       reservation.renterProfileImageUrl ||
                       "/images/profileimg.png"
@@ -513,7 +440,13 @@ const FloatingWidget: React.FC = () => {
                         rental.rentalDetail?.productImageUrl ||
                         "/icons/icon72.png"
                       }
-                      profileImage="/images/profileimg.png"
+                      profileImage={
+                        isOwner
+                          ? rental.rentalDetail?.renterProfileImageUrl ||
+                            "/images/profileimg.png" // 사용자가 오너면 렌터 프로필
+                          : rental.rentalDetail?.ownerProfileImageUrl ||
+                            "/images/profileimg.png" // 사용자가 렌터면 오너 프로필
+                      }
                       buttonText={buttonText}
                       actionLink={actionLink}
                     />
@@ -540,7 +473,7 @@ const FloatingWidget: React.FC = () => {
             </div>
 
             {/* 닫기 버튼 */}
-            <div className="text-center mt-8 mb-12 sm:mb-6">
+            <div className="text-center mt-8 mb-6">
               <button
                 onClick={() => setIsOpen(false)}
                 className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-3 rounded-full text-sm font-medium"
