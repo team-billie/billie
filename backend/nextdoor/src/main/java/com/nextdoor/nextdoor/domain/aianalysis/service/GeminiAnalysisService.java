@@ -40,7 +40,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     public GeminiAnalysisService(
             ApplicationEventPublisher eventPublisher,
-            @Qualifier("geminiFlash")
+            @Qualifier("geminiPro")
             GenerativeModel geminiAnalysisModel,
             @Qualifier("geminiPro")
             GenerativeModel geminiComparisonModel,
