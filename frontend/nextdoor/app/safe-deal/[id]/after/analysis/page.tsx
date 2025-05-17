@@ -16,12 +16,26 @@ export default function SafeDealAfter() {
     return;
   }
   return (
-    <main className="relative min-h-[100dvh] flex flex-col gap-4">
-      <Header txt={"반납하기"} />
-      <CompareAnalysis />
-      <GrayButton txt="보증금 처리" onClick={() => setIsModalOpen(true)} />
+    <main className=" max-w-screen-sm mx-auto fixed inset-0  h-full bg-graygradient flex flex-col overflow-hidden">
+      {/* Header: 고정 */}
+      <div className="z-10">
+        <Header txt="반납하기" />
+      </div>
+
+      {/* 스크롤 가능한 본문 */}
+      <div className="flex-1 overflow-y-auto">
+        <CompareAnalysis />
+      </div>
+
+      {/* 하단 버튼: 고정 */}
+      <div className="z-10 p-4 bg-graygradient">
+        <GrayButton txt="보증금 처리" onClick={() => setIsModalOpen(true)} />
+      </div>
+
+      {/* 모달 */}
       {isModalOpen && (
-        <div className="absolute inset-0 bg-gray900 flex-1 flex items-center justify-center p-10 bg-opacity-70">
+        <div className="absolute inset-0 bg-gray900 flex items-center justify-center p-10 bg-opacity-70">
+          {/* 보증금 & 이미지 & 렌터아이디 */}
           <HandleDepositModal
             charge={10000}
             rentalImg=""
