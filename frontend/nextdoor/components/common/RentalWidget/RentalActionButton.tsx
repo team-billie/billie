@@ -1,7 +1,7 @@
 // components/RentalActionButton.tsx
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface RentalActionButtonProps {
   rentalId: number;
@@ -17,15 +17,13 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
   rentalId,
   title,
   isOwner,
-  productImage = '/icons/icon72.png',
-  profileImage = '/images/profileimg.png',
+  productImage = "/icons/icon72.png",
+  profileImage = "/images/profileimg.png",
   buttonText,
-  actionLink
+  actionLink,
 }) => {
   return (
-    <div 
-      className="flex items-center bg-white rounded-2xl p-4 mb-4 border-l-4 border-blue-500 shadow-sm"
-    >
+    <div className="flex items-center bg-white rounded-2xl p-4 mb-4 border-l-4 border-blue-500 shadow-sm">
       <div className="relative mr-4">
         <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-200">
           <Image
@@ -47,13 +45,13 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
           />
         </div>
       </div>
-      
+
       <div className="flex-1 flex flex-col justify-center min-w-0">
         <p className="font-semibold text-black text-base mb-1">안심대여</p>
         <p className="text-sm text-gray-500 truncate">{title}</p>
       </div>
-      
-      <div className="flex items-center" style={{ width: '170px' }}>
+
+      <div className="flex items-center" style={{ width: "170px" }}>
         {actionLink ? (
           <Link href={actionLink} className="w-full">
             <span className="bg-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors inline-block w-full text-center">
@@ -61,7 +59,7 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
             </span>
           </Link>
         ) : (
-          <button 
+          <button
             disabled
             className="bg-gray-400 text-white px-6 py-2.5 rounded-full text-sm font-medium w-full"
           >
