@@ -31,7 +31,7 @@ public class PostMapper {
                 .productImage(result.getProductImage())
                 .rentalFee(String.valueOf(result.getRentalFee()))
                 .deposit(String.valueOf(result.getDeposit()))
-                .like(result.getLikeCount())
+                .likeCount(result.getLikeCount())
                 .dealCount(result.getDealCount())
                 .build();
     }
@@ -49,6 +49,7 @@ public class PostMapper {
                 .category(result.getCategory())
                 .authorId(result.getAuthorId())
                 .nickname(result.getNickname())
+                .likeCount(result.getLikeCount())
                 .build();
     }
 

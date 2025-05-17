@@ -16,6 +16,6 @@ public class PostListResponse {
     private String productImage;
     private String rentalFee;
     private String deposit;
-    private int like;
+    private int likeCount;
     private int dealCount;
 }
