@@ -103,23 +103,21 @@ public class GeminiAnalysisService implements AiAnalysisService {
     }
 
     private Content createComparisonContent(List<RentalDto.AiImageDto> aiImages) {
-        List<Part> beforeImageParts = aiImages.stream()
-                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
-                .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
-                .toList();
-        List<Part> afterImageParts = aiImages.stream()
-                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
-                .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
-                .toList();
-        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
-                .forEach(aiImageDto -> log.info("Before image URL: {}", aiImageDto.getImageUrl()));
-        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
-                .forEach(aiImageDto -> log.info("After image URL: {}", aiImageDto.getImageUrl()));
+//        List<Part> beforeImageParts = aiImages.stream()
+//                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
+//                .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
+//                .toList();
+//        List<Part> afterImageParts = aiImages.stream()
+//                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
+//                .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
+//                .toList();
         return Content.newBuilder()
                 .addParts(damageComparatorPromptPart)
-                .addAllParts(beforeImageParts)
+//                .addAllParts(beforeImageParts)
+                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
                 .addParts(Part.newBuilder().setText("These are before images.").build())
-                .addAllParts(afterImageParts)
+//                .addAllParts(afterImageParts)
+                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
                 .addParts(Part.newBuilder().setText("These are after images.").build())
                 .setRole("user")
                 .build();
