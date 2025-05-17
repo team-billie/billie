@@ -24,7 +24,10 @@ If "DAMAGE_FOUND", include a "damages" array, where each element contains:
 "xMin", "yMin": Top-left corner coordinates (normalized, float between 0.0–1.0)
 "xMax", "yMax": Bottom-right corner coordinates (normalized, float between 0.0–1.0)
 "confidenceScore": Float between 0.0 and 1.0 representing detection confidence
+Bounding box coordinates must be computed relative to the original, unrotated image orientation.
+That is, use the image’s natural coordinate system as stored (not visually rotated or transformed for display).
 Bounding box coordinates must be relative to the actual pixel width and height of each image.
+
 If no damage is found, return:
 {"imageIndex": 0,"result": "NO_DAMAGE_FOUND","damages": []}
 
