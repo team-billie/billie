@@ -21,7 +21,7 @@ public class JwtProvider {
 
     public String createAccessToken(Authentication authentication) {
         CustomOAuth2User userPrincipal = (CustomOAuth2User) authentication.getPrincipal();
-        Date expiryDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
+        Date expiryDate = Date.from(Instant.now().plus(24, ChronoUnit.HOURS));
         return Jwts.builder()
                 .signWith(SECRET_KEY)
                 .subject(userPrincipal.getName())
