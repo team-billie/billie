@@ -2,14 +2,20 @@
 # before/after 각각 업로드된 파일 리스트를 읽어서
 # CLIP 임베딩 → Hungarian 매칭
 # app/routers/match.py
-
-from fastapi import APIRouter, UploadFile, File
-from fastapi.responses import PlainTextResponse
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, HttpUrl
 from typing import List
-from app.clip_embed import embed_image
-from app.matcher import compute_similarity_matrix, match_embeddings
+import httpx
+from app.clip_embed import embed_image_bytes
+from app.matcher import match_embeddings, compute_similarity_matrix
 
 router = APIRouter(prefix="/match", tags=["match"])
+
+class MatchRequest(BaseModel):
+    before: List[HttpUrl]
+    after:  List[HttpUrl]
+    threshold: float = 0.5  # optional threshold
 
 @router.post("/", response_class=PlainTextResponse)
 async def match_images(
