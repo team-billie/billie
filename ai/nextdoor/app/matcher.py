@@ -9,8 +9,12 @@ def compute_similarity_matrix(before_embs, after_embs):
     return sim.cpu().numpy()
 
 # 유사도 측정
-def match_embeddings(before_embs, after_embs, threshold: float = 0.8):
-    sim = compute_similarity_matrix(before_embs, after_embs)
-    cost = 1 - sim
+def match_embeddings(before_embs, after_embs, threshold: float = 0.5):
+    sim_matrix = compute_similarity_matrix(before_embs, after_embs)
+    cost = 1 - sim_matrix
     row_idx, col_idx = linear_sum_assignment(cost)
-    return [(int(i), int(j)) for i,j in zip(row_idx, col_idx) if sim[i,j] >= threshold]
+    pairs = []
+    for i, j in zip(row_idx, col_idx):
+        if sim_matrix[i, j] >= threshold:
+            pairs.append((int(i), int(j), float(sim_matrix[i, j])))
+    return pairs
