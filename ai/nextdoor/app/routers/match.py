@@ -15,7 +15,7 @@ router = APIRouter(prefix="/match", tags=["match"])
 class MatchRequest(BaseModel):
     before: List[HttpUrl]
     after:  List[HttpUrl]
-    threshold: float = 0.5  # optional threshold
+    threshold: float = 0.8  # match_embeddings 함수에 보낼 기본값 0.8
 
 @router.post("/", response_class=JSONResponse)
 async def match_images(req: MatchRequest):

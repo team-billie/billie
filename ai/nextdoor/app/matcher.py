@@ -8,8 +8,10 @@ def compute_similarity_matrix(before_embs, after_embs):
     sim = B @ A.T
     return sim.cpu().numpy()
 
-# 유사도 측정
-def match_embeddings(before_embs, after_embs, threshold: float = 0.8):
+# 유사도 측정  
+# 함수를 직접 호출할 때 아무 값도 안 넘기면 유사도는 0.8
+# def match_embeddings(before_embs, after_embs, threshold: float = 0.8):
+def match_embeddings(before_embs, after_embs, threshold):
     sim_matrix = compute_similarity_matrix(before_embs, after_embs)
     cost = 1 - sim_matrix
     row_idx, col_idx = linear_sum_assignment(cost)
