@@ -1,0 +1,35 @@
+import { useEffect, useState } from "react";
+import ResultItem from "./ResultItem";
+import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
+import { AiAnalysisGetRequestDTO } from "@/types/ai-analysis/response";
+
+export default function BeforeAnalysis() {
+  const [results, setResults] = useState<AiAnalysisGetRequestDTO | null>(null);
+  const damageAnalysis = useAnalysisStore((state) => state.damageAnalysis);
+  console.log("❤️❤️❤️", damageAnalysis);
+
+  return (
+    <div className="relative flex flex-col  p-5">
+      <div className="flex flex-col gap-2">
+        {damageAnalysis && damageAnalysis.length > 0 ? (
+          <>
+            <div className="font-bold text-2xl text-purple mb-5">
+              <div>AI 분석결과</div>
+              <div>다음과 같은 손상이 발견됐어요!</div>
+            </div>
+            {damageAnalysis.map((item, imageIndex) =>
+              item.damages.map((damage, damageIndex) => (
+                <ResultItem
+                  key={`${imageIndex}-${damageIndex}`}
+                  damage={damage}
+                />
+              ))
+            )}
+          </>
+        ) : (
+          <div>분석된 데이터가 없습니다.</div>
+        )}
+      </div>
+    </div>
+  );
+}

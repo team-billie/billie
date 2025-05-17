@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import Button from "../Button";
 import Title from "../Title";
 import {
-  AiAfterPhotosRequest,
-  AiBeforePhotosRequest,
+  AiAfterPhotosPostRequest,
+  AiBeforePhotosPostRequest,
 } from "@/lib/api/ai-analysis/request";
 import axiosInstance from "@/lib/api/instance";
-
+import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
+import GrayButton from "../GrayButton";
 interface PhotoRegisterProps {
   status: "after" | "before";
 }
@@ -28,19 +29,23 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
   //상태 값 바꿔주기
   const [serverData, setServerData] = useState<AiAnalysisData | null>(null);
-  const [isResult, setIsResult] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasPhotos, setHasPhotos] = useState(false);
   const { id } = useParams();
   const router = useRouter();
 
+  // 분석 결과 처리 함수
   const handleBeforePhotos = async () => {
     if (!userId) return;
     try {
       console.log("AI분석 요청 시도");
-      const res = await AiBeforePhotosRequest(Number(id));
-      setIsResult(true);
-      router.push(`/safe-deal/${id}/before/payment`);
+      const res = await AiBeforePhotosPostRequest(Number(id));
+      if (res.analysis) {
+        useAnalysisStore.getState().setDamageAnalysis(res.analysis); // 상태에 저장
+      } else {
+        useAnalysisStore.getState().setDamageAnalysis("[]"); // 분석 결과 없으면 빈 배열로 초기화
+      }
+      router.push(`/safe-deal/${id}/before/analysis`);
     } catch (error) {
       alert("AI 분석 중 오류가 발생했습니다.");
     }
@@ -53,7 +58,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     if (!userId) return;
     try {
       console.log("여기입니다");
-      const res = await AiAfterPhotosRequest(Number(id));
+      const res = await AiAfterPhotosPostRequest(Number(id));
       router.push(`/safe-deal/${id}/after/analysis`);
     } catch (error) {
       alert("AI 분석 중 오류가 발생했습니다.");
@@ -80,7 +85,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
             />
             <div className="fixed bottom-4 left-0 w-full px-4">
               <div className="max-w-md mx-auto">
-                <Button
+                <GrayButton
                   txt="AI 물품 상태 확인"
                   onClick={() => handleBeforePhotos()}
                 />
@@ -101,7 +106,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
               serverImages={serverData?.beforeImages || []}
             />
             <div className="px-4 w-full">
-              <Button
+              <GrayButton
                 txt="AI 물품 상태 확인"
                 onClick={() => handleAfterPhotos()}
               />

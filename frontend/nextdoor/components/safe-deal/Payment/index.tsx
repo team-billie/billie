@@ -125,9 +125,7 @@ export default function Payment() {
               <Button txt="결제하기" onClick={() => sendBtnHandler()} />
               <GrayButton
                 txt="AI 분석 결과 다시 보기"
-                onClick={() =>
-                  router.push(`/reservations/${id}/safe-deal/manage`)
-                }
+                onClick={() => router.push(`/safe-deal/${id}/before/analysis`)}
               />
             </div>
           </div>
