@@ -84,6 +84,12 @@ type SelectOwnerAccountRequestDto = {
     bankCode: string;
 }
 
+// 결제 내역 조회
+type GetHistoryRequestDto = {
+    userKey: string;
+    rentalId: number;
+}
+
 export type { CreateFinUserRequestDto, 
     CreateFinAccountRequestDto, 
     GetAccountListRequestDto,   
@@ -95,4 +101,6 @@ export type { CreateFinUserRequestDto,
     VerifyAccountRequestDto,
     GetFinUserRequestDto,
     SelectOwnerAccountRequestDto,
-    PayItemRequestDto }; 
+    PayItemRequestDto,
+    GetHistoryRequestDto, 
+}; 
