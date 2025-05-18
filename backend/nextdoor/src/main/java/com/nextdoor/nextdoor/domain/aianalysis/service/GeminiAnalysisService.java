@@ -11,10 +11,11 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDa
 import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
-import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisMatcherCommandPort;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
+import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherResponseDto;
+import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -114,6 +115,14 @@ public class GeminiAnalysisService implements AiAnalysisService {
     }
 
     private Content createComparisonContent(List<RentalDto.AiImageDto> aiImages) {
+        ImageMatcherResponseDto imageMatcherResponseDto = aiAnalysisMatcherCommandPort.match(
+                new ImageMatcherRequestDto(
+                        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
+                                .map(RentalDto.AiImageDto::getImageUrl).toList(),
+                        aiImages.stream().filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
+                                .map(RentalDto.AiImageDto::getImageUrl).toList()
+                ));
+        log.info("imageMatcherResponseDto: {}", imageMatcherResponseDto);
         List<Part> beforeImageParts = aiImages.stream()
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
@@ -122,16 +131,17 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
                 .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
                 .toList();
-        return Content.newBuilder()
-                .addParts(damageComparatorPromptPart)
-                .addAllParts(beforeImageParts)
-//                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
-                .addParts(Part.newBuilder().setText("These are before images.").build())
-                .addAllParts(afterImageParts)
-//                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
-                .addParts(Part.newBuilder().setText("These are after images.").build())
-                .setRole("user")
-                .build();
+//        return Content.newBuilder()
+//                .addParts(damageComparatorPromptPart)
+//                .addAllParts(beforeImageParts)
+////                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
+//                .addParts(Part.newBuilder().setText("These are before images.").build())
+//                .addAllParts(afterImageParts)
+////                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
+//                .addParts(Part.newBuilder().setText("These are after images.").build())
+//                .setRole("user")
+//                .build();
+        return null;
     }
 
     private String cleanMarkdownCodeBlocks(String text) {
