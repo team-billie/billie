@@ -79,14 +79,14 @@ public class GeminiAnalysisService implements AiAnalysisService {
     }
 
     private Content createAnalysisContent(List<RentalDto.AiImageDto> aiImages) {
-//        List<Part> imageParts = aiImages.stream()
-//                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
-//                .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
-//                .toList();
+        List<Part> imageParts = aiImages.stream()
+                .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
+                .map(aiImageDto -> PartMaker.fromMimeTypeAndData(aiImageDto.getMimeType(), aiImageDto.getImageUrl()))
+                .toList();
         return Content.newBuilder()
                 .addParts(damageAnalyzerPromptPart)
-//                .addAllParts(imageParts)
-                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
+                .addAllParts(imageParts)
+//                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
                 .setRole("user")
                 .build();
     }
@@ -121,10 +121,10 @@ public class GeminiAnalysisService implements AiAnalysisService {
         return Content.newBuilder()
                 .addParts(damageComparatorPromptPart)
 //                .addAllParts(beforeImageParts)
-                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_4_%EC%A0%84_1.jpg"))
+                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
                 .addParts(Part.newBuilder().setText("These are before images.").build())
 //                .addAllParts(afterImageParts)
-                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EC%A4%80%EC%88%98_4_%ED%9B%84_1.jpg"))
+                .addParts(PartMaker.fromMimeTypeAndData("image/jpeg", ""))
                 .addParts(Part.newBuilder().setText("These are after images.").build())
                 .setRole("user")
                 .build();
