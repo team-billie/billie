@@ -11,9 +11,11 @@ interface ReservationActionButtonProps {
   onConfirm?: () => void;
   onCancel?: () => void;
   isReservation?: boolean;
+  isOwner?: boolean; // 추가: 오너 여부 (빨간색/파란색 경계선용)
   actionText?: string;
   onAction?: () => void;
-  onNavigate?: (id: number) => void; // 추가된 prop
+  onNavigate?: (id: number) => void;
+  isShining?: boolean; // 추가: 빛나는 효과
 }
 
 const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
@@ -25,9 +27,11 @@ const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
   onConfirm,
   onCancel,
   isReservation = false,
+  isOwner = true, // 기본값은 오너 (빨간색)
   actionText,
   onAction,
-  onNavigate, // 추가된 prop
+  onNavigate,
+  isShining = false,
 }) => {
   // 확정 버튼 클릭 시 호출될 함수
   const handleConfirm = () => {
@@ -57,8 +61,14 @@ const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
     }
   };
 
+  // 오너/렌터에 따른 색상 선택 (오너: 빨간색, 렌터: 파란색)
+  const borderColorClass = isOwner ? "border-red-300" : "border-blue-500";
+  
+  // 빛나는 효과가 있는지 여부에 따른 클래스
+  const shiningClass = isShining ? "animate-item-shine" : "";
+
   return (
-    <div className="flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 border-red-300 shadow-sm">
+    <div className={`flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 ${borderColorClass} shadow-sm ${shiningClass}`}>
       <div className="relative mr-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-200">
           <Image
