@@ -99,6 +99,7 @@ export const GetPaymentDataRequest = (rentalId: string) =>
   axiosInstance
     .get(`/api/v1/rentals/${rentalId}/request-remittance`)
     .then((response) => {
+      console.log("😇", response);
       return response.data;
     })
     .catch((error) => {

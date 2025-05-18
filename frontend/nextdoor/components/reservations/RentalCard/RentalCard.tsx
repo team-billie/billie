@@ -67,7 +67,7 @@ export default function RentalCard({
         {/* AI 안심거래 버튼 */}
         {(pathname === "/reservations" ||
           pathname === "/reservations/lend") && (
-          <div className="absolute top-3 right-4 z-10">
+          <div className="absolute top-3 right-4 ">
             <SafeDealBtn reservationId={rentalId} />
           </div>
         )}
