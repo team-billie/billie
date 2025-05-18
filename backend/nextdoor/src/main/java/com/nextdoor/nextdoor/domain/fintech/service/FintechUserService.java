@@ -2,8 +2,8 @@ package com.nextdoor.nextdoor.domain.fintech.service;
 
 import com.nextdoor.nextdoor.domain.auth.port.AuthFintechCommandPort;
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
-import com.nextdoor.nextdoor.domain.fintech.domain.FintechUser;
-import com.nextdoor.nextdoor.domain.fintech.repository.FintechUserRepository;
+import com.nextdoor.nextdoor.domain.member.domain.Member;
+import com.nextdoor.nextdoor.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -16,12 +16,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FintechUserService implements AuthFintechCommandPort {
     private final SsafyApiClient client;
-    private final FintechUserRepository fintechUserRepository;
+    private final MemberRepository memberRepository;
     private final RegistAccountService regService;
 
     /**
      * 1) SSAFY API 로 user 생성
-     * 2) DB 에 FintechUser 저장
+     * 2) DB 에 Member 저장
      * 3) 빌리페이(Account & RegistAccount)도 자동으로 생성
      */
 
@@ -32,10 +32,14 @@ public class FintechUserService implements AuthFintechCommandPort {
                     // SSAFY가 준 userKey 꺼내서 DB에 저장
                     String userKey = ssafyResp.get("userKey").toString();
 
-                    // 2) 블로킹으로 FintechUser 저장
+                    // 2) 블로킹으로 Member 저장
                     return Mono.fromCallable(() -> {
-                                FintechUser u = new FintechUser(userKey, userId, LocalDateTime.now());
-                                return fintechUserRepository.save(u);
+                                Member member = Member.builder()
+                                        .userKey(userKey)
+                                        .email(ssafyApiEmail)
+                                        .nickname("User" + userId) // Default nickname
+                                        .build();
+                                return memberRepository.save(member);
                             })
                             .subscribeOn(Schedulers.boundedElastic())
 
