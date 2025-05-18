@@ -239,13 +239,13 @@ const FloatingWidget: React.FC = () => {
       // 모달에 전달할 데이터 설정
       setSelectedRental({
         charge: rental.rentalDetail?.charge || 0,
-        rentalId: rental.rentalId.toString(),
+        rentalId: rental.rentalId.toString()
       });
       setIsModalOpen(true);
       setIsOpen(false); // 위젯 닫기
     }
   };
-
+  
   // 결제요청 처리
   const handlePaymentRequest = (id: number) => {
     showAlert("결제 요청", "결제 요청이 전송되었습니다.", "success");
@@ -268,42 +268,17 @@ const FloatingWidget: React.FC = () => {
         const success = await confirmReservation(reservationId);
         if (success) {
           showAlert("예약 확정", "예약이 확정되었습니다.", "success");
-
+          
           // 확정된 예약 정보 찾기
           const confirmedReservation = pendingReservations.find(
-            (res) => res.reservationId === reservationId
+            res => res.reservationId === reservationId
           );
-
+          
           if (confirmedReservation) {
-            // 새로운 렌탈 객체 생성
-            const newRental = {
-              rentalId: reservationId,
-              process: "BEFORE_RENTAL",
-              detailStatus: "CREATED", // 안심결제요청 버튼 상태
-              rentalDetail: {
-                title: confirmedReservation.postTitle,
-                rentalId: reservationId,
-                charge: confirmedReservation.rentalFee,
-                deposit: confirmedReservation.deposit,
-                ownerId: userId, // 현재 사용자를 오너로 설정
-                // renterId가 없는 경우 빈 값 설정
-                renterId: (confirmedReservation as any).renterId || 0,
-                productImageUrl: confirmedReservation.postProductImage,
-                ownerProfileImageUrl:
-                  confirmedReservation.ownerProfileImageUrl ||
-                  "/images/profileimg.png",
-                // renterProfileImageUrl이 없는 경우 기본 이미지 설정
-                renterProfileImageUrl:
-                  (confirmedReservation as any).renterProfileImageUrl ||
-                  "/images/profileimg.png",
-              },
-            };
-
-            // 수동으로 activeRentals 배열 업데이트 대신
-            // 서버 데이터를 새로고침하여 UI를 업데이트
+            // 초기 데이터가 반영될 시간을 확보하기 위해 짧은 지연 후 대여 목록 새로고침
             setTimeout(() => {
               refreshRentals();
-            }, 500); // 서버 반영 시간을 위한 짧은 지연
+            }, 500);
           }
         } else {
           showAlert("오류 발생", "예약 확정 중 문제가 발생했습니다.", "error");
@@ -320,6 +295,25 @@ const FloatingWidget: React.FC = () => {
       console.error("예약 처리 실패:", error);
       showAlert("오류 발생", "요청 처리 중 문제가 발생했습니다.", "error");
     }
+  };
+
+  // 렌탈 항목 페이지 이동 처리 함수 (새로 추가)
+  const handleRentalNavigate = (rentalId: number) => {
+    // 위젯 닫기
+    setIsOpen(false);
+    
+    // 해당 항목을 위젯에서 제거 (실시간 UI 업데이트)
+    const updatedRentals = activeRentals.filter(rental => rental.rentalId !== rentalId);
+    // 참고: activeRentals는 직접 수정할 수 없으므로 refreshRentals 호출
+    
+    // 로컬 스토리지에 처리된 항목 ID 저장하여 새로고침 시에도 유지
+    const processedItems = JSON.parse(localStorage.getItem('processedRentalItems') || '[]');
+    localStorage.setItem('processedRentalItems', JSON.stringify([...processedItems, rentalId]));
+    
+    // 잠시 후 데이터 새로고침 (서버 상태 반영)
+    setTimeout(() => {
+      refreshRentals();
+    }, 500);
   };
 
   const getRentalActionLink = (rental: RentalStatusMessage) => {
@@ -376,11 +370,7 @@ const FloatingWidget: React.FC = () => {
         case "RENTAL_IN_ACTIVE":
           return "물품 결제 완료";
         case "RETURNED":
-          // return detailStatus === "RENTAL_PERIOD_ENDED"
-          //   ? "안심 반납 처리"
-          //   : detailStatus === "BEFORE_AND_AFTER_COMPARED"
-          //   ? "보증금 처리"
-          //   : "반납 처리 중";
+          // 모든 "RETURNED" 상태에서 "안심 반납 처리"로 표시 (수정된 부분)
           return "안심 반납 처리";
         case "RENTAL_COMPLETED":
           return "거래 완료";
@@ -584,9 +574,9 @@ const FloatingWidget: React.FC = () => {
                     rental.rentalDetail?.title || "대여 물품";
 
                   // 안심결제요청 버튼인지 확인
-                  const isPaymentRequestButton =
-                    isOwner &&
-                    rental.process === "BEFORE_RENTAL" &&
+                  const isPaymentRequestButton = 
+                    isOwner && 
+                    rental.process === "BEFORE_RENTAL" && 
                     rental.detailStatus === "CREATED";
 
                   return (
@@ -608,12 +598,11 @@ const FloatingWidget: React.FC = () => {
                       }
                       buttonText={buttonText}
                       actionLink={actionLink}
-                      // 안심결제요청 버튼인 경우 onClick 핸들러 추가
-                      onClick={
-                        isPaymentRequestButton
-                          ? () => handleRentalAction(rental)
-                          : undefined
+                      onClick={isPaymentRequestButton 
+                        ? () => handleRentalAction(rental) 
+                        : undefined
                       }
+                      onNavigate={handleRentalNavigate} // 새로 추가된 prop
                     />
                   );
                 })}

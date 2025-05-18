@@ -11,7 +11,8 @@ interface RentalActionButtonProps {
   profileImage?: string;
   buttonText: string;
   actionLink?: string;
-  onClick?: () => void; // 추가된 prop
+  onClick?: () => void;
+  onNavigate?: (rentalId: number) => void; // 추가된 prop
 }
 
 const RentalActionButton: React.FC<RentalActionButtonProps> = ({
@@ -23,7 +24,15 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
   buttonText,
   actionLink,
   onClick,
+  onNavigate, // 추가된 prop
 }) => {
+  // Link 클릭 시 호출될 함수
+  const handleNavigate = (e: React.MouseEvent) => {
+    if (onNavigate) {
+      onNavigate(rentalId);
+    }
+  };
+
   return (
     <div className="flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 border-blue-500 shadow-sm">
       <div className="relative mr-3">
@@ -66,8 +75,12 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
             <span className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
           </div>
         ) : actionLink ? (
-          // 기존 링크 버튼
-          <Link href={actionLink} className="relative pr-6 group">
+          // 링크 버튼에 onClick 이벤트 추가
+          <Link 
+            href={actionLink} 
+            className="relative pr-6 group" 
+            onClick={handleNavigate}
+          >
             <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors inline-block text-center whitespace-nowrap overflow-hidden text-ellipsis min-w-[120px]">
               {buttonText}
             </span>

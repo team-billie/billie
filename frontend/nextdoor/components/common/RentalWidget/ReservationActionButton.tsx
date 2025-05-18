@@ -13,6 +13,7 @@ interface ReservationActionButtonProps {
   isReservation?: boolean;
   actionText?: string;
   onAction?: () => void;
+  onNavigate?: (id: number) => void; // 추가된 prop
 }
 
 const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
@@ -26,7 +27,36 @@ const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
   isReservation = false,
   actionText,
   onAction,
+  onNavigate, // 추가된 prop
 }) => {
+  // 확정 버튼 클릭 시 호출될 함수
+  const handleConfirm = () => {
+    if (onConfirm) {
+      onConfirm();
+      // 확정 후 페이지 이동은 없으므로 onNavigate는 호출하지 않음
+    }
+  };
+
+  // 취소 버튼 클릭 시 호출될 함수
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+      // 취소 후 위젯이 닫힐 필요가 없으므로 onNavigate는 호출하지 않음
+    }
+  };
+
+  // 액션 버튼 클릭 시 호출될 함수
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+      
+      // 액션 후 페이지 이동이 있으면 위젯 닫기
+      if (onNavigate) {
+        onNavigate(id);
+      }
+    }
+  };
+
   return (
     <div className="flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 border-red-300 shadow-sm">
       <div className="relative mr-3">
@@ -65,13 +95,13 @@ const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
           <div className="flex justify-between relative pr-6">
             <div className="flex space-x-1">
               <button
-                onClick={onConfirm}
+                onClick={handleConfirm}
                 className="bg-blue-500 text-white px-3 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap"
               >
                 확정
               </button>
               <button
-                onClick={onCancel}
+                onClick={handleCancel}
                 className="bg-gray-500 text-white px-3 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition-colors whitespace-nowrap"
               >
                 취소
@@ -83,7 +113,7 @@ const ReservationActionButton: React.FC<ReservationActionButtonProps> = ({
           // 단일 액션 버튼
           <div className="relative pr-6 group">
             <button
-              onClick={onAction}
+              onClick={handleAction}
               className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap overflow-hidden text-ellipsis min-w-[120px]"
             >
               {actionText || "처리하기"}
