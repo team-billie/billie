@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. Member 더미 데이터 (20명의 사용자 생성)
 INSERT INTO member (
-    member_id, uuid, userKey, email, birth, gender, address, profile_image_url, nickname, auth_provider, created_at
+    member_id, uuid, user_key, email, birth, gender, address, profile_image_url, nickname, auth_provider, created_at
 ) VALUES
       (1, 'uuid-1', 'userKey-1', 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', '홍길동', 'LOCAL', '2024-01-01T10:00:00'),
       (2, 'uuid-2', 'userKey-2', 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg',  '김영희', 'LOCAL', '2024-01-02T10:00:00'),
