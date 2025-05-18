@@ -5,15 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateAccountResult {
+public class DeleteRentalResult {
     private Long rentalId;
-    private String accountNo;
-    private String bankCode;
-    private BigDecimal finalAmount;
+    private boolean success;
+    private String message;
 }
