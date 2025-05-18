@@ -2,8 +2,8 @@ package com.nextdoor.nextdoor.command;
 
 import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisMatcherCommandPort;
-import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherResponseDto;
+import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
 
