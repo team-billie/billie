@@ -15,4 +15,4 @@ Define "additional damage" as any of the following:
 - Discoloration
 - Contamination
 
-Provide one sentence with the overall condition summary of the objects analyzed.
+Provide the overall condition summary of the objects analyzed in Korean.
