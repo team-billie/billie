@@ -257,6 +257,44 @@ public class AccountService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    /**
+     * 빌리페이 자동 생성 & 등록 (type=BILI_PAY)
+     * 사용자 계정 생성 직후 자동 호출: 계좌 생성 & DB 저장 → Account 생성
+     * 빌리페이 생성 메서드, 따로 api 는 필요없다. 계정 생성하고 service로 요청해서 만들면 끝
+     */
+    public Mono<RegistAccountResponseDto> createBilipay(String userKey) {
+        return client.createAccount(userKey, /* 빌리페이 고정 파라미터 */ "999-1-6c20074711854e")
+                .flatMap(resp -> {
+                    @SuppressWarnings("unchecked")
+                    Map<String,Object> rec = (Map<String,Object>) resp.get("REC");
+                    if (rec == null) {
+                        return Mono.error(new RuntimeException("SSAFY 계좌 생성 응답에 REC가 없습니다."));
+                    }
+                    String acctNo   = rec.get("accountNo").toString();
+                    String bankCode = rec.get("bankCode").toString();
+
+                    return Mono.fromCallable(() -> {
+                        Member member = memberQueryPort.findByUserKey(userKey)
+                                .orElseThrow(() -> new RuntimeException("사용자 없음: " + userKey));
+
+                        // 1) Account 엔티티 생성
+                        Account a = Account.builder()
+                                .accountNo(acctNo)
+                                .bankCode(bankCode)
+                                .balance(0)
+                                .createdAt(LocalDateTime.now())
+                                .member(member)
+                                .registered(true)        // 자동 등록
+                                .accountType(RegistAccountType.BILI_PAY)
+                                .alias("빌리페이")
+                                .primary(false)           // 빌리페이는 주계좌 아님
+                                .build();
+                        a = accountRepository.save(a);
+                        return toDto(a);
+                    }).subscribeOn(Schedulers.boundedElastic());
+                });
+    }
+
     /** DTO 변환 헬퍼 */
     private RegistAccountResponseDto toDto(Account a) {
         return new RegistAccountResponseDto(
