@@ -5,7 +5,7 @@ import RentalDetailBtn from "../manage/Button/RentalDetailBtn";
 import OwnerActionBtn from "../manage/Button/OwnerActionBtn";
 import RenterActionBtn from "../manage/Button/RenterActionBtn";
 import { RentalProcess, RentalStatus, UserType } from "@/types/rental";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import SafeDealBtn from "../manage/Button/SafeDealBtn";
 import useUserStore from "@/lib/store/useUserStore";
 
@@ -42,8 +42,8 @@ export default function RentalCard({
 }: RentalCardProps) {
   const pathname = usePathname();
   const { userId } = useUserStore();
-  console.log("RentalCard userId:", userId);
-
+  const router = useRouter();
+  const { id } = useParams();
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
     return null;
@@ -79,11 +79,14 @@ export default function RentalCard({
 
       {/* 버튼들 */}
       <div className="flex divide-x border rounded-md overflow-hidden text-center text-sm">
-        <RentalDetailBtn />
+        <RentalDetailBtn
+          onClick={() => router.push(`/reservations/${rentalId}`)}
+        />
+
         {/* 사용자 타입에 따라 다른 버튼 컴포넌트 렌더링 */}
         {userType === "OWNER" ? (
           <OwnerActionBtn
-            charge={cost}
+            charge={cost * date}
             status={status}
             process={process}
             rentalId={rentalId}

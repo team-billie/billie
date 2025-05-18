@@ -11,5 +11,5 @@ interface ReservationResponseDTO {
   rentalStatus: string;
   rentalProcess: string;
   title: string;
-  productImageUrl: string;
+  productImageUrls: string[];
 }
