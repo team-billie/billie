@@ -170,17 +170,19 @@ INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, da
 ALTER TABLE rental AUTO_INCREMENT = 11;
 
 -- 10. Deposit 더미 데이터
-INSERT INTO deposit (deposit_id, rental_id, regist_account_id, amount, status, deducted_amount, held_at, returned_at) VALUES
-                                                                                                                          (1, 1, 1, 300000, 'HELD', NULL, '2024-03-15T10:30:00', NULL),
-                                                                                                                          (2, 2, 1, 500000, 'RETURNED', 50000, '2024-03-17T10:30:00', '2024-03-24T18:00:00'),
-                                                                                                                          (3, 3, 1, 800000, 'RETURNED', 0, '2024-03-18T09:30:00', '2024-03-19T19:00:00'),
-                                                                                                                          (4, 4, 1, 200000, 'DEDUCTED', 20000, '2024-03-20T11:30:00', '2024-03-27T17:00:00'),
-                                                                                                                          (5, 5, 1, 400000, 'RETURNED', 0, '2024-03-22T14:30:00', '2024-03-29T16:00:00'),
-                                                                                                                          (6, 6, 2, 100000, 'HELD', NULL, '2024-03-25T09:00:00', NULL),
-                                                                                                                          (7, 7, 2, 250000, 'HELD', NULL, '2024-03-27T13:00:00', NULL),
-                                                                                                                          (8, 8, 2, 350000, 'HELD', NULL, '2024-03-30T10:00:00', NULL),
-                                                                                                                          (9, 9, 2, 150000, 'HELD', NULL, '2024-04-01T11:00:00', NULL),
-                                                                                                                          (10, 10, 2, 300000, 'HELD', NULL, '2024-04-03T15:00:00', NULL);
+INSERT INTO deposit (deposit_id, rental_id, renter_account_id, amount, status, deducted_amount, held_at, returned_at
+) VALUES
+      (1,  1, 1, 300000, 'HELD',     NULL,   '2024-03-15 10:30:00', NULL),
+      (2,  2, 1, 500000, 'RETURNED', 50000,  '2024-03-17 10:30:00', '2024-03-24 18:00:00'),
+      (3,  3, 1, 800000, 'RETURNED',     0,  '2024-03-18 09:30:00', '2024-03-19 19:00:00'),
+      (4,  4, 1, 200000, 'DEDUCTED', 20000,  '2024-03-20 11:30:00', '2024-03-27 17:00:00'),
+      (5,  5, 1, 400000, 'RETURNED',     0,  '2024-03-22 14:30:00', '2024-03-29 16:00:00'),
+      (6,  6, 2, 100000, 'HELD',       NULL,   '2024-03-25 09:00:00', NULL),
+      (7,  7, 2, 250000, 'HELD',       NULL,   '2024-03-27 13:00:00', NULL),
+      (8,  8, 2, 350000, 'HELD',       NULL,   '2024-03-30 10:00:00', NULL),
+      (9,  9, 2, 150000, 'HELD',       NULL,   '2024-04-01 11:00:00', NULL),
+      (10, 10,2, 300000, 'HELD',       NULL,   '2024-04-03 15:00:00', NULL);
+
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE deposit AUTO_INCREMENT = 11;
