@@ -119,22 +119,24 @@ ALTER TABLE post_likes AUTO_INCREMENT = 21;
 --                                                              ('092ef68d-5a10-4b92-b323-b6db7c009e76', 2, '2025-05-12 10:33:26.789068');
 
 -- 6. Account 데이터 추가
-INSERT INTO account (account_id, account_no, bank_code, balance, created_at, user_key) VALUES
-                                                                                           (1, '9990439282572673', '999', 0, '2025-05-12 10:33:18.577802', '5b4e4cb4-c670-4ba9-96c9-ec191910005b'),
-                                                                                           (2, '9991329456396744', '999', 0, '2025-05-12 10:33:26.905820', '092ef68d-5a10-4b92-b323-b6db7c009e76');
+INSERT INTO account (
+    account_id, account_no, bank_code, account_type, alias, is_primary, balance, created_at, is_registered, member_id
+) VALUES
+      (1, '9990439282572673', '999', 'BILI_PAY',   '빌리페이',  false, 0, '2025-05-12 10:33:18', true,  1),
+      (2, '9991329456396744', '999', 'BILI_PAY',   '빌리페이',  false, 0, '2025-05-12 10:33:26', true,  2);
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE account AUTO_INCREMENT = 3;
 
--- 7. RegistAccount 데이터 추가
-INSERT INTO regist_account
-(regist_account_id, account_id, user_key, balance, is_primary, registered_at, alias, account_type)
-VALUES
-    (1, 1, '5b4e4cb4-c670-4ba9-96c9-ec191910005b', 0, 0, '2025-05-12 10:33:18.596775', '빌리페이', 'BILI_PAY'),
-    (2, 2, '092ef68d-5a10-4b92-b323-b6db7c009e76', 0, 0, '2025-05-12 10:33:26.909828', '빌리페이', 'BILI_PAY');
+-- -- 7. RegistAccount 데이터 추가
+-- INSERT INTO regist_account
+-- (regist_account_id, account_id, user_key, balance, is_primary, registered_at, alias, account_type)
+-- VALUES
+--     (1, 1, '5b4e4cb4-c670-4ba9-96c9-ec191910005b', 0, 0, '2025-05-12 10:33:18.596775', '빌리페이', 'BILI_PAY'),
+--     (2, 2, '092ef68d-5a10-4b92-b323-b6db7c009e76', 0, 0, '2025-05-12 10:33:26.909828', '빌리페이', 'BILI_PAY');
 
 -- AUTO_INCREMENT 값 설정
-ALTER TABLE regist_account AUTO_INCREMENT = 3;
+-- ALTER TABLE regist_account AUTO_INCREMENT = 3;
 
 -- 8. Reservation 더미 데이터 (10개)
 INSERT INTO reservation (reservation_id, start_date, end_date, rental_fee, deposit, status, rental_id, owner_id, renter_id, post_id) VALUES

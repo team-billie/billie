@@ -19,7 +19,7 @@ public class AuthFintechQueryAdapter implements AuthFintechQueryPort {
     public AuthFintechQueryDto findByUserId(Long userId) {
         return jpaQueryFactory.select(Projections.constructor(
                         AuthFintechQueryDto.class,
-                        qMember.userKey    
+                        qMember.userKey
                 ))
                 .from(qMember)
                 .where(qMember.id.eq(userId))
