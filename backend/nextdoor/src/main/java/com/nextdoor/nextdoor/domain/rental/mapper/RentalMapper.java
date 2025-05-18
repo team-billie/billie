@@ -43,7 +43,7 @@ public class RentalMapper {
     public RemittanceResponse toResponse(RequestRemittanceResult result) {
         return RemittanceResponse.builder()
                 .ownerNickname(result.getOwnerNickname())
-                .rentalFee(result.getRentalFee())
+                .rentalFee(result.getFinalAmount())
                 .deposit(result.getDeposit())
                 .accountNo(result.getAccountNo())
                 .bankCode(result.getBankCode())
@@ -92,6 +92,7 @@ public class RentalMapper {
                 .rentalId(rentalId)
                 .accountNo(request.getAccountNo())
                 .bankCode(request.getBankCode())
+                .finalAmount(request.getFinalAmount())
                 .build();
     }
 
@@ -100,6 +101,7 @@ public class RentalMapper {
                 .rentalId(result.getRentalId())
                 .accountNo(result.getAccountNo())
                 .bankCode(result.getBankCode())
+                .finalAmount(result.getFinalAmount())
                 .build();
     }
 

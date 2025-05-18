@@ -111,7 +111,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
                         .select(Projections.constructor(
                                 RequestRemittanceResult.class,
                                 member.nickname.as("ownerNickname"),
-                                reservation.rentalFee,
+                                rental.finalAmount,
                                 reservation.deposit,
                                 rental.accountNo,
                                 rental.bankCode
