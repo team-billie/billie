@@ -12,7 +12,8 @@ interface RentalActionButtonProps {
   buttonText: string;
   actionLink?: string;
   onClick?: () => void;
-  onNavigate?: (rentalId: number) => void; // 추가된 prop
+  onNavigate?: (rentalId: number) => void;
+  isShining?: boolean; // 추가: 빛나는 효과
 }
 
 const RentalActionButton: React.FC<RentalActionButtonProps> = ({
@@ -24,7 +25,8 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
   buttonText,
   actionLink,
   onClick,
-  onNavigate, // 추가된 prop
+  onNavigate,
+  isShining = false,
 }) => {
   // Link 클릭 시 호출될 함수
   const handleNavigate = (e: React.MouseEvent) => {
@@ -32,9 +34,15 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
       onNavigate(rentalId);
     }
   };
+  
+  // 오너/렌터에 따른 색상 선택 (오너: 빨간색, 렌터: 파란색)
+  const borderColorClass = isOwner ? "border-red-300" : "border-blue-500";
+  
+  // 빛나는 효과가 있는지 여부에 따른 클래스
+  const shiningClass = isShining ? "animate-item-shine" : "";
 
   return (
-    <div className="flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 border-blue-500 shadow-sm">
+    <div className={`flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 ${borderColorClass} shadow-sm ${shiningClass}`}>
       <div className="relative mr-3">
         <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-200">
           <Image
