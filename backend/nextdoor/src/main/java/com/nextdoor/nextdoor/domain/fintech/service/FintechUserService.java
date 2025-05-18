@@ -37,7 +37,7 @@ public class FintechUserService implements AuthFintechCommandPort {
                                 Member member = Member.builder()
                                         .userKey(userKey)
                                         .email(ssafyApiEmail)
-                                        .nickname("User" + userId) // Default nickname
+//                                        .nickname("User" + userId) // Default nickname
                                         .build();
                                 return memberRepository.save(member);
                             })
