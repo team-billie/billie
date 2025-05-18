@@ -13,6 +13,7 @@ import RentalActionButton from "./RentalActionButton";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import useUserStore from "@/lib/store/useUserStore";
 import { Portal } from "@/lib/utils/widget/portal";
+import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
 
 const FloatingWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +23,11 @@ const FloatingWidget: React.FC = () => {
   const dragStartPos = useRef({ x: 0, y: 0 });
   const wasDragged = useRef(false);
   const nodeRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRental, setSelectedRental] = useState<{
+    charge: number;
+    rentalId: string;
+  } | null>(null);
 
   const { userId } = useUserStore();
 
@@ -223,6 +229,23 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
+  // 안심 결제 요청 모달 처리 (새로 추가된 함수)
+  const handleRentalAction = (rental: RentalStatusMessage) => {
+    const { process, detailStatus } = rental;
+    const isOwner = userId === rental.rentalDetail?.ownerId;
+
+    // 오너이고 BEFORE_RENTAL 상태이며 CREATED 상태일 때만 모달 열기
+    if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
+      // 모달에 전달할 데이터 설정
+      setSelectedRental({
+        charge: rental.rentalDetail?.charge || 0,
+        rentalId: rental.rentalId.toString()
+      });
+      setIsModalOpen(true);
+      setIsOpen(false); // 위젯 닫기
+    }
+  };
+  
   // 결제요청 처리
   const handlePaymentRequest = (id: number) => {
     showAlert("결제 요청", "결제 요청이 전송되었습니다.", "success");
@@ -265,6 +288,11 @@ const FloatingWidget: React.FC = () => {
   const getRentalActionLink = (rental: RentalStatusMessage) => {
     const { rentalId, process, detailStatus } = rental;
     const isOwner = userId === rental.rentalDetail?.ownerId;
+
+    // 안심결제요청 버튼인 경우에는 링크를 반환하지 않음
+    if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
+      return "";
+    }
 
     if (isOwner) {
       switch (process) {
@@ -517,29 +545,11 @@ const FloatingWidget: React.FC = () => {
                   const displayTitle =
                     rental.rentalDetail?.title || "대여 물품";
 
-                  console.log(
-                    "[위젯] 렌탈 표시:",
-                    rental.rentalId,
-                    "사용자 역할:",
-                    isOwner ? "오너" : "렌터",
-                    "이미지:",
-                    rental.rentalDetail?.productImageUrl
-                  );
-
-                  // 프로필 이미지 로깅
-                  const profileImageSource = isOwner
-                    ? rental.rentalDetail?.renterProfileImageUrl ||
-                      "/images/profileimg.png"
-                    : rental.rentalDetail?.ownerProfileImageUrl ||
-                      "/images/profileimg.png";
-
-                  console.log(
-                    "[위젯] 프로필 이미지 선택:",
-                    "역할:",
-                    isOwner ? "오너->렌터 프로필" : "렌터->오너 프로필",
-                    "선택된 이미지:",
-                    profileImageSource
-                  );
+                  // 안심결제요청 버튼인지 확인
+                  const isPaymentRequestButton = 
+                    isOwner && 
+                    rental.process === "BEFORE_RENTAL" && 
+                    rental.detailStatus === "CREATED";
 
                   return (
                     <RentalActionButton
@@ -560,6 +570,11 @@ const FloatingWidget: React.FC = () => {
                       }
                       buttonText={buttonText}
                       actionLink={actionLink}
+                      // 안심결제요청 버튼인 경우 onClick 핸들러 추가
+                      onClick={isPaymentRequestButton 
+                        ? () => handleRentalAction(rental) 
+                        : undefined
+                      }
                     />
                   );
                 })}
@@ -594,6 +609,15 @@ const FloatingWidget: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 안심결제 모달 */}
+      {isModalOpen && selectedRental && (
+        <PaymentApplyModal
+          charge={selectedRental.charge}
+          rentalId={selectedRental.rentalId}
+          setIsModalOpen={setIsModalOpen}
+        />
       )}
     </Portal>
   );

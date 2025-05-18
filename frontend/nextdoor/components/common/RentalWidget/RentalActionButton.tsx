@@ -11,6 +11,7 @@ interface RentalActionButtonProps {
   profileImage?: string;
   buttonText: string;
   actionLink?: string;
+  onClick?: () => void; // 추가된 prop
 }
 
 const RentalActionButton: React.FC<RentalActionButtonProps> = ({
@@ -21,6 +22,7 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
   profileImage = "/images/profileimg.png",
   buttonText,
   actionLink,
+  onClick,
 }) => {
   return (
     <div className="flex items-center bg-white rounded-2xl p-3 mb-3 border-l-4 border-blue-500 shadow-sm">
@@ -52,7 +54,19 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
       </div>
 
       <div className="flex items-center">
-        {actionLink ? (
+        {onClick ? (
+          // 모달을 열기 위한 버튼 (안심결제요청)
+          <div className="relative pr-6 group">
+            <button
+              onClick={onClick}
+              className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors inline-block text-center whitespace-nowrap overflow-hidden text-ellipsis min-w-[120px]"
+            >
+              {buttonText}
+            </button>
+            <span className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        ) : actionLink ? (
+          // 기존 링크 버튼
           <Link href={actionLink} className="relative pr-6 group">
             <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors inline-block text-center whitespace-nowrap overflow-hidden text-ellipsis min-w-[120px]">
               {buttonText}
@@ -60,6 +74,7 @@ const RentalActionButton: React.FC<RentalActionButtonProps> = ({
             <span className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
           </Link>
         ) : (
+          // 비활성화 버튼
           <div className="relative pr-6">
             <button
               disabled
