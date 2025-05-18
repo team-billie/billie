@@ -113,10 +113,10 @@ INSERT INTO post_likes (post_like_id, post_id, member_id, created_at) VALUES
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE post_likes AUTO_INCREMENT = 21;
 
--- 5. FintechUser 데이터 추가
-INSERT INTO fintech_user (user_key, user_id, created_at) VALUES
-                                                             ('5b4e4cb4-c670-4ba9-96c9-ec191910005b', 1, '2025-05-12 10:33:18.369177'),
-                                                             ('092ef68d-5a10-4b92-b323-b6db7c009e76', 2, '2025-05-12 10:33:26.789068');
+-- -- 5. FintechUser 데이터 추가
+-- INSERT INTO fintech_user (user_key, user_id, created_at) VALUES
+--                                                              ('5b4e4cb4-c670-4ba9-96c9-ec191910005b', 1, '2025-05-12 10:33:18.369177'),
+--                                                              ('092ef68d-5a10-4b92-b323-b6db7c009e76', 2, '2025-05-12 10:33:26.789068');
 
 -- 6. Account 데이터 추가
 INSERT INTO account (account_id, account_no, bank_code, balance, created_at, user_key) VALUES
