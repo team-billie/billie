@@ -323,6 +323,7 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.processUpdateAccountInfo(command.getAccountNo(), command.getBankCode());
+        rental.updateFinalAmount(command.getFinalAmount());
 
         String renterUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
                 rental.getRentalId(),
@@ -356,6 +357,7 @@ public class RentalServiceImpl implements RentalService {
                 .rentalId(rental.getRentalId())
                 .accountNo(rental.getAccountNo())
                 .bankCode(rental.getBankCode())
+                .finalAmount(rental.getFinalAmount())
                 .build();
     }
 
