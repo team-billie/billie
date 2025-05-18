@@ -17,7 +17,7 @@ import java.util.Map;
 public class FintechUserService implements AuthFintechCommandPort {
     private final SsafyApiClient client;
     private final MemberRepository memberRepository;
-    private final RegistAccountService regService;
+    private final AccountService accountService;
 
     /**
      * 1) SSAFY API 로 user 생성
@@ -44,7 +44,7 @@ public class FintechUserService implements AuthFintechCommandPort {
                             .subscribeOn(Schedulers.boundedElastic())
 
                             // 3) 저장이 끝나면 빌리페이 생성 → 그리고 원래 SSAFY 응답 Map 리턴
-                            .then(regService.createBilipay(userKey))
+                            .then(accountService.createBilipay(userKey))
                             .thenReturn(ssafyResp);
                 });
     }
