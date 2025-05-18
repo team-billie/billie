@@ -20,7 +20,7 @@ public class RegistAccountController {
 
     /**
      * 등록된 계좌 목록 조회
-     * GET /api/v1/fintechs/regist-accounts?userKey=123123123123
+     * GET /api/v1/fintechs/regist-accounts?userKey=...
      */
     @GetMapping("/regist-accounts")
     public Mono<ResponseEntity<List<RegistAccountResponseDto>>> listRegistAccounts(
@@ -31,30 +31,24 @@ public class RegistAccountController {
     }
 
     /**
-     * 계좌 등록 API
+     * 외부 계좌 등록 (EXTERNAL)
      * POST /api/v1/fintechs/regist-accounts
      */
     @PostMapping("/regist-accounts")
     public Mono<ResponseEntity<Object>> registerAccount(
             @RequestBody RegistAccountRequestDto req
     ) {
-        return registAccountService.registerAccount(req)
-                // 성공 시: DTO 를 Object 로 body 에 담기
-                .map(dto -> ResponseEntity
-                        .ok()
-                        .<Object>body(dto)
-                )
-                // 실패 시: error Map 을 Object 로 body 에 담기
+        return accountService.registerAccount(req)
+                .map(dto -> ResponseEntity.ok().<Object>body(dto))
                 .onErrorResume(e -> {
                     Map<String,String> error = new HashMap<>();
                     error.put("error", e.getMessage());
                     return Mono.just(
-                            ResponseEntity
-                                    .badRequest()
-                                    .<Object>body(error)
+                            ResponseEntity.badRequest().<Object>body(error)
                     );
                 });
     }
+
 
     /**
      * 주계좌 변경
