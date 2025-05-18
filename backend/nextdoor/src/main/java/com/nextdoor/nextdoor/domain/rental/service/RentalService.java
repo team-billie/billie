@@ -25,5 +25,4 @@ public interface RentalService {
     UpdateAccountResult updateAccount(UpdateAccountCommand command);
     ManagedRentalCountResult countManagedRentals(Long ownerId);
     SearchRentalResult getRentalById(Long rentalId);
-    DeleteRentalResult deleteRental(DeleteRentalCommand command);
 }
