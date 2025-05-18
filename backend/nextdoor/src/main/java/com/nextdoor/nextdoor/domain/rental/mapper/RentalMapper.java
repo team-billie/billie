@@ -5,6 +5,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRental
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.DeleteRentalResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.ManagedRentalCountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
@@ -107,6 +108,20 @@ public class RentalMapper {
     public ManagedRentalCountResponse toManagedRentalCountResponse(ManagedRentalCountResult result) {
         return ManagedRentalCountResponse.builder()
                 .managedRentalCount(result.getManagedRentalCount())
+                .build();
+    }
+
+    public DeleteRentalCommand toDeleteCommand(Long rentalId) {
+        return DeleteRentalCommand.builder()
+                .rentalId(rentalId)
+                .build();
+    }
+
+    public DeleteRentalResponse toDeleteResponse(DeleteRentalResult result) {
+        return DeleteRentalResponse.builder()
+                .rentalId(result.getRentalId())
+                .success(result.isSuccess())
+                .message(result.getMessage())
                 .build();
     }
 }
