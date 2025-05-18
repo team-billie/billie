@@ -40,9 +40,9 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final ApplicationEventPublisher eventPublisher;
 
     private final GenerativeModel geminiAnalysisModel;
-    private final GenerativeModel geminiComparisonModel;
     private final Part damageAnalyzerPromptPart;
-    private final Part damageComparatorPromptPart;
+    private final Part overallDamageComparatorPromptPart;
+    private final Part pairDamageComparatorPromptPart;
 
     private final AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort;
     private final AiAnalysisMatcherCommandPort aiAnalysisMatcherCommandPort;
@@ -52,21 +52,21 @@ public class GeminiAnalysisService implements AiAnalysisService {
             ApplicationEventPublisher eventPublisher,
             @Qualifier("geminiFlash")
             GenerativeModel geminiAnalysisModel,
-            @Qualifier("geminiPro")
-            GenerativeModel geminiComparisonModel,
             @Qualifier("damageAnalyzerPromptPart")
             Part damageAnalyzerPromptPart,
-            @Qualifier("damageComparatorPromptPart")
-            Part damageComparatorPromptPart,
+            @Qualifier("overallDamageComparatorPromptPart")
+            Part overallDamageComparatorPromptPart,
+            @Qualifier("pairDamageComparatorPromptPart")
+            Part pairDamageComparatorPromptPart,
             AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort,
             AiAnalysisMatcherCommandPort aiAnalysisMatcherCommandPort,
             GeminiComparatorAsyncPort geminiComparatorAsyncPort
     ) {
         this.eventPublisher = eventPublisher;
         this.geminiAnalysisModel = geminiAnalysisModel;
-        this.geminiComparisonModel = geminiComparisonModel;
         this.damageAnalyzerPromptPart = damageAnalyzerPromptPart;
-        this.damageComparatorPromptPart = damageComparatorPromptPart;
+        this.overallDamageComparatorPromptPart = overallDamageComparatorPromptPart;
+        this.pairDamageComparatorPromptPart = pairDamageComparatorPromptPart;
         this.aiAnalysisRentalQueryPort = aiAnalysisRentalQueryPort;
         this.aiAnalysisMatcherCommandPort = aiAnalysisMatcherCommandPort;
         this.geminiComparatorAsyncPort = geminiComparatorAsyncPort;
@@ -183,7 +183,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
             List<RentalDto.AiImageDto> afterAiImages
     ) {
         return Content.newBuilder()
-                .addParts(damageComparatorPromptPart)
+                .addParts(overallDamageComparatorPromptPart)
                 .addAllParts(beforeAiImages.stream()
                         .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                         .map(this::convertToImagePart)
@@ -200,7 +200,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     private Content createPairComparisonContent(RentalDto.AiImageDto beforeAiImage, RentalDto.AiImageDto afterAiImage) {
         return Content.newBuilder()
-                .addParts(damageComparatorPromptPart)
+                .addParts(pairDamageComparatorPromptPart)
                 .addParts(convertToImagePart(beforeAiImage))
                 .addParts(Part.newBuilder().setText("This is a before image.").build())
                 .addParts(convertToImagePart(afterAiImage))

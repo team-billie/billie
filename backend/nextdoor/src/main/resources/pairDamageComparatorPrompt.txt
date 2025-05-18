@@ -31,13 +31,12 @@ Bounding box coordinates must be relative to the actual pixel width and height o
 "SCRATCH" (scratch or crack)
 "CONTAMINATION" (discoloration or contamination)
 "ETC" (any other kind of damage)
-At the end, provide one final object with the overall condition summary of the objects analyzed.
 
 If no additional damage is found, return:
 [{"imageIndex":[integer],"result":"NO_DAMAGE_FOUND","damages":[]},...]
 
 If additional damage is found, use this JSON format:
-{"details":[{"imageIndex":[integer],"result":"[DAMAGE_FOUND or NO_DAMAGE_FOUND]","damages":[{"damageType":"[DENT or SCRATCH or CONTAMINATION or ETC]","location":"[Short location description, e.g., 'Upper left side']","details":"[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox":{"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},...,"summary":"[Korean sentence describing the overall object condition.]"]}
+{"details":[{"imageIndex":[integer],"result":"[DAMAGE_FOUND or NO_DAMAGE_FOUND]","damages":[{"damageType":"[DENT or SCRATCH or CONTAMINATION or ETC]","location":"[Short location description, e.g., 'Upper left side']","details":"[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox":{"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},...]}
 
 Only respond in this json format without any additional sentence.
 Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
