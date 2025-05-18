@@ -22,7 +22,7 @@ public class Deposit {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "renter_account_id", nullable = false)
-    private Account accountId;
+    private Account account;
 
     @Column(nullable = false)
     private Integer amount;
