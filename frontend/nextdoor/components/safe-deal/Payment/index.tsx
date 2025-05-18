@@ -115,7 +115,7 @@ export default function Payment() {
                 </div>
               </div>
               <div className="text-gray900 text-4xl font-semibold">
-                {rentalFeeAmount + depositAmount}원
+                {rentalFeeAmount}원
               </div>
               <div className="flex items-center gap-1 text-gray600 mb-60">
                 <span>빌리페이 잔액 {balance} 원</span>
