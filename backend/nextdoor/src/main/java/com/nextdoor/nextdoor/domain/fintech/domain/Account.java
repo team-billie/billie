@@ -2,6 +2,7 @@ package com.nextdoor.nextdoor.domain.fintech.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.nextdoor.nextdoor.domain.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -31,5 +32,5 @@ public class Account {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_key", nullable = false)
     @JsonIgnore
-    private FintechUser user;
+    private Member user;
 }
