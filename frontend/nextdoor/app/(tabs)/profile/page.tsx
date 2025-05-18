@@ -8,39 +8,39 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function ProfilePage() {
-    const { username, userKey, userId, reset } = useUserStore();
-    const router = useRouter();
+  const { username, userKey, userId, reset } = useUserStore();
+  const router = useRouter();
 
-    const handleLogout = () => {
-        reset();
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("userKey");
-        router.push("/login");
-    }
+  const handleLogout = () => {
+    reset();
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userKey");
+    router.push("/login");
+  }
 
-    useEffect(() => {
-        console.log(userKey, userId);
-    }, []);
+  useEffect(() => {
+    console.log(userKey, userId);
+  }, []);
 
-    return (
+  return (
     <div className="flex flex-col min-h-[100dvh] pb-20">
       <div className="flex-1 flex flex-col bg-blue300 p-4">
         <div className="flex-1 flex flex-col pt-8 text-white font-bold text-2xl px-2">
           <span>안녕하세요</span>
           <span>{username || "사용자"} 님!</span>
         </div>
-        
-        <PayBox type="profile"/>
+
+        <PayBox type="profile" />
       </div>
-      
+
       <div className="flex flex-col gap-4 bg-gray100 text-gray-700 p-4">
-        <div className="bg-white shadow-popup p-4 rounded-2xl">
-          <LinkHeader type="like"/>
-        </div>
+        <Link href="/posts/liked" className="bg-white shadow-popup p-4 rounded-2xl">
+          <LinkHeader type="like" />
+        </Link>
 
         <div className="grid grid-cols-2 gap-4">
           <Link href="/reservations" className="bg-white shadow-popup p-4 rounded-2xl">
-            <LinkHeader type="reservation"/>
+            <LinkHeader type="reservation" />
             <div className="flex justify-end items-end font-bold px-2 mt-1 text-gray900">
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
@@ -49,7 +49,7 @@ export default function ProfilePage() {
           </Link>
 
           <Link href="/reservations/manage" className="bg-white shadow-popup p-4 rounded-2xl">
-            <LinkHeader type="apply"/>
+            <LinkHeader type="apply" />
             <div className="flex justify-end items-end font-bold px-2 mt-1 text-gray900">
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
@@ -63,5 +63,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-    );
-  }
+  );
+}

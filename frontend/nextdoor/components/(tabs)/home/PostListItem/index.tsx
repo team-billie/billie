@@ -2,6 +2,7 @@ import { Heart, DollarSign } from "lucide-react";
 import { PostListItemDto } from "@/types/posts/response";
 import { useState } from "react";
 import { formatNumberWithCommas } from "@/lib/utils/money";
+import { PostLikeRequest, PostLikeDeleteRequest } from "@/lib/api/posts";
 
 interface PostListItemProps {
   post: PostListItemDto;
@@ -11,9 +12,14 @@ export default function PostListItem({ post }: PostListItemProps) {
   const [isLiked, setIsLiked] = useState(false);
 
   const handleLikeBtn = () => {
+    if (isLiked) {
+      PostLikeDeleteRequest(post.postId.toString());
+    } else {
+      PostLikeRequest(post.postId.toString());
+    }
     setIsLiked(!isLiked);
   };
-  
+
   return (
     <div className="grid grid-cols-[1fr_3fr] gap-4 border-b border-gray-200 pb-4">
       {/* //이미지 사진 */}
@@ -25,9 +31,8 @@ export default function PostListItem({ post }: PostListItemProps) {
         <div className="flex justify-between">
           <div className="text-xl font-bold">{post.title}</div>
           <Heart
-            className={`cursor-pointer transition-colors ${
-              isLiked ? "text-pink-500 fill-pink-300" : "text-gray600"
-            }`}
+            className={`cursor-pointer transition-colors ${isLiked ? "text-pink-500 fill-pink-300" : "text-gray600"
+              }`}
             onClick={(e) => {
               e.preventDefault();
               handleLikeBtn();
