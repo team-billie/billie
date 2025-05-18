@@ -27,7 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @EntityGraph(attributePaths = {"member"})
     Optional<Account> findById(Long id);
 
-    /** 회원(userKey)의 특정 타입(BILI_PAY, EXTERNAL 등) 계좌 조회 */
+    /** 주계좌 변경 - 회원(userKey)의 특정 타입(BILI_PAY, EXTERNAL 등) 계좌 조회 */
     @EntityGraph(attributePaths = {"member"})
     List<Account> findByMember_UserKeyAndAccountType(String userKey, RegistAccountType accountType);
 
