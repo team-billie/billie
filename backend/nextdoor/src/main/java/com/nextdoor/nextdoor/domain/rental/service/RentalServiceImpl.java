@@ -370,4 +370,33 @@ public class RentalServiceImpl implements RentalService {
         return rentalQueryPort.findRentalById(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("ID가 " + rentalId + "인 대여 정보가 존재하지 않습니다."));
     }
+
+    @Override
+    @Transactional
+    public DeleteRentalResult deleteRental(DeleteRentalCommand command) {
+        try {
+            Rental rental = rentalRepository.findByRentalId(command.getRentalId())
+                    .orElseThrow(() -> new NoSuchRentalException("ID가 " + command.getRentalId() + "인 대여 정보가 존재하지 않습니다."));
+
+            rentalRepository.delete(rental);
+
+            return DeleteRentalResult.builder()
+                    .rentalId(command.getRentalId())
+                    .success(true)
+                    .message("대여 정보가 성공적으로 삭제되었습니다.")
+                    .build();
+        } catch (NoSuchRentalException e) {
+            return DeleteRentalResult.builder()
+                    .rentalId(command.getRentalId())
+                    .success(false)
+                    .message(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return DeleteRentalResult.builder()
+                    .rentalId(command.getRentalId())
+                    .success(false)
+                    .message("대여 정보 삭제 중 오류가 발생했습니다: " + e.getMessage())
+                    .build();
+        }
+    }
 }
