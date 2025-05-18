@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
 import com.nextdoor.nextdoor.domain.fintech.dto.InquireTransactionHistoryRequestDto;
+import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.port.MemberQueryPort;
 import com.nextdoor.nextdoor.domain.fintech.repository.AccountRepository;
@@ -19,7 +20,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -201,5 +204,31 @@ public class AccountService {
             InquireTransactionHistoryRequestDto req
     ) {
         return client.inquireTransactionHistoryList(req);
+    }
+
+    // regist_account 서비스들을 병합
+    // 등록된(registered=true) 모든 계좌 조회
+    public Mono<List<RegistAccountResponseDto>> getRegistAccounts(String userKey) {
+        return Mono.fromCallable(() ->
+                accountRepository
+                        .findByMember_UserKeyAndRegisteredIsTrue(userKey)
+                        .stream()
+                        .map(this::toDto)
+                        .collect(Collectors.toList())
+        ).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    /** DTO 변환 헬퍼 */
+    private RegistAccountResponseDto toDto(Account a) {
+        return new RegistAccountResponseDto(
+                a.getId(),
+                a.getAccountNo(),
+                a.getBankCode(),
+                a.getAccountType(),
+                a.getAlias(),
+                a.getPrimary(),
+                a.getBalance(),
+                a.getCreatedAt()
+        );
     }
 }
