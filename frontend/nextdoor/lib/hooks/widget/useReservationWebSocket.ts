@@ -18,6 +18,9 @@ interface ReservationData {
   status: string;
   ownerName: string; 
   ownerProfileImageUrl: string; 
+  renterName: string;
+  renterProfileImageUrl: string;
+  renterId: number;
 }
 
 export default function useReservationWebSocket() {
@@ -118,7 +121,8 @@ export default function useReservationWebSocket() {
               ownerName: reservationData.ownerName || '소유자',
               ownerProfileImageUrl: reservationData.ownerProfileImageUrl || '/images/profileimg.png',
               renterName: reservationData.renterName || '렌터',
-              renterProfileImageUrl: reservationData.renterProfileImageUrl || '/images/profileimg.png'
+              renterProfileImageUrl: reservationData.renterProfileImageUrl || '/images/profileimg.png',
+              renterId: reservationData.renterId || 0
             };
             
             handleReservationUpdate(formattedReservation);
