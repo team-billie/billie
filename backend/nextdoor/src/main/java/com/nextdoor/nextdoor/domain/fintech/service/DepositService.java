@@ -92,6 +92,7 @@ public class DepositService {
                         depositRepository.findByRentalId(req.getRentalId())
                                 .orElseThrow(() -> new RuntimeException("보증금 내역이 없습니다: rentalId=" + req.getRentalId()))
                 )
+                .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(deposit -> {
                     // 2) 원금·차감액 계산
                     long original   = deposit.getAmount();
