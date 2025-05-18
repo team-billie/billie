@@ -1,11 +1,13 @@
 package com.nextdoor.nextdoor.domain.post.controller;
 
 import com.nextdoor.nextdoor.domain.post.controller.dto.request.CreatePostRequest;
+import com.nextdoor.nextdoor.domain.post.controller.dto.request.UpdatePostRequest;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.CreatePostResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostDetailResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostLikeResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostListResponse;
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.UpdatePostResponse;
 import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.service.PostService;
 import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostCommand;
@@ -13,6 +15,8 @@ import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
+import com.nextdoor.nextdoor.domain.post.service.dto.UpdatePostCommand;
+import com.nextdoor.nextdoor.domain.post.service.dto.UpdatePostResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,5 +131,32 @@ public class PostController {
         Page<PostListResponse> responsePage = results.map(postMapper::toResponse);
 
         return ResponseEntity.ok(responsePage);
+    }
+
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UpdatePostResponse> updatePost(
+            @PathVariable Long postId,
+            @RequestPart("post") @Valid UpdatePostRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal Long authorId
+    ) {
+        UpdatePostCommand command = postMapper.toUpdateCommand(request, images, postId, authorId);
+        UpdatePostResult result = postService.updatePost(command);
+        UpdatePostResponse response = postMapper.toUpdateResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal Long userId
+    ) {
+        boolean success = postService.deletePost(postId, userId);
+        if (success) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

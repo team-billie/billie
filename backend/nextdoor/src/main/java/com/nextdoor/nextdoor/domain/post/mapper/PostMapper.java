@@ -1,9 +1,11 @@
 package com.nextdoor.nextdoor.domain.post.mapper;
 
 import com.nextdoor.nextdoor.domain.post.controller.dto.request.CreatePostRequest;
+import com.nextdoor.nextdoor.domain.post.controller.dto.request.UpdatePostRequest;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.CreatePostResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostDetailResponse;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.PostListResponse;
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.UpdatePostResponse;
 import com.nextdoor.nextdoor.domain.post.domain.Post;
 import com.nextdoor.nextdoor.domain.post.service.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +97,56 @@ public class PostMapper {
                 .category(post.getCategory())
                 .rentalFee(post.getRentalFee())
                 .deposit(post.getDeposit())
+                .preferredLocation(location)
+                .authorId(post.getAuthorId())
+                .productImageUrls(imageUrls)
+                .build();
+    }
+
+    public UpdatePostCommand toUpdateCommand(UpdatePostRequest request, List<MultipartFile> productImages, Long postId, Long authorId) {
+        return UpdatePostCommand.builder()
+                .postId(postId)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .category(request.getCategory())
+                .rentalFee(request.getRentalFee() != null ? request.getRentalFee().longValue() : null)
+                .deposit(request.getDeposit() != null ? request.getDeposit().longValue() : null)
+                .address(request.getAddress())
+                .preferredLocation(request.getPreferredLocation())
+                .authorId(authorId)
+                .productImages(productImages)
+                .build();
+    }
+
+    public UpdatePostResponse toUpdateResponse(UpdatePostResult result) {
+        return UpdatePostResponse.builder()
+                .id(result.getId())
+                .title(result.getTitle())
+                .content(result.getContent())
+                .category(result.getCategory().name())
+                .rentalFee(String.valueOf(result.getRentalFee()))
+                .deposit(String.valueOf(result.getDeposit()))
+                .address(result.getAddress())
+                .preferredLocation(result.getPreferredLocation())
+                .authorId(result.getAuthorId())
+                .productImageUrls(result.getProductImageUrls())
+                .build();
+    }
+
+    public UpdatePostResult toUpdateResult(Post post, List<String> imageUrls) {
+        LocationDto location = LocationDto.builder()
+                .latitude(post.getLatitude())
+                .longitude(post.getLongitude())
+                .build();
+
+        return UpdatePostResult.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory())
+                .rentalFee(post.getRentalFee())
+                .deposit(post.getDeposit())
+                .address(post.getAddress())
                 .preferredLocation(location)
                 .authorId(post.getAuthorId())
                 .productImageUrls(imageUrls)
