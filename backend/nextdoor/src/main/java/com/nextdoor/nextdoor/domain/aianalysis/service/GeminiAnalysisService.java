@@ -11,6 +11,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.DamageAna
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.DamageComparisonResponseDto;
 import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
+import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisMatcherCommandPort;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
@@ -108,38 +109,57 @@ public class GeminiAnalysisService implements AiAnalysisService {
         // if (rental.getDamageAnalysis() != null) {
         //     throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
         // }
-        List<RentalDto.AiImageDto> aiImages = rental.getAiImages(); //ai image 존재 여부 검증
         List<RentalDto.AiImageDto> beforeAiImages = rental.getAiImages().stream()
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                 .toList();
         List<RentalDto.AiImageDto> afterAiImages = rental.getAiImages().stream()
                 .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.AFTER))
                 .toList();
-        ImageMatcherResponseDto imageMatcherResponseDto = aiAnalysisMatcherCommandPort.match(
+        // Flask한테 송신 및 수신
+        ImageMatcherResponseDto matcherResponse = aiAnalysisMatcherCommandPort.match(
                 new ImageMatcherRequestDto(
                         beforeAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
                         afterAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList()
                 ));
-        log.info("imageMatcherResponseDto: {}", imageMatcherResponseDto);
-        List<RentalDto.AiImageDto[]> aiImagePairs = imageMatcherResponseDto.getMatches().stream().map(match -> {
-            RentalDto.AiImageDto[] aiImagePair = new RentalDto.AiImageDto[2];
-            aiImagePair[0] = beforeAiImages.get(match.getBeforeIndex());
-            aiImagePair[1] = afterAiImages.get(match.getAfterIndex());
-            log.info("aiImagePair[0]: {}", aiImagePair[0]);
-            log.info("aiImagePair[1]: {}", aiImagePair[1]);
-            return aiImagePair;
-        }).toList();
+        List<RentalDto.AiImageDto[]> aiImagePairs = matcherResponse.getMatches().stream()
+                .map(match -> new RentalDto.AiImageDto[] {
+                    beforeAiImages.get(match.getBeforeIndex()),
+                    afterAiImages.get(match.getAfterIndex())
+                }).toList();
+        // 이미지 쌍 전부 비동기로 Gemini한테 송신 및 결과 수신
         List<CompletableFuture<GenerateContentResponse>> futures = new ArrayList<>();
         aiImagePairs.forEach(aiImagePair -> futures.add(geminiComparatorAsyncPort.generateContent(createComparisonContent(aiImagePair[0], aiImagePair[1]))));
-        List<GenerateContentResponse> responses = futures.stream()
+        List<String> geminiResponses = futures.stream()
                 .map(CompletableFuture::join)
-                .toList();
-        List<String> damageAnalysisResults = responses.stream()
                 .map(response ->
                         cleanMarkdownCodeBlocks(response.getCandidates(0).getContent().getParts(0).getText()))
                 .toList();
-//        eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(inspectDamageRequestDto.getRentalId(), damageAnalysisResults));
-        return new DamageComparisonResponseDto(damageAnalysisResults);
+        // 프론트로 전할 API 응답 및 이벤트 요소 생성
+        List<DamageComparisonResponseDto.MatchingResult> responseMatchingResults = new ArrayList<>();
+        List<AiCompareAnalysisCompletedEvent.MatchingResult> eventMatchingResults = new ArrayList<>();
+        for (int i = 0; i < geminiResponses.size(); i++) {
+            responseMatchingResults.add(new DamageComparisonResponseDto.MatchingResult(
+                    aiImagePairs.get(i)[0].getImageUrl(),
+                    aiImagePairs.get(i)[1].getImageUrl(),
+                    geminiResponses.get(i)
+            ));
+            eventMatchingResults.add(new AiCompareAnalysisCompletedEvent.MatchingResult(
+                    aiImagePairs.get(i)[1].getAiImageId(),
+                    aiImagePairs.get(i)[0].getAiImageId(),
+                    geminiResponses.get(i)
+            ));
+        }
+        // 이벤트 발행 및 API 응답 리턴
+        eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(
+                inspectDamageRequestDto.getRentalId(),
+                null,
+                eventMatchingResults
+        ));
+        return new DamageComparisonResponseDto(
+                beforeAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
+                afterAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
+                null,
+                responseMatchingResults);
     }
 
     private Content createComparisonContent(RentalDto.AiImageDto beforeAiImage, RentalDto.AiImageDto afterAiImage) {
