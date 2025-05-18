@@ -8,7 +8,6 @@ interface SafeDealBtnProps {
 
 export default function SafeDealBtn({ reservationId }: SafeDealBtnProps) {
   const { userId } = useUserStore();
-  console.log("SafeDealBtn userId:", userId);
 
   // userId가 없으면 렌더링하지 않음
   if (!userId) {

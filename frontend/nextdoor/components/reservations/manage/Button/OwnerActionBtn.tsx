@@ -37,8 +37,6 @@ export default function OwnerActionBtn({
   const [isDepositModal, setIsDepositModal] = useState(false);
   const router = useRouter();
   const { receiverBank } = useBankStore();
-  console.log("OwnerActionBtn userId:", userId);
-  console.log("OWner버튼", process);
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
     return null;

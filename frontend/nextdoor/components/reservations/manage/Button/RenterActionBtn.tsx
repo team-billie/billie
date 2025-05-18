@@ -25,8 +25,6 @@ function RenterActionBtn({
 }: RenterActionBtnProps) {
   const { userId } = useUserStore();
   const router = useRouter();
-  console.log("RenterActionBtn userId:", userId);
-  console.log("RENTER버튼", process);
 
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
