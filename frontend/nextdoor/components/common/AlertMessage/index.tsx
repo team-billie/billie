@@ -8,7 +8,7 @@ interface AlertMessageProps {
 export default function AlertMessage({ txt, exiting = false }: AlertMessageProps) {
     return (
         <div
-            className={`absolute overflow-hidden top-4 flex items-center bg-[#F9FCFF] rounded-lg w-[90dvw] p-4 shadow-popup
+            className={`absolute border-blue200 border-2 overflow-hidden top-4 flex items-center bg-[#F9FCFF] rounded-lg w-[90dvw] p-4 shadow-popup
                 ${exiting ? 'animate-slide-exit' : 'animate-slide-enter'}`}
             style={{
                 animation: exiting
@@ -124,7 +124,7 @@ export default function AlertMessage({ txt, exiting = false }: AlertMessageProps
                 />
             </div>
 
-            <div className=" text-[#607793] font-bold flex items-center gap-2">
+            <div className=" text-blue300 font-bold flex items-center gap-2">
                 <CircleAlert className="w-6 h-6" />
                 <span>{txt}</span>
             </div>
