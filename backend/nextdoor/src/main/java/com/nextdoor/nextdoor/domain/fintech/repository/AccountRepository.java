@@ -14,20 +14,24 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     // 계좌 등록 api => 계좌번호 + 은행코드로 조회
     Optional<Account> findByAccountNoAndBankCode(String accountNo, String bankCode);
 
-    // 사용자의 모든 계좌 조회
+    /** 회원(userKey)에 속한 모든 계좌 조회 */
     @EntityGraph(attributePaths = {"member"})
     List<Account> findByMember_UserKey(String userKey);
 
-    // 사용자의 특정 계좌 조회
+    /** 회원(userKey)의 특정 계좌(accountNo) 조회 */
     @EntityGraph(attributePaths = {"member"})
     Optional<Account> findByMember_UserKeyAndAccountNo(String userKey, String accountNo);
 
-    // ID로 계좌 조회 (eager loading)
+    /** ID(pk)로 계좌 조회 (member 정보도 함께 페치) */
     @Override
     @EntityGraph(attributePaths = {"member"})
     Optional<Account> findById(Long id);
 
-    // 사용자의 특정 타입 계좌 조회
+    /** 회원(userKey)의 특정 타입(BILI_PAY, EXTERNAL 등) 계좌 조회 */
     @EntityGraph(attributePaths = {"member"})
     List<Account> findByMember_UserKeyAndAccountType(String userKey, RegistAccountType accountType);
+
+    /** “등록된” 계좌만 필터링해서 조회 */
+    @EntityGraph(attributePaths = {"member"})
+    List<Account> findByMember_UserKeyAndRegisteredIsTrue(String userKey);
 }
