@@ -2,7 +2,6 @@ package com.nextdoor.nextdoor.domain.fintech.service;
 
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
-import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccountType;
 import com.nextdoor.nextdoor.domain.fintech.dto.InquireTransactionHistoryRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountRequestDto;
