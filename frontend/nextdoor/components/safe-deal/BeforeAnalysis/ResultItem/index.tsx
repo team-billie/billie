@@ -12,7 +12,7 @@ export default function ResultItem({ damage }: ResultItemProps) {
     <div className="w-full flex">
       <div className="bg-gray700 w-1 "></div>
       <div className="text-lg px-4 py-3 w-full bg-transparentWhite10 text-white break-words">
-        {damage.location}
+        {damage.details}
       </div>
     </div>
   );
