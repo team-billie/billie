@@ -46,7 +46,7 @@ const FloatingWidget: React.FC = () => {
 
   const { showAlert } = useAlertModal();
 
-  // 위치 정보 저장 
+  // 위치 정보 저장
   const savePosition = (pos: { x: number; y: number }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("widgetPosition", JSON.stringify(pos));
@@ -516,6 +516,30 @@ const FloatingWidget: React.FC = () => {
                   const buttonText = getRentalButtonText(rental);
                   const displayTitle =
                     rental.rentalDetail?.title || "대여 물품";
+
+                  console.log(
+                    "[위젯] 렌탈 표시:",
+                    rental.rentalId,
+                    "사용자 역할:",
+                    isOwner ? "오너" : "렌터",
+                    "이미지:",
+                    rental.rentalDetail?.productImageUrl
+                  );
+
+                  // 프로필 이미지 로깅
+                  const profileImageSource = isOwner
+                    ? rental.rentalDetail?.renterProfileImageUrl ||
+                      "/images/profileimg.png"
+                    : rental.rentalDetail?.ownerProfileImageUrl ||
+                      "/images/profileimg.png";
+
+                  console.log(
+                    "[위젯] 프로필 이미지 선택:",
+                    "역할:",
+                    isOwner ? "오너->렌터 프로필" : "렌터->오너 프로필",
+                    "선택된 이미지:",
+                    profileImageSource
+                  );
 
                   return (
                     <RentalActionButton
