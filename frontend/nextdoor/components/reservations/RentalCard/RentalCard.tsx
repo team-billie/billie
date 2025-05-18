@@ -8,6 +8,7 @@ import { RentalProcess, RentalStatus, UserType } from "@/types/rental";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import SafeDealBtn from "../manage/Button/SafeDealBtn";
 import useUserStore from "@/lib/store/useUserStore";
+import { MessageCircleMore } from "lucide-react";
 
 interface RentalCardProps {
   title: string;
@@ -67,7 +68,7 @@ export default function RentalCard({
         {/* AI 안심거래 버튼 */}
         {(pathname === "/reservations" ||
           pathname === "/reservations/lend") && (
-          <div className="absolute top-3 right-4 z-10">
+          <div className="absolute top-3 right-4 ">
             <SafeDealBtn reservationId={rentalId} />
           </div>
         )}
@@ -102,6 +103,9 @@ export default function RentalCard({
             onSuccess={onActionSuccess}
           />
         )}
+        <div className="w-12 py-2 hover:bg-gray-100 cursor-pointer flex text-gray600 justify-center items-center">
+          <MessageCircleMore />
+        </div>
       </div>
     </div>
   );

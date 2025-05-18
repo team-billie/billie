@@ -10,6 +10,9 @@ import { GetPaymentDataRequest, HoldDepositRequest } from "@/lib/api/pays";
 import { GetPaymentDataResponseDto } from "@/types/pays/response";
 import Button from "../Button";
 import GrayButton from "../GrayButton";
+import PaymentTitle from "./PaymentTitle";
+import Header from "../Header";
+import GradientButton from "./GradientBtn";
 export default function Payment() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,49 +101,54 @@ export default function Payment() {
   }, []);
 
   return (
-    <div className="relative flex flex-col min-h-[100dvh]">
-      {isLoading ? (
-        <Loading txt="결제가" isSuccess={isSuccess} headerTxt="빌리페이 송금" />
-      ) : (
-        <>
-          <div className="flex-1 flex flex-col items-center p-6">
-            <div className="w-full flex-1 flex flex-col items-center gap-3 pt-44">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-full bg-gray500"></div>
-                <div className="text-gray900 text-lg">
-                  <span className="font-semibold">
-                    {paymentData?.ownerNickname}
-                  </span>
-                  님에게
-                </div>
-              </div>
-              <div className="text-gray900 text-4xl font-semibold">
-                {rentalFeeAmount}원
-              </div>
-              <div className="flex items-center gap-1 text-gray600 mb-60">
-                <span>빌리페이 잔액 {balance} 원</span>
-              </div>
-            </div>
-            <div className="w-full flex flex-col gap-2">
-              <Button txt="결제하기" onClick={() => sendBtnHandler()} />
-              <GrayButton
-                txt="AI 분석 결과 다시 보기"
-                onClick={() => router.push(`/safe-deal/${id}/before/analysis`)}
-              />
-            </div>
+    <div className="relative h-[100dvh] overflow-auto flex flex-col">
+      <div className="fixed top-0 left-0 w-full z-10 bg-graygradient">
+        <Header txt={"결제하기"} />
+      </div>
+      <PaymentTitle />
+      {/* ✅ 중간 콘텐츠 */}
+      <div className="flex-1 flex flex-col items-center justify-center  pb-[300px] text-center">
+        <div className="flex items-center gap-2 mb-6 mt-6">
+          <div className="text-gray900 text-lg">
+            <span className="font-semibold text-2xl px-2">
+              {paymentData?.ownerNickname}
+            </span>
+            님에게
           </div>
-        </>
-      )}
+        </div>
 
-      {isModalOpen && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
-          <AutoRechargeModal
-            setIsModalOpen={setIsModalOpen}
-            sendBtnHandler={sendBtnHandler}
-            needCharge={chargeNeeded}
+        <div className="text-gray900 flex items-center gap-2 mb-2">
+          <div className="text-lg">대여료</div>
+          <div className="font-semibold text-2xl">{rentalFeeAmount}원</div>
+        </div>
+
+        <div className="text-gray900 flex items-center gap-2 mb-4">
+          <div className="text-lg">보증금</div>
+          <div className="font-semibold text-2xl">{depositAmount}원</div>
+        </div>
+        <div className="text-gray900 flex items-center gap-2 mb-4">
+          <div className="text-2xl">총</div>
+          <div className="font-semibold text-4xl">
+            {rentalFeeAmount + depositAmount}원
+          </div>
+        </div>
+        <div>이 결제 됩니다</div>
+        <div className="flex items-center gap-1 text-gray600 pt-4">
+          <span>빌리페이 잔액 {balance}원</span>
+        </div>
+        <div className="p-4">보증금은 빌리페이에서 안전하게 보관됩니다</div>
+      </div>
+
+      {/* ✅ 고정된 하단 버튼 영역 */}
+      <div className="fixed bottom-0 left-0 w-full px-6 py-6 bg-white z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.05)]">
+        <div className="flex flex-col gap-2 w-full">
+          <GradientButton txt="결제하기" onClick={() => sendBtnHandler()} />
+          <GrayButton
+            txt="AI 분석 결과 다시 보기"
+            onClick={() => router.push(`/safe-deal/${id}/before/analysis`)}
           />
         </div>
-      )}
+      </div>
     </div>
   );
 }
