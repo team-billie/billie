@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/posts")
+@RequestMapping("/api/v1/posts")
 public class SearchController {
 
   private final PostSearchService postSearchService;
@@ -30,18 +30,13 @@ public class SearchController {
           @RequestParam(value = "sort", defaultValue = "createdAt") String sort,
           @RequestParam(value = "direction", defaultValue = "DESC") String direction
   ) {
-    try {
-      Sort.Direction sortDirection = "ASC".equalsIgnoreCase(direction)
-              ? Sort.Direction.ASC
-              : Sort.Direction.DESC;
+    Sort.Direction sortDirection = "ASC".equalsIgnoreCase(direction)
+            ? Sort.Direction.ASC
+            : Sort.Direction.DESC;
 
-      PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+    PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
-      Page<PostSearchResponseDto> results = postSearchService.searchPostsByKeywordInAddress(keyword, address, pageRequest);
-      return ResponseEntity.ok(results);
-    } catch (Exception e) {
-      log.error("검색 오류: {}", e.getMessage(), e);
-      return ResponseEntity.internalServerError().build();
-    }
+    Page<PostSearchResponseDto> results = postSearchService.searchPostsByKeywordInAddress(keyword, address, pageRequest);
+    return ResponseEntity.ok(results);
   }
 }
