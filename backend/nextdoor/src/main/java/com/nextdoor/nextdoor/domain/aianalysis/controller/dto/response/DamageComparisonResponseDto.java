@@ -9,5 +9,17 @@ import java.util.List;
 @Getter
 public class DamageComparisonResponseDto {
 
-    private List<String> damageComparisonResults;
+    private List<String> beforeImages;
+    private List<String> afterImages;
+    private String overallResult;
+    private List<MatchingResult> matchingResults;
+
+    @AllArgsConstructor
+    @Getter
+    public static class MatchingResult {
+
+        private String beforeImage;
+        private String afterImage;
+        private String comparisonResult;
+    }
 }
