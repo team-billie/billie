@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import ResultItem from "./ResultItem";
 import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
-import { AiAnalysisGetRequestDTO } from "@/types/ai-analysis/response";
+import {
+  AiAnalysisGetRequestDTO,
+  DamageAnalysis,
+} from "@/types/ai-analysis/response";
 
 export default function BeforeAnalysis() {
-  const [results, setResults] = useState<AiAnalysisGetRequestDTO | null>(null);
-  const damageAnalysis = useAnalysisStore((state) => state.damageAnalysis);
-  console.log("❤️❤️❤️", damageAnalysis);
+  const damageAnalysis = useAnalysisStore<DamageAnalysis | null>(
+    (state) => state.damageAnalysis
+  );
 
   return (
     <div className="relative flex flex-col  p-5">

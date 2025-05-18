@@ -105,7 +105,7 @@ export default function OwnerActionBtn({
 
   const disabled = isButtonDisabled();
   const label = getLabel();
-
+  console.log("charge : ", charge);
   return (
     <>
       <div
@@ -114,6 +114,7 @@ export default function OwnerActionBtn({
       >
         {label}
       </div>
+      {/* 계좌 등록 */}
       {isModal && (
         <PaymentApplyModal
           charge={charge}
@@ -121,6 +122,7 @@ export default function OwnerActionBtn({
           setIsModalOpen={setModal}
         />
       )}
+      {/* 보증금 반환 */}
       {isDepositModal && (
         <HandleDepositModal
           charge={deposit}

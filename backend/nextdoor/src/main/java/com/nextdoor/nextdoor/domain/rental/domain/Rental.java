@@ -57,9 +57,6 @@ public class Rental {
     @Column(name = "deposit_id")
     private Long depositId;
 
-    @Column(name = "final_amount")
-    private BigDecimal finalAmount;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -140,11 +137,6 @@ public class Rental {
 
     public void updateDepositId(Long depositId) {
         this.depositId = depositId;
-    }
-
-    public void updateFinalAmount(BigDecimal amount) {
-        validateAmount(amount);
-        this.finalAmount = amount;
     }
 
     public void validateRemittancePendingState() {

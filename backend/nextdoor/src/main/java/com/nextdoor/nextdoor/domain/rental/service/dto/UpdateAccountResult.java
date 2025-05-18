@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Getter
 @Builder
 @NoArgsConstructor
@@ -15,5 +13,4 @@ public class UpdateAccountResult {
     private Long rentalId;
     private String accountNo;
     private String bankCode;
-    private BigDecimal finalAmount;
 }
