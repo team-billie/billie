@@ -18,7 +18,7 @@ public class AiCompareAnalysisCompletedEventListener {
     public void handleAiCompareAnalysisCompletedEvent(AiCompareAnalysisCompletedEvent aiCompareAnalysisCompletedEvent) {
         rentalService.updateComparedAnalysis(
                 aiCompareAnalysisCompletedEvent.getRentalId(),
-                aiCompareAnalysisCompletedEvent.getDamageAnalysis()
+                aiCompareAnalysisCompletedEvent.getOverallComparisonResult()
         );
     }
 }
