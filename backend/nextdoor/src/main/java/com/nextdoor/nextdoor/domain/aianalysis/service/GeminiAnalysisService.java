@@ -13,6 +13,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEven
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
+import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisMatcherCommandPort;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final Part damageComparatorPromptPart;
 
     private final AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort;
+    private final AiAnalysisMatcherCommandPort aiAnalysisMatcherCommandPort;
 
     public GeminiAnalysisService(
             ApplicationEventPublisher eventPublisher,
@@ -50,7 +52,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
             Part damageAnalyzerPromptPart,
             @Qualifier("damageComparatorPromptPart")
             Part damageComparatorPromptPart,
-            AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort
+            AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort,
+            AiAnalysisMatcherCommandPort aiAnalysisMatcherCommandPort
     ) {
         this.eventPublisher = eventPublisher;
         this.geminiAnalysisModel = geminiAnalysisModel;
@@ -58,6 +61,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         this.damageAnalyzerPromptPart = damageAnalyzerPromptPart;
         this.damageComparatorPromptPart = damageComparatorPromptPart;
         this.aiAnalysisRentalQueryPort = aiAnalysisRentalQueryPort;
+        this.aiAnalysisMatcherCommandPort = aiAnalysisMatcherCommandPort;
     }
 
     @Override
