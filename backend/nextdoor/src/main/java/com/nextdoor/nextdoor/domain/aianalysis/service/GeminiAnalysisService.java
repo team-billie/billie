@@ -125,6 +125,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
             RentalDto.AiImageDto[] aiImagePair = new RentalDto.AiImageDto[2];
             aiImagePair[0] = beforeAiImages.get(match.getBeforeIndex());
             aiImagePair[1] = afterAiImages.get(match.getAfterIndex());
+            log.info("aiImagePair[0]: {}", aiImagePair[0]);
+            log.info("aiImagePair[1]: {}", aiImagePair[1]);
             return aiImagePair;
         }).toList();
         List<CompletableFuture<GenerateContentResponse>> futures = new ArrayList<>();
