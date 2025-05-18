@@ -19,7 +19,7 @@ public class ImageMatcherResponseDto {
     @Getter
     @ToString
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    private static class Match {
+    public static class Match {
 
         private Integer beforeIndex;
         private Integer afterIndex;
