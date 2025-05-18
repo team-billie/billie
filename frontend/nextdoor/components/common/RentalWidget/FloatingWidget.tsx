@@ -15,7 +15,7 @@ import useUserStore from "@/lib/store/useUserStore";
 import { Portal } from "@/lib/utils/widget/portal";
 import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
 
-const FloatingWidget: React.FC = () => {
+const FloatingWidget: React.FC = () => { 
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 200 });
   const [isShining, setIsShining] = useState(false);
@@ -72,42 +72,82 @@ const FloatingWidget: React.FC = () => {
     }
   }, [isOpen, refreshRentals]);
 
+  // 주기적인 데이터 갱신을 위한 타이머
+  useEffect(() => {
+    // 5분마다 서버에서 최신 데이터 가져오기
+    const refreshTimer = setInterval(() => {
+      refreshRentals();
+    }, 300000); // 5분 = 300,000 밀리초
+    
+    return () => {
+      clearInterval(refreshTimer);
+    };
+  }, [refreshRentals]);
+
+  // 숨김 항목 상태 초기화 및 관리
+  useEffect(() => {
+    // 로컬 스토리지에서 숨겨진 항목 불러오기
+    if (typeof window !== "undefined") {
+      const hiddenItemsJson = localStorage.getItem("hiddenWidgetItems");
+      if (hiddenItemsJson) {
+        try {
+          const parsedItems = JSON.parse(hiddenItemsJson);
+          const currentTime = Date.now();
+          
+          // 3분(180초)이 지나지 않은 항목만 필터링
+          const validHiddenItems = parsedItems.filter((item: { id: number, timestamp: number }) => {
+            return currentTime - item.timestamp < 180000;
+          });
+          
+          // 유효한 항목만 상태로 설정
+          setHiddenItemIds(validHiddenItems.map((item: { id: number }) => item.id));
+          
+          // 로컬 스토리지 업데이트
+          localStorage.setItem("hiddenWidgetItems", JSON.stringify(validHiddenItems));
+        } catch (e) {
+          console.error("숨김 항목 정보 파싱 오류:", e);
+          localStorage.removeItem("hiddenWidgetItems");
+        }
+      }
+    }
+  }, []);
+
   // 새로운 항목이 추가되었는지 확인하고 빛나는 효과 적용
   useEffect(() => {
-    // 처음 로드 시에는 빛나는 효과 적용하지 않음
-    if (prevRentals.length === 0 || prevReservations.length === 0) {
-      setPrevRentals(activeRentals);
-      setPrevReservations(pendingReservations);
-      return;
-    }
-
-    const newShiningItems: number[] = [];
+    const isInitialLoad = prevRentals.length === 0 && prevReservations.length === 0;
     
-    // 새로운 예약 확인
-    pendingReservations.forEach(res => {
-      const found = prevReservations.find(prev => prev.reservationId === res.reservationId);
-      if (!found) {
-        newShiningItems.push(res.reservationId);
-      }
-    });
-    
-    // 새로운 렌탈 확인
-    actionNeededRentals.forEach(rental => {
-      const found = prevRentals.find(prev => prev.rentalId === rental.rentalId);
-      if (!found) {
-        newShiningItems.push(rental.rentalId);
-      }
-    });
-    
-    if (newShiningItems.length > 0) {
-      setShiningItems(newShiningItems);
+    // 새로운 항목 확인 로직 - 초기 로드가 아닐 때만 실행
+    if (!isInitialLoad) {
+      const newShiningItems: number[] = [];
       
-      // 5초 후에 빛나는 효과 제거
-      setTimeout(() => {
-        setShiningItems([]);
-      }, 5000);
+      // 새로운 예약 확인
+      pendingReservations.forEach(res => {
+        const found = prevReservations.find(prev => prev.reservationId === res.reservationId);
+        if (!found) {
+          newShiningItems.push(res.reservationId);
+        }
+      });
+      
+      // 새로운 렌탈 확인
+      actionNeededRentals.forEach(rental => {
+        const found = prevRentals.find(prev => prev.rentalId === rental.rentalId);
+        if (!found) {
+          newShiningItems.push(rental.rentalId);
+        }
+      });
+      
+      if (newShiningItems.length > 0) {
+        console.log("새 항목 감지: ", newShiningItems);
+        setShiningItems(newShiningItems);
+        
+        // 5초 후에 빛나는 효과 제거
+        setTimeout(() => {
+          setShiningItems([]);
+        }, 5000);
+      }
     }
     
+    // 현재 상태를 이전 상태로 저장
     setPrevRentals(activeRentals);
     setPrevReservations(pendingReservations);
   }, [activeRentals, pendingReservations]);
@@ -454,27 +494,29 @@ const FloatingWidget: React.FC = () => {
         }
         
         @keyframes item-shine {
-          0% {
-            transform: translateX(0);
-            background-color: rgba(255, 255, 255, 0.1);
-          }
-          25% {
-            transform: translateX(5px);
-            background-color: rgba(74, 157, 245, 0.2);
-          }
-          50% {
-            transform: translateX(0);
-            background-color: rgba(255, 255, 255, 0.1);
-          }
-          75% {
-            transform: translateX(5px);
-            background-color: rgba(74, 157, 245, 0.2);
-          }
-          100% {
-            transform: translateX(0);
-            background-color: rgba(255, 255, 255, 0.1);
-          }
-        }
+  0% {
+    transform: translateX(0);
+    background-color: rgba(255, 255, 255, 1); /* 완전 불투명한 흰색 */
+  }
+  25% {
+    transform: translateX(5px);
+    background-color: rgba(237, 242, 255, 1); /* 연한 파란색 배경 */
+    box-shadow: 0 0 8px rgba(74, 157, 245, 0.6); /* 글로우 효과 추가 */
+  }
+  50% {
+    transform: translateX(0);
+    background-color: rgba(255, 255, 255, 1);
+  }
+  75% {
+    transform: translateX(5px);
+    background-color: rgba(237, 242, 255, 1);
+    box-shadow: 0 0 8px rgba(74, 157, 245, 0.6);
+  }
+  100% {
+    transform: translateX(0);
+    background-color: rgba(255, 255, 255, 1);
+  }
+}
 
         .animate-item-shine {
           animation: item-shine 2s ease-in-out;
@@ -676,4 +718,4 @@ const FloatingWidget: React.FC = () => {
   );
 };
 
-export default FloatingWidget;
+export default FloatingWidget;    
