@@ -85,7 +85,7 @@ export default function Payment() {
   useEffect(() => {
     GetPaymentDataRequest(id as string).then(
       (res: GetPaymentDataResponseDto) => {
-        console.log(res);
+        console.log("❤️❤️❤️", res);
 
         setPaymentData(res);
         setRentalFeeAmount(res.rentalFee);
