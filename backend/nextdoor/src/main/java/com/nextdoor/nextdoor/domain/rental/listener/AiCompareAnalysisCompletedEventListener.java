@@ -20,5 +20,12 @@ public class AiCompareAnalysisCompletedEventListener {
                 aiCompareAnalysisCompletedEvent.getRentalId(),
                 aiCompareAnalysisCompletedEvent.getOverallComparisonResult()
         );
+        aiCompareAnalysisCompletedEvent.getMatchingResults()
+                .forEach(matchingResult -> rentalService.createAiImageComparisonPair(
+                        aiCompareAnalysisCompletedEvent.getRentalId(),
+                        matchingResult.getBeforeImageId(),
+                        matchingResult.getAfterImageId(),
+                        matchingResult.getPairComparisonResult()
+                ));
     }
 }
