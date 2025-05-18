@@ -2,7 +2,7 @@ package com.nextdoor.nextdoor.domain.fintech.controller;
 
 import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountResponseDto;
-import com.nextdoor.nextdoor.domain.fintech.service.RegistAccountService;
+import com.nextdoor.nextdoor.domain.fintech.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/fintechs")
 @RequiredArgsConstructor
 public class RegistAccountController {
-    private final RegistAccountService registAccountService;
+    private final AccountService accountService;
 
     /**
      * 등록된 계좌 목록 조회
@@ -26,7 +26,7 @@ public class RegistAccountController {
     public Mono<ResponseEntity<List<RegistAccountResponseDto>>> listRegistAccounts(
             @RequestParam("userKey") String userKey
     ) {
-        return registAccountService.getRegistAccounts(userKey)
+        return accountService.getRegistAccounts(userKey)
                 .map(ResponseEntity::ok);
     }
 
