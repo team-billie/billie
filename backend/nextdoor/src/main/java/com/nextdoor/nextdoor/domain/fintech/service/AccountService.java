@@ -295,6 +295,36 @@ public class AccountService {
                 });
     }
 
+    /** 4) 주계좌 변경: EXTERNAL 계좌만 대상 */
+    public Mono<RegistAccountResponseDto> changePrimary(String userKey, Long targetAccountId) {
+        return Mono.fromCallable(() -> {
+            Account target = accountRepository.findById(targetAccountId)
+                    .orElseThrow(() -> new RuntimeException("계좌 없음: " + targetAccountId));
+            if (!target.getMember().getUuid().equals(userKey)) {
+                throw new RuntimeException("권한 없음: 다른 사용자 계좌 변경 불가");
+            }
+            if (target.getAccountType() != RegistAccountType.EXTERNAL) {
+                throw new RuntimeException("BILI_PAY 계좌는 주계좌로 설정할 수 없습니다.");
+            }
+
+            // 1) 기존 primary=false 처리
+            accountRepository
+                    .findByMember_UserKeyAndAccountType(userKey, RegistAccountType.EXTERNAL)
+                    .forEach(a -> {
+                        if (a.getPrimary()) {
+                            a.setPrimary(false);
+                            accountRepository.save(a);
+                        }
+                    });
+
+            // 2) 대상만 primary=true
+            target.setPrimary(true);
+            target.setCreatedAt(LocalDateTime.now()); // Optional: 갱신 시각
+            Account saved = accountRepository.save(target);
+            return toDto(saved);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
     /** DTO 변환 헬퍼 */
     private RegistAccountResponseDto toDto(Account a) {
         return new RegistAccountResponseDto(
