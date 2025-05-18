@@ -3,7 +3,9 @@ package com.nextdoor.nextdoor.domain.fintech.service;
 import com.nextdoor.nextdoor.domain.fintech.client.SsafyApiClient;
 import com.nextdoor.nextdoor.domain.fintech.domain.Account;
 import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccount;
+import com.nextdoor.nextdoor.domain.fintech.domain.RegistAccountType;
 import com.nextdoor.nextdoor.domain.fintech.dto.InquireTransactionHistoryRequestDto;
+import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountResponseDto;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.port.MemberQueryPort;
@@ -216,6 +218,43 @@ public class AccountService {
                         .map(this::toDto)
                         .collect(Collectors.toList())
         ).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    // 계좌 등록 - 외부(EXTERNAL)
+    public Mono<RegistAccountResponseDto> registerAccount(RegistAccountRequestDto req) {
+        return Mono.fromCallable(() -> {
+            // 1) Member 조회
+            Member member = memberQueryPort.findByUserKey(req.getUserKey())
+                    .orElseThrow(() -> new RuntimeException("사용자 없음: " + req.getUserKey()));
+
+            // 2) SSAFY 에 이미 만들어둔 account 엔티티 조회
+            Account acct = accountRepository
+                    .findByAccountNoAndBankCode(req.getAccountNo(), req.getBankCode())
+                    .orElseThrow(() -> new RuntimeException(
+                            "계좌 없음 또는 은행코드 불일치: "
+                                    + req.getAccountNo() + " / " + req.getBankCode()));
+
+            // 3) 이미 등록된 계좌인지 체크
+            if (acct.getRegistered()) {
+                throw new RuntimeException("이미 등록된 계좌입니다.");
+            }
+
+            // 4) 주계좌 판별: 같은 회원의 EXTERNAL 계좌 중 이미 primary=true 가 있는지
+            boolean hasPrimary = accountRepository
+                    .findByMember_UserKeyAndAccountType(req.getUserKey(), RegistAccountType.EXTERNAL)
+                    .stream().anyMatch(Account::getPrimary);
+            boolean isPrimary = !hasPrimary;
+
+            // 5) 엔티티 업데이트 후 저장
+            acct.setRegistered(true);
+            acct.setAccountType(RegistAccountType.EXTERNAL);
+            acct.setAlias(req.getAlias());
+            acct.setPrimary(isPrimary);
+            acct.setCreatedAt(LocalDateTime.now());  // 등록 시각으로 덮어쓰기
+            Account saved = accountRepository.save(acct);
+
+            return toDto(saved);
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     /** DTO 변환 헬퍼 */
