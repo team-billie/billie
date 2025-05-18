@@ -17,8 +17,8 @@ public class AiCompareAnalysisCompletedEvent {
     @Getter
     public static class MatchingResult {
 
-        private Long aiImageId;
-        private Long comparisonTargetId;
-        private String comparisonResult;
+        private Long beforeImageId;
+        private Long afterImageId;
+        private String pairComparisonResult;
     }
 }

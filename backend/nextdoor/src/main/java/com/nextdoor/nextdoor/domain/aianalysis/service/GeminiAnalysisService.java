@@ -131,8 +131,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
                     pairResponses.get(i)
             ));
             eventMatchingResults.add(new AiCompareAnalysisCompletedEvent.MatchingResult(
-                    aiImagePairs.get(i)[1].getAiImageId(),
                     aiImagePairs.get(i)[0].getAiImageId(),
+                    aiImagePairs.get(i)[1].getAiImageId(),
                     pairResponses.get(i)
             ));
         }
