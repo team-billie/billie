@@ -63,6 +63,7 @@ dependencies {
 // 8.x 클라이언트만 사용
 	implementation 'co.elastic.clients:elasticsearch-java:8.13.4'
 	implementation 'jakarta.json:jakarta.json-api:2.1.2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {
