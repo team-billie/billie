@@ -2,10 +2,7 @@ package com.nextdoor.nextdoor.domain.rental.service;
 
 import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
-import com.nextdoor.nextdoor.domain.rental.domain.AiImageType;
-import com.nextdoor.nextdoor.domain.rental.domain.Rental;
-import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
-import com.nextdoor.nextdoor.domain.rental.domain.RentalStatus;
+import com.nextdoor.nextdoor.domain.rental.domain.*;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rental.domainservice.RentalImageDomainService;
 import com.nextdoor.nextdoor.domain.rental.event.out.DepositProcessingRequestEvent;
@@ -16,6 +13,7 @@ import com.nextdoor.nextdoor.domain.rental.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rental.message.RentalStatusMessage;
 import com.nextdoor.nextdoor.domain.rental.message.RequestRemittanceStatusMessage;
 import com.nextdoor.nextdoor.domain.rental.port.*;
+import com.nextdoor.nextdoor.domain.rental.repository.AiImageComparisonPairRepository;
 import com.nextdoor.nextdoor.domain.rental.repository.RentalRepository;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
@@ -37,6 +35,7 @@ import java.util.List;
 public class RentalServiceImpl implements RentalService {
 
     private final RentalRepository rentalRepository;
+    private final AiImageComparisonPairRepository aiImageComparisonPairRepository;
     private final S3ImageUploadPort s3ImageUploadService;
     private final ReservationQueryPort reservationQueryPort;
     private final RentalQueryPort rentalQueryPort;
@@ -400,5 +399,11 @@ public class RentalServiceImpl implements RentalService {
                     .message("대여 정보 삭제 중 오류가 발생했습니다: " + e.getMessage())
                     .build();
         }
+    }
+
+    @Override
+    @Transactional
+    public void createAiImageComparisonPair(Long rentalId, Long beforeImageId, Long afterImageId, String pairComparisonResult) {
+        aiImageComparisonPairRepository.save(new AiImageComparisonPair(rentalId, beforeImageId, afterImageId, pairComparisonResult));
     }
 }
