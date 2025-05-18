@@ -268,6 +268,39 @@ const FloatingWidget: React.FC = () => {
         const success = await confirmReservation(reservationId);
         if (success) {
           showAlert("예약 확정", "예약이 확정되었습니다.", "success");
+          
+          // 확정된 예약 정보 찾기
+          const confirmedReservation = pendingReservations.find(
+            res => res.reservationId === reservationId
+          );
+          
+          if (confirmedReservation) {
+            // 새로운 렌탈 객체 생성
+            const newRental = {
+              rentalId: reservationId,
+              process: "BEFORE_RENTAL",
+              detailStatus: "CREATED", // 안심결제요청 버튼 상태
+              rentalDetail: {
+                title: confirmedReservation.postTitle,
+                rentalId: reservationId,
+                charge: confirmedReservation.rentalFee,
+                deposit: confirmedReservation.deposit,
+                ownerId: userId, // 현재 사용자를 오너로 설정
+                // renterId가 없는 경우 빈 값 설정
+                renterId: (confirmedReservation as any).renterId || 0,
+                productImageUrl: confirmedReservation.postProductImage,
+                ownerProfileImageUrl: confirmedReservation.ownerProfileImageUrl || "/images/profileimg.png",
+                // renterProfileImageUrl이 없는 경우 기본 이미지 설정
+                renterProfileImageUrl: (confirmedReservation as any).renterProfileImageUrl || "/images/profileimg.png"
+              }
+            };
+            
+            // 수동으로 activeRentals 배열 업데이트 대신
+            // 서버 데이터를 새로고침하여 UI를 업데이트
+            setTimeout(() => {
+              refreshRentals();
+            }, 500); // 서버 반영 시간을 위한 짧은 지연
+          }
         } else {
           showAlert("오류 발생", "예약 확정 중 문제가 발생했습니다.", "error");
         }
@@ -339,11 +372,12 @@ const FloatingWidget: React.FC = () => {
         case "RENTAL_IN_ACTIVE":
           return "물품 결제 완료";
         case "RETURNED":
-          return detailStatus === "RENTAL_PERIOD_ENDED"
-            ? "안심 반납 처리"
-            : detailStatus === "BEFORE_AND_AFTER_COMPARED"
-            ? "보증금 처리"
-            : "반납 처리 중";
+          // return detailStatus === "RENTAL_PERIOD_ENDED"
+          //   ? "안심 반납 처리"
+          //   : detailStatus === "BEFORE_AND_AFTER_COMPARED"
+          //   ? "보증금 처리"
+          //   : "반납 처리 중";
+          return "안심 반납 처리";
         case "RENTAL_COMPLETED":
           return "거래 완료";
         default:
