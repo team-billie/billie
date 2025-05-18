@@ -11,7 +11,7 @@ public class DamageComparisonResponseDto {
 
     private List<String> beforeImages;
     private List<String> afterImages;
-    private String overallResult;
+    private String overallComparisonResult;
     private List<MatchingResult> matchingResults;
 
     @AllArgsConstructor
@@ -20,6 +20,6 @@ public class DamageComparisonResponseDto {
 
         private String beforeImage;
         private String afterImage;
-        private String comparisonResult;
+        private String pairComparisonResult;
     }
 }
