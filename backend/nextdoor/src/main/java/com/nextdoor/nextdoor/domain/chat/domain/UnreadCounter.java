@@ -15,6 +15,6 @@ public class UnreadCounter {
     @PrimaryKey
     private UnreadCounterKey key;
 
-    @CounterColumn("unread_count")
+    @Column("unread_count")
     private long unreadCount;
 }

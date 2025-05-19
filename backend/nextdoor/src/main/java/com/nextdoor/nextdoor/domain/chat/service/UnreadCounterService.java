@@ -4,6 +4,10 @@ import com.nextdoor.nextdoor.domain.chat.domain.UnreadCounter;
 import com.nextdoor.nextdoor.domain.chat.domain.UnreadCounterKey;
 import com.nextdoor.nextdoor.domain.chat.infrastructure.persistence.UnreadCounterRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.cassandra.core.CassandraTemplate;
+import org.springframework.data.cassandra.core.query.Criteria;
+import org.springframework.data.cassandra.core.query.Query;
+import org.springframework.data.cassandra.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,30 +16,47 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UnreadCounterService {
-    private final UnreadCounterRepository repository;
+
+    private final CassandraTemplate cassandraTemplate;
+    private final UnreadCounterRepository unreadCounterRepository;
 
     /** 채팅 수신 시 해당 유저의 미확인 카운트 1 증가 */
     public void increase(Long roomId, Long userId) {
-        var key = new UnreadCounterKey(roomId, userId);
-        var counter = UnreadCounter.builder()
-                .key(key)
-                .unreadCount(1L)
-                .build();
-        repository.save(counter);
+        Query q = Query.query(
+                Criteria.where("room_id").is(roomId),
+                Criteria.where("user_id").is(userId)
+        );
+        Update u = Update.empty().increment("unread_count", 1);
+        cassandraTemplate.update(q, u, UnreadCounter.class);
     }
 
     /** 사용자가 방 내역 열람 시 미확인 카운트 초기화 */
     public void reset(Long roomId, Long userId) {
-        repository.deleteById(new UnreadCounterKey(roomId, userId));
+        UnreadCounterKey key = new UnreadCounterKey(roomId, userId);
+
+        unreadCounterRepository.deleteById(key);
+
+        // 또는 CassandraTemplate 사용
+        // Query dq = Query.query(
+        //     Criteria.where("room_id").is(roomId),
+        //     Criteria.where("user_id").is(userId)
+        // );
+        // cassandraTemplate.delete(dq, UnreadCounter.class);
     }
 
     /** 특정 유저의 미확인 메시지 개수 조회 */
-    @Transactional(readOnly = true)
     public long getCount(Long roomId, Long userId) {
-        return repository.findById(new UnreadCounterKey(roomId, userId))
-                .map(UnreadCounter::getUnreadCount)
-                .orElse(0L);
+        // 여러 CriteriaDefinition을 콤마로 나열합니다.
+        Query query = Query.query(
+                Criteria.where("room_id").is(roomId),
+                Criteria.where("user_id").is(userId)
+        );
+
+        // selectOne은 UnreadCounter 또는 null 반환
+        UnreadCounter counter = cassandraTemplate.selectOne(query, UnreadCounter.class);
+        return (counter != null)
+                ? counter.getUnreadCount()
+                : 0L;
     }
 }
