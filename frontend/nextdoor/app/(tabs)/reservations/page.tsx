@@ -69,7 +69,7 @@ export default function ReservationPage() {
 
           return {
             id: item.rentalId,
-            img: item.productImageUrl,
+            img: item.productImageUrls[0],
             title: item.title,
             date: diffDays + 1,
             cost: item.rentalFee,
@@ -115,7 +115,7 @@ export default function ReservationPage() {
           onChangeCondition={(newCondition) => setCondition(newCondition)}
         />
       </div>
-      <div className="flex flex-col m-4">
+      <div className="flex flex-col overflow-y-auto m-4 gap-6 h-full mb-24">
         {loading && <LoadingSpinner />}
         {error && <ErrorMessage message={error} />}
         {!loading && !error && reservations.length === 0 && (

@@ -1,11 +1,14 @@
-export default function RentalDetailBtn() {
-  const handleClick = async () => {};
+interface RentalDetailBtnProps {
+  onClick?: () => void;
+}
+
+export default function RentalDetailBtn({ onClick }: RentalDetailBtnProps) {
   return (
-    <div
+    <button
       className="flex-1 py-2 hover:bg-gray-100 cursor-pointer text-center"
-      onClick={handleClick}
+      onClick={onClick}
     >
       상세보기
-    </div>
+    </button>
   );
 }

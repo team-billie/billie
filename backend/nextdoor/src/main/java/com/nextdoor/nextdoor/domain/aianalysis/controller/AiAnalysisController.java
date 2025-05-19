@@ -2,7 +2,8 @@ package com.nextdoor.nextdoor.domain.aianalysis.controller;
 
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.DamageAnalysisRequestDto;
 import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.request.DamageComparisonRequestDto;
-import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.InspectDamageResponseDto;
+import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.DamageAnalysisResponseDto;
+import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.DamageComparisonResponseDto;
 import com.nextdoor.nextdoor.domain.aianalysis.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class AiAnalysisController {
     private final AiAnalysisService aiAnalysisService;
 
     @PostMapping("/analyze")
-    public ResponseEntity<InspectDamageResponseDto> analyzeDamage(
+    public ResponseEntity<DamageAnalysisResponseDto> analyzeDamage(
             @AuthenticationPrincipal Long loginUserId,
             @RequestBody DamageAnalysisRequestDto damageAnalysisRequestDto
     ) {
@@ -28,7 +29,7 @@ public class AiAnalysisController {
     }
 
     @PostMapping("/compare")
-    public ResponseEntity<InspectDamageResponseDto> compareDamage(
+    public ResponseEntity<DamageComparisonResponseDto> compareDamage(
             @AuthenticationPrincipal Long loginUserId,
             @RequestBody DamageComparisonRequestDto damageComparisonRequestDto
     ) {

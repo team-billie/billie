@@ -63,7 +63,7 @@ export default function ReservationLendPage() {
 
           return {
             id: item.rentalId,
-            img: item.productImageUrl,
+            img: item.productImageUrls[0],
             title: item.title,
             cost: item.rentalFee,
             date: diffDays + 1,
@@ -129,7 +129,7 @@ export default function ReservationLendPage() {
         selectedCondition={condition}
         onChangeCondition={(newCondition) => setCondition(newCondition)}
       />
-      <div className="h-screen overflow-y-auto p-4 flex flex-col gap-6">
+      <div className="flex flex-col overflow-y-auto m-4 gap-6 h-full mb-24">
         {loading && <LoadingSpinner />}
         {error && <ErrorMessage message={error} />}
         {!loading && !error && reservations.length === 0 && (

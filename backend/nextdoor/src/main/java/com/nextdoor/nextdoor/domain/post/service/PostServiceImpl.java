@@ -48,8 +48,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public PostDetailResult getPostDetail(Long postId) {
-        return postQueryPort.getPostDetail(postId);
+    public PostDetailResult getPostDetail(PostDetailCommand command) {
+        return postQueryPort.getPostDetail(command.getPostId());
     }
 
     @Override

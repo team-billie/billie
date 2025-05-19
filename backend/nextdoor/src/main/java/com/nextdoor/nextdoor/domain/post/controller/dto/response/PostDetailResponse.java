@@ -20,4 +20,5 @@ public class PostDetailResponse {
     private Long authorId;
     private String nickname;
     private int likeCount;
+    private boolean isLikedByUser;
 }

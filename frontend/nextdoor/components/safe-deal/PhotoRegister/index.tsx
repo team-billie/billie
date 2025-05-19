@@ -40,10 +40,13 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       const res =
         status === "before"
           ? await AiBeforePhotosPostRequest(rentalId)
-          : await AiAfterPhotosPostRequest(rentalId);
+          : AiAfterPhotosPostRequest(rentalId);
 
       if (status === "before") {
-        useAnalysisStore.getState().setDamageAnalysis(res.analysis || "[]");
+        console.log("res : ", res);
+        useAnalysisStore
+          .getState()
+          .setDamageAnalysis(res.damageAnalysis || "[]");
         router.push(`/safe-deal/${rentalId}/before/analysis`);
       } else {
         router.push(`/safe-deal/${rentalId}/after/analysis`);

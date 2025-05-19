@@ -21,8 +21,8 @@ public class Deposit {
     private Long rentalId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "regist_account_id", nullable = false)
-    private RegistAccount registAccount;
+    @JoinColumn(name = "renter_account_id", nullable = false)
+    private Account account;
 
     @Column(nullable = false)
     private Integer amount;

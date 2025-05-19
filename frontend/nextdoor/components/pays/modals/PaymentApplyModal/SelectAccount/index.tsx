@@ -43,6 +43,7 @@ export default function SelectAccount({
           {
             accountNo: billyAccount?.accountNo || "",
             bankCode: billyAccount?.bankCode || "",
+            finalAmount: payCharge,
           },
           rentalId
         );
@@ -51,6 +52,7 @@ export default function SelectAccount({
           {
             accountNo: selectAccount?.accountNo || "",
             bankCode: selectAccount?.bankCode || "",
+            finalAmount: payCharge,
           },
           rentalId
         );

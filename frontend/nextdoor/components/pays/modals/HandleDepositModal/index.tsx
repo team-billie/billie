@@ -57,6 +57,8 @@ export default function HandleDepositModal({
           {changeBtnClicked ? (
             <ChangeDeposit
               payCharge={payCharge}
+              handleSubmit={handleSubmit}
+              charge={charge}
               setPayCharge={setPayCharge}
               setChangeBtnClicked={setChangeBtnClicked}
             />

@@ -13,15 +13,26 @@ import RentalActionButton from "./RentalActionButton";
 import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import useUserStore from "@/lib/store/useUserStore";
 import { Portal } from "@/lib/utils/widget/portal";
+import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
 
 const FloatingWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 200 });
   const [isShining, setIsShining] = useState(false);
   const [prevRequestCount, setPrevRequestCount] = useState(0);
+  const [hiddenItemIds, setHiddenItemIds] = useState<number[]>([]);
+  const [shiningItems, setShiningItems] = useState<number[]>([]);
+  const [prevRentals, setPrevRentals] = useState<RentalStatusMessage[]>([]);
+  const [prevReservations, setPrevReservations] = useState<any[]>([]);
+  
   const dragStartPos = useRef({ x: 0, y: 0 });
   const wasDragged = useRef(false);
   const nodeRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRental, setSelectedRental] = useState<{
+    charge: number;
+    rentalId: string;
+  } | null>(null);
 
   const { userId } = useUserStore();
 
@@ -46,7 +57,7 @@ const FloatingWidget: React.FC = () => {
 
   const { showAlert } = useAlertModal();
 
-  // 위치 정보 저장 
+  // 위치 정보 저장
   const savePosition = (pos: { x: number; y: number }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("widgetPosition", JSON.stringify(pos));
@@ -54,27 +65,60 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
-  // 임시 데이터 - 실제 구현 시 API에서 가져와야함
-  const [paymentRequests, setPaymentRequests] = useState([
-    {
-      id: 1,
-      detail: "경민 임시데이터터",
-      productImage: "/icons/icon72.png",
-      profileImage: "/images/profileimg.png",
-    },
-  ]);
+  // 위젯이 열릴 때마다 서버 데이터 갱신
+  useEffect(() => {
+    if (isOpen) {
+      refreshRentals(); // 서버에서 최신 데이터 가져오기
+    }
+  }, [isOpen, refreshRentals]);
 
-  const [returnRequests, setReturnRequests] = useState([
-    {
-      id: 2,
-      detail: "꿍얼꿍얼 임시데이터 ",
-      productImage: "/icons/icon72.png",
-      profileImage: "/images/profileimg.png",
-    },
-  ]);
+  // 새로운 항목이 추가되었는지 확인하고 빛나는 효과 적용
+  useEffect(() => {
+    // 처음 로드 시에는 빛나는 효과 적용하지 않음
+    if (prevRentals.length === 0 || prevReservations.length === 0) {
+      setPrevRentals(activeRentals);
+      setPrevReservations(pendingReservations);
+      return;
+    }
+
+    const newShiningItems: number[] = [];
+    
+    // 새로운 예약 확인
+    pendingReservations.forEach(res => {
+      const found = prevReservations.find(prev => prev.reservationId === res.reservationId);
+      if (!found) {
+        newShiningItems.push(res.reservationId);
+      }
+    });
+    
+    // 새로운 렌탈 확인
+    actionNeededRentals.forEach(rental => {
+      const found = prevRentals.find(prev => prev.rentalId === rental.rentalId);
+      if (!found) {
+        newShiningItems.push(rental.rentalId);
+      }
+    });
+    
+    if (newShiningItems.length > 0) {
+      setShiningItems(newShiningItems);
+      
+      // 5초 후에 빛나는 효과 제거
+      setTimeout(() => {
+        setShiningItems([]);
+      }, 5000);
+    }
+    
+    setPrevRentals(activeRentals);
+    setPrevReservations(pendingReservations);
+  }, [activeRentals, pendingReservations]);
 
   // 처리 대여 항목 필터링
   const actionNeededRentals = activeRentals.filter((rental) => {
+    // 임시로 숨김 처리된 항목은 표시하지 않음
+    if (hiddenItemIds.includes(rental.rentalId)) {
+      return false;
+    }
+
     const isOwner = userId === rental.rentalDetail?.ownerId;
     const isRenter = userId === rental.rentalDetail?.renterId;
 
@@ -100,11 +144,7 @@ const FloatingWidget: React.FC = () => {
   });
 
   // 현재 총 요청 수 계산
-  const totalRequestCount =
-    pendingReservations.length +
-    paymentRequests.length +
-    returnRequests.length +
-    actionNeededRentals.length;
+  const totalRequestCount = pendingReservations.length + actionNeededRentals.length;
 
   useEffect(() => {
     if (totalRequestCount > prevRequestCount) {
@@ -223,18 +263,32 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
-  // 결제요청 처리
-  const handlePaymentRequest = (id: number) => {
-    showAlert("결제 요청", "결제 요청이 전송되었습니다.", "success");
-    setPaymentRequests((prev) => prev.filter((item) => item.id !== id));
+  // 안심 결제 요청 모달 처리
+  const handleRentalAction = (rental: RentalStatusMessage) => {
+    const { process, detailStatus } = rental;
+    const isOwner = userId === rental.rentalDetail?.ownerId;
+
+    // 오너이고 BEFORE_RENTAL 상태이며 CREATED 상태일 때만 모달 열기
+    if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
+      // 모달에 전달할 데이터 설정
+      setSelectedRental({
+        charge: rental.rentalDetail?.charge || 0,
+        rentalId: rental.rentalId.toString()
+      });
+      setIsModalOpen(true);
+      setIsOpen(false); // 위젯 닫기
+    }
   };
 
-  // 안심 반납 처리
-  const handleReturnRequest = (id: number) => {
-    showAlert("반납 처리", "안심 반납 처리가 완료되었습니다.", "success");
-    setReturnRequests((prev) => prev.filter((item) => item.id !== id));
+  // 렌탈 항목 페이지 이동 처리 함수
+  const handleRentalNavigate = (rentalId: number) => {
+    // 위젯 닫기
+    setIsOpen(false);
+    
+    // 해당 항목을 임시로 숨김 처리
+    setHiddenItemIds(prev => [...prev, rentalId]);
   };
-
+  
   // 예약 확정/취소
   const handleReservationAction = async (
     reservationId: number,
@@ -245,6 +299,18 @@ const FloatingWidget: React.FC = () => {
         const success = await confirmReservation(reservationId);
         if (success) {
           showAlert("예약 확정", "예약이 확정되었습니다.", "success");
+          
+          // 확정된 예약 정보 찾기
+          const confirmedReservation = pendingReservations.find(
+            res => res.reservationId === reservationId
+          );
+          
+          if (confirmedReservation) {
+            // 초기 데이터가 반영될 시간을 확보하기 위해 짧은 지연 후 대여 목록 새로고침
+            setTimeout(() => {
+              refreshRentals();
+            }, 500);
+          }
         } else {
           showAlert("오류 발생", "예약 확정 중 문제가 발생했습니다.", "error");
         }
@@ -262,9 +328,23 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
+  // 예약 항목 처리
+  const handleReservationNavigate = (reservationId: number) => {
+    // 위젯 닫기
+    setIsOpen(false);
+    
+    // 해당 항목을 임시로 숨김 처리
+    setHiddenItemIds(prev => [...prev, reservationId]);
+  };
+
   const getRentalActionLink = (rental: RentalStatusMessage) => {
     const { rentalId, process, detailStatus } = rental;
     const isOwner = userId === rental.rentalDetail?.ownerId;
+
+    // 안심결제요청 버튼인 경우에는 링크를 반환하지 않음
+    if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
+      return "";
+    }
 
     if (isOwner) {
       switch (process) {
@@ -311,11 +391,8 @@ const FloatingWidget: React.FC = () => {
         case "RENTAL_IN_ACTIVE":
           return "물품 결제 완료";
         case "RETURNED":
-          return detailStatus === "RENTAL_PERIOD_ENDED"
-            ? "안심 반납 처리"
-            : detailStatus === "BEFORE_AND_AFTER_COMPARED"
-            ? "보증금 처리"
-            : "반납 처리 중";
+          // 모든 "RETURNED" 상태에서 "안심 반납 처리"로 표시
+          return "안심 반납 처리";
         case "RENTAL_COMPLETED":
           return "거래 완료";
         default:
@@ -374,6 +451,34 @@ const FloatingWidget: React.FC = () => {
         .animate-shine {
           animation: shine 2s ease-in-out;
           animation-iteration-count: 3;
+        }
+        
+        @keyframes item-shine {
+          0% {
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+          25% {
+            transform: translateX(5px);
+            background-color: rgba(74, 157, 245, 0.2);
+          }
+          50% {
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+          75% {
+            transform: translateX(5px);
+            background-color: rgba(74, 157, 245, 0.2);
+          }
+          100% {
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+        }
+
+        .animate-item-shine {
+          animation: item-shine 2s ease-in-out;
+          animation-iteration-count: 2;
         }
       `}</style>
 
@@ -463,6 +568,7 @@ const FloatingWidget: React.FC = () => {
                       "/images/profileimg.png"
                     }
                     isReservation={true}
+                    isOwner={true} // 예약 요청은 항상 오너에게 오는 것
                     onConfirm={() =>
                       handleReservationAction(
                         reservation.reservationId,
@@ -475,37 +581,11 @@ const FloatingWidget: React.FC = () => {
                         "cancel"
                       )
                     }
+                    onNavigate={handleReservationNavigate}
+                    isShining={shiningItems.includes(reservation.reservationId)}
                   />
                 ))
               ) : null}
-
-              {/* 결제 요청 항목 */}
-              {paymentRequests.map((item) => (
-                <ReservationActionButton
-                  key={item.id}
-                  id={item.id}
-                  title="안심대여"
-                  detail={item.detail}
-                  productImage={item.productImage}
-                  profileImage={item.profileImage}
-                  actionText="결제요청"
-                  onAction={() => handlePaymentRequest(item.id)}
-                />
-              ))}
-
-              {/* 안심 반납 처리 항목 */}
-              {returnRequests.map((item) => (
-                <ReservationActionButton
-                  key={item.id}
-                  id={item.id}
-                  title="안심대여"
-                  detail={item.detail}
-                  productImage={item.productImage}
-                  profileImage={item.profileImage}
-                  actionText="안심 반납 처리"
-                  onAction={() => handleReturnRequest(item.id)}
-                />
-              ))}
 
               {/* 대여 요청 항목 */}
               {!rentalLoading &&
@@ -516,6 +596,12 @@ const FloatingWidget: React.FC = () => {
                   const buttonText = getRentalButtonText(rental);
                   const displayTitle =
                     rental.rentalDetail?.title || "대여 물품";
+
+                  // 안심결제요청 버튼인지 확인
+                  const isPaymentRequestButton = 
+                    isOwner && 
+                    rental.process === "BEFORE_RENTAL" && 
+                    rental.detailStatus === "CREATED";
 
                   return (
                     <RentalActionButton
@@ -536,6 +622,12 @@ const FloatingWidget: React.FC = () => {
                       }
                       buttonText={buttonText}
                       actionLink={actionLink}
+                      onClick={isPaymentRequestButton 
+                        ? () => handleRentalAction(rental) 
+                        : undefined
+                      }
+                      onNavigate={handleRentalNavigate}
+                      isShining={shiningItems.includes(rental.rentalId)}
                     />
                   );
                 })}
@@ -570,6 +662,15 @@ const FloatingWidget: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 안심결제 모달 */}
+      {isModalOpen && selectedRental && (
+        <PaymentApplyModal
+          charge={selectedRental.charge}
+          rentalId={selectedRental.rentalId}
+          setIsModalOpen={setIsModalOpen}
+        />
       )}
     </Portal>
   );

@@ -8,7 +8,6 @@ interface SafeDealBtnProps {
 
 export default function SafeDealBtn({ reservationId }: SafeDealBtnProps) {
   const { userId } = useUserStore();
-  console.log("SafeDealBtn userId:", userId);
 
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
@@ -17,7 +16,7 @@ export default function SafeDealBtn({ reservationId }: SafeDealBtnProps) {
 
   return (
     <div className="relative inline-block">
-      <Link href={`/reservations/${reservationId}/safe-deal/manage`}>
+      <Link href={`/safe-deal/${reservationId}/result`}>
         <div className="bg-blue400 p-1.5 rounded-xl text-white px-3.5 font-semibold text-sm whitespace-nowrap">
           AI 안심거래
         </div>

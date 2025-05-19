@@ -22,24 +22,21 @@ interface ReservationItem {
 export default function ReservationManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
   const { userId } = useUserStore();
-  console.log("ReservationManagePage userId:", userId);
 
   const loadReservations = async () => {
     if (!userId) return;
 
     try {
       const data = await fetchOwnerReservations(userId);
-      console.log(data);
+      console.log("😇😇", data);
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
         const end = new Date(item.endDate);
         const duration = Math.ceil((+end - +start) / (1000 * 60 * 60 * 24)) + 1;
-        console.log("❤️❤️❤️", duration);
+
         return {
           id: item.reservationId,
-          img:
-            // item.feedProductImage ??
-            "https://picsum.photos/seed/picsum/200/300",
+          img: item.postProductImage,
           postTitle: item.postTitle,
           cost: item.rentalFee * duration,
           date: duration,

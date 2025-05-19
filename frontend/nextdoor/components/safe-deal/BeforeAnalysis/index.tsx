@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import ResultItem from "./ResultItem";
 import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
-import { AiAnalysisGetRequestDTO } from "@/types/ai-analysis/response";
+import {
+  AiAnalysisGetRequestDTO,
+  DamageAnalysis,
+} from "@/types/ai-analysis/response";
 
 export default function BeforeAnalysis() {
-  const [results, setResults] = useState<AiAnalysisGetRequestDTO | null>(null);
-  const damageAnalysis = useAnalysisStore((state) => state.damageAnalysis);
-  console.log("❤️❤️❤️", damageAnalysis);
+  const damageAnalysis = useAnalysisStore<DamageAnalysis | null>(
+    (state) => state.damageAnalysis
+  );
 
   return (
     <div className="relative flex flex-col  p-5">
@@ -27,7 +30,12 @@ export default function BeforeAnalysis() {
             )}
           </>
         ) : (
-          <div>분석된 데이터가 없습니다.</div>
+          <div className="font-bold text-2xl">
+            <div className="bg-gray700 w-1 "></div>
+            <div className="text-lg px-4 py-3 w-full bg-transparentWhite10 text-white break-words">
+              손상 결과 없음
+            </div>
+          </div>
         )}
       </div>
     </div>
