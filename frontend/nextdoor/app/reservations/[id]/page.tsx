@@ -4,7 +4,7 @@ import DetailCard from "@/components/reservations/DetailCard";
 import axiosInstance from "@/lib/api/instance";
 import { GetReservationDetailRequest } from "@/lib/api/rental/request";
 import { GetReservationDetailRequestDTO } from "@/types/rental/request";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ReservationDetailPage() {
@@ -18,6 +18,7 @@ export default function ReservationDetailPage() {
     setReservation(data);
   };
 
+  const router = useRouter();
   useEffect(() => {
     if (id) {
       fetchReservationDetail();
@@ -37,6 +38,8 @@ export default function ReservationDetailPage() {
   const handleDelete = () => {
     try {
       axiosInstance.delete(`/api/v1/rentals/${id}`);
+      alert("거래 취소를 성공하셨습니다");
+      router.push("/reservations");
       return;
     } catch (err) {
       console.log(err);

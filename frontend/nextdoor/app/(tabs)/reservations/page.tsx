@@ -115,7 +115,7 @@ export default function ReservationPage() {
           onChangeCondition={(newCondition) => setCondition(newCondition)}
         />
       </div>
-      <div className="flex flex-col m-4 gap-6">
+      <div className="flex flex-col overflow-y-auto m-4 gap-6 h-full mb-24">
         {loading && <LoadingSpinner />}
         {error && <ErrorMessage message={error} />}
         {!loading && !error && reservations.length === 0 && (

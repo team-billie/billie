@@ -16,23 +16,30 @@ export default function SafeDealAfter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id } = useParams();
   const { userId } = useUserStore();
-  if (!userId) {
-    return;
-  }
+
+  useEffect(() => {
+    if (!id) return;
+    fetchReservationDetail();
+  }, [id]);
 
   const fetchReservationDetail = async () => {
+    if (!id) return;
     const data = await GetReservationDetailRequest(Number(id));
     setReservation(data);
   };
 
-  useEffect(() => {
-    if (id) {
-      fetchReservationDetail();
-    }
-  }, [id]);
+  if (!userId || !id) {
+    return (
+      <main className="max-w-screen-sm mx-auto fixed inset-0 h-full bg-graygradient flex items-center justify-center">
+        <div className="text-center text-white">
+          <p>로딩 중 입니다</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className=" max-w-screen-sm mx-auto fixed inset-0  h-full bg-graygradient flex flex-col overflow-hidden">
+    <main className="max-w-screen-sm mx-auto fixed inset-0 h-full bg-graygradient flex flex-col overflow-hidden">
       {/* Header: 고정 */}
       <div className="z-10">
         <Header txt="반납하기" />
@@ -51,7 +58,6 @@ export default function SafeDealAfter() {
       {/* 모달 */}
       {isModalOpen && (
         <div className="absolute inset-0 bg-gray900 flex items-center justify-center p-10 bg-opacity-70">
-          {/* 보증금 & 이미지 & 렌터아이디 */}
           {reservation && (
             <HandleDepositModal
               charge={reservation.deposit}

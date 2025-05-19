@@ -3,7 +3,7 @@ import DamageLocation from "../common/DamageLocation";
 import ReportTitle from "../ReportTitle";
 import ColorBox from "./ColorBox";
 import DetailReport from "./DetailReport";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { AiAnalysisGetRequest } from "@/lib/api/ai-analysis/request";
 import { useParams } from "next/navigation";
 import AllPhotos from "./AllPhotos";
@@ -12,22 +12,32 @@ export default function CompareAnalysis() {
   const { id } = useParams();
   const [afterPhotos, setAfterPhotos] = useState<string[] | null>(null);
   const [beforePhotos, setBeforePhotos] = useState<string[] | null>(null);
-  // 분석 결과
   const [analysis, setAnalysis] = useState<DamageAnalysisItem[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasAnalysis, setHasAnalysis] = useState(false);
 
-  const fetchAiAnalysis = async () => {
-    const res = await AiAnalysisGetRequest(Number(id));
-    if (res) {
-      setAfterPhotos(res.afterImages);
-      setBeforePhotos(res.beforeImages);
-      // JSON 문자열로 온 analysis를 객체로 파싱
-      const parsedAnalysis: DamageAnalysisItem[] = JSON.parse(res.analysis);
-      setAnalysis(parsedAnalysis);
+  const fetchAiAnalysis = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      const res = await AiAnalysisGetRequest(Number(id));
+      if (res) {
+        setAfterPhotos(res.afterImages);
+        setBeforePhotos(res.beforeImages);
+        if (res.analysis) {
+          const parsedAnalysis: DamageAnalysisItem[] = JSON.parse(res.analysis);
+          setAnalysis(parsedAnalysis);
+          setHasAnalysis(true);
+        }
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Failed to fetch analysis:', error);
+      setIsLoading(false);
     }
-  };
+  }, [id]);
 
-  // 각 damageType 개수를 계산하는 함수
-  const countDamageTypes = (analysis: DamageAnalysisItem[]) => {
+  const countDamageTypes = useCallback((analysis: DamageAnalysisItem[]) => {
     const counts: Record<string, number> = {};
     analysis.forEach((item) => {
       item.damages.forEach((damage) => {
@@ -36,16 +46,35 @@ export default function CompareAnalysis() {
       });
     });
     return counts;
-  };
+  }, []);
 
   const damageCounts = useMemo(() => {
     if (!analysis) return {};
     return countDamageTypes(analysis);
-  }, [analysis]);
+  }, [analysis, countDamageTypes]);
 
   useEffect(() => {
+    if (!id) return;
+    
     fetchAiAnalysis();
-  }, [id]);
+    
+    // 분석 결과가 없을 때만 주기적으로 확인
+    if (!hasAnalysis) {
+      const intervalId = setInterval(fetchAiAnalysis, 5000);
+      return () => clearInterval(intervalId);
+    }
+  }, [id, fetchAiAnalysis, hasAnalysis]);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4">분석 결과를 불러오는 중입니다...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col">

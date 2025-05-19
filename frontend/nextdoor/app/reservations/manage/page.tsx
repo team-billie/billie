@@ -28,11 +28,12 @@ export default function ReservationManagePage() {
 
     try {
       const data = await fetchOwnerReservations(userId);
-      console.log(data);
+      console.log("😇😇", data);
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
         const end = new Date(item.endDate);
         const duration = Math.ceil((+end - +start) / (1000 * 60 * 60 * 24)) + 1;
+
         return {
           id: item.reservationId,
           img: item.postProductImage,

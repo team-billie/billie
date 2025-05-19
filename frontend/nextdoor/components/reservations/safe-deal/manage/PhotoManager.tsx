@@ -103,6 +103,7 @@ export default function PhotoManager({
       alert("사진 업로드에 실패했습니다.");
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -131,6 +132,7 @@ export default function PhotoManager({
           <div className="flex justify-center">
             {totalImages < 10 ? (
               <FileUpload
+                key={`file-upload-${totalImages}`}
                 onChange={handleFileChange}
                 multiple
                 disabled={uploading}

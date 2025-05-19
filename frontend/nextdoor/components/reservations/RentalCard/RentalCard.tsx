@@ -51,7 +51,7 @@ export default function RentalCard({
   }
   const totalCost = cost * date;
   return (
-    <div className="w-full border rounded-lg flex flex-col">
+    <div className="w-full border rounded-lg flex flex-col mb-30">
       {/* 대여기간 */}
       <RentalPeriod startDate={startDate} endDate={endDate} />
 
