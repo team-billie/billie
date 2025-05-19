@@ -20,31 +20,29 @@ public class FintechUserService implements AuthFintechCommandPort {
     private final AccountService accountService;
 
     /**
-     * 1) SSAFY API 로 user 생성
-     * 2) DB 에 Member 저장
-     * 3) 빌리페이(Account & RegistAccount)도 자동으로 생성
+     * 1) SSAFY API 로 user 생성 → userKey 발급
+     * 2) 기존 Member 조회 후 userKey 업데이트
+     * 3) 빌리페이 생성
      */
 
     // 계정 생성 (빌리페이 생성도 같이함)
-    public Mono<Map<String,Object>> createUser(Long userId, String ssafyApiEmail) {
-        return client.createUser(userId, ssafyApiEmail)
+    @Override
+    public Mono<Map<String,Object>> createUser(Long memberId, String ssafyApiEmail) {
+        return client.createUser(memberId, ssafyApiEmail)
                 .flatMap(ssafyResp -> {
-                    // SSAFY가 준 userKey 꺼내서 DB에 저장
                     String userKey = ssafyResp.get("userKey").toString();
 
-                    // 2) 블로킹으로 Member 저장
+                    // 2) 블로킹으로 기존 Member 조회 & userKey 업데이트
                     return Mono.fromCallable(() -> {
-                                Member member = Member.builder()
-                                        .userKey(userKey)
-                                        .email(ssafyApiEmail)
-                                        .nickname("User" + userId) // Default nickname
-                                        .build();
+                                Member member = memberRepository.findById(memberId)
+                                        .orElseThrow(() -> new RuntimeException("Member가 없습니다: " + memberId));
+                                member.setUserKey(userKey);
                                 return memberRepository.save(member);
                             })
                             .subscribeOn(Schedulers.boundedElastic())
 
                             // 3) 저장이 끝나면 빌리페이 생성 → 그리고 원래 SSAFY 응답 Map 리턴
-                            .then(accountService.createBilipay(userKey))
+                            .flatMap(updated -> accountService.createBilipay(userKey))
                             .thenReturn(ssafyResp);
                 });
     }

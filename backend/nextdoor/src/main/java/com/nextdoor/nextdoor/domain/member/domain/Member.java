@@ -23,7 +23,7 @@ public class Member extends TimestampedEntity {
     private String uuid;
 
     /** 핀테크 외부 시스템(user_key) 식별자 **/
-    @Column(name = "user_key", length = 36, unique = true)
+    @Column(name = "user_key", length = 36)
     private String userKey;
 
     @NotNull
@@ -57,6 +57,8 @@ public class Member extends TimestampedEntity {
     public void updateAddress(String address) {
         this.address = address;
     }
+
+    public void updateUserKey(String userKey) { this.userKey = userKey; }
 
 //    public void updateAccountId(Long accountId) {
 //        this.accountId = accountId;
