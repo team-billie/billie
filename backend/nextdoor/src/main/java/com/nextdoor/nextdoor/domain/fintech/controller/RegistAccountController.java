@@ -2,7 +2,7 @@ package com.nextdoor.nextdoor.domain.fintech.controller;
 
 import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountRequestDto;
 import com.nextdoor.nextdoor.domain.fintech.dto.RegistAccountResponseDto;
-import com.nextdoor.nextdoor.domain.fintech.service.RegistAccountService;
+import com.nextdoor.nextdoor.domain.fintech.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,65 +16,55 @@ import java.util.Map;
 @RequestMapping("/api/v1/fintechs")
 @RequiredArgsConstructor
 public class RegistAccountController {
-    private final RegistAccountService registAccountService;
+    private final AccountService accountService;
 
     /**
      * 등록된 계좌 목록 조회
-     * GET /api/v1/fintechs/regist-accounts?userKey=123123123123
+     * GET /api/v1/fintechs/regist-accounts?userKey=...
      */
     @GetMapping("/regist-accounts")
     public Mono<ResponseEntity<List<RegistAccountResponseDto>>> listRegistAccounts(
             @RequestParam("userKey") String userKey
     ) {
-        return registAccountService.getRegistAccounts(userKey)
+        return accountService.getRegistAccounts(userKey)
                 .map(ResponseEntity::ok);
     }
 
     /**
-     * 계좌 등록 API
+     * 외부 계좌 등록 (EXTERNAL)
      * POST /api/v1/fintechs/regist-accounts
      */
     @PostMapping("/regist-accounts")
     public Mono<ResponseEntity<Object>> registerAccount(
             @RequestBody RegistAccountRequestDto req
     ) {
-        return registAccountService.registerAccount(req)
-                // 성공 시: DTO 를 Object 로 body 에 담기
-                .map(dto -> ResponseEntity
-                        .ok()
-                        .<Object>body(dto)
-                )
-                // 실패 시: error Map 을 Object 로 body 에 담기
+        return accountService.registerAccount(req)
+                .map(dto -> ResponseEntity.ok().<Object>body(dto))
                 .onErrorResume(e -> {
                     Map<String,String> error = new HashMap<>();
                     error.put("error", e.getMessage());
                     return Mono.just(
-                            ResponseEntity
-                                    .badRequest()
-                                    .<Object>body(error)
+                            ResponseEntity.badRequest().<Object>body(error)
                     );
                 });
     }
 
+
     /**
      * 주계좌 변경
-     * PUT /api/v1/fintechs/regist-accounts/primary?registAccountId=1&userKey=5b4e4cb4-c670-4ba9-96c9-ec191910005b
+     * PUT /api/v1/fintechs/regist-accounts/primary?accountId=...&userKey=...
      */
     @PutMapping("/regist-accounts/primary")
-    public Mono<ResponseEntity<Object>>  changePrimary(
-            @RequestParam("registAccountId") Long registAccountId,
+    public Mono<ResponseEntity<Object>> changePrimary(
+            @RequestParam("accountId") Long accountId,
             @RequestParam("userKey") String userKey
     ) {
-        return registAccountService.changePrimary(userKey, registAccountId)
-                // 성공 시: DTO
+        return accountService.changePrimary(userKey, accountId)
                 .map(dto -> ResponseEntity.ok().<Object>body(dto))
-                // 그 외 예외는 400 + 메시지 JSON
                 .onErrorResume(e -> {
                     Map<String, String> err = Map.of("error", e.getMessage());
                     return Mono.just(
-                            ResponseEntity
-                                    .badRequest()
-                                    .<Object>body(err)
+                            ResponseEntity.badRequest().<Object>body(err)
                     );
                 });
     }

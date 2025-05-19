@@ -25,9 +25,9 @@ public class MemberServiceImpl implements MemberService {
         if (memberDto.getAddress() != null) {
             member.updateAddress(memberDto.getAddress());
         }
-        if (memberDto.getAccountId() != null) {
-            member.updateAccountId(memberDto.getAccountId());
-        }
+//        if (memberDto.getAccountId() != null) {
+//            member.updateAccountId(memberDto.getAccountId());
+//        }
         return MemberResponseDto.from(member);
     }
 

@@ -4,28 +4,28 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. Member 더미 데이터 (20명의 사용자 생성)
 INSERT INTO member (
-    member_id, uuid, email, birth, gender, address, profile_image_url, account, nickname, auth_provider, created_at
+    member_id, uuid, user_key, email, birth, gender, address, profile_image_url, nickname, auth_provider, secure_password, created_at
 ) VALUES
-      (1, 'uuid-1', 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', 1, '홍길동', 'LOCAL', '2024-01-01T10:00:00'),
-      (2, 'uuid-2', 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg', 2, '김영희', 'LOCAL', '2024-01-02T10:00:00'),
-      (3, 'uuid-3', 'park@example.com', '1992-03-20', 'MALE', '서울시 송파구', 'profile3.jpg', 3, '박철수', 'LOCAL', '2024-01-03T10:00:00'),
-      (4, 'uuid-4', 'lee@example.com', '1993-04-25', 'FEMALE', '경기도 성남시', 'profile4.jpg', 4, '이민지', 'LOCAL', '2024-01-04T10:00:00'),
-      (5, 'uuid-5', 'choi@example.com', '1994-05-30', 'MALE', '경기도 수원시', 'profile5.jpg', 5, '최성훈', 'LOCAL', '2024-01-05T10:00:00'),
-      (6, 'uuid-6', 'jung@example.com', '1995-06-15', 'FEMALE', '인천시 부평구', 'profile6.jpg', 6, '정유리', 'LOCAL', '2024-01-06T10:00:00'),
-      (7, 'uuid-7', 'kang@example.com', '1996-07-10', 'MALE', '부산시 해운대구', 'profile7.jpg', 7, '강준혁', 'LOCAL', '2024-01-07T10:00:00'),
-      (8, 'uuid-8', 'seo@example.com', '1997-08-05', 'FEMALE', '대구시 수성구', 'profile8.jpg', 8, '서상은', 'LOCAL', '2024-01-08T10:00:00'),
-      (9, 'uuid-9', 'lim@example.com', '1998-09-20', 'MALE', '광주시 남구', 'profile9.jpg', 9, '임재형', 'LOCAL', '2024-01-09T10:00:00'),
-      (10, 'uuid-10', 'yoon@example.com', '1999-10-15', 'FEMALE', '대전시 유성구', 'profile10.jpg', 10, '윤소연', 'LOCAL', '2024-01-10T10:00:00'),
-      (11, 'uuid-11', 'kim2@example.com', '1989-11-30', 'MALE', '서울시 종로구', 'profile11.jpg', 11, '김민수', 'LOCAL', '2024-01-11T10:00:00'),
-      (12, 'uuid-12', 'lee2@example.com', '1988-12-25', 'FEMALE', '서울시 중구', 'profile12.jpg', 12, '이수진', 'LOCAL', '2024-01-12T10:00:00'),
-      (13, 'uuid-13', 'park2@example.com', '1987-01-10', 'MALE', '경기도 고양시', 'profile13.jpg', 13, '박지훈', 'LOCAL', '2024-01-13T10:00:00'),
-      (14, 'uuid-14', 'cho@example.com', '1986-02-28', 'FEMALE', '경기도 안산시', 'profile14.jpg', 14, '조현아', 'LOCAL', '2024-01-14T10:00:00'),
-      (15, 'uuid-15', 'song@example.com', '1985-03-15', 'MALE', '인천시 계양구', 'profile15.jpg', 15, '송태호', 'LOCAL', '2024-01-15T10:00:00'),
-      (16, 'uuid-16', 'oh@example.com', '1984-04-20', 'FEMALE', '부산시 금정구', 'profile16.jpg', 16, '오예원', 'LOCAL', '2024-01-16T10:00:00'),
-      (17, 'uuid-17', 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg', 17, '하동민', 'LOCAL', '2024-01-17T10:00:00'),
-      (18, 'uuid-18', 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg', 18, '신혜진', 'LOCAL', '2024-01-18T10:00:00'),
-      (19, 'uuid-19', 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg', 19, '안준서', 'LOCAL', '2024-01-19T10:00:00'),
-      (20, 'uuid-20', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', 20, '양서현', 'LOCAL', '2024-01-20T10:00:00');
+      (1, 'uuid-1', 'userKey-1', 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', '홍길동', 'LOCAL', NULL, '2024-01-01T10:00:00'),
+      (2, 'uuid-2', 'userKey-2', 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg',  '김영희', 'LOCAL', NULL, '2024-01-02T10:00:00'),
+      (3, 'uuid-3', 'userKey-3', 'park@example.com', '1992-03-20', 'MALE', '서울시 송파구', 'profile3.jpg',  '박철수', 'LOCAL', NULL,  '2024-01-03T10:00:00'),
+      (4, 'uuid-4', 'userKey-4', 'lee@example.com', '1993-04-25', 'FEMALE', '경기도 성남시', 'profile4.jpg',  '이민지', 'LOCAL', NULL, '2024-01-04T10:00:00'),
+      (5, 'uuid-5', 'userKey-5', 'choi@example.com', '1994-05-30', 'MALE', '경기도 수원시', 'profile5.jpg',  '최성훈', 'LOCAL', NULL, '2024-01-05T10:00:00'),
+      (6, 'uuid-6', 'userKey-6', 'jung@example.com', '1995-06-15', 'FEMALE', '인천시 부평구', 'profile6.jpg',  '정유리', 'LOCAL', NULL, '2024-01-06T10:00:00'),
+      (7, 'uuid-7', 'userKey-7', 'kang@example.com', '1996-07-10', 'MALE', '부산시 해운대구', 'profile7.jpg',  '강준혁', 'LOCAL', NULL, '2024-01-07T10:00:00'),
+      (8, 'uuid-8', 'userKey-8', 'seo@example.com', '1997-08-05', 'FEMALE', '대구시 수성구', 'profile8.jpg',  '서상은', 'LOCAL', NULL, '2024-01-08T10:00:00'),
+      (9, 'uuid-9', 'userKey-9', 'lim@example.com', '1998-09-20', 'MALE', '광주시 남구', 'profile9.jpg',  '임재형', 'LOCAL', NULL, '2024-01-09T10:00:00'),
+      (10, 'uuid-10', 'userKey-10', 'yoon@example.com', '1999-10-15', 'FEMALE', '대전시 유성구', 'profile10.jpg',  '윤소연', 'LOCAL', NULL, '2024-01-10T10:00:00'),
+      (11, 'uuid-11', 'userKey-11', 'kim2@example.com', '1989-11-30', 'MALE', '서울시 종로구', 'profile11.jpg',  '김민수', 'LOCAL', NULL, '2024-01-11T10:00:00'),
+      (12, 'uuid-12', 'userKey-12', 'lee2@example.com', '1988-12-25', 'FEMALE', '서울시 중구', 'profile12.jpg',  '이수진', 'LOCAL', NULL, '2024-01-12T10:00:00'),
+      (13, 'uuid-13', 'userKey-13', 'park2@example.com', '1987-01-10', 'MALE', '경기도 고양시', 'profile13.jpg', '박지훈', 'LOCAL', NULL, '2024-01-13T10:00:00'),
+      (14, 'uuid-14', 'userKey-14', 'cho@example.com', '1986-02-28', 'FEMALE', '경기도 안산시', 'profile14.jpg',  '조현아', 'LOCAL', NULL, '2024-01-14T10:00:00'),
+      (15, 'uuid-15', 'userKey-15', 'song@example.com', '1985-03-15', 'MALE', '인천시 계양구', 'profile15.jpg',  '송태호', 'LOCAL', NULL, '2024-01-15T10:00:00'),
+      (16, 'uuid-16', 'userKey-16', 'oh@example.com', '1984-04-20', 'FEMALE', '부산시 금정구', 'profile16.jpg',  '오예원', 'LOCAL', NULL, '2024-01-16T10:00:00'),
+      (17, 'uuid-17', 'userKey-17', 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg',  '하동민', 'LOCAL', NULL, '2024-01-17T10:00:00'),
+      (18, 'uuid-18', 'userKey-18', 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg',  '신혜진', 'LOCAL', NULL, '2024-01-18T10:00:00'),
+      (19, 'uuid-19', 'userKey-19', 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg',  '안준서', 'LOCAL', NULL, '2024-01-19T10:00:00'),
+      (20, 'uuid-20', 'userKey-20', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', '양서현', 'LOCAL', NULL, '2024-01-20T10:00:00');
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE member AUTO_INCREMENT = 21;
@@ -113,28 +113,30 @@ INSERT INTO post_likes (post_like_id, post_id, member_id, created_at) VALUES
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE post_likes AUTO_INCREMENT = 21;
 
--- 5. FintechUser 데이터 추가
-INSERT INTO fintech_user (user_key, user_id, created_at) VALUES
-                                                             ('5b4e4cb4-c670-4ba9-96c9-ec191910005b', 1, '2025-05-12 10:33:18.369177'),
-                                                             ('092ef68d-5a10-4b92-b323-b6db7c009e76', 2, '2025-05-12 10:33:26.789068');
+-- -- 5. FintechUser 데이터 추가
+-- INSERT INTO fintech_user (user_key, user_id, created_at) VALUES
+--                                                              ('5b4e4cb4-c670-4ba9-96c9-ec191910005b', 1, '2025-05-12 10:33:18.369177'),
+--                                                              ('092ef68d-5a10-4b92-b323-b6db7c009e76', 2, '2025-05-12 10:33:26.789068');
 
 -- 6. Account 데이터 추가
-INSERT INTO account (account_id, account_no, bank_code, balance, created_at, user_key) VALUES
-                                                                                           (1, '9990439282572673', '999', 0, '2025-05-12 10:33:18.577802', '5b4e4cb4-c670-4ba9-96c9-ec191910005b'),
-                                                                                           (2, '9991329456396744', '999', 0, '2025-05-12 10:33:26.905820', '092ef68d-5a10-4b92-b323-b6db7c009e76');
+INSERT INTO account (
+    account_id, account_no, bank_code, account_type, alias, is_primary, balance, created_at, is_registered, member_id
+) VALUES
+      (1, '9990439282572673', '999', 'BILI_PAY',   '빌리페이',  false, 0, '2025-05-12 10:33:18', true,  1),
+      (2, '9991329456396744', '999', 'BILI_PAY',   '빌리페이',  false, 0, '2025-05-12 10:33:26', true,  2);
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE account AUTO_INCREMENT = 3;
 
--- 7. RegistAccount 데이터 추가
-INSERT INTO regist_account
-(regist_account_id, account_id, user_key, balance, is_primary, registered_at, alias, account_type)
-VALUES
-    (1, 1, '5b4e4cb4-c670-4ba9-96c9-ec191910005b', 0, 0, '2025-05-12 10:33:18.596775', '빌리페이', 'BILI_PAY'),
-    (2, 2, '092ef68d-5a10-4b92-b323-b6db7c009e76', 0, 0, '2025-05-12 10:33:26.909828', '빌리페이', 'BILI_PAY');
+-- -- 7. RegistAccount 데이터 추가
+-- INSERT INTO regist_account
+-- (regist_account_id, account_id, user_key, balance, is_primary, registered_at, alias, account_type)
+-- VALUES
+--     (1, 1, '5b4e4cb4-c670-4ba9-96c9-ec191910005b', 0, 0, '2025-05-12 10:33:18.596775', '빌리페이', 'BILI_PAY'),
+--     (2, 2, '092ef68d-5a10-4b92-b323-b6db7c009e76', 0, 0, '2025-05-12 10:33:26.909828', '빌리페이', 'BILI_PAY');
 
 -- AUTO_INCREMENT 값 설정
-ALTER TABLE regist_account AUTO_INCREMENT = 3;
+-- ALTER TABLE regist_account AUTO_INCREMENT = 3;
 
 -- 8. Reservation 더미 데이터 (10개)
 INSERT INTO reservation (reservation_id, start_date, end_date, rental_fee, deposit, status, rental_id, owner_id, renter_id, post_id) VALUES
@@ -168,17 +170,19 @@ INSERT INTO rental (rental_id, reservation_id, rental_status, rental_process, da
 ALTER TABLE rental AUTO_INCREMENT = 11;
 
 -- 10. Deposit 더미 데이터
-INSERT INTO deposit (deposit_id, rental_id, regist_account_id, amount, status, deducted_amount, held_at, returned_at) VALUES
-                                                                                                                          (1, 1, 1, 300000, 'HELD', NULL, '2024-03-15T10:30:00', NULL),
-                                                                                                                          (2, 2, 1, 500000, 'RETURNED', 50000, '2024-03-17T10:30:00', '2024-03-24T18:00:00'),
-                                                                                                                          (3, 3, 1, 800000, 'RETURNED', 0, '2024-03-18T09:30:00', '2024-03-19T19:00:00'),
-                                                                                                                          (4, 4, 1, 200000, 'DEDUCTED', 20000, '2024-03-20T11:30:00', '2024-03-27T17:00:00'),
-                                                                                                                          (5, 5, 1, 400000, 'RETURNED', 0, '2024-03-22T14:30:00', '2024-03-29T16:00:00'),
-                                                                                                                          (6, 6, 2, 100000, 'HELD', NULL, '2024-03-25T09:00:00', NULL),
-                                                                                                                          (7, 7, 2, 250000, 'HELD', NULL, '2024-03-27T13:00:00', NULL),
-                                                                                                                          (8, 8, 2, 350000, 'HELD', NULL, '2024-03-30T10:00:00', NULL),
-                                                                                                                          (9, 9, 2, 150000, 'HELD', NULL, '2024-04-01T11:00:00', NULL),
-                                                                                                                          (10, 10, 2, 300000, 'HELD', NULL, '2024-04-03T15:00:00', NULL);
+INSERT INTO deposit (deposit_id, rental_id, renter_account_id, amount, status, deducted_amount, held_at, returned_at
+) VALUES
+      (1,  1, 1, 300000, 'HELD',     NULL,   '2024-03-15 10:30:00', NULL),
+      (2,  2, 1, 500000, 'RETURNED', 50000,  '2024-03-17 10:30:00', '2024-03-24 18:00:00'),
+      (3,  3, 1, 800000, 'RETURNED',     0,  '2024-03-18 09:30:00', '2024-03-19 19:00:00'),
+      (4,  4, 1, 200000, 'DEDUCTED', 20000,  '2024-03-20 11:30:00', '2024-03-27 17:00:00'),
+      (5,  5, 1, 400000, 'RETURNED',     0,  '2024-03-22 14:30:00', '2024-03-29 16:00:00'),
+      (6,  6, 2, 100000, 'HELD',       NULL,   '2024-03-25 09:00:00', NULL),
+      (7,  7, 2, 250000, 'HELD',       NULL,   '2024-03-27 13:00:00', NULL),
+      (8,  8, 2, 350000, 'HELD',       NULL,   '2024-03-30 10:00:00', NULL),
+      (9,  9, 2, 150000, 'HELD',       NULL,   '2024-04-01 11:00:00', NULL),
+      (10, 10,2, 300000, 'HELD',       NULL,   '2024-04-03 15:00:00', NULL);
+
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE deposit AUTO_INCREMENT = 11;
