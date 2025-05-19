@@ -58,11 +58,10 @@ public class ChatRestController {
     /** 3) 채팅 메시지 이력 조회 */
     @GetMapping("/rooms/{roomId}/messages")
     public ResponseEntity<Page<MessageDto>> getHistory(
-            Principal principal,
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long roomId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
-        Long userId = Long.valueOf(principal.getName());
         Page<ChatMessage> histories = messageService.getHistory(roomId, userId, page, size);
         Page<MessageDto> dtoPage = histories.map(MessageDto::from);
         return ResponseEntity.ok(dtoPage);
@@ -71,10 +70,9 @@ public class ChatRestController {
     /** 4) 채팅 메시지 전송 */
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<MessageDto> sendMessage(
-            Principal principal,
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long roomId,
             @RequestBody SendMessageRequest request) {
-        Long userId = Long.valueOf(principal.getName());
         ChatMessage saved = messageService.sendMessage(roomId, userId, request.getContent());
         return ResponseEntity.ok(MessageDto.from(saved));
     }
@@ -82,9 +80,8 @@ public class ChatRestController {
     /** 5) 채팅 메시지 삭제(회수) */
     @DeleteMapping("/messages/{messageId}")
     public ResponseEntity<Void> deleteMessage(
-            Principal principal,
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long messageId) {
-        Long userId = Long.valueOf(principal.getName());
         messageService.deleteMessage(messageId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -104,9 +101,8 @@ public class ChatRestController {
     /** 7) 채팅방 삭제 */
     @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoom(
-            Principal principal,
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long roomId) {
-        Long userId = Long.valueOf(principal.getName());
         chatRoomService.deleteRoom(roomId, userId);
         return ResponseEntity.noContent().build();
     }
