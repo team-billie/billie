@@ -26,4 +26,5 @@ public interface RentalService {
     ManagedRentalCountResult countManagedRentals(Long ownerId);
     SearchRentalResult getRentalById(Long rentalId);
     DeleteRentalResult deleteRental(DeleteRentalCommand command);
+    void createAiImageComparisonPair(Long rentalId, Long beforeImageId, Long afterImageId, String pairComparisonResult);
 }

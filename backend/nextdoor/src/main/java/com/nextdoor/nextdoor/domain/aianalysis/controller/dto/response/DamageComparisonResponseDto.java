@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.aianalysis.event.out;
+package com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,10 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class AiCompareAnalysisCompletedEvent {
+public class DamageComparisonResponseDto {
 
-    private Long rentalId;
+    private List<String> beforeImages;
+    private List<String> afterImages;
     private String overallComparisonResult;
     private List<MatchingResult> matchingResults;
 
@@ -17,8 +18,8 @@ public class AiCompareAnalysisCompletedEvent {
     @Getter
     public static class MatchingResult {
 
-        private Long beforeImageId;
-        private Long afterImageId;
+        private String beforeImage;
+        private String afterImage;
         private String pairComparisonResult;
     }
 }
