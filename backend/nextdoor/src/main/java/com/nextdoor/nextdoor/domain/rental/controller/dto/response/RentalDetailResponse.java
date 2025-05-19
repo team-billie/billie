@@ -17,6 +17,7 @@ import java.util.List;
 public class RentalDetailResponse {
 
     private Long reservationId;
+    private Long postId;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal rentalFee; //Per Day
