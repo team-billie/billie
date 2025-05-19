@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -46,10 +47,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         MemberQueryDto member = authMemberQueryPort.findByEmailAndAuthProvider(email, authProvider).orElseGet(() -> {
             MemberQueryDto newMember = authMemberCommandPort.save(new MemberCommandDto(authProvider, nickname, email, profileImageUrl));
+
+            // 비동기로 처리하고 결과를 기다리지 않음
             long randomNumber = (long) (Math.random() * Long.MAX_VALUE);
-            authFintechCommandPort.createUser(newMember.getId(), randomNumber + newMember.getEmail()).block();
+            createUserAsync(newMember.getId(), randomNumber + newMember.getEmail());
+
             return newMember;
         });
+
         return new CustomOAuth2User(member.getId().toString(), oAuth2User.getAttributes());
+
+    }
+
+    // 비동기 메서드 추가
+    private void createUserAsync(Long memberId, String email) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                // 약간의 지연 추가로 트랜잭션 커밋 보장
+                Thread.sleep(500);
+                authFintechCommandPort.createUser(memberId, email).block();
+            } catch (Exception e) {
+                log.error("핀테크 사용자 생성 실패: " + e.getMessage(), e);
+            }
+        });
     }
 }
