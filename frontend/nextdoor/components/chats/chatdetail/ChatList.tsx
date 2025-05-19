@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Message } from '@/types/chats/chat';
 import ChatBubble from './ChatBubble';
 import DateDivider from './DateDivider';
-import useUserStore from '@/lib/store/useUserStore'; // useUserStore 추가
+import useUserStore from '@/lib/store/useUserStore'; 
 
 interface ChatListProps {
   messages: Message[];
@@ -18,10 +18,8 @@ const ChatList: React.FC<ChatListProps> = ({
   className = '',
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  // useUserStore에서 사용자 정보 가져오기
   const userStoreData = useUserStore();
   
-  // props로 전달받은 값이 없는 경우 useUserStore의 값 사용
   const displayName = username || userStoreData.username || 'username';
   const displayAvatar = userAvatar || userStoreData.profileImageUrl || '/images/profileimg.png';
 
