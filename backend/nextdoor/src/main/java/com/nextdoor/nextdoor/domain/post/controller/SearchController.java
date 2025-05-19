@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.post.controller;
 
 import com.nextdoor.nextdoor.domain.post.controller.dto.PostSearchResponseDto;
+import com.nextdoor.nextdoor.domain.post.search.KeywordSuggestionService;
 import com.nextdoor.nextdoor.domain.post.search.PostSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchController {
 
   private final PostSearchService postSearchService;
+  private final KeywordSuggestionService keywordSuggestionService;
 
   @GetMapping("/search")
   public ResponseEntity<Page<PostSearchResponseDto>> search(
@@ -36,7 +40,19 @@ public class SearchController {
 
     PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
+    if (keyword != null && !keyword.isBlank()) {
+      keywordSuggestionService.saveSearchKeyword(keyword);
+    }
+
     Page<PostSearchResponseDto> results = postSearchService.searchPostsByKeywordInAddress(keyword, address, pageRequest);
     return ResponseEntity.ok(results);
+  }
+
+  @GetMapping("/search/suggestions")
+  public ResponseEntity<List<String>> getSuggestions(
+          @RequestParam(value = "prefix", required = false, defaultValue = "") String prefix
+  ) {
+    List<String> suggestions = keywordSuggestionService.suggestKeywords(prefix);
+    return ResponseEntity.ok(suggestions);
   }
 }
