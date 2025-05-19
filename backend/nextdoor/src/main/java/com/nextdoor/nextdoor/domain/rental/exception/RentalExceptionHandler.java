@@ -25,6 +25,13 @@ public class RentalExceptionHandler {
     }
 
     @ExceptionHandler({
+            PairComparisonProcessingException.class
+    })
+    public ResponseEntity<ErrorResponse> handleInternalServerErrorException(BaseCustomException e, HttpServletRequest request) {
+        return logAndHandleException(HttpStatus.INTERNAL_SERVER_ERROR, e, request);
+    }
+
+    @ExceptionHandler({
             HttpMessageNotReadableException.class
     })
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
