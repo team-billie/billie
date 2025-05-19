@@ -37,18 +37,26 @@ export default function ProductPhotos({ images }: ProductPhotosProps) {
         onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
         className="w-full h-full"
       >
-        {images.map((image, idx) => (
-          <SwiperSlide key={idx}>
-            <div className="relative w-full h-64">
-              <Image
-                src={image}
-                alt={`Product ${idx + 1}`}
-                fill
-                className="object-cover"
-              />
+        {Array.isArray(images) && images.length > 0 ? (
+          images.map((image, idx) => (
+            <SwiperSlide key={idx}>
+              <div className="relative w-full h-64">
+                <Image
+                  src={image}
+                  alt={`상품 이미지 ${idx + 1}`}
+                  fill
+                  className="object-cover rounded-xl"
+                />
+              </div>
+            </SwiperSlide>
+          ))
+        ) : (
+          <SwiperSlide>
+            <div className="relative w-full h-64 flex items-center justify-center bg-gray-100 rounded-xl">
+              <span className="text-gray-400">이미지가 없습니다</span>
             </div>
           </SwiperSlide>
-        ))}
+        )}
       </Swiper>
     </div>
   );
