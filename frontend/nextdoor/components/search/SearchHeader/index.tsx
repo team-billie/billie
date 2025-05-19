@@ -30,6 +30,7 @@ export default function SearchHeader({ searchValue, setSearchValue, handleSearch
                 } catch (error) {
                     console.error("자동완성 로드 실패:", error);
                     setSuggestions([]);
+                    setShowSuggestions(false);
                 }
             } else {
                 setSuggestions([]);

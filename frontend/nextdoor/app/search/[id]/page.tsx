@@ -5,7 +5,7 @@ import SearchHeader from "@/components/search/SearchHeader";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PostListResponse } from "@/types/posts/response";
-import { searchPosts } from "@/api/posts";
+import { searchPosts } from "@/lib/api/posts";
 import Image from "next/image";
 
 export default function SearchDetailPage() {

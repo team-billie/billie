@@ -35,11 +35,48 @@ export const GetPostListRequest = (
 // 검색어 자동완성 API
 export const getSuggestions = async (prefix: string) => {
   try {
+    console.log('자동완성 API 호출:', prefix);
     const response = await axiosInstance.get('/api/v1/posts/search/suggestions', {
       params: { prefix }
     });
+    console.log('자동완성 API 응답:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('자동완성 API 에러 상세:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    return handleApiError(error, "검색어 자동완성");
+  }
+};
+
+// 검색 API
+export const searchPosts = async ({
+  keyword,
+  page = 0,
+  size = 10,
+  sort = 'createdAt',
+  direction = 'DESC'
+}: {
+  keyword: string;
+  page?: number;
+  size?: number;
+  sort?: string;
+  direction?: 'ASC' | 'DESC';
+}) => {
+  try {
+    const response = await axiosInstance.get('/api/v1/posts/search', {
+      params: {
+        keyword,
+        page,
+        size,
+        sort,
+        direction
+      }
+    });
     return response.data;
   } catch (error) {
-    return handleApiError(error, "검색어 자동완성");
+    return handleApiError(error, "게시글 검색");
   }
 };
