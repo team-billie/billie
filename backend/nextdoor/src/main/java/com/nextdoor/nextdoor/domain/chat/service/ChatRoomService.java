@@ -42,4 +42,16 @@ public class ChatRoomService {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 id=" + roomId));
     }
+
+    /** 채팅방 삭제 – 해당 방에 속한 사용자만 삭제 가능 */
+    public void deleteRoom(Long roomId, Long userId) {
+        ChatRoom room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 id=" + roomId));
+        boolean isMember = room.getMembers().stream()
+                .anyMatch(m -> m.getUserId().equals(userId));
+        if (!isMember) {
+            throw new SecurityException("채팅방 참여자만 삭제할 수 있습니다.");
+        }
+        roomRepository.delete(room);
+    }
 }
