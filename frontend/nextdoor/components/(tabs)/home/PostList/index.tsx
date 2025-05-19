@@ -55,7 +55,7 @@ export default function PostList() {
         <div className="py-8 text-center text-gray-500">로딩 중...</div>
       ) : postList && postList.length > 0 ? (
         <>
-          <div className="flex flex-col gap-4 text-gray900">
+          <div className="flex flex-col gap-3 text-gray900">
             {postList.map((post: PostListItemDto) => (
               <Link href={`/posts/${post.postId}`} key={post.postId}>
                 <PostListItem post={post} />

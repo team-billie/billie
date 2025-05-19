@@ -85,17 +85,27 @@ type SelectOwnerAccountRequestDto = {
   finalAmount: number;
 };
 
-export type {
-  CreateFinUserRequestDto,
-  CreateFinAccountRequestDto,
-  GetAccountListRequestDto,
-  AddAccountRequestDto,
-  GetAddedListRequestDto,
-  TransferAccountRequestDto,
-  HoldDepositRequestDto,
-  ReturnDepositRequestDto,
-  VerifyAccountRequestDto,
-  GetFinUserRequestDto,
-  SelectOwnerAccountRequestDto,
-  PayItemRequestDto,
-};
+// 결제 내역 조회
+type GetPaymentHistoryRequestDto = {
+  userKey: string;
+  accountNo: string;
+  startDate: string;
+  endDate: string;
+  transactionType: string;
+  orderByType: string;
+}
+
+export type { CreateFinUserRequestDto, 
+    CreateFinAccountRequestDto, 
+    GetAccountListRequestDto,   
+    AddAccountRequestDto, 
+    GetAddedListRequestDto, 
+    TransferAccountRequestDto, 
+    HoldDepositRequestDto, 
+    ReturnDepositRequestDto,
+    VerifyAccountRequestDto,
+    GetFinUserRequestDto,
+    SelectOwnerAccountRequestDto,
+    PayItemRequestDto,
+    GetPaymentHistoryRequestDto, 
+}; 

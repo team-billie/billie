@@ -5,6 +5,7 @@ import { AlertModalProvider } from "@/lib/providers/AlertModalProvider";
 // import DraggableWidget from "@/components/common/RentalWidget";
 import WidgetProvider from "@/lib/providers/WidgetProvider";
 import FloatingWidget from "@/components/common/RentalWidget/FloatingWidget";
+import AlertMessage from "@/components/common/AlertMessage";
 
 export const viewport = {
   themeColor: "#ffffff",
@@ -37,6 +38,7 @@ export default function RootLayout({
           {children}
           {/* <FloatingWidget /> */}
           </WidgetProvider>
+          <AlertMessage />
         </AlertModalProvider>
       </body>
     </html>

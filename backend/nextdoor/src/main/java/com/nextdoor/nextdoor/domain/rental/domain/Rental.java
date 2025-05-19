@@ -57,6 +57,9 @@ public class Rental {
     @Column(name = "deposit_id")
     private Long depositId;
 
+    @Column(name = "final_amount")
+    private BigDecimal finalAmount;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -106,7 +109,7 @@ public class Rental {
 
     public void updateDamageAnalysis(String damageAnalysis) {
         this.damageAnalysis = damageAnalysis;
-        updateStatus(RentalStatus.REMITTANCE_REQUESTED);
+        updateStatus(RentalStatus.BEFORE_PHOTO_ANALYZED);
     }
 
     public void updateComparedAnalysis(String comparedAnalysis) {
@@ -137,6 +140,11 @@ public class Rental {
 
     public void updateDepositId(Long depositId) {
         this.depositId = depositId;
+    }
+
+    public void updateFinalAmount(BigDecimal amount) {
+        validateAmount(amount);
+        this.finalAmount = amount;
     }
 
     public void validateRemittancePendingState() {

@@ -10,6 +10,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GetPaymentDataRequest, HoldDepositRequest } from "@/lib/api/pays";
 import { GetPaymentDataResponseDto } from "@/types/pays/response";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+
 export default function PaymentPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +26,7 @@ export default function PaymentPage() {
     const amount = 30000;
 
     const [isChargeNeeded, setIsChargeNeeded] = useState(false);
+    const { showAlert } = useAlertStore();
 
     const [paymentData, setPaymentData] = useState<GetPaymentDataResponseDto | null>(null);
     
@@ -46,10 +49,10 @@ export default function PaymentPage() {
                 rentalId: Number(id),
             }).then((res) => {
                 console.log(res);
-                alert("대여 결제 완료");
+                showAlert("대여 결제 완료", "success");
                 router.push("/profile");
             }).catch(() => {
-                alert("대여 결제 실패");
+                showAlert("대여 결제 실패", "error");
             });
 
 
@@ -61,14 +64,14 @@ export default function PaymentPage() {
                 amount: depositAmount,
             }).then((res) => {
                 console.log(res);
-                alert("보증금 보관 완료");
+                showAlert("보증금 보관 완료", "success");
             }).catch(() => {
-                alert("보증금 보관 실패");
+                showAlert("보증금 보관 실패", "error");
             });
 
 
         } catch (error) {
-            alert("결제 실패");
+            showAlert("결제 실패", "error");
         }
     }
     

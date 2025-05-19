@@ -19,10 +19,12 @@ public interface RentalService {
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
     void updateRentalDepositId(Long rentalId, Long depositId);
-    AiAnalysisResult getAiAnalysis(Long rentalId);
+    AiComparisonResult getAiAnalysis(Long rentalId);
     void updateDamageAnalysis(Long rentalId, String damageAnalysis);
     void updateComparedAnalysis(Long rentalId, String comparedAnalysis);
     UpdateAccountResult updateAccount(UpdateAccountCommand command);
     ManagedRentalCountResult countManagedRentals(Long ownerId);
     SearchRentalResult getRentalById(Long rentalId);
+    DeleteRentalResult deleteRental(DeleteRentalCommand command);
+    void createAiImageComparisonPair(Long rentalId, Long beforeImageId, Long afterImageId, String pairComparisonResult);
 }

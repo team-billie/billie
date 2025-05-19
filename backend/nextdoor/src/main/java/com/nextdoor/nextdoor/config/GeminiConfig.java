@@ -30,8 +30,11 @@ public class GeminiConfig {
     @Value("${custom.damage-analyzer-prompt-location}")
     private String damageAnalyzerPromptLocation;
 
-    @Value("${custom.damage-comparator-prompt-location}")
-    private String damageComparatorPromptLocation;
+    @Value("${custom.summarizer-prompt-location}")
+    private String summarizerPromptLocation;
+
+    @Value("${custom.pair-damage-comparator-prompt-location}")
+    private String pairDamageComparatorPromptLocation;
 
     @Value("${custom.product-analyzer-prompt-location}")
     private String productAnalyzerPromptLocation;
@@ -52,13 +55,18 @@ public class GeminiConfig {
     }
 
     @Bean(name = "damageAnalyzerPromptPart")
-    public Part afterImageDamageAnalyzerPromptPart(ResourceLoader resourceLoader) {
+    public Part damageAnalyzerPromptPart(ResourceLoader resourceLoader) {
         return loadPromptPart(resourceLoader, damageAnalyzerPromptLocation);
     }
 
-    @Bean(name = "damageComparatorPromptPart")
-    public Part imageComparisonDamageAnalyzerPromptPart(ResourceLoader resourceLoader) {
-        return loadPromptPart(resourceLoader, damageComparatorPromptLocation);
+    @Bean(name = "summarizerPromptPart")
+    public Part summarizerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, summarizerPromptLocation);
+    }
+
+    @Bean(name = "pairDamageComparatorPromptPart")
+    public Part pairDamageComparatorPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, pairDamageComparatorPromptLocation);
     }
 
     @Bean(name = "productAnalyzerPromptPart")

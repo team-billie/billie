@@ -4,16 +4,30 @@ import LoadingSpinner from "@/components/common/LoadingSpinner.tsx";
 import ProductInfos from "@/components/posts/detail/ProductInfos";
 import ProductPhotos from "@/components/posts/detail/ProductPhotos";
 import ProductReservation from "@/components/posts/detail/ProductReservation";
+import { GetPostLikeRequest } from "@/lib/api/posts";
 import { postDetailRequest } from "@/lib/api/posts/request";
 import { PostDetailResponseDTO } from "@/types/posts/response";
-import { MessageCircle } from "lucide-react";
-import { useParams } from "next/navigation";
+import { ChevronLeft, Heart, MessageCircle } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PostLikeDeleteRequest, PostLikeRequest } from "@/lib/api/posts";
 
 export default function PostDetailPage() {
   const [product, setProduct] = useState<PostDetailResponseDTO | null>(null);
   const { id } = useParams();
   const feedId = Number(id);
+  const router = useRouter();
+
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleLikeBtn = () => {
+    if (isLiked) {
+      PostLikeDeleteRequest(id.toString());
+    } else {
+      PostLikeRequest(id.toString());
+    }
+    setIsLiked(!isLiked);
+  };
 
   useEffect(() => {
     async function fetchPostDetail() {
@@ -24,6 +38,14 @@ export default function PostDetailPage() {
       }
     }
     fetchPostDetail();
+
+    async function fetchPostLike() {
+      const data = await GetPostLikeRequest(feedId.toString());
+      console.log(data);
+      setIsLiked(data.liked);
+    }
+    fetchPostLike();
+
   }, [feedId]);
 
   if (!product) {
@@ -36,6 +58,22 @@ export default function PostDetailPage() {
   return (
     <main className="relative">
       <div className="min-h-screen flex flex-col pb-24">
+        {/* 물품 페이지 헤더 */}
+        <div className="absolute top-4 left-2 right-2 flex justify-between z-10 px-2">
+          <div onClick={() => router.back()} className="flex items-center justify-center bg-blue100 bg-opacity-70 rounded-full text-gray800 w-11 h-11 p-1.5">
+            <ChevronLeft className="w-6 h-6" />
+          </div>
+          <button className="flex items-center justify-center bg-blue100 bg-opacity-70 rounded-full text-gray-700 w-11 h-11 p-1.5">
+            <Heart 
+              className={`cursor-pointer transition-colors w-6 h-6 ${isLiked ? "text-pink-500 fill-pink-300" : "text-gray800 fill-gray400"}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleLikeBtn();
+              }}
+            />
+          </button>
+        </div>
+
         {/* 물품 사진 */}
         <ProductPhotos images={product.productImage} />
 

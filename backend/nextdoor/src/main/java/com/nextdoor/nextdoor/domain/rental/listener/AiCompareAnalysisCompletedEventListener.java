@@ -18,7 +18,14 @@ public class AiCompareAnalysisCompletedEventListener {
     public void handleAiCompareAnalysisCompletedEvent(AiCompareAnalysisCompletedEvent aiCompareAnalysisCompletedEvent) {
         rentalService.updateComparedAnalysis(
                 aiCompareAnalysisCompletedEvent.getRentalId(),
-                aiCompareAnalysisCompletedEvent.getDamageAnalysis()
+                aiCompareAnalysisCompletedEvent.getOverallComparisonResult()
         );
+        aiCompareAnalysisCompletedEvent.getMatchingResults()
+                .forEach(matchingResult -> rentalService.createAiImageComparisonPair(
+                        aiCompareAnalysisCompletedEvent.getRentalId(),
+                        matchingResult.getBeforeImageId(),
+                        matchingResult.getAfterImageId(),
+                        matchingResult.getPairComparisonResult()
+                ));
     }
 }

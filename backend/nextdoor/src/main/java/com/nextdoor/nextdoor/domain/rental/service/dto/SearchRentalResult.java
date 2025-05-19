@@ -15,6 +15,7 @@ import java.util.List;
 public class SearchRentalResult {
 
     private Long id;
+    private Long postId;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal rentalFee; //Per Day

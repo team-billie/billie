@@ -6,8 +6,7 @@ import CheckDeposit from "./CheckDeposit";
 import { ReturnDepositRequest } from "@/lib/api/pays";
 import { ReturnDepositRequestDto } from "@/types/pays/request";
 import useUserStore from "@/lib/store/useUserStore";
-import useAlertModal from "@/lib/hooks/alert/useAlertModal";
-import { useRouter } from "next/navigation";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface HandleDepositModalProps {
   charge: number;
@@ -28,8 +27,8 @@ export default function HandleDepositModal({
   const [deductedAmount, setDeductedAmount] = useState(0);
   const [payCharge, setPayCharge] = useState(charge);
   const { userKey, billyAccount } = useUserStore();
-  const { showAlert } = useAlertModal();
-  const router = useRouter();
+  const { showAlert } = useAlertStore();
+
   const handleSubmit = () => {
     const requestBody: ReturnDepositRequestDto = {
       userKey: userKey,
@@ -40,7 +39,9 @@ export default function HandleDepositModal({
     };
 
     ReturnDepositRequest(requestBody).then((res) => {
-      showAlert("보증금 처리", "보증금 반환이 완료되었습니다", "success");
+      showAlert("보증금 처리가 완료되었습니다!", "success");
+    }).catch((err) => {
+      showAlert("보증금 처리 실패하였습니다.", "error");
     });
     router.push("/home");
     setIsModalOpen(false);
@@ -58,6 +59,8 @@ export default function HandleDepositModal({
           {changeBtnClicked ? (
             <ChangeDeposit
               payCharge={payCharge}
+              handleSubmit={handleSubmit}
+              charge={charge}
               setPayCharge={setPayCharge}
               setChangeBtnClicked={setChangeBtnClicked}
             />

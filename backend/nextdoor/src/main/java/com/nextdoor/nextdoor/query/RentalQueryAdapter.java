@@ -60,6 +60,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
         List<SearchRentalResult> results = queryFactory
                 .select(Projections.fields(SearchRentalResult.class,
                         reservation.id.as("id"),
+                        reservation.postId,
                         reservation.startDate.as("startDate"),
                         reservation.endDate.as("endDate"),
                         reservation.rentalFee,
@@ -111,10 +112,13 @@ public class RentalQueryAdapter implements RentalQueryPort {
                         .select(Projections.constructor(
                                 RequestRemittanceResult.class,
                                 member.nickname.as("ownerNickname"),
-                                reservation.rentalFee,
+                                member.profileImageUrl.as("ownerProfileImageUrl"),
+                                rental.finalAmount,
                                 reservation.deposit,
                                 rental.accountNo,
-                                rental.bankCode
+                                rental.bankCode,
+                                reservation.startDate,
+                                reservation.endDate
                         ))
                         .from(reservation)
                         .join(member).on(reservation.ownerId.eq(member.id))
@@ -185,6 +189,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
         SearchRentalResult result = queryFactory
                 .select(Projections.fields(SearchRentalResult.class,
                         reservation.id.as("id"),
+                        reservation.postId,
                         reservation.startDate.as("startDate"),
                         reservation.endDate.as("endDate"),
                         reservation.rentalFee,

@@ -16,11 +16,7 @@ export default function ProfilePage() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userKey");
     router.push("/login");
-  };
-
-  useEffect(() => {
-    console.log(userKey, userId);
-  }, []);
+  }
 
   return (
     <div className="flex flex-col min-h-[100dvh] pb-20">
@@ -34,15 +30,12 @@ export default function ProfilePage() {
       </div>
 
       <div className="flex flex-col gap-4 bg-gray100 text-gray-700 p-4">
-        <div className="bg-white shadow-popup p-4 rounded-2xl">
+        <Link href="/posts/liked" className="bg-white shadow-popup p-4 rounded-2xl">
           <LinkHeader type="like" />
-        </div>
+        </Link>
 
         <div className="grid grid-cols-2 gap-4">
-          <Link
-            href="/reservations"
-            className="bg-white shadow-popup p-4 rounded-2xl"
-          >
+          <Link href="/reservations" className="bg-white shadow-popup p-4 rounded-2xl">
             <LinkHeader type="reservation" />
             <div className="flex justify-end items-end font-bold px-2 mt-1 text-gray900">
               <span className="text-4xl">4</span>
@@ -53,10 +46,7 @@ export default function ProfilePage() {
             </div>
           </Link>
 
-          <Link
-            href="/reservations/manage"
-            className="bg-white shadow-popup p-4 rounded-2xl"
-          >
+          <Link href="/reservations/manage" className="bg-white shadow-popup p-4 rounded-2xl">
             <LinkHeader type="apply" />
             <div className="flex justify-end items-end font-bold px-2 mt-1 text-gray900">
               <span className="text-4xl">4</span>

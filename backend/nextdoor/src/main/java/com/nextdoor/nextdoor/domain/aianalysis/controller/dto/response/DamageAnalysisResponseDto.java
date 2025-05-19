@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class InspectDamageResponseDto {
+public class DamageAnalysisResponseDto {
 
-    private String damageAnalysis;
+    private String damageAnalysisResult;
 }
