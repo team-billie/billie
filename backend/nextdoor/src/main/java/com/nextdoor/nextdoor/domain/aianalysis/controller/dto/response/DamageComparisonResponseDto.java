@@ -36,6 +36,7 @@ public class DamageComparisonResponseDto {
                 private String damageType;
                 private String location;
                 private String details;
+                private BoundingBox boundingBox;
                 private float confidenceScore;
 
                 @AllArgsConstructor
