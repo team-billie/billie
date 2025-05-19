@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Message } from '@/types/chats/chat';
 import ChatBubble from './ChatBubble';
 import DateDivider from './DateDivider';
-import useUserStore from '@/lib/store/useUserStore'; 
+import useUserStore from '@/lib/store/useUserStore';
 
 interface ChatListProps {
   messages: Message[];
@@ -19,7 +19,7 @@ const ChatList: React.FC<ChatListProps> = ({
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const userStoreData = useUserStore();
-  
+
   const displayName = username || userStoreData.username || 'username';
   const displayAvatar = userAvatar || userStoreData.profileImageUrl || '/images/profileimg.png';
 
@@ -69,22 +69,28 @@ const ChatList: React.FC<ChatListProps> = ({
 
           {group.messages.map((message, messageIndex) => {
             const prevMessage = messageIndex > 0 ? group.messages[messageIndex - 1] : null;
+            const nextMessage = messageIndex < group.messages.length - 1
+              ? group.messages[messageIndex + 1]
+              : null;
+
             const isContinuous = prevMessage?.sender === message.sender;
-            
-            const isTimeClose = prevMessage 
+            const isTimeClose = prevMessage
               ? message.timestamp.getTime() - prevMessage.timestamp.getTime() < 5 * 60 * 1000
               : false;
-            
+
+            const isNextSame = nextMessage?.sender === message.sender &&
+              nextMessage.timestamp.getTime() - message.timestamp.getTime() < 5 * 60 * 1000;
+
             const showAvatar = !isContinuous || !isTimeClose;
-            
-            const uniqueKey = `${groupIndex}-${messageIndex}-${message.id}`;
-            
+            const showTimestamp = !isNextSame;
+
             return (
               <ChatBubble
-                key={uniqueKey}
+                key={`${groupIndex}-${messageIndex}-${message.id}`}
                 message={message}
                 showProfileIcon={message.sender === 'other' && showAvatar}
                 showUsername={message.sender === 'other' && showAvatar}
+                showTimestamp={showTimestamp}
                 username={displayName}
                 profileIcon={displayAvatar}
               />
