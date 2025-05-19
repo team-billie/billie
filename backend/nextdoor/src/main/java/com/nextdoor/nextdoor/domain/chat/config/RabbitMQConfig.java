@@ -18,9 +18,10 @@ public class RabbitMQConfig {
     public static final String CHAT_ROUTING_KEY= "chat.key";
 
     @Bean
-    public DirectExchange chatExchange() {
-        return new DirectExchange(CHAT_EXCHANGE);
+    public TopicExchange chatExchange() {
+        return new TopicExchange(RabbitMQConfig.CHAT_EXCHANGE);
     }
+
 
     @Bean
     public Queue chatQueue() {
@@ -28,7 +29,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding chatBinding(Queue chatQueue, DirectExchange chatExchange) {
+    public Binding chatBinding(Queue chatQueue, TopicExchange chatExchange) {
         return BindingBuilder
                 .bind(chatQueue)
                 .to(chatExchange)
