@@ -1,15 +1,14 @@
 import React, { ReactNode } from 'react';
 import ChatHeader from '@/components/chats/chatdetail/ChatsDetailHeader';
-// import ProductInfo from '../chat/ProductInfo';
 import ChatInput from '@/components/chats/chatdetail/ChatInput';
 import { Product } from '@/types/chats/chat';
-import useUserStore from '@/lib/store/useUserStore'; // useUserStore 추가
+import useUserStore from '@/lib/store/useUserStore';
 
 interface ChatLayoutProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  username?: string; // 선택적으로 변경
-  // product: Product;
+  username?: string;
+  profileImage?: string; // 추가된 prop
   children: ReactNode;
   onSendMessage: (message: string) => void;
   onBackClick?: () => void;
@@ -18,7 +17,7 @@ interface ChatLayoutProps {
 
 const ChatLayout: React.FC<ChatLayoutProps> = ({
   username,
-  // product,
+  profileImage = '/images/profileimg.png', 
   children,
   onSendMessage,
   value,
@@ -37,11 +36,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       {/* 헤더 */}
       <ChatHeader 
         username={displayName} 
-        onBackClick={onBackClick} 
+        onBackClick={onBackClick}
+        profileImage={profileImage}
       />
-      
-      {/* 제품 정보 */}
-      {/* <ProductInfo product={product} /> */}
       
       {/* 채팅 내용 */}
       <div className="flex-1 overflow-hidden">

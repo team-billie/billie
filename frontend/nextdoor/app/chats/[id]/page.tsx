@@ -5,11 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
-import ChatAccordion from "@/components/chats/chatdetail/ChatAccordion";
+import ChatAccordion from "@/components/chats/chatdetail/ChatProductInfoCard";
 import { Message } from "@/types/chats/chat";
 import { getChatMessages, getBorrowingChatRooms, convertToChatRoomUI, getLendingChatRooms } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
 import { useWebSocket } from "@/lib/hooks/chats/useWebSocket"; // 웹소켓 훅 import
+import ProductInfoCard from "@/components/chats/chatdetail/ChatProductInfoCard";
 
 export default function ChatDetailPage() {
   const params = useParams();
@@ -186,6 +187,13 @@ export default function ChatDetailPage() {
     setValue(e.target.value);
   };
 
+  const handleProductDetailClick = () => {
+    // 상품 상세 페이지로 이동
+    if (productInfo.postId) {
+      router.push(`/posts/${productInfo.postId}`);
+    }
+  };
+
   const handleSend = (content: string) => {
     if (!content.trim() || !userId) return;
 
@@ -220,37 +228,15 @@ export default function ChatDetailPage() {
       onChange={handleChange}
       onSendMessage={handleSend}
       onBackClick={handleBackClick}
+      profileImage={otherUser.avatar}
+      
     >
-      <ChatAccordion title="예약 및 제품 정보">
-        <div className="flex items-start p-3">
-          <div className="flex-shrink-0 mr-3 relative">
-            {/* 제품 이미지 */}
-            <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-200">
-              <Image 
-                src={productInfo.postImageUrl}
-                alt={productInfo.title}
-                width={64}
-                height={64}
-                className="object-cover"
-              />
-            </div>
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <h3 className="text-md font-medium">{productInfo.title}</h3>
-            
-            {/* 제품 정보 */}
-            <p className="text-xs text-gray-400 mt-1">
-              {productInfo.title} • {productInfo.rentalFee.toLocaleString()}원/일
-            </p>
-            
-            {/* 추가 정보 */}
-            <p className="text-xs text-gray-400 mt-1">
-              보증금: {productInfo.deposit.toLocaleString()}원
-            </p>
-          </div>
-        </div>
-      </ChatAccordion>
+      <div className="px-3 mt-2">
+  <ProductInfoCard 
+    productInfo={productInfo}
+    onDetailClick={handleProductDetailClick}
+  />
+</div>
 
       {/* 채팅 목록 */}
       <ChatList

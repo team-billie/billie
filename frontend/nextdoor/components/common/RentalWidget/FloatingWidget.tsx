@@ -57,21 +57,18 @@ const FloatingWidget: React.FC = () => {
 
   const { showAlert } = useAlertModal();
 
-  // 위치 정보 저장
   const savePosition = (pos: { x: number; y: number }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("widgetPosition", JSON.stringify(pos));
     }
   };
 
-  // 위젯이 열릴 때마다 서버 데이터 갱신
   useEffect(() => {
     if (isOpen) {
       refreshRentals(); // 서버에서 최신 데이터 가져오기
     }
   }, [isOpen, refreshRentals]);
 
-  // 주기적인 데이터 갱신을 위한 타이머
   useEffect(() => {
     // 5분마다 서버에서 최신 데이터 가져오기
     const refreshTimer = setInterval(() => {
@@ -83,9 +80,7 @@ const FloatingWidget: React.FC = () => {
     };
   }, [refreshRentals]);
 
-  // 숨김 항목 상태 초기화 및 관리
   useEffect(() => {
-    // 로컬 스토리지에서 숨겨진 항목 불러오기
     if (typeof window !== "undefined") {
       const hiddenItemsJson = localStorage.getItem("hiddenWidgetItems");
       if (hiddenItemsJson) {
@@ -93,19 +88,16 @@ const FloatingWidget: React.FC = () => {
           const parsedItems = JSON.parse(hiddenItemsJson);
           const currentTime = Date.now();
 
-          // 3분(180초)이 지나지 않은 항목만 필터링
           const validHiddenItems = parsedItems.filter(
             (item: { id: number; timestamp: number }) => {
               return currentTime - item.timestamp < 180000;
             }
           );
 
-          // 유효한 항목만 상태로 설정
           setHiddenItemIds(
             validHiddenItems.map((item: { id: number }) => item.id)
           );
 
-          // 로컬 스토리지 업데이트
           localStorage.setItem(
             "hiddenWidgetItems",
             JSON.stringify(validHiddenItems)
@@ -118,16 +110,13 @@ const FloatingWidget: React.FC = () => {
     }
   }, []);
 
-  // 새로운 항목이 추가되었는지 확인하고 빛나는 효과 적용
   useEffect(() => {
     const isInitialLoad =
       prevRentals.length === 0 && prevReservations.length === 0;
 
-    // 새로운 항목 확인 로직 - 초기 로드가 아닐 때만 실행
     if (!isInitialLoad) {
       const newShiningItems: number[] = [];
 
-      // 새로운 예약 확인
       pendingReservations.forEach((res) => {
         const found = prevReservations.find(
           (prev) => prev.reservationId === res.reservationId
@@ -137,7 +126,6 @@ const FloatingWidget: React.FC = () => {
         }
       });
 
-      // 새로운 렌탈 확인
       actionNeededRentals.forEach((rental) => {
         const found = prevRentals.find(
           (prev) => prev.rentalId === rental.rentalId
@@ -151,21 +139,18 @@ const FloatingWidget: React.FC = () => {
         console.log("새 항목 감지: ", newShiningItems);
         setShiningItems(newShiningItems);
 
-        // 5초 후에 빛나는 효과 제거
+        // 10초 
         setTimeout(() => {
           setShiningItems([]);
-        }, 5000);
+        }, 10000);
       }
     }
 
-    // 현재 상태를 이전 상태로 저장
     setPrevRentals(activeRentals);
     setPrevReservations(pendingReservations);
   }, [activeRentals, pendingReservations]);
 
-  // 처리 대여 항목 필터링
   const actionNeededRentals = activeRentals.filter((rental) => {
-    // 임시로 숨김 처리된 항목은 표시하지 않음
     if (hiddenItemIds.includes(rental.rentalId)) {
       return false;
     }
@@ -194,7 +179,6 @@ const FloatingWidget: React.FC = () => {
     return false;
   });
 
-  // 현재 총 요청 수 계산
   const totalRequestCount =
     pendingReservations.length + actionNeededRentals.length;
 
@@ -209,11 +193,9 @@ const FloatingWidget: React.FC = () => {
       return () => clearTimeout(timer);
     }
 
-    // 이전 요청 수 업데이트
     setPrevRequestCount(totalRequestCount);
   }, [totalRequestCount, prevRequestCount]);
 
-  // 화면 크기에 관계없이 일관된 위치 유지
   const updatePosition = () => {
     if (typeof window !== "undefined") {
       const savedPosition = localStorage.getItem("widgetPosition");
@@ -315,14 +297,11 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
-  // 안심 결제 요청 모달 처리
   const handleRentalAction = (rental: RentalStatusMessage) => {
     const { process, detailStatus } = rental;
     const isOwner = userId === rental.rentalDetail?.ownerId;
 
-    // 오너이고 BEFORE_RENTAL 상태이며 CREATED 상태일 때만 모달 열기
     if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
-      // 모달에 전달할 데이터 설정
       setSelectedRental({
         charge: rental.rentalDetail?.charge || 0,
         rentalId: rental.rentalId.toString(),
@@ -332,12 +311,9 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
-  // 렌탈 항목 페이지 이동 처리 함수
   const handleRentalNavigate = (rentalId: number) => {
-    // 위젯 닫기
     setIsOpen(false);
 
-    // 해당 항목을 임시로 숨김 처리
     setHiddenItemIds((prev) => [...prev, rentalId]);
   };
 
@@ -385,7 +361,6 @@ const FloatingWidget: React.FC = () => {
     // 위젯 닫기
     setIsOpen(false);
 
-    // 해당 항목을 임시로 숨김 처리
     setHiddenItemIds((prev) => [...prev, reservationId]);
   };
 
