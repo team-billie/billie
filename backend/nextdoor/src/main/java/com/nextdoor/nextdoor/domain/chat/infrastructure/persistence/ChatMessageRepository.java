@@ -1,20 +1,20 @@
-//package com.nextdoor.nextdoor.domain.chat.infrastructure.persistence;
-//
-//import com.nextdoor.nextdoor.domain.chat.domain.ChatMessage;
-//import com.nextdoor.nextdoor.domain.chat.domain.ChatMessageKey;
-//import org.springframework.data.cassandra.repository.CassandraRepository;
-//import org.springframework.data.cassandra.repository.Query;
-//import org.springframework.data.repository.query.Param;
-//import org.springframework.stereotype.Repository;
-//
-//import java.util.List;
-//import java.util.UUID;
-//
-//@Repository
-//public interface ChatMessageRepository extends CassandraRepository<ChatMessage, ChatMessageKey> {
-//    // 특정 대화방 메시지 페이징 조회
-//    List<ChatMessage> findByKeyConversationId(UUID conversationId);
-//
-//    // 마지막 메시지 조회,  마지막 메시지 한 건만 꺼내올 쿼리 메서드
-//    ChatMessage findFirstByKeyConversationIdOrderByKeySentAtDesc(UUID conversationId);
-//}
+package com.nextdoor.nextdoor.domain.chat.infrastructure.persistence;
+
+import com.nextdoor.nextdoor.domain.chat.domain.ChatMessage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ * JPA: ChatMessage 영속화 및 조회
+ */
+@Repository
+public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
+
+    /** 채팅방별 메시지 이력(시간순) */
+    Page<ChatMessage> findByChatRoomIdOrderBySentAtAsc(Long roomId, Pageable pageable);
+
+    /** 키워드 포함 메시지 검색 */
+    Page<ChatMessage> findByChatRoomIdAndContentContaining(Long roomId, String keyword, Pageable pageable);
+}
