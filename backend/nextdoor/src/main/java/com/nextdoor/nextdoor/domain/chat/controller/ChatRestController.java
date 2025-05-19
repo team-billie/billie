@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -31,8 +32,7 @@ public class ChatRestController {
 
     /** 1) 채팅방 목록 조회 */
     @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoomDto>> listRooms(Principal principal) {
-        Long userId = Long.valueOf(principal.getName());
+    public ResponseEntity<List<ChatRoomDto>> listRooms(@AuthenticationPrincipal Long userId) {
         List<ChatRoom> rooms = chatRoomService.findRoomsByUser(userId);
         List<ChatRoomDto> dtos = rooms.stream().map(room -> {
             String lastMessage = room.getMessages().isEmpty()
