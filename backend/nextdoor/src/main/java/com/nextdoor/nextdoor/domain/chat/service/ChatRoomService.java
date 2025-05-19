@@ -36,7 +36,7 @@ public class ChatRoomService {
      * 유저가 주인 또는 렌터로 참여한 방 조회
      */
     public List<ChatRoom> findRoomsByUser(Long userId) {
-        return roomRepository.findByOwnerIdOrRenterId(userId, userId);
+        return roomRepository.findByOwnerIdOrRenterIdOrderByCreatedAtDesc(userId, userId);
     }
 
     /** 단일 채팅방 조회 (존재하지 않으면 예외) */

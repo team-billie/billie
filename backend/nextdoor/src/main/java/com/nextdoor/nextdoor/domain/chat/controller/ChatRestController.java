@@ -2,12 +2,16 @@ package com.nextdoor.nextdoor.domain.chat.controller;
 
 import com.nextdoor.nextdoor.domain.chat.domain.ChatMessage;
 import com.nextdoor.nextdoor.domain.chat.domain.ChatRoom;
-import com.nextdoor.nextdoor.domain.chat.dto.ChatRoomDto;
-import com.nextdoor.nextdoor.domain.chat.dto.MessageDto;
-import com.nextdoor.nextdoor.domain.chat.dto.SendMessageRequest;
+import com.nextdoor.nextdoor.domain.chat.dto.*;
+import com.nextdoor.nextdoor.domain.chat.port.ChatMemberQueryPort;
+import com.nextdoor.nextdoor.domain.chat.port.ChatPostQueryPort;
+import com.nextdoor.nextdoor.domain.chat.port.ChatRentalQueryPort;
+import com.nextdoor.nextdoor.domain.chat.port.ChatReservationQueryPort;
 import com.nextdoor.nextdoor.domain.chat.service.ChatRoomService;
 import com.nextdoor.nextdoor.domain.chat.service.MessageService;
 import com.nextdoor.nextdoor.domain.chat.service.UnreadCounterService;
+import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
+import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,22 +35,94 @@ public class ChatRestController {
     private final ChatRoomService chatRoomService;
     private final MessageService messageService;
     private final UnreadCounterService unreadCounterService;
+    private final ChatMemberQueryPort chatMemberQueryPort;
+    private final ChatPostQueryPort chatPostQueryPort;
+    private final ChatReservationQueryPort chatReservationQueryPort;
+    private final ChatRentalQueryPort chatRentalQueryPort;
 
     /** 1) 채팅방 목록 조회 */
     @GetMapping("/rooms")
     public ResponseEntity<List<ChatRoomDto>> listRooms(@AuthenticationPrincipal Long userId) {
         List<ChatRoom> rooms = chatRoomService.findRoomsByUser(userId);
         List<ChatRoomDto> dtos = rooms.stream().map(room -> {
+            // 마지막 메시지 & 시각
             String lastMessage = room.getMessages().isEmpty()
                     ? ""
                     : room.getMessages().get(room.getMessages().size() - 1).getContent();
             LocalDateTime lastSentAt = room.getMessages().isEmpty()
                     ? room.getCreatedAt()
                     : room.getMessages().get(room.getMessages().size() - 1).getSentAt();
+            // 미확인 메시지 개수
             long unreadCount = unreadCounterService.getCount(room.getId(), userId);
-            return ChatRoomDto.from(room, lastMessage, lastSentAt, unreadCount);
+            // 상대 사용자 ID(오너/렌터 반대측)
+            Long otherId = room.getOwnerId().equals(userId)
+                    ? room.getRenterId()
+                    : room.getOwnerId();
+            // 상대 사용자 정보
+            MemberDto other = chatMemberQueryPort.findById(otherId)
+                    .orElse(MemberDto.builder().nickname("").profileImageUrl("").build());
+            // 게시물 정보
+            PostDto post = chatPostQueryPort.findById(room.getPostId())
+                    .orElse(PostDto.builder().imageUrl("").title("")
+                            .rentalFee(0L).deposit(0L).build());
+            // 채팅방 상태 결정
+            String chatStatus = determineChatStatus(
+                    room.getPostId(), room.getOwnerId(), room.getRenterId()
+            );
+            return ChatRoomDto.builder()
+                    .roomId(room.getId())
+                    .postId(room.getPostId())
+                    .ownerId(room.getOwnerId())
+                    .renterId(room.getRenterId())
+                    .lastMessage(lastMessage)
+                    .lastSentAt(lastSentAt)
+                    .unreadCount(unreadCount)
+                    .otherNickname(other.getNickname())
+                    .otherProfileImageUrl(other.getProfileImageUrl())
+                    .postImageUrl(post.getImageUrl())
+                    .title(post.getTitle())
+                    .rentalFee(post.getRentalFee())
+                    .deposit(post.getDeposit())
+                    .chatStatus(chatStatus)
+                    .build();
         }).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
+    }
+
+    /** 채팅 상태 (예약중, 거래중, 상태없음) 결정 로직 예시 */
+    private String determineChatStatus(Long postId, Long ownerId, Long renterId) {
+        // 예약 정보 조회
+        ReservationDto reservation = chatReservationQueryPort.findByPostIdAndOwnerIdAndRenterId(postId, ownerId, renterId)
+                .orElse(null);
+
+        // 예약 정보가 없으면 "상태없음"
+        if (reservation == null) {
+            return "상태없음";
+        }
+
+        // 예약 상태가 PENDING이면 "예약중"
+        if (reservation.getStatus() == ReservationStatus.PENDING) {
+            return "예약중";
+        }
+
+        // 렌탈 정보 조회
+        Long rentalId = reservation.getRentalId();
+        if (rentalId == null) {
+            return "상태없음";
+        }
+
+        RentalDto rental = chatRentalQueryPort.findById(rentalId).orElse(null);
+        if (rental == null) {
+            return "상태없음";
+        }
+
+        // 렌탈 프로세스가 RENTAL_COMPLETED가 아니면 "거래중"
+        if (rental.getRentalProcess() != RentalProcess.RENTAL_COMPLETED) {
+            return "거래중";
+        }
+
+        // 그 외에는 "상태없음"
+        return "상태없음";
     }
 
     /** 2) 채팅방 생성 */

@@ -15,4 +15,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
      * 특정 사용자가 주인(owner)이거나 렌터(renter)인 방을 모두 가져온다.
      */
     List<ChatRoom> findByOwnerIdOrRenterId(Long ownerId, Long renterId);
+
+    List<ChatRoom> findByOwnerIdOrRenterIdOrderByCreatedAtDesc(Long ownerId, Long renterId);
 }
