@@ -21,7 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+/**
+ * REST API 컨트롤러: 채팅방 목록/생성/삭제, 메시지 조회/전송/회수/검색
+ */
 @RestController
 @RequestMapping("/api/v1/chats")
 @RequiredArgsConstructor
@@ -42,7 +44,7 @@ public class ChatRestController {
                     ? room.getCreatedAt()
                     : room.getMessages().get(room.getMessages().size() - 1).getSentAt();
             long unreadCount = unreadCounterService.getCount(room.getId(), userId);
-            return ChatRoomDto.of(room, lastMessage, lastSentAt, unreadCount);
+            return ChatRoomDto.from(room, lastMessage, lastSentAt, unreadCount);
         }).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
@@ -51,10 +53,13 @@ public class ChatRestController {
     @PostMapping("/rooms")
     public ResponseEntity<Map<String, Long>> createRoom(
             @RequestBody CreateRoomRequest request) {
-        ChatRoom room = chatRoomService.createRoom(request.getMemberIds());
+        ChatRoom room = chatRoomService.createRoom(
+                request.getPostId(),
+                request.getOwnerId(),
+                request.getRenterId()
+        );
         return ResponseEntity.ok(Collections.singletonMap("roomId", room.getId()));
     }
-
     /** 3) 채팅 메시지 이력 조회 */
     @GetMapping("/rooms/{roomId}/messages")
     public ResponseEntity<Page<MessageDto>> getHistory(
@@ -107,8 +112,11 @@ public class ChatRestController {
         return ResponseEntity.noContent().build();
     }
 
+    /** 채팅방 생성용 요청 DTO */
     @Data
     public static class CreateRoomRequest {
-        private List<Long> memberIds;
+        private Long postId;
+        private Long ownerId;
+        private Long renterId;
     }
 }

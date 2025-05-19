@@ -19,21 +19,23 @@ import java.util.stream.Collectors;
 public class ChatRoomService {
     private final ChatRoomRepository roomRepository;
 
-    /** 새로운 1:1 채팅방 생성 */
-    public ChatRoom createRoom(List<Long> memberIds) {
-        var members = memberIds.stream()
-                .map(ChatMember::new)
-                .collect(Collectors.toList());
-        var room = ChatRoom.builder()
-                .members(members)
+    /**
+     * 1:1 채팅방 생성 (게시글ID, 오너ID, 렌터ID)
+     */
+    public ChatRoom createRoom(Long postId, Long ownerId, Long renterId) {
+        ChatRoom room = ChatRoom.builder()
+                .postId(postId)
+                .ownerId(ownerId)
+                .renterId(renterId)
                 .build();
         return roomRepository.save(room);
     }
 
-    /** 특정 유저가 속한 채팅방 전체 조회 */
-    @Transactional(readOnly = true)
+    /**
+     * 유저가 주인 또는 렌터로 참여한 방 조회
+     */
     public List<ChatRoom> findRoomsByUser(Long userId) {
-        return roomRepository.findByMembersUserId(userId);
+        return roomRepository.findByOwnerIdOrRenterId(userId, userId);
     }
 
     /** 단일 채팅방 조회 (존재하지 않으면 예외) */

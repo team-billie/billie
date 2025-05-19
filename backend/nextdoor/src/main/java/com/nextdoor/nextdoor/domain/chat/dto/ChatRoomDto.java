@@ -14,21 +14,27 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatRoomDto {
     private Long roomId;
+    private Long postId;
+    private Long ownerId;
+    private Long renterId;
     private String lastMessage;
     private LocalDateTime lastSentAt;
     private long unreadCount;
 
-    public static ChatRoomDto of(
+    public static ChatRoomDto from(
             ChatRoom room,
-            String lastMessage,
-            LocalDateTime lastSentAt,
-            long unreadCount
+            String lastMsg,
+            LocalDateTime lastAt,
+            long unread
     ) {
         return ChatRoomDto.builder()
                 .roomId(room.getId())
-                .lastMessage(lastMessage)
-                .lastSentAt(lastSentAt)
-                .unreadCount(unreadCount)
+                .postId(room.getPostId())
+                .ownerId(room.getOwnerId())
+                .renterId(room.getRenterId())
+                .lastMessage(lastMsg)
+                .lastSentAt(lastAt)
+                .unreadCount(unread)
                 .build();
     }
 }
