@@ -70,7 +70,6 @@ const FloatingWidget: React.FC = () => {
   }, [isOpen, refreshRentals]);
 
   useEffect(() => {
-    // 5분마다 서버에서 최신 데이터 가져오기
     const refreshTimer = setInterval(() => {
       refreshRentals();
     }, 300000); // 5분 = 300,000 밀리초
@@ -234,7 +233,6 @@ const FloatingWidget: React.FC = () => {
     }
   };
 
-  // 초기 위치 설정 및 화면 크기 변경 감지
   useEffect(() => {
     // 초기 위치 설정
     if (!localStorage.getItem("widgetPosition")) {
@@ -255,7 +253,6 @@ const FloatingWidget: React.FC = () => {
     };
   }, []);
 
-  // 위치가 변경될 때마다 저장
   useEffect(() => {
     savePosition(position);
   }, [position]);
@@ -312,6 +309,7 @@ const FloatingWidget: React.FC = () => {
   };
 
   const handleRentalNavigate = (rentalId: number) => {
+    // 위젯 닫기
     setIsOpen(false);
 
     setHiddenItemIds((prev) => [...prev, rentalId]);
@@ -361,6 +359,7 @@ const FloatingWidget: React.FC = () => {
     // 위젯 닫기
     setIsOpen(false);
 
+    // 해당 항목을 임시로 숨김 처리
     setHiddenItemIds((prev) => [...prev, reservationId]);
   };
 
@@ -368,7 +367,6 @@ const FloatingWidget: React.FC = () => {
     const { rentalId, process, detailStatus } = rental;
     const isOwner = userId === rental.rentalDetail?.ownerId;
 
-    // 안심결제요청 버튼인 경우에는 링크를 반환하지 않음
     if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
       return "";
     }
