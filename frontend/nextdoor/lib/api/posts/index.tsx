@@ -31,3 +31,15 @@ export const GetPostListRequest = (
     .catch((error) => {
       return handleApiError(error, "게시글 목록 조회");
     });
+
+// 검색어 자동완성 API
+export const getSuggestions = async (prefix: string) => {
+  try {
+    const response = await axiosInstance.get('/api/v1/posts/search/suggestions', {
+      params: { prefix }
+    });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, "검색어 자동완성");
+  }
+};
