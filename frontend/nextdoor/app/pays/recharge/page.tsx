@@ -23,7 +23,7 @@ export default function RechargePage() {
     const { mainAccount, billyAccount, userKey } = useUserStore();
     const router = useRouter();
     const rechargeAccount = selectedAccount ?? mainAccount;
-    
+
     const rechargeForm = useForm<FormValues>({
         defaultValues: {
             userKey: userKey,
@@ -43,45 +43,50 @@ export default function RechargePage() {
         });
     }
 
-    return (
-    <div className="relative flex flex-col min-h-[100dvh]">
-    <Header txt="충전" />
-    <FormProvider {...rechargeForm}>
-        <div className="flex-1 flex flex-col items-center">
-            <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
-                <div className="flex gap-2 items-center justify-center" onClick={() => setIsAccountListModalOpen(true)}>
-                    <img
-                        src={getBankInfo(rechargeAccount?.bankCode ?? "000")?.image}
-                        alt={getBankInfo(rechargeAccount?.bankCode ?? "000")?.bankName}
-                        className="w-7 h-7 rounded-full"
-                    />
-                    <div className="text-gray900 font-semibold">내 <span>{getBankInfo(rechargeAccount?.bankCode ?? "000")?.bankName}</span> 계좌에서</div>
-                    <ChevronDown className="w-4 h-full"/>
-                </div>
-                <div className="text-sm">{rechargeAccount?.accountNo}</div>
-            </div>
-            
-            <div className="flex flex-col items-center">
-                <AmountInput placeholderTxt="얼마를 충전할까요?"/>
-                <div className="text-xs text-gray600">빌리페이 잔액 <span>{billyAccount?.balance}</span>원</div>
-            </div>
-
-            <div className="flex text-gray900 text-sm mt-5 py-5 gap-3">
-                <div className="border border-gray300 px-3 py-1 rounded-2xl" >+1만원</div>
-                <div className="border border-gray300 px-3 py-1 rounded-2xl" >+5만원</div>
-                <div className="border border-gray300 px-3 py-1 rounded-2xl" >+10만원</div>
-            </div>
-
-            <div className="p-4 w-full flex-1 flex items-end">
-                <Button onClick={rechargeForm.handleSubmit(onSubmit)} txt="충전하기" state={true}/>
-            </div>
-        </div>
-    </FormProvider>
-    {isAccountListModalOpen && 
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
-            <MyAccountListModal setIsModalOpen={setIsAccountListModalOpen} setSelectedAccount={setSelectedAccount}/>
-        </div>
+    const handleAmountChange = (amount: number) => {
+        const currentBalance = rechargeForm.getValues("transactionBalance") ?? 0;
+        rechargeForm.setValue("transactionBalance", currentBalance + amount);
     }
-    </div>
+
+    return (
+        <div className="relative flex flex-col min-h-[100dvh]">
+            <Header txt="충전" />
+            <FormProvider {...rechargeForm}>
+                <div className="flex-1 flex flex-col items-center">
+                    <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
+                        <div className="flex gap-2 items-center justify-center" onClick={() => setIsAccountListModalOpen(true)}>
+                            <img
+                                src={getBankInfo(rechargeAccount?.bankCode ?? "000")?.image}
+                                alt={getBankInfo(rechargeAccount?.bankCode ?? "000")?.bankName}
+                                className="w-7 h-7 rounded-full"
+                            />
+                            <div className="text-gray900 font-semibold">내 <span>{getBankInfo(rechargeAccount?.bankCode ?? "000")?.bankName}</span> 계좌에서</div>
+                            <ChevronDown className="w-4 h-full" />
+                        </div>
+                        <div className="text-sm">{rechargeAccount?.accountNo}</div>
+                    </div>
+
+                    <div className="flex flex-col items-center">
+                        <AmountInput placeholderTxt="얼마를 충전할까요?" />
+                        <div className="text-xs text-gray600">빌리페이 잔액 <span>{billyAccount?.balance}</span>원</div>
+                    </div>
+
+                    <div className="flex text-gray900 text-sm mt-5 py-5 gap-3">
+                        <div onClick={() => handleAmountChange(10000)} className="border border-gray300 px-3 py-1 rounded-2xl" >+1만원</div>
+                        <div onClick={() => handleAmountChange(50000)} className="border border-gray300 px-3 py-1 rounded-2xl" >+5만원</div>
+                        <div onClick={() => handleAmountChange(100000)} className="border border-gray300 px-3 py-1 rounded-2xl" >+10만원</div>
+                    </div>
+
+                    <div className="p-4 w-full flex-1 flex items-end">
+                        <Button onClick={rechargeForm.handleSubmit(onSubmit)} txt="충전하기" state={true} />
+                    </div>
+                </div>
+            </FormProvider>
+            {isAccountListModalOpen &&
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
+                    <MyAccountListModal setIsModalOpen={setIsAccountListModalOpen} setSelectedAccount={setSelectedAccount} />
+                </div>
+            }
+        </div>
     );
 }
