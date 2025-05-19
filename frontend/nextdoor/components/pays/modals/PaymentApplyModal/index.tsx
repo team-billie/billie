@@ -20,11 +20,12 @@ export default function PaymentApplyModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="min-h-[45vh] p-4 flex flex-col gap-3 w-full max-w-md mx-4 overflow-y-auto bg-white rounded-2xl transform transition-transform duration-300 translate-y-0">
+      <div className="min-h-[37vh] p-4 flex flex-col gap-3 w-full max-w-md mx-4 overflow-y-auto bg-white rounded-2xl transform transition-transform duration-300 translate-y-0">
         {changeBtnClicked ? (
           <ChangeCharge
             setPayCharge={setPayCharge}
             setChangeBtnClicked={setChangeBtnClicked}
+            payCharge={payCharge}
           />
         ) : (
           <SelectAccount

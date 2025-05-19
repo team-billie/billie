@@ -7,6 +7,8 @@ import useUserStore from "@/lib/store/useUserStore";
 import { useEffect } from "react";
 import { GetAddedListRequest } from "@/lib/api/pays";
 import { AddAccountResponseDto } from "@/types/pays/response";
+import { formatNumberWithCommas } from "@/lib/utils/money";
+
 interface PayBoxProps {
   type: "profile" | "pay";
 }
@@ -42,13 +44,12 @@ const BillyPayBox = ({ type }: PayBoxProps) => {
 
   return (
     <div
-      className={`${
-        type === "pay" ? "bg-blue100" : "bg-white"
-      } flex items-cente p-4 rounded-lg`}
+      className={`${type === "pay" ? "bg-blue100" : "bg-white"
+        } flex items-cente p-4 rounded-lg`}
     >
       <div className="text-lg font-semibold text-blue400">billy pay</div>
       <div className="flex-1 flex justify-end text-gray900 text-xl font-bold">
-        <span>{billyAccount?.balance}</span>
+        <span>{formatNumberWithCommas(billyAccount?.balance ?? 0)}</span>
         <span>원</span>
       </div>
       {type === "profile" && <ChevronRight className="text-gray600" />}

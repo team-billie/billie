@@ -4,14 +4,15 @@
 import { ChevronDown } from "lucide-react"
 import Button from "@/components/pays/common/Button";
 import { AmountInput } from "@/components/pays/common/Input";
-import { FormProvider, useForm } from "react-hook-form";
-import { useBankStore } from "@/lib/store/useBankStore";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { TransferAccountRequestDto } from "@/types/pays/request/index";
 import useUserStore from "@/lib/store/useUserStore";
 import { TransferAccountRequest } from "@/lib/api/pays";
 import { useRouter } from "next/navigation";
 import { VerifyAccountResponseDto } from "@/types/pays/response";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+import { useEffect } from "react";
 
 type FormValues = TransferAccountRequestDto;
 
@@ -22,6 +23,7 @@ interface WithdrawAmountProps {
 export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps) {
     const { userKey, billyAccount } = useUserStore();
     const router = useRouter();
+    const { showAlert } = useAlertStore();
     const withdrawForm = useForm<FormValues>({
         defaultValues: {
             userKey: userKey,
@@ -33,18 +35,61 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
         },
     });
 
+
     const onSubmit = (data: FormValues) => {
+        if (!data.transactionBalance || data.transactionBalance === 0) {
+            showAlert("송금 금액을 입력해주세요.", "error");
+            return;
+        }
+        //0500같이 0으로 숫자가 시작할 경우 return 하고 값 리셋
+        if (data.transactionBalance.toString().startsWith("0")) {
+            withdrawForm.setValue("transactionBalance", 0);
+            showAlert("올바른 금액을 입력해주세요.", "error");
+            return;
+        }
+
+        const rawValue = String(data.transactionBalance).replace(/,/g, '');
+        const balance = Number(rawValue);
+        //1000원 단위로 송금하도록 return 가장 근접한 천 단위로 바꿔주고
+        if (balance % 1000 !== 0) {
+            data.transactionBalance = Math.round(balance / 1000) * 1000;
+            withdrawForm.setValue("transactionBalance", data.transactionBalance);
+            showAlert("1000원 단위로 송금해주세요.", "error");
+            return;
+        }
+
         console.log(data);
         TransferAccountRequest(data).then((res) => {
-            alert("빌리에서 계좌로 이체가 완료되었습니다.");
+            showAlert("빌리에서 계좌로 이체가 완료되었습니다.", "success");
             router.push("/profile");
+        }).catch((err) => {
+            showAlert("빌리에서 계좌로 이체에 실패했습니다.", "error");
         });
     }
 
     const handleAmountChange = (amount: number) => {
         const currentBalance = withdrawForm.getValues("transactionBalance") ?? 0;
-        withdrawForm.setValue("transactionBalance", currentBalance + amount);
+        withdrawForm.setValue("transactionBalance", Number(currentBalance) + amount);
     }
+
+    const watchedAmount = useWatch({
+        control: withdrawForm.control,
+        name: "transactionBalance",
+    });
+
+    useEffect(() => {
+        if (watchedAmount > (billyAccount?.balance ?? 0)) {
+            showAlert("잔액을 초과할 수 없습니다.", "error");
+            withdrawForm.setValue("transactionBalance", billyAccount?.balance ?? 0);
+        }
+
+        //최대 200만원 송금 가능
+        if (watchedAmount > 2000000) {
+            showAlert("최대 200만원 송금 가능합니다.", "error");
+            withdrawForm.setValue("transactionBalance", 2000000);
+        }
+    }, [watchedAmount]);
+
     return (
         <FormProvider {...withdrawForm}>
             <div className="flex-1 flex flex-col items-center">

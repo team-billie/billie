@@ -1,5 +1,7 @@
 "use client";
 
+import Button from "@/components/pays/common/Button";
+import Header from "@/components/pays/common/Header";
 import Loading from "@/components/pays/common/Loading";
 import AutoRechargeModal from "@/components/pays/modals/AutoRechargeModal";
 import { PayItemRequest } from "@/lib/api/pays";
@@ -8,11 +10,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GetPaymentDataRequest, HoldDepositRequest } from "@/lib/api/pays";
 import { GetPaymentDataResponseDto } from "@/types/pays/response";
-import Button from "../Button";
-import GrayButton from "../GrayButton";
-import PaymentTitle from "./PaymentTitle";
-import Header from "../Header";
-import GradientButton from "./GradientBtn";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+import { formatNumberWithCommas } from "@/lib/utils/money";
+import { CircleAlert } from "lucide-react";
+
 export default function Payment() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +23,7 @@ export default function Payment() {
   // 빌리 잔액 : zustand
   const { billyAccount, userKey } = useUserStore();
   const balance = billyAccount?.balance ?? 0;
-
-  // 이체할 금액, 사람, 계좌 : api 호출
-  const amount = 30000;
+  const { showAlert } = useAlertStore();
 
   const [isChargeNeeded, setIsChargeNeeded] = useState(false);
 
@@ -38,6 +37,7 @@ export default function Payment() {
       return;
     }
 
+    setIsLoading(true);
     try {
       PayItemRequest({
         userKey: userKey,
@@ -50,11 +50,11 @@ export default function Payment() {
       })
         .then((res) => {
           console.log(res);
-          alert("대여 결제 완료");
+          showAlert("대여 결제 완료", "success");
           router.push("/profile");
         })
         .catch(() => {
-          alert("대여 결제 실패");
+          showAlert("대여 결제 실패", "error");
         });
 
       // 보증금 보관 api 호출
@@ -66,17 +66,14 @@ export default function Payment() {
       })
         .then((res) => {
           console.log(res);
-          alert("보증금 보관 완료");
+          showAlert("보증금 보관 완료", "success");
         })
         .catch(() => {
-          alert("보증금 보관 실패");
+          showAlert("보증금 보관 실패", "error");
         });
     } catch (error) {
-      alert("결제 실패");
+      showAlert("결제 실패", "error");
     }
-  };
-  const aIBtnHandler = () => {
-    console.log("AI분석 결과 다시 보기");
   };
 
   const [rentalFeeAmount, setRentalFeeAmount] = useState(0);
@@ -88,7 +85,6 @@ export default function Payment() {
   useEffect(() => {
     GetPaymentDataRequest(id as string).then(
       (res: GetPaymentDataResponseDto) => {
-        console.log("❤️❤️❤️", res);
 
         setPaymentData(res);
         setRentalFeeAmount(res.rentalFee);
@@ -101,54 +97,70 @@ export default function Payment() {
   }, []);
 
   return (
-    <div className="relative h-[100dvh] overflow-auto flex flex-col">
-      <div className="fixed top-0 left-0 w-full z-10 bg-graygradient">
-        <Header txt={"결제하기"} />
-      </div>
-      <PaymentTitle />
-      {/* ✅ 중간 콘텐츠 */}
-      <div className="flex-1 flex flex-col items-center justify-center  pb-[300px] text-center">
-        <div className="flex items-center gap-2 mb-6 mt-6">
-          <div className="text-gray900 text-lg">
-            <span className="font-semibold text-2xl px-2">
-              {paymentData?.ownerNickname}
-            </span>
-            님에게
+    <div className="relative flex flex-col min-h-[100dvh]">
+      {isLoading
+        ? <Loading type="payment" isSuccess={isSuccess} headerTxt="결제" />
+        : <><Header txt="결제하기" />
+          <div className="flex-1 flex flex-col items-center px-6 py-4">
+            <div className="w-full flex-1 flex flex-col gap-4">
+
+              {/* 물품정보 */}
+              {/* <div className="flex items-center gap-3 border-b border-gray300 pb-4">
+                <div className="w-16 h-16 rounded-lg bg-gray500" />
+                <div className="flex flex-col gap-1">
+                  <div className="text-gray900 text-lg">다이슨 헤어 드라이기(임시)</div>
+                  <div className="text-gray600 text-sm">3일</div>
+                </div>
+                </div> */}
+
+              <div className="flex-1 flex flex-col text-3xl items-center justify-center gap-2 border-b border-gray300 pb-16">
+                <div className="text-blue400 font-semibold">{formatNumberWithCommas(rentalFeeAmount + depositAmount)}원을</div>
+                <div className="text-gray900 font-semibold">보낼까요?</div>
+                <div className="flex justify-end gap-1 text-gray600 text-sm mb-4">
+                  <span>빌리페이 잔액 {balance}원</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 border-b border-gray300 pb-4">
+
+                <div className="flex items-center justify-between gap-2 font-semibold">
+                  <div className="flex items-center gap-2 text-gray600">
+                    <div className="w-8 h-8 rounded-full bg-gray500" />
+                    <div>대여료</div>
+                  </div>
+                  <div className="text-gray800 text-lg">{formatNumberWithCommas(rentalFeeAmount)}원</div>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 font-semibold">
+                  <div className="flex items-center gap-2 text-gray600">
+                    <img src="/images/banks/billypay.png" className="w-8 h-8 rounded-full bg-gray500" />
+                    <div>보증금</div>
+                  </div>
+                  <div className="text-gray800 text-lg">{formatNumberWithCommas(depositAmount)}원</div>
+                </div>
+
+                <div className="text-gray600 flex items-center gap-2 mt-2">
+                  <CircleAlert className="w-5 h-5" />
+                  <span>보증금은 빌리페이에서 안전하게 보관됩니다.</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div className="flex flex-col w-full  gap-2">
+              <Button txt={`결제하기`} state={true} onClick={() => sendBtnHandler()} />
+              <Button txt={`AI 결과 다시 보기`} state={false} onClick={() => router.push(`/safe-deal/${id}/before/analysis`)} />
+            </div>
           </div>
-        </div>
+        </>
+      }
 
-        <div className="text-gray900 flex items-center gap-2 mb-2">
-          <div className="text-lg">대여료</div>
-          <div className="font-semibold text-2xl">{rentalFeeAmount}원</div>
+      {isModalOpen &&
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
+          <AutoRechargeModal setIsModalOpen={setIsModalOpen} sendBtnHandler={sendBtnHandler} needCharge={chargeNeeded} />
         </div>
-
-        <div className="text-gray900 flex items-center gap-2 mb-4">
-          <div className="text-lg">보증금</div>
-          <div className="font-semibold text-2xl">{depositAmount}원</div>
-        </div>
-        <div className="text-gray900 flex items-center gap-2 mb-4">
-          <div className="text-2xl">총</div>
-          <div className="font-semibold text-4xl">
-            {rentalFeeAmount + depositAmount}원
-          </div>
-        </div>
-        <div>이 결제 됩니다</div>
-        <div className="flex items-center gap-1 text-gray600 pt-4">
-          <span>빌리페이 잔액 {balance}원</span>
-        </div>
-        <div className="p-4">보증금은 빌리페이에서 안전하게 보관됩니다</div>
-      </div>
-
-      {/* ✅ 고정된 하단 버튼 영역 */}
-      <div className="fixed bottom-0 left-0 w-full px-6 py-6 bg-white z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.05)]">
-        <div className="flex flex-col gap-2 w-full">
-          <GradientButton txt="결제하기" onClick={() => sendBtnHandler()} />
-          <GrayButton
-            txt="AI 분석 결과 다시 보기"
-            onClick={() => router.push(`/safe-deal/${id}/before/analysis`)}
-          />
-        </div>
-      </div>
+      }
     </div>
   );
 }
