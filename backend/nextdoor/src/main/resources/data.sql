@@ -4,28 +4,28 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. Member 더미 데이터 (20명의 사용자 생성)
 INSERT INTO member (
-    member_id, uuid, user_key, email, birth, gender, address, profile_image_url, nickname, auth_provider, created_at
+    member_id, uuid, user_key, email, birth, gender, address, profile_image_url, nickname, auth_provider, secure_password, created_at
 ) VALUES
-      (1, 'uuid-1', 'userKey-1', 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', '홍길동', 'LOCAL', '2024-01-01T10:00:00'),
-      (2, 'uuid-2', 'userKey-2', 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg',  '김영희', 'LOCAL', '2024-01-02T10:00:00'),
-      (3, 'uuid-3', 'userKey-3', 'park@example.com', '1992-03-20', 'MALE', '서울시 송파구', 'profile3.jpg',  '박철수', 'LOCAL', '2024-01-03T10:00:00'),
-      (4, 'uuid-4', 'userKey-4', 'lee@example.com', '1993-04-25', 'FEMALE', '경기도 성남시', 'profile4.jpg',  '이민지', 'LOCAL', '2024-01-04T10:00:00'),
-      (5, 'uuid-5', 'userKey-5', 'choi@example.com', '1994-05-30', 'MALE', '경기도 수원시', 'profile5.jpg',  '최성훈', 'LOCAL', '2024-01-05T10:00:00'),
-      (6, 'uuid-6', 'userKey-6', 'jung@example.com', '1995-06-15', 'FEMALE', '인천시 부평구', 'profile6.jpg',  '정유리', 'LOCAL', '2024-01-06T10:00:00'),
-      (7, 'uuid-7', 'userKey-7', 'kang@example.com', '1996-07-10', 'MALE', '부산시 해운대구', 'profile7.jpg',  '강준혁', 'LOCAL', '2024-01-07T10:00:00'),
-      (8, 'uuid-8', 'userKey-8', 'seo@example.com', '1997-08-05', 'FEMALE', '대구시 수성구', 'profile8.jpg',  '서상은', 'LOCAL', '2024-01-08T10:00:00'),
-      (9, 'uuid-9', 'userKey-9', 'lim@example.com', '1998-09-20', 'MALE', '광주시 남구', 'profile9.jpg',  '임재형', 'LOCAL', '2024-01-09T10:00:00'),
-      (10, 'uuid-10', 'userKey-10', 'yoon@example.com', '1999-10-15', 'FEMALE', '대전시 유성구', 'profile10.jpg',  '윤소연', 'LOCAL', '2024-01-10T10:00:00'),
-      (11, 'uuid-11', 'userKey-11', 'kim2@example.com', '1989-11-30', 'MALE', '서울시 종로구', 'profile11.jpg',  '김민수', 'LOCAL', '2024-01-11T10:00:00'),
-      (12, 'uuid-12', 'userKey-12', 'lee2@example.com', '1988-12-25', 'FEMALE', '서울시 중구', 'profile12.jpg',  '이수진', 'LOCAL', '2024-01-12T10:00:00'),
-      (13, 'uuid-13', 'userKey-13', 'park2@example.com', '1987-01-10', 'MALE', '경기도 고양시', 'profile13.jpg', '박지훈', 'LOCAL', '2024-01-13T10:00:00'),
-      (14, 'uuid-14', 'userKey-14', 'cho@example.com', '1986-02-28', 'FEMALE', '경기도 안산시', 'profile14.jpg',  '조현아', 'LOCAL', '2024-01-14T10:00:00'),
-      (15, 'uuid-15', 'userKey-15', 'song@example.com', '1985-03-15', 'MALE', '인천시 계양구', 'profile15.jpg',  '송태호', 'LOCAL', '2024-01-15T10:00:00'),
-      (16, 'uuid-16', 'userKey-16', 'oh@example.com', '1984-04-20', 'FEMALE', '부산시 금정구', 'profile16.jpg',  '오예원', 'LOCAL', '2024-01-16T10:00:00'),
-      (17, 'uuid-17', 'userKey-17', 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg',  '하동민', 'LOCAL', '2024-01-17T10:00:00'),
-      (18, 'uuid-18', 'userKey-18', 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg',  '신혜진', 'LOCAL', '2024-01-18T10:00:00'),
-      (19, 'uuid-19', 'userKey-19', 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg',  '안준서', 'LOCAL', '2024-01-19T10:00:00'),
-      (20, 'uuid-20', 'userKey-20', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', '양서현', 'LOCAL', '2024-01-20T10:00:00');
+      (1, 'uuid-1', 'userKey-1', 'hong@example.com', '1990-01-01', 'MALE', '서울시 강남구', 'profile1.jpg', '홍길동', 'LOCAL', NULL, '2024-01-01T10:00:00'),
+      (2, 'uuid-2', 'userKey-2', 'kim@example.com', '1991-02-15', 'FEMALE', '서울시 서초구', 'profile2.jpg',  '김영희', 'LOCAL', NULL, '2024-01-02T10:00:00'),
+      (3, 'uuid-3', 'userKey-3', 'park@example.com', '1992-03-20', 'MALE', '서울시 송파구', 'profile3.jpg',  '박철수', 'LOCAL', NULL,  '2024-01-03T10:00:00'),
+      (4, 'uuid-4', 'userKey-4', 'lee@example.com', '1993-04-25', 'FEMALE', '경기도 성남시', 'profile4.jpg',  '이민지', 'LOCAL', NULL, '2024-01-04T10:00:00'),
+      (5, 'uuid-5', 'userKey-5', 'choi@example.com', '1994-05-30', 'MALE', '경기도 수원시', 'profile5.jpg',  '최성훈', 'LOCAL', NULL, '2024-01-05T10:00:00'),
+      (6, 'uuid-6', 'userKey-6', 'jung@example.com', '1995-06-15', 'FEMALE', '인천시 부평구', 'profile6.jpg',  '정유리', 'LOCAL', NULL, '2024-01-06T10:00:00'),
+      (7, 'uuid-7', 'userKey-7', 'kang@example.com', '1996-07-10', 'MALE', '부산시 해운대구', 'profile7.jpg',  '강준혁', 'LOCAL', NULL, '2024-01-07T10:00:00'),
+      (8, 'uuid-8', 'userKey-8', 'seo@example.com', '1997-08-05', 'FEMALE', '대구시 수성구', 'profile8.jpg',  '서상은', 'LOCAL', NULL, '2024-01-08T10:00:00'),
+      (9, 'uuid-9', 'userKey-9', 'lim@example.com', '1998-09-20', 'MALE', '광주시 남구', 'profile9.jpg',  '임재형', 'LOCAL', NULL, '2024-01-09T10:00:00'),
+      (10, 'uuid-10', 'userKey-10', 'yoon@example.com', '1999-10-15', 'FEMALE', '대전시 유성구', 'profile10.jpg',  '윤소연', 'LOCAL', NULL, '2024-01-10T10:00:00'),
+      (11, 'uuid-11', 'userKey-11', 'kim2@example.com', '1989-11-30', 'MALE', '서울시 종로구', 'profile11.jpg',  '김민수', 'LOCAL', NULL, '2024-01-11T10:00:00'),
+      (12, 'uuid-12', 'userKey-12', 'lee2@example.com', '1988-12-25', 'FEMALE', '서울시 중구', 'profile12.jpg',  '이수진', 'LOCAL', NULL, '2024-01-12T10:00:00'),
+      (13, 'uuid-13', 'userKey-13', 'park2@example.com', '1987-01-10', 'MALE', '경기도 고양시', 'profile13.jpg', '박지훈', 'LOCAL', NULL, '2024-01-13T10:00:00'),
+      (14, 'uuid-14', 'userKey-14', 'cho@example.com', '1986-02-28', 'FEMALE', '경기도 안산시', 'profile14.jpg',  '조현아', 'LOCAL', NULL, '2024-01-14T10:00:00'),
+      (15, 'uuid-15', 'userKey-15', 'song@example.com', '1985-03-15', 'MALE', '인천시 계양구', 'profile15.jpg',  '송태호', 'LOCAL', NULL, '2024-01-15T10:00:00'),
+      (16, 'uuid-16', 'userKey-16', 'oh@example.com', '1984-04-20', 'FEMALE', '부산시 금정구', 'profile16.jpg',  '오예원', 'LOCAL', NULL, '2024-01-16T10:00:00'),
+      (17, 'uuid-17', 'userKey-17', 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg',  '하동민', 'LOCAL', NULL, '2024-01-17T10:00:00'),
+      (18, 'uuid-18', 'userKey-18', 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg',  '신혜진', 'LOCAL', NULL, '2024-01-18T10:00:00'),
+      (19, 'uuid-19', 'userKey-19', 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg',  '안준서', 'LOCAL', NULL, '2024-01-19T10:00:00'),
+      (20, 'uuid-20', 'userKey-20', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', '양서현', 'LOCAL', NULL '2024-01-20T10:00:00');
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE member AUTO_INCREMENT = 21;
