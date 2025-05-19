@@ -127,10 +127,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
         // 이미지 쌍 만들고 비교
         List<RentalDto.AiImageDto[]> aiImagePairs = matchImages(beforeAiImages, afterAiImages);
-        List<String> geminiResponses = compareImages(aiImagePairs);
-        String summary = geminiComparatorAsyncPort.generateContent(createSummaryContent(geminiResponses)).join()
-                .getCandidates(0).getContent().getParts(0).getText();
-        List<String> pairResponses = geminiResponses.subList(1, geminiResponses.size());
+        List<String> pairResponses = compareImages(aiImagePairs);
 
         // 프론트로 전할 API 응답 및 이벤트 요소 생성
         List<DamageComparisonResponseDto.MatchingResult> responseMatchingResults = new ArrayList<>();
@@ -151,6 +148,18 @@ public class GeminiAnalysisService implements AiAnalysisService {
                     pairResponses.get(i)
             ));
         }
+
+        // 손상이 하나라도 있으면 요약하고 아니면 null
+        List<String> damageDetails = new ArrayList<>();
+        responseMatchingResults
+                .forEach(matchingResult -> matchingResult.getPairComparisonResult().getDamages()
+                        .forEach(damage -> damageDetails.add(damage.getDetails())));
+        String summary = responseMatchingResults.stream()
+                .anyMatch(matchingResult ->
+                        matchingResult.getPairComparisonResult().getResult().equals("DAMAGE_FOUND"))
+                ? geminiComparatorAsyncPort.generateContent(createSummaryContent(damageDetails)).join()
+                        .getCandidates(0).getContent().getParts(0).getText()
+                : null;
 
         // 이벤트 발행 및 API 응답 리턴
         eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(
