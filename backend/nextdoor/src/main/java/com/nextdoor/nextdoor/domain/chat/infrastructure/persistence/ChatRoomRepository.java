@@ -11,6 +11,8 @@ import java.util.List;
  */
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    // 특정 유저가 속한 채팅방 전체 조회
-     List<ChatRoom> findByMembersUserId(Long userId);
+    /**
+     * 특정 사용자가 주인(owner)이거나 렌터(renter)인 방을 모두 가져온다.
+     */
+    List<ChatRoom> findByOwnerIdOrRenterId(Long ownerId, Long renterId);
 }
