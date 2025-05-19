@@ -30,7 +30,7 @@ export const AiAnalysisGetRequest = async (
     const response = await axiosInstance.get(
       `/api/v1/rentals/${rentalId}/ai-analysis`
     );
-    console.log("AI 이미지 분석 결과 조회 성공");
+    console.log("AI 이미지 분석 결과 조회 성공:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("AI 이미지 분석 결과 조회 실패:", error);

@@ -11,7 +11,7 @@ export default function ColorBox({ txt, num }: ColorBoxProps) {
 
   return (
     <div
-      className={`flex flex-col justify-center items-center w-24 h-24 rounded-3xl ${bgColorClass} ${textColorClass}`}
+      className={`flex flex-col justify-center items-center w-1/4 h-24 rounded-3xl ${bgColorClass} ${textColorClass}`}
     >
       <div className="font-bold text-2xl">{num}</div>
       <div className="text-xs">{txt}</div>

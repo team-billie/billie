@@ -38,9 +38,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       const rentalId = Number(id);
 
       const res =
-        status === "before"
-          ? await AiBeforePhotosPostRequest(rentalId)
-          : AiAfterPhotosPostRequest(rentalId);
+        status === "before" && (await AiBeforePhotosPostRequest(rentalId));
 
       if (status === "before") {
         console.log("res : ", res);
