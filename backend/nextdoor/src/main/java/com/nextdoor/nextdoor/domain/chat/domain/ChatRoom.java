@@ -25,6 +25,10 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages;
 
+    /** 게시글 ID */
+    @Column(name = "post_id")
+    private Long postId;
+
     @Builder
     public ChatRoom(List<ChatMember> members) {
         this.members = members;
