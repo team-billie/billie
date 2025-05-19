@@ -12,6 +12,7 @@ import {
   AiBeforePhotosPostRequest,
 } from "@/lib/api/ai-analysis/request";
 import useUserStore from "@/lib/store/useUserStore";
+import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 
 interface PhotoRegisterProps {
   status: "after" | "before";
@@ -29,6 +30,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const router = useRouter();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
   const [serverData, setServerData] = useState<AiAnalysisData | null>(null);
+  const { showAlert } = useAlertModal();
 
   if (!userId) return null;
 
@@ -36,10 +38,10 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     try {
       if (!id) return;
       const rentalId = Number(id);
-
+      showAlert("분석 시작", "물품 분석을 시작하겠습니다", "info");
       const res =
         status === "before" && (await AiBeforePhotosPostRequest(rentalId));
-
+      showAlert("분석 완료", "물품 분석을 완료하였습니다", "info");
       if (status === "before") {
         console.log("res : ", res);
         useAnalysisStore
