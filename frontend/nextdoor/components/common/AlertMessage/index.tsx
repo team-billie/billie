@@ -1,19 +1,20 @@
+"use client"
+
+import { useAlertStore } from '@/lib/store/useAlertStore';
 import { CircleAlert } from 'lucide-react';
 
-interface AlertMessageProps {
-    txt: string;
-    exiting: boolean;
-    type?: 'success' | 'error';
-}
+export default function AlertMessage() {
+    const { message: txt, isExiting, isOpen, type = "success" } = useAlertStore();
 
-export default function AlertMessage({ txt, exiting = false, type = 'success' }: AlertMessageProps) {
+    if (!isOpen) return null;
+
     return (
         <div className='absolute top-4 w-full flex px-4'>
             <div
                 className={`${type === 'success' ? 'bg-[#F9FCFF] border-blue200' : 'bg-[#FFF3F4] border-[#FF94A6]'} flex-1 border-2 overflow-hidden flex items-center rounded-lg p-4 shadow-popup
-                ${exiting ? 'animate-slide-exit' : 'animate-slide-enter'}`}
+                ${isExiting ? 'animate-slide-exit' : 'animate-slide-enter'}`}
             style={{
-                animation: exiting
+                animation: isExiting
                     ? 'slideExit 0.5s ease forwards'
                     : 'slideEnter 0.5s ease forwards'
             }}
@@ -126,7 +127,7 @@ export default function AlertMessage({ txt, exiting = false, type = 'success' }:
                 />
             </div></>)}
 
-            <div className=" text-blue300 font-bold flex items-center gap-2">
+            <div className={`${type === 'success' ? 'text-blue300' : 'text-[#FF637D]'} font-bold flex items-center gap-2`}>
                 <CircleAlert className="w-6 h-6" />
                 <span>{txt}</span>
             </div>

@@ -8,11 +8,13 @@ import WithdrawAmount from "@/components/pays/(withdraw)/WithdrawAmount";
 import { VerifyAccountRequestDto } from "@/types/pays/request";
 import { VerifyAccountRequest } from "@/lib/api/pays";
 import { VerifyAccountResponseDto } from "@/types/pays/response";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 export default function WithdrawPage() {
   const [isPossibleAccount, setIsPossibleAccount] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<VerifyAccountRequestDto | null>(null);
   const [verifiedAccount, setVerifiedAccount] = useState<VerifyAccountResponseDto | null>(null);
+  const { showAlert } = useAlertStore();
 
   // 계좌 확인
   const handleVerifyAccount = (account: VerifyAccountRequestDto) => {
@@ -22,8 +24,7 @@ export default function WithdrawPage() {
         setIsPossibleAccount(true);
       })
       .catch((err) => {
-        console.log(err);
-        alert("계좌 확인에 실패했습니다.");
+        showAlert("계좌 확인에 실패했습니다.", "error");
       })
     
   }
