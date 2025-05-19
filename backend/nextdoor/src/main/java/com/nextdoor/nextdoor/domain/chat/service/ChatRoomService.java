@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public class ChatRoomService {
                 .postId(postId)
                 .ownerId(ownerId)
                 .renterId(renterId)
+                .createdAt(LocalDateTime.now())
                 .build();
         return roomRepository.save(room);
     }
