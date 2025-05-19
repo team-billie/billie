@@ -25,7 +25,7 @@ INSERT INTO member (
       (17, 'uuid-17', 'userKey-17', 'ha@example.com', '1983-05-25', 'MALE', '대구시 동구', 'profile17.jpg',  '하동민', 'LOCAL', NULL, '2024-01-17T10:00:00'),
       (18, 'uuid-18', 'userKey-18', 'shin@example.com', '1982-06-30', 'FEMALE', '광주시 서구', 'profile18.jpg',  '신혜진', 'LOCAL', NULL, '2024-01-18T10:00:00'),
       (19, 'uuid-19', 'userKey-19', 'ahn@example.com', '1981-07-05', 'MALE', '대전시 서구', 'profile19.jpg',  '안준서', 'LOCAL', NULL, '2024-01-19T10:00:00'),
-      (20, 'uuid-20', 'userKey-20', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', '양서현', 'LOCAL', NULL '2024-01-20T10:00:00');
+      (20, 'uuid-20', 'userKey-20', 'yang@example.com', '1980-08-10', 'FEMALE', '울산시 남구', 'profile20.jpg', '양서현', 'LOCAL', NULL, '2024-01-20T10:00:00');
 
 -- AUTO_INCREMENT 값 설정
 ALTER TABLE member AUTO_INCREMENT = 21;
