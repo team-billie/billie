@@ -597,7 +597,7 @@ const FloatingWidget: React.FC = () => {
               ) : pendingReservations.length > 0 ? (
                 pendingReservations.map((reservation: any) => (
                   <ReservationActionButton
-                    key={reservation.reservationId}
+                    key={`reservation-${reservation.reservationId}`}
                     id={reservation.reservationId}
                     title={reservation.postTitle}
                     productImage={
@@ -647,7 +647,7 @@ const FloatingWidget: React.FC = () => {
 
                   return (
                     <RentalActionButton
-                      key={rental.rentalId}
+                      key={`rental-${rental.rentalId}`}
                       rentalId={rental.rentalId}
                       title={displayTitle}
                       isOwner={isOwner}
