@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.aianalysis.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.api.GenerateContentResponse;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -126,7 +128,17 @@ public class GeminiAnalysisService implements AiAnalysisService {
         // 이미지 쌍 만들고 비교
         List<RentalDto.AiImageDto[]> aiImagePairs = matchImages(beforeAiImages, afterAiImages);
         List<String> geminiResponses = compareImages(beforeAiImages, afterAiImages, aiImagePairs);
-        String overallResponse = geminiResponses.getFirst();
+        String overallResponse;
+        try {
+            Map<String, String> overallGeminiResponse = objectMapper.readValue(geminiResponses.getFirst(), new TypeReference<>() {});
+            overallResponse = switch (overallGeminiResponse.get("result")) {
+                case "DAMAGE_FOUND" -> overallGeminiResponse.get("details");
+                case "NO_DAMAGE_FOUND" -> null;
+                default -> null;
+            };
+        } catch (JsonProcessingException e) {
+            throw new GeminiResponseProcessingException("Gemini 응답 변환 도중 예외 발생: " + geminiResponses.getFirst(), e);
+        }
         List<String> pairResponses = geminiResponses.subList(1, geminiResponses.size());
 
         // 프론트로 전할 API 응답 및 이벤트 요소 생성
@@ -196,16 +208,16 @@ public class GeminiAnalysisService implements AiAnalysisService {
     ) {
         return Content.newBuilder()
                 .addParts(overallDamageComparatorPromptPart)
+                .addParts(Part.newBuilder().setText("These are before images.").build())
                 .addAllParts(beforeAiImages.stream()
                         .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                         .map(this::convertToImagePart)
                         .toList())
-                .addParts(Part.newBuilder().setText("These are before images.").build())
+                .addParts(Part.newBuilder().setText("These are after images.").build())
                 .addAllParts(afterAiImages.stream()
                         .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
                         .map(this::convertToImagePart)
                         .toList())
-                .addParts(Part.newBuilder().setText("These are after images.").build())
                 .setRole("user")
                 .build();
     }
