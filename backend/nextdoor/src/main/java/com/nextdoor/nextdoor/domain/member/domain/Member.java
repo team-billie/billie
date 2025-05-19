@@ -46,6 +46,10 @@ public class Member extends TimestampedEntity {
 
     private String authProvider;
 
+    /** 안심비밀번호 6자리 **/
+    @Column(name = "secure_password", length = 6)
+    private String securePassword;
+
     public void updateBirth(String birth) {
         this.birth = birth;
     }
