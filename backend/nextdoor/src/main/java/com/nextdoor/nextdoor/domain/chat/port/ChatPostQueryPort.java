@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.chat.port;
 
-import com.nextdoor.nextdoor.domain.chat.application.dto.PostDto;
+
+import com.nextdoor.nextdoor.domain.chat.dto.PostDto;
 
 import java.util.Optional;
 
