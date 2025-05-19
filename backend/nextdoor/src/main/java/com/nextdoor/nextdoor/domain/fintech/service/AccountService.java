@@ -60,9 +60,13 @@ public class AccountService {
                                         .accountNo(acctNo)
                                         .bankCode(bankCode)
                                         .balance(0)
+                                        .accountType(RegistAccountType.EXTERNAL) // 외부계좌
+                                        .alias(null)                            // 별칭 없음
+                                        .primary(false)                         // 주계좌 아님
+                                        .balance(0)
                                         .createdAt(LocalDateTime.now())
-                                        .member(member)      // 연관관계 바인딩
-                                        .registered(false)   // 기본값은 미등록 상태
+                                        .registered(false)                      // 아직 등록되지 않음
+                                        .member(member)
                                         .build();
 
                                 // 블로킹 JPA 호출

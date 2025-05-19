@@ -8,12 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "account",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uq_primary_account_per_member",
-                columnNames = {"member_id", "is_primary"}
-        )
-)
+@Table(name = "account")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
