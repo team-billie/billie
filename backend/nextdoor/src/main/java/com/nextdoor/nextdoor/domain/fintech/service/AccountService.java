@@ -315,7 +315,7 @@ public class AccountService {
         return Mono.fromCallable(() -> {
             Account target = accountRepository.findById(targetAccountId)
                     .orElseThrow(() -> new RuntimeException("계좌 없음: " + targetAccountId));
-            if (!target.getMember().getUuid().equals(userKey)) {
+            if (!target.getMember().getUserKey().equals(userKey)) {
                 throw new RuntimeException("권한 없음: 다른 사용자 계좌 변경 불가");
             }
             if (target.getAccountType() != RegistAccountType.EXTERNAL) {
