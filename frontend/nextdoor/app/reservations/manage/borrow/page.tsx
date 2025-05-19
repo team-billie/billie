@@ -31,7 +31,8 @@ export default function ReservationBorrowManagePage() {
 
     try {
       const data = await fetchRenterReservations(userId);
-      console.log(data);
+      console.log("😇😇", data);
+
       const mappedItems = data.map((item: any) => {
         const start = new Date(item.startDate);
         const end = new Date(item.endDate);
