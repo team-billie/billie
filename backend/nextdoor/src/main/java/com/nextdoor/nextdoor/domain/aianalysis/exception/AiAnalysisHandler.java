@@ -19,9 +19,10 @@ public class AiAnalysisHandler {
     }
 
     @ExceptionHandler({
-            ExternalApiException.class
+            ExternalApiException.class,
+            GeminiResponseProcessingException.class
     })
-    public ResponseEntity<ErrorResponseDto> handleExternalApiException(ExternalApiException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleInternalServerErrorException(BaseCustomException e, HttpServletRequest request) {
         return logAndHandleException(HttpStatus.INTERNAL_SERVER_ERROR, e, request);
     }
 

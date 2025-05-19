@@ -18,8 +18,13 @@ public class Member extends TimestampedEntity {
     @Column(name = "member_id")
     private Long id;
 
+    /** 웹소켓 고유 식별자 **/
     @UuidGenerator
     private String uuid;
+
+    /** 핀테크 외부 시스템(user_key) 식별자 **/
+    @Column(name = "user_key", length = 36)
+    private String userKey;
 
     @NotNull
     private String email;
@@ -33,13 +38,17 @@ public class Member extends TimestampedEntity {
 
     private String profileImageUrl;
 
-    @Column(name = "account")
-    private Long accountId;
+//    @Column(name = "account")
+//    private Long accountId;
 
     @NotNull
     private String nickname;
 
     private String authProvider;
+
+    /** 안심비밀번호 6자리 **/
+    @Column(name = "secure_password", length = 6)
+    private String securePassword;
 
     public void updateBirth(String birth) {
         this.birth = birth;
@@ -53,7 +62,9 @@ public class Member extends TimestampedEntity {
         this.address = address;
     }
 
-    public void updateAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
+    public void updateUserKey(String userKey) { this.userKey = userKey; }
+
+//    public void updateAccountId(Long accountId) {
+//        this.accountId = accountId;
+//    }
 }

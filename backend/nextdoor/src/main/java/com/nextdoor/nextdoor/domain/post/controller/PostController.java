@@ -12,6 +12,7 @@ import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.service.PostService;
 import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostResult;
+import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
@@ -55,9 +56,13 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailResponse> getPostDetail(@PathVariable Long postId) {
-        PostDetailResult result = postService.getPostDetail(postId);
-        PostDetailResponse response = postMapper.toDetailResponse(result);
+    public ResponseEntity<PostDetailResponse> getPostDetail(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal Long userId) {
+        PostDetailCommand command = postMapper.toDetailCommand(postId, userId);
+        PostDetailResult result = postService.getPostDetail(command);
+        boolean isLiked = postService.isPostLikedByMember(postId, userId);
+        PostDetailResponse response = postMapper.toDetailResponse(result, isLiked);
 
         return ResponseEntity.ok(response);
     }

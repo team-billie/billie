@@ -70,6 +70,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
 
   // (이용료*일수) 가격 측정
   const selectedDaysCount = selectedDates.length;
+  const totalRentalPrice = selectedDaysCount * rentalFee;
   const totalPrice = selectedDaysCount * rentalFee + deposit;
 
   const getInstructionMessage = () => {
@@ -200,9 +201,21 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
               <span className="text-gray-600">총 대여일</span>
               <span>{selectedDaysCount}일</span>
             </div>
+            <div className="flex justify-between mb-2">
+              <span className="font-bold">대여료 </span>
+              <span className="font-bold">
+                ₩{totalRentalPrice.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex justify-between mb-2">
+              <span className="font-bold">보증금 </span>
+              <span className="font-semibold">₩{deposit.toLocaleString()}</span>
+            </div>
             <div className="flex justify-between mb-4">
               <span className="font-bold">총 금액</span>
-              <span className="font-bold">₩{totalPrice.toLocaleString()}</span>
+              <span className="text-lg font-semibold">
+                ₩{totalPrice.toLocaleString()}
+              </span>
             </div>
             <button
               className="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors duration-200"

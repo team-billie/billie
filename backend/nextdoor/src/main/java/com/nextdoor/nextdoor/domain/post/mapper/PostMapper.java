@@ -19,6 +19,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostMapper {
 
+    public PostDetailCommand toDetailCommand(Long postId, Long userId) {
+        return PostDetailCommand.builder()
+                .postId(postId)
+                .userId(userId)
+                .build();
+    }
+
     public SearchPostCommand toCommand(Long userId, Pageable pageable) {
         return SearchPostCommand.builder()
                 .userId(userId)
@@ -38,7 +45,7 @@ public class PostMapper {
                 .build();
     }
 
-    public PostDetailResponse toDetailResponse(PostDetailResult result) {
+    public PostDetailResponse toDetailResponse(PostDetailResult result, boolean isLiked) {
 
         return PostDetailResponse.builder()
                 .title(result.getTitle())
@@ -52,6 +59,7 @@ public class PostMapper {
                 .authorId(result.getAuthorId())
                 .nickname(result.getNickname())
                 .likeCount(result.getLikeCount())
+                .isLikedByUser(isLiked)
                 .build();
     }
 
