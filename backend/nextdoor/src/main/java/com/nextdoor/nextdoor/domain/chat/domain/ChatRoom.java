@@ -14,24 +14,37 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** 해당 방을 연 게시글 ID */
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
+
+    /** 물건 주인(오너) */
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
+
+    /** 물건 빌리는 사용자(렌터) */
+    @Column(name = "renter_id", nullable = false)
+    private Long renterId;
+
+    /** 방 생성 시각 */
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatMember> members;
-
+    /** 이 방의 메시지들 */
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages;
 
-    /** 게시글 ID */
-    @Column(name = "post_id")
-    private Long postId;
 
-    @Builder
-    public ChatRoom(List<ChatMember> members) {
-        this.members = members;
-        this.members.forEach(m -> m.setChatRoom(this));
-    }
+//    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<ChatMember> members;
+
+//    @Builder
+//    public ChatRoom(List<ChatMember> members) {
+//        this.members = members;
+//        this.members.forEach(m -> m.setChatRoom(this));
+//    }
 }
