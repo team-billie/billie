@@ -45,15 +45,18 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 id=" + roomId));
     }
 
-    /** 채팅방 삭제 – 해당 방에 속한 사용자만 삭제 가능 */
+    /** 채팅방 삭제 – 오너나 렌터만 삭제 가능 */
     public void deleteRoom(Long roomId, Long userId) {
         ChatRoom room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 id=" + roomId));
-        boolean isMember = room.getMembers().stream()
-                .anyMatch(m -> m.getUserId().equals(userId));
-        if (!isMember) {
+
+        // ownerId 또는 renterId 와 일치해야 삭제 허용
+        boolean isParticipant = room.getOwnerId().equals(userId)
+                || room.getRenterId().equals(userId);
+        if (!isParticipant) {
             throw new SecurityException("채팅방 참여자만 삭제할 수 있습니다.");
         }
+
         roomRepository.delete(room);
     }
 }
