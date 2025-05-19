@@ -184,22 +184,34 @@ public class AccountService {
                 )
                 .flatMap(ssafyResp ->
                         // 블로킹 작업은 boundedElastic 스케줄러에서 처리
-                        Mono.fromCallable(() -> {
-                                    // 명시적 트랜잭션 내에서 DB 업데이트와 이벤트 발행을 함께 처리
-                                    return transactionTemplate.execute(status -> {
-                                        try {
-                                            // 송금 완료 후 이벤트 발행
-                                            RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
-                                            eventPublisher.publishEvent(event);
+                        Mono.fromCallable(() ->
+                                        transactionTemplate.execute(status -> {
+                                            try {
+                                                // 1) 출금 계좌 조회 & balance 차감
+                                                Account withdrawAcct = accountRepository.findByAccountNo(withdrawalAccountNo)
+                                                        .orElseThrow(() -> new RuntimeException("출금 계좌 없음: " + withdrawalAccountNo));
+                                                withdrawAcct.setBalance(withdrawAcct.getBalance() - (int)transactionBalance);
+                                                accountRepository.save(withdrawAcct);
 
-                                            log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
-                                            return ssafyResp;
-                                        } catch (Exception e) {
-                                            status.setRollbackOnly();
-                                            throw e;
-                                        }
-                                    });
-                                })
+                                                // 2) 입금 계좌 조회 & balance 증가
+                                                Account depositAcct = accountRepository.findByAccountNo(depositAccountNo)
+                                                        .orElseThrow(() -> new RuntimeException("입금 계좌 없음: " + depositAccountNo));
+                                                depositAcct.setBalance(depositAcct.getBalance() + (int)transactionBalance);
+                                                accountRepository.save(depositAcct);
+
+                                                // 3) 결제 완료 이벤트 발행
+                                                RemittanceCompletedEvent event = new RemittanceCompletedEvent(rentalId);
+                                                eventPublisher.publishEvent(event);
+                                                log.info("결제 완료 – rentalId: {}, amount: {}", rentalId, transactionBalance);
+
+                                                // 4) 최종적으로 SSAFY 응답 반환
+                                                return ssafyResp;
+                                            } catch (Exception e) {
+                                                status.setRollbackOnly();
+                                                throw e;
+                                            }
+                                        })
+                                )
                                 .subscribeOn(Schedulers.boundedElastic())
                 );
     }
