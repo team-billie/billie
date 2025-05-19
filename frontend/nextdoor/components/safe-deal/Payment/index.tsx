@@ -30,7 +30,7 @@ export default function Payment() {
 
   const [paymentData, setPaymentData] =
     useState<GetPaymentDataResponseDto | null>(null);
-
+  console.log(paymentData);
   const sendBtnHandler = (isAfterRecharge: boolean = false) => {
     if (!isAfterRecharge && isChargeNeeded) {
       console.log("충전 필요");
@@ -88,8 +88,6 @@ export default function Payment() {
   useEffect(() => {
     GetPaymentDataRequest(id as string).then(
       (res: GetPaymentDataResponseDto) => {
-        console.log("❤️❤️❤️", res);
-
         setPaymentData(res);
         setRentalFeeAmount(res.rentalFee);
         setDepositAmount(res.deposit);

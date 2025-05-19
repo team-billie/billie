@@ -6,19 +6,14 @@ import {
 } from "@/types/ai-analysis/response";
 import DamageLocation from "../common/DamageLocation";
 import ReportTitle from "../ReportTitle";
-import ColorBox from "./ColorBox";
-import DetailReport from "./DetailReport";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import {
-  AiAfterPhotosPostRequest,
-  AiAnalysisGetRequest,
-} from "@/lib/api/ai-analysis/request";
+import { AiAnalysisGetRequest } from "@/lib/api/ai-analysis/request";
 import { useParams } from "next/navigation";
-import AllPhotos from "./AllPhotos";
-import { GetReservationDetailRequestDTO } from "@/types/rental/request";
-import { GetReservationDetailRequest } from "@/lib/api/rental/request";
+import ColorBox from "../CompareAnalysis/ColorBox";
+import DetailReport from "../CompareAnalysis/DetailReport";
+import AllPhotos from "../CompareAnalysis/AllPhotos";
 
-export default function CompareAnalysis() {
+export default function DoneReport() {
   const { id } = useParams();
   const [afterPhotos, setAfterPhotos] = useState<string[] | null>(null);
   const [beforePhotos, setBeforePhotos] = useState<string[] | null>(null);
@@ -31,8 +26,6 @@ export default function CompareAnalysis() {
   const [matchingResults, setMatchingResults] = useState<
     MatchingResult[] | null
   >(null);
-
- 
   const fetchAiAnalysis = useCallback(async () => {
     if (!id) return;
 

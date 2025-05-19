@@ -75,8 +75,67 @@ export const searchPosts = async ({
         direction
       }
     });
-    return response.data;
-  } catch (error) {
+      return response.data;
+    } catch (error) {
     return handleApiError(error, "게시글 검색");
   }
 };
+
+// 좋아요한 게시글 목록 조회
+export const GetPostLikeListRequest = (
+  userId: string,
+  page: number = 0,
+  size: number = 10,
+  sorted: string = "desc"
+) =>
+  axiosInstance
+    .get(`/api/v1/posts/liked`, {
+      params: {
+        userId,
+        page,
+        size,
+        sorted,
+      },
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return handleApiError(error, "좋아요한 게시글 목록 조회");
+    });
+
+// 게시글 좋아요 여부 조회
+export const GetPostLikeRequest = (postId: string) =>
+  axiosInstance
+    .get(`/api/v1/posts/${postId}/like`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return handleApiError(error, "게시글 좋아요 여부 조회");
+    });
+
+
+// 게시글 좋아요 요청 api
+export const PostLikeRequest = (postId: string) =>
+  axiosInstance
+    .post(`/api/v1/posts/${postId}/like`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return handleApiError(error, "게시글 좋아요 요청");
+    });
+
+
+// 게시글 좋아요 취소 요청 api
+export const PostLikeDeleteRequest = (postId: string) =>
+  axiosInstance
+    .delete(`/api/v1/posts/${postId}/like`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return handleApiError(error, "게시글 좋아요 취소 요청");
+    });
+

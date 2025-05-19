@@ -274,7 +274,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public AiAnalysisResult getAiAnalysis(Long rentalId) {
+    public AiComparisonResult getAiAnalysis(Long rentalId) {
         rentalRepository.findByRentalId(rentalId)
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 

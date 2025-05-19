@@ -1,18 +1,17 @@
 "use client"
 
-import SelectBankModal from "@/components/pays/modals/SelectBankModal"
-import Header from "@/components/pays/common/Header"
-import { BankDto, getBankInfo } from "@/lib/utils/getBankInfo";
-import { useEffect, useState } from "react";
 import Button from "@/components/pays/common/Button";
-import { ChevronDown } from "lucide-react";
+import Header from "@/components/pays/common/Header";
 import MakeAccountModal from "@/components/pays/modals/MakeAccountModal";
-import { CreateFinAccountRequest, GetAddedListRequest } from "@/lib/api/pays";
+import SelectBankModal from "@/components/pays/modals/SelectBankModal";
+import { CreateFinAccountRequest } from "@/lib/api/pays";
+import useUserStore from "@/lib/store/useUserStore";
+import { BankDto, getBankInfo } from "@/lib/utils/getBankInfo";
 import { AddAccountRequestDto } from "@/types/pays/request";
 import { CreateFinAccountResponseDto } from "@/types/pays/response";
-import useUserStore from "@/lib/store/useUserStore";
-import { AddAccountResponseDto } from "@/types/pays/response";
-import axiosInstance from "@/lib/api/instance";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 export default function MakeAccountPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +19,8 @@ export default function MakeAccountPage() {
     const [isMakeAccountModalOpen, setIsMakeAccountModalOpen] = useState(false);
     const [account, setAccount] = useState<AddAccountRequestDto | null>(null);
     const userKey = useUserStore((state) => state.userKey);
-    
+    const { showAlert } = useAlertStore();
+
     const onSubmit = () => {
         setIsModalOpen(false);
         
@@ -34,10 +34,10 @@ export default function MakeAccountPage() {
                 setAccount({userKey: userKey, accountNo: res.REC.accountNo, bankCode: res.REC.bankCode, alias: "앱 계좌 등록"});
             })
             .catch((err) => {
-                console.log(err);
+                showAlert("계좌 생성에 실패했습니다.", "error");
             })
         } else {
-            alert("은행을 선택해주세요.");
+            showAlert("은행을 선택해주세요.", "error");
         }
     }
     

@@ -11,7 +11,7 @@ import { CreateFinUserRequestDto,
   SelectOwnerAccountRequestDto, 
   PayItemRequestDto,
   VerifyAccountRequestDto,
-  GetHistoryRequestDto } from "@/types/pays/request/index";
+  GetPaymentHistoryRequestDto } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
 const handleApiError = (error: any, name: string) => {
@@ -86,8 +86,10 @@ export const ReturnDepositRequest = (requestBody: ReturnDepositRequestDto) =>
   apiCall("/api/v1/fintechs/deposits/return", requestBody, "보증금 반환");
 
 //거래 내역 조회
-export const GetHistoryRequest = (requestBody: GetHistoryRequestDto) => 
+export const GetPaymentHistoryRequest = (requestBody: GetPaymentHistoryRequestDto) => 
   apiCall("/api/v1/fintechs/accounts/transactions/history", requestBody, "거래 내역 조회");
+
+
 
 // -----------------------------------------
 // 대여 결제 데이터 호출

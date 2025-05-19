@@ -3,14 +3,14 @@
 //계좌 등록하기 페이지
 import EnterAccount from "@/components/pays/common/EnterAccount";
 import Header from "@/components/pays/common/Header";
-import { useState } from "react";
-import { BankDto } from "@/lib/utils/getBankInfo";
-import { FormProvider, useForm } from "react-hook-form";
-import Link from "next/link";
-import useUserStore from "@/lib/store/useUserStore";
 import { AddAccountRequest } from "@/lib/api/pays";
+import useUserStore from "@/lib/store/useUserStore";
+import { AddAccountRequestDto } from "@/types/pays/request";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckAccountRequestDto } from "@/types/pays/request";
+import { FormProvider, useForm } from "react-hook-form";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+
 
 type FormValues = {
     accountNo: string;
@@ -22,6 +22,8 @@ type FormValues = {
 export default function AddAccountPage() {
     const { userKey } = useUserStore();
     const router = useRouter();
+    const { showAlert } = useAlertStore();
+
 
     const addAccountForm = useForm<FormValues>({
         defaultValues: {
@@ -32,14 +34,19 @@ export default function AddAccountPage() {
         },
     });
     
-    const handleAccountSelected = (selectedAccount: CheckAccountRequestDto) => {
+    const handleAccountSelected = (selectedAccount: AddAccountRequestDto) => {
         addAccountForm.setValue("bankCode", selectedAccount.bankCode);
         addAccountForm.setValue("accountNo", selectedAccount.accountNo);
 
-        AddAccountRequest(addAccountForm.getValues()).then((res) => {
-            alert("계좌 등록이 완료되었습니다.");
-            router.push("/profile");    
-        });
+        AddAccountRequest(addAccountForm.getValues())
+            .then((res) => {
+                router.push("/profile");    
+                showAlert("계좌 등록이 완료되었습니다.", "success");
+            })
+            .catch((err) => {
+                console.log(err);
+                showAlert("계좌 등록에 실패했습니다.", "error");
+            })
         console.log(addAccountForm.getValues());
     }
 

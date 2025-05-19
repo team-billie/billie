@@ -46,7 +46,7 @@ export default function ProductInfos({
       {/* 판매자 정보 */}
       <div className="flex">
         <div className="flex gap-3">
-          <div className="w-12 h-12 m-auto rounded-full  bg-gray600"></div>
+          <img src={`/images/profileimg.png`} className="w-12 h-12 m-auto rounded-full  bg-gray600"></img>
           <div>
             <div className="text-lg">{nickname}</div>
             <div className="text-gray600">판매 경력 1년</div>

@@ -1,13 +1,15 @@
 "use client";
 
+import { PostLikeRequest } from "@/lib/api/posts";
+import { PostLikeDeleteRequest } from "@/lib/api/posts";
 import { ChevronLeft, Heart } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import { Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 interface ProductPhotosProps {
   images: string[];
@@ -25,14 +27,7 @@ export default function ProductPhotos({ images }: ProductPhotosProps) {
   return (
     <div className="w-full relative h-64">
       {/* 상단 버튼 */}
-      <div className="absolute top-2 left-2 right-2 flex justify-between z-10 px-2">
-        <Link href="/home">
-          <ChevronLeft className="bg-gray-200 rounded-full text-gray-700 w-8 h-8 p-1.5" />
-        </Link>
-        <button>
-          <Heart className="bg-gray-200 rounded-full text-gray-700 w-8 h-8 p-1.5" />
-        </button>
-      </div>
+      
 
       {/* 이미지 슬라이더 */}
       <Swiper

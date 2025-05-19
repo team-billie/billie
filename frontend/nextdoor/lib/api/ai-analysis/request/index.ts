@@ -13,11 +13,10 @@ export const AiBeforePhotosPostRequest = async (rentalId: number) => {
         },
       }
     );
-    alert("AI 이미지 분석 요청이 완료되었습니다 ✅"); // ✅ 알림 추가
+
     return response.data;
   } catch (error: any) {
     console.error("AI 이미지 분석 요청 실패:", error);
-    alert("AI 이미지 분석 요청에 실패했습니다 ❌");
     throw error;
   }
 };
@@ -30,7 +29,7 @@ export const AiAnalysisGetRequest = async (
     const response = await axiosInstance.get(
       `/api/v1/rentals/${rentalId}/ai-analysis`
     );
-    console.log("AI 이미지 분석 결과 조회 성공");
+    console.log("AI 이미지 분석 결과 조회 성공:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("AI 이미지 분석 결과 조회 실패:", error);

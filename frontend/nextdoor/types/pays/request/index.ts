@@ -86,9 +86,13 @@ type SelectOwnerAccountRequestDto = {
 };
 
 // 결제 내역 조회
-type GetHistoryRequestDto = {
-    userKey: string;
-    rentalId: number;
+type GetPaymentHistoryRequestDto = {
+  userKey: string;
+  accountNo: string;
+  startDate: string;
+  endDate: string;
+  transactionType: string;
+  orderByType: string;
 }
 
 export type { CreateFinUserRequestDto, 
@@ -103,5 +107,5 @@ export type { CreateFinUserRequestDto,
     GetFinUserRequestDto,
     SelectOwnerAccountRequestDto,
     PayItemRequestDto,
-    GetHistoryRequestDto, 
+    GetPaymentHistoryRequestDto, 
 }; 

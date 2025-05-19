@@ -104,9 +104,15 @@ export const bankList: BankDto[] = [
   },
   {
     bankCode: '999',
-    bankName: '싸피은행',
-    image: '/images/banks/ssafy.png',
+    bankName: '빌리페이',
+    image: '/images/banks/billypay.png',
     accountTypeUniqueNo: '999-1-6c20074711854e'
+  },
+  {
+    bankCode: '',
+    bankName: '빌리페이',
+    image: '/images/banks/billypay.png',
+    accountTypeUniqueNo: ''
   },
   {
     bankCode: '000',

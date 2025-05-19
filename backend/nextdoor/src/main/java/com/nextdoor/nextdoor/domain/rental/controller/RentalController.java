@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.rental.controller;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRentalsRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
-import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiComparisonResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.DeleteRentalResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.ManagedRentalCountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
@@ -94,9 +94,9 @@ public class RentalController {
     }
 
     @GetMapping("/{rentalId}/ai-analysis")
-    ResponseEntity<AiAnalysisResponse> getAiAnalysis(@PathVariable Long rentalId){
-        AiAnalysisResult result = rentalService.getAiAnalysis(rentalId);
-        AiAnalysisResponse response = rentalMapper.toResponse(result);
+    ResponseEntity<AiComparisonResponse> getAiAnalysis(@PathVariable Long rentalId){
+        AiComparisonResult result = rentalService.getAiAnalysis(rentalId);
+        AiComparisonResponse response = rentalMapper.toResponse(result);
 
         return ResponseEntity.ok(response);
     }

@@ -4,6 +4,7 @@ import HandleDepositModal from "@/components/pays/modals/HandleDepositModal";
 import CompareAnalysis from "@/components/safe-deal/CompareAnalysis";
 import GrayButton from "@/components/safe-deal/GrayButton";
 import Header from "@/components/safe-deal/Header";
+import { AiAfterPhotosPostRequest } from "@/lib/api/ai-analysis/request";
 import { GetReservationDetailRequest } from "@/lib/api/rental/request";
 import useUserStore from "@/lib/store/useUserStore";
 import { GetReservationDetailRequestDTO } from "@/types/rental/request";
@@ -19,20 +20,29 @@ export default function SafeDealAfter() {
 
   useEffect(() => {
     if (!id) return;
-    fetchReservationDetail();
+    const fetchData = async () => {
+      try {
+        await AiAfterPhotosPostRequest(Number(id));
+        await fetchReservationDetail();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
   }, [id]);
 
   const fetchReservationDetail = async () => {
     if (!id) return;
     const data = await GetReservationDetailRequest(Number(id));
+
     setReservation(data);
   };
 
-  if (!userId || !id) {
+  if (!userId || !id || !reservation) {
     return (
       <main className="max-w-screen-sm mx-auto fixed inset-0 h-full bg-graygradient flex items-center justify-center">
         <div className="text-center text-white">
-          <p>로딩 중 입니다</p>
+          <span>로딩중중</span>
         </div>
       </main>
     );

@@ -30,8 +30,8 @@ public class GeminiConfig {
     @Value("${custom.damage-analyzer-prompt-location}")
     private String damageAnalyzerPromptLocation;
 
-    @Value("${custom.overall-damage-comparator-prompt-location}")
-    private String overallDamageComparatorPromptLocation;
+    @Value("${custom.summarizer-prompt-location}")
+    private String summarizerPromptLocation;
 
     @Value("${custom.pair-damage-comparator-prompt-location}")
     private String pairDamageComparatorPromptLocation;
@@ -59,9 +59,9 @@ public class GeminiConfig {
         return loadPromptPart(resourceLoader, damageAnalyzerPromptLocation);
     }
 
-    @Bean(name = "overallDamageComparatorPromptPart")
-    public Part overallDamageComparatorPromptPart(ResourceLoader resourceLoader) {
-        return loadPromptPart(resourceLoader, overallDamageComparatorPromptLocation);
+    @Bean(name = "summarizerPromptPart")
+    public Part summarizerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, summarizerPromptLocation);
     }
 
     @Bean(name = "pairDamageComparatorPromptPart")

@@ -14,6 +14,7 @@ import { getBankInfo } from "@/lib/utils/getBankInfo";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { TransferAccountRequest } from "@/lib/api/pays";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 type FormValues = TransferAccountRequestDto;
 
@@ -23,6 +24,7 @@ export default function RechargePage() {
     const { mainAccount, billyAccount, userKey } = useUserStore();
     const router = useRouter();
     const rechargeAccount = selectedAccount ?? mainAccount;
+    const { showAlert } = useAlertStore();
 
     const rechargeForm = useForm<FormValues>({
         defaultValues: {
@@ -38,8 +40,10 @@ export default function RechargePage() {
         rechargeForm.setValue("withdrawalAccountNo", rechargeAccount?.accountNo ?? "");
         console.log(rechargeForm.getValues());
         TransferAccountRequest(rechargeForm.getValues()).then((res) => {
-            alert("충전 완료");
+            showAlert("빌리페이 충전 완료", "success");
             router.push("/profile");
+        }).catch(() => {
+            showAlert("빌리페이 충전 실패", "error");
         });
     }
 
