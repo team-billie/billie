@@ -63,7 +63,7 @@ export default function ReservationLendPage() {
 
           return {
             id: item.rentalId,
-            img: item.productImageUrl,
+            img: item.productImageUrls[0],
             title: item.title,
             cost: item.rentalFee,
             date: diffDays + 1,

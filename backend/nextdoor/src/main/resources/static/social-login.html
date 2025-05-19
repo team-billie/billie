@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>URL 파라미터 키와 값 표시 및 개별 복사</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+        }
+        .param {
+            margin-bottom: 1.2rem;
+        }
+        .key {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        .value-container {
+            display: flex;
+            align-items: center;
+        }
+        .value {
+            background-color: #f0f0f0;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+            min-width: 100px;
+        }
+        button {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>URL 파라미터</h2>
+<div id="param-list"></div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const paramListDiv = document.getElementById('param-list');
+
+    if (![...params].length) {
+        paramListDiv.textContent = '파라미터가 없습니다.';
+    } else {
+        for (const [key, value] of params.entries()) {
+            const paramDiv = document.createElement('div');
+            paramDiv.className = 'param';
+
+            const keyDiv = document.createElement('div');
+            keyDiv.className = 'key';
+            keyDiv.textContent = key;
+
+            const valueContainer = document.createElement('div');
+            valueContainer.className = 'value-container';
+
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'value';
+            valueDiv.textContent = value;
+
+            const button = document.createElement('button');
+            button.textContent = '복사';
+            button.onclick = () => {
+                navigator.clipboard.writeText(value)
+                    .then(() => alert(`"${value}" 복사됨`))
+                    .catch(err => alert('복사 실패: ' + err));
+            };
+
+            valueContainer.appendChild(valueDiv);
+            valueContainer.appendChild(button);
+            paramDiv.appendChild(keyDiv);
+            paramDiv.appendChild(valueContainer);
+
+            paramListDiv.appendChild(paramDiv);
+        }
+    }
+</script>
+
+</body>
+</html>

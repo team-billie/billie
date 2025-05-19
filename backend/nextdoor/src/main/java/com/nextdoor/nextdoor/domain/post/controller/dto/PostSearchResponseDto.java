@@ -6,36 +6,28 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PostSearchResponseDto {
-    private Long id;
+    private Long postId;
     private String title;
-    private String content;
-    private Long rentalFee;
-    private Long deposit;
-    private String address;
-    private String category;
-    private Long authorId;
-    private Integer likeCount;
-    private Instant createdAt;
-    
+    private String productImage;
+    private String rentalFee;
+    private String deposit;
+    private int likeCount;
+    private int dealCount;
+
     public static PostSearchResponseDto from(PostDocument document) {
         return PostSearchResponseDto.builder()
-            .id(document.getId())
+            .postId(document.getId())
             .title(document.getTitle())
-            .content(document.getContent())
-            .rentalFee(document.getRentalFee())
-            .deposit(document.getDeposit())
-            .address(document.getAddress())
-            .category(document.getCategory())
-            .authorId(document.getAuthorId())
+            .productImage(null) // PostDocument doesn't have productImage field
+            .rentalFee(String.valueOf(document.getRentalFee()))
+            .deposit(String.valueOf(document.getDeposit()))
             .likeCount(document.getLikeCount())
-            .createdAt(document.getCreatedAt())
+            .dealCount(0) // PostDocument doesn't have dealCount field
             .build();
     }
 }

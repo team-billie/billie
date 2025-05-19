@@ -1,46 +1,39 @@
-// 앱 전체에서 위젯 제공
-'use client';
+// WidgetProvider.tsx
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import FloatingWidget from '@/components/common/RentalWidget/FloatingWidget';
+import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation"; 
+import FloatingWidget from "@/components/common/RentalWidget/FloatingWidget";
 
-const WidgetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const WidgetProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [showWidget, setShowWidget] = useState(false);
-  
+  const pathname = usePathname(); 
+
   // 로그인 상태 확인
   useEffect(() => {
     const checkAuthStatus = () => {
-      const token = localStorage.getItem('accessToken');
-      console.log("TOKEN CHECK:", !!token, token); // 디버깅용
-      setShowWidget(!!token); // 토큰이 있으면 위젯 표시
+      const token = localStorage.getItem("accessToken");
+      console.log("TOKEN CHECK:", !!token, token, "Current URL:", pathname);
+      setShowWidget(!!token);
     };
-    
-    // 초기 확인
-    if (typeof window !== 'undefined') {
+
+    if (typeof window !== "undefined") {
       checkAuthStatus();
-      
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'accessToken') {
-          console.log("Storage change detected:", e.key, e.newValue);
-          checkAuthStatus();
-        }
-      };
-      
-      window.addEventListener('storage', handleStorageChange);
-      
-      const timer = setTimeout(() => {
-        checkAuthStatus();
-      }, 1000);
-      
+
+
+    
+      const timer = setInterval(checkAuthStatus, 2000);
+
       return () => {
-        window.removeEventListener('storage', handleStorageChange);
-        clearTimeout(timer);
+        clearInterval(timer);
       };
     }
-  }, []);
+  }, [pathname]); 
 
-  console.log("SHOW WIDGET:", showWidget); // 디버깅용
-  
+  console.log("SHOW WIDGET:", showWidget, "Current URL:", pathname);
+
   return (
     <>
       {children}

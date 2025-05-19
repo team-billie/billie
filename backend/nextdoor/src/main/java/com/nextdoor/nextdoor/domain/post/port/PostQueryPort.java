@@ -9,4 +9,5 @@ public interface PostQueryPort {
 
     Page<SearchPostResult> searchPostsByMemberAddress(SearchPostCommand command);
     PostDetailResult getPostDetail(Long postId);
+    Page<SearchPostResult> searchPostsLikedByMember(SearchPostCommand command);
 }

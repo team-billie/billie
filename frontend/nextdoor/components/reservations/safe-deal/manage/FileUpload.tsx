@@ -23,7 +23,7 @@ export default function FileUpload({
   }
 
   return (
-    <div className="w-full h-28 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors duration-200">
+    <div className="w-44 h-44 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors duration-200">
       <label
         className={`flex flex-col items-center justify-center w-full h-full cursor-pointer rounded-lg transition-all
           ${

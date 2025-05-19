@@ -23,10 +23,6 @@ export default function VerifyGoogleMap({
   onAddressSelect,
   initialAddress,
 }: GoogleMapComponentProps) {
-  useEffect(() => {
-    console.log("✅ API 키:", process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
-  }, []);
-
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -218,8 +214,8 @@ export default function VerifyGoogleMap({
           onLoad={onLoad}
           onUnmount={onUnmount}
           options={{
-            gestureHandling: "none",         
-            disableDefaultUI: true,          
+            gestureHandling: "none",
+            disableDefaultUI: true,
             draggable: false,
             zoomControl: false,
             streetViewControl: false,

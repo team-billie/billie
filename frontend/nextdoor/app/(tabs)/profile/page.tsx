@@ -45,7 +45,9 @@ export default function ProfilePage() {
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
             </div>
-            <div className="mt-3 text-center text-gray500 text-sm">현재 에약중인 물품수</div>
+            <div className="mt-3 text-center text-gray500 text-sm">
+              현재 에약중인 물품수
+            </div>
           </Link>
 
           <Link href="/reservations/manage" className="bg-white shadow-popup p-4 rounded-2xl">
@@ -54,12 +56,19 @@ export default function ProfilePage() {
               <span className="text-4xl">4</span>
               <span className="text-lg">건</span>
             </div>
-            <div className="mt-3 text-center text-gray500 text-sm">예약 요청받은 물품수</div>
+            <div className="mt-3 text-center text-gray500 text-sm">
+              예약 요청받은 물품수
+            </div>
           </Link>
         </div>
 
         <div className="flex justify-end">
-          <div onClick={handleLogout} className="text-center text-white text-lg bg-gray900 shadow-popup py-2 px-14 rounded-2xl">logout</div>
+          <div
+            onClick={handleLogout}
+            className="text-center text-white text-lg bg-gray900 shadow-popup py-2 px-14 rounded-2xl"
+          >
+            logout
+          </div>
         </div>
       </div>
     </div>

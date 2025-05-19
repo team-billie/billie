@@ -24,8 +24,10 @@ export default function OAuthRedirectPage() {
   
 
   useEffect(() => {
-    const accessToken = searchParams.get('accessToken');
-    const userKey = searchParams.get('userKey');
+    const accessToken = searchParams.get("accessToken");
+    const userKey = searchParams.get("userKey");
+    const uuid = searchParams.get("uuid");
+    
 
     if (accessToken && userKey) {
       localStorage.setItem('accessToken', accessToken);

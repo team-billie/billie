@@ -4,6 +4,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.request.RetrieveRental
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UpdateAccountRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.request.UploadImageRequest;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.AiAnalysisResponse;
+import com.nextdoor.nextdoor.domain.rental.controller.dto.response.DeleteRentalResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.ManagedRentalCountResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RemittanceResponse;
 import com.nextdoor.nextdoor.domain.rental.controller.dto.response.RentalDetailResponse;
@@ -12,6 +13,7 @@ import com.nextdoor.nextdoor.domain.rental.controller.dto.response.UploadImageRe
 import com.nextdoor.nextdoor.domain.rental.mapper.RentalMapper;
 import com.nextdoor.nextdoor.domain.rental.service.RentalService;
 import com.nextdoor.nextdoor.domain.rental.service.dto.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -102,7 +104,7 @@ public class RentalController {
     @PatchMapping("/{rentalId}/account")
     public ResponseEntity<UpdateAccountResponse> updateAccount(
             @PathVariable Long rentalId,
-            @RequestBody UpdateAccountRequest request) {
+            @Valid @RequestBody UpdateAccountRequest request) {
 
         UpdateAccountCommand command = rentalMapper.toUpdateAccountCommand(rentalId, request);
         UpdateAccountResult result = rentalService.updateAccount(command);
@@ -119,5 +121,30 @@ public class RentalController {
         ManagedRentalCountResponse response = rentalMapper.toManagedRentalCountResponse(result);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{rentalId}")
+    public ResponseEntity<RentalDetailResponse> getRentalById(
+            @PathVariable Long rentalId) {
+
+        SearchRentalResult result = rentalService.getRentalById(rentalId);
+        RentalDetailResponse response = rentalMapper.toResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{rentalId}")
+    public ResponseEntity<DeleteRentalResponse> deleteRental(
+            @PathVariable Long rentalId) {
+
+        DeleteRentalCommand command = rentalMapper.toDeleteCommand(rentalId);
+        DeleteRentalResult result = rentalService.deleteRental(command);
+        DeleteRentalResponse response = rentalMapper.toDeleteResponse(result);
+
+        if (result.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }

@@ -25,7 +25,6 @@ interface ReservationItem {
 export default function ReservationBorrowManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
   const { userId } = useUserStore();
-  console.log("ReservationBorrowManagePage userId:", userId);
 
   const loadReservations = async () => {
     if (!userId) return;
@@ -40,7 +39,7 @@ export default function ReservationBorrowManagePage() {
 
         return {
           id: item.reservationId,
-          img: "https://picsum.photos/seed/picsum/200/300",
+          img: item.postProductImage,
           postTitle: item.postTitle,
           cost: item.rentalFee * duration,
           date: duration,

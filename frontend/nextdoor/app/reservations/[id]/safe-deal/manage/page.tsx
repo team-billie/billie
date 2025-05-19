@@ -2,7 +2,8 @@
 
 import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManager";
 import SafeDealNavbar from "@/components/reservations/safe-deal/SafeDealNavbar";
-import { AiBeforePhotosRequest } from "@/lib/api/ai-analysis/request";
+import Title from "@/components/safe-deal/Title";
+import { AiBeforePhotosPostRequest } from "@/lib/api/ai-analysis/request";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
 import { useParams, useRouter } from "next/navigation";
@@ -61,7 +62,7 @@ export default function SafeDealManage() {
 
     setLoading(true);
     try {
-      const res = await AiBeforePhotosRequest(Number(id));
+      const res = await AiBeforePhotosPostRequest(Number(id));
       setResult(res);
       console.log("AI 분석 결과:", res);
     } catch (error) {
@@ -80,6 +81,9 @@ export default function SafeDealManage() {
     <main>
       <SafeDealNavbar />
       <div className="h-screen flex flex-col items-center gap-4 py-6">
+        <div className="font-bold text-xl text-white">
+          나의 물품의 상태는 어떨까?
+        </div>
         <PhotoManager
           rentalId={Number(id)}
           status="대여 물품 사진"
@@ -88,6 +92,7 @@ export default function SafeDealManage() {
           photos={rentalPhotos}
           serverImages={serverData?.beforeImages || []}
         />
+        <div></div>
         <PhotoManager
           rentalId={Number(id)}
           status="반납 물품 사진"
