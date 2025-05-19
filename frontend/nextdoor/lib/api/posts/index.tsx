@@ -56,6 +56,18 @@ export const GetPostLikeListRequest = (
     });
 
 
+// 게시글 좋아요 여부 조회
+export const GetPostLikeRequest = (postId: string) =>
+  axiosInstance
+    .get(`/api/v1/posts/${postId}/like`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return handleApiError(error, "게시글 좋아요 여부 조회");
+    });
+
+
 // 게시글 좋아요 요청 api
 export const PostLikeRequest = (postId: string) =>
   axiosInstance
