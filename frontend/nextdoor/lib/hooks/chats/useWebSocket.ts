@@ -49,7 +49,7 @@ export const useWebSocket = ({ conversationId, onMessage }: UseWebSocketProps) =
         try {
           console.log('Raw message:', event.data);
           const data = JSON.parse(event.data);
-          console.log('메시지 수신:', data);
+          console.log('‼️‼️‼️‼️메시지 수신:', data);
           
           if (onMessage) {
             const chatMessage: ChatMessageDto = {
