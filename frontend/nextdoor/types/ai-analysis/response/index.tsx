@@ -6,7 +6,6 @@ export type BoundingBox = {
 };
 
 export type Damage = {
-  damageType: "DENT" | "CONTAMINATION" | "SCRATCH" | "OTHER";
   location: string;
   details: string;
   boundingBox: BoundingBox;
@@ -17,6 +16,13 @@ export type DamageAnalysisItem = {
   imageIndex: number;
   result: "DAMAGE_FOUND" | "NO_DAMAGE";
   damages: Damage[];
+};
+
+export type DamageAnalysis = DamageAnalysisItem[];
+
+export type AnalysisState = {
+  damageAnalysis: DamageAnalysis | null;
+  setDamageAnalysis: (dataString: string) => void;
 };
 
 export type PairComparisonResult = {
@@ -30,16 +36,16 @@ export type MatchingResult = {
   pairComparisonResult: PairComparisonResult;
 };
 
-export type AiAnalysisGetRequestDTO = {
+export type AiAnalysisResponse = {
   beforeImages: string[];
   afterImages: string[];
   overallComparisonResult: string | null;
   matchingResults: MatchingResult[];
 };
 
-export type DamageAnalysis = DamageAnalysisItem[];
-
-export interface AnalysisState {
-  damageAnalysis: DamageAnalysis | null;
-  setDamageAnalysis: (data: string) => void; // string 형태(서버에서 오는 JSON 문자열)을 받아서 파싱해서 저장
-}
+export type AiAnalysisGetRequestDTO = {
+  beforeImages: string[];
+  afterImages: string[];
+  overallComparisonResult: string | null;
+  matchingResults: MatchingResult[];
+};

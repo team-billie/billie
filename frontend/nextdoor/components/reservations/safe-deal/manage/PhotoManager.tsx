@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import FileUpload from "./FileUpload";
 import axiosInstance from "@/lib/api/instance";
 import useUserStore from "@/lib/store/useUserStore";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/pagination";
+import Image from "next/image";
 
 interface PhotoManagerProps {
   status: string;
@@ -30,6 +36,8 @@ export default function PhotoManager({
   const [serverImageUrls, setServerImageUrls] =
     useState<string[]>(serverImages);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // 서버 이미지 불러오기
   useEffect(() => {
@@ -104,7 +112,7 @@ export default function PhotoManager({
       alert("사진 업로드에 실패했습니다.");
     } finally {
       setUploading(false);
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 
@@ -126,10 +134,9 @@ export default function PhotoManager({
   const totalImages = serverImageUrls.length + photos.length;
 
   return (
-    <div className="flex">
-      <div className="items-center justify-center w-full">
+    <div className="flex justify-center overflow-hidden w-full  flex-1">
+      <div className="w-full max-w-screen-sm px-4">
         <div className="mt-2 mb-4 w-full flex flex-col">
-          {/* FileUpload를 가운데로 감싸는 div에 flex justify-center 추가 */}
           <div className="flex justify-center">
             {totalImages < 10 ? (
               <FileUpload
@@ -145,13 +152,7 @@ export default function PhotoManager({
             )}
           </div>
 
-          {/* 상태 메시지 */}
           <div className="p-2 text-center">
-            {status && (
-              <div className="text-xl text-gray-900 font-semibold">
-                {status}
-              </div>
-            )}
             <div className="text-sm text-gray-600">
               {`${totalImages}장 등록됨 (최대 10장)`}
             </div>
@@ -167,25 +168,32 @@ export default function PhotoManager({
             )}
           </div>
 
-          {/* 이미지 미리보기 */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-4 mt-4">
-            {serverImageUrls.map((url, index) => (
-              <img
-                key={`server-${index}`}
-                src={url}
-                alt={`서버 이미지 ${index + 1}`}
-                className="w-full h-auto rounded-md border"
-              />
-            ))}
-
-            {previews.map((previewUrl, index) => (
-              <img
-                key={`preview-${index}`}
-                src={previewUrl}
-                alt={`업로드 미리보기 ${index + 1}`}
-                className="w-full h-auto rounded-md border"
-              />
-            ))}
+          <div className="w-full relative mb-4 ">
+            <Swiper
+              slidesPerView={2.4}
+              spaceBetween={8}
+              freeMode={true}
+              pagination={{ clickable: true }}
+              modules={[FreeMode]}
+              onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+              className="mySwiper"
+            >
+              {serverImageUrls.map((image, idx) => (
+                <SwiperSlide key={idx}>
+                  <div
+                    className="relative w-full h-44 cursor-pointer"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <Image
+                      src={image}
+                      alt={`Product ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
       </div>

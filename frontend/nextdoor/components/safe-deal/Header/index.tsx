@@ -11,7 +11,7 @@ export default function Header({ txt }: HeaderProps) {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 flex min-h-[60px] items-center px-4 text-white">
+    <div className="sticky top-0 flex min-h-16 items-center px-4 text-white">
       <button onClick={() => router.push("/reservations")}>
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
