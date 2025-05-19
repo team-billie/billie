@@ -34,11 +34,13 @@ export default function HomePage() {
                         <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
                 ) : (
-                    postList.map((post: PostListItemDto) => (
-                        <Link href={`/posts/${post.postId}`} key={post.postId}>
-                            <PostListItem key={post.postId} post={post} />
-                        </Link>
-                    ))
+                    <div className="flex flex-col gap-3 text-gray900">
+                        {postList.map((post: PostListItemDto) => (
+                            <Link href={`/posts/${post.postId}`} key={post.postId}>
+                                <PostListItem key={post.postId} post={post} />
+                            </Link>
+                        ))}
+                    </div>
                 )}
             </main>
         </div>

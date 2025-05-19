@@ -4,9 +4,10 @@ import { useParams, useRouter } from "next/navigation";
 import SearchHeader from "@/components/search/SearchHeader";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PostListResponse } from "@/types/posts/response";
+import { PostListItemDto } from "@/types/posts/response";
 import { searchPosts } from "@/lib/api/posts";
 import Image from "next/image";
+import PostListItem from "@/components/(tabs)/home/PostListItem";
 
 export default function SearchDetailPage() {
     const { id: rawId } = useParams();
@@ -14,7 +15,7 @@ export default function SearchDetailPage() {
     const id = decodeURIComponent(Array.isArray(rawId) ? rawId[0] : rawId || "");
 
     const [searchValue, setSearchValue] = useState(id || "");
-    const [postList, setPostList] = useState<PostListResponse[]>([]);
+    const [postList, setPostList] = useState<PostListItemDto[]>([]);   
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -60,36 +61,16 @@ export default function SearchDetailPage() {
     }, [page]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             <SearchHeader searchValue={searchValue} setSearchValue={setSearchValue} handleSearch={handleSearch}/>
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {postList.map((post) => (
-                        <Link href={`/posts/${post.postId}`} key={post.postId}>
-                            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                                <div className="relative h-48 w-full">
-                                    <Image
-                                        src={post.productImage || '/placeholder.png'}
-                                        alt={post.title}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold text-gray-800 truncate">{post.title}</h3>
-                                    <div className="mt-2">
-                                        <p className="text-sm text-gray-600">보증금: {post.deposit}원</p>
-                                        <p className="text-sm text-gray-600">대여료: {post.rentalFee}원</p>
-                                    </div>
-                                    <div className="mt-2 flex justify-between text-sm text-gray-500">
-                                        <span>❤️ {post.likeCount}</span>
-                                        <span>거래 {post.dealCount}회</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+            <div className="max-w-7xl mx-auto px-4 pt-2">
+            <div className="flex flex-col gap-3 text-gray900">
+                {postList.map((post: PostListItemDto) => (
+                <Link href={`/posts/${post.postId}`} key={post.postId}>
+                    <PostListItem post={post} />
+                </Link>
+                ))}
+            </div>
                 
                 {loading && (
                     <div className="text-center py-4">

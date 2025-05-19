@@ -39,11 +39,11 @@ export default function PostListItem({ post }: PostListItemProps) {
             }}
           /> */}
           <div className="flex gap-2">
-            <div className="flex gap-[6px] items-center text-blue400 border border-blue400 rounded-md px-1 ">
+            <div className="flex gap-[6px] max-h-[24px] items-center text-blue400 border border-blue400 rounded-md px-1 ">
               <Heart className="w-4 h-4" />
               <div>{post.likeCount}</div>
             </div>
-            <div className="flex gap-[3px] items-center text-sm text-blue400 border border-blue400 rounded-md px-1 py-[2px]">
+            <div className="flex gap-[3px] max-h-[24px] items-center text-sm text-blue400 border border-blue400 rounded-md px-1 py-[2px]">
               <DollarSign className="w-4 h-4" />
               <div>{post.dealCount}</div>
             </div>
