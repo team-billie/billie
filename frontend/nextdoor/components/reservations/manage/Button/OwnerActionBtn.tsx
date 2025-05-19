@@ -11,7 +11,6 @@ import { useState } from "react";
 import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
 import HandleDepositModal from "@/components/pays/modals/HandleDepositModal";
 import { useParams, useRouter } from "next/navigation";
-import { useBankStore } from "@/lib/store/useBankStore";
 
 interface OwnerActionBtnProps {
   status: RentalStatus;
@@ -36,7 +35,6 @@ export default function OwnerActionBtn({
   const [isModal, setModal] = useState(false);
   const [isDepositModal, setIsDepositModal] = useState(false);
   const router = useRouter();
-  const { receiverBank } = useBankStore();
   // userId가 없으면 렌더링하지 않음
   if (!userId) {
     return null;

@@ -5,6 +5,7 @@ import { AddAccountRequest } from "@/lib/api/pays";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
 import { AddAccountRequestDto } from "@/types/pays/request";
 import { useRouter } from "next/navigation";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 
 interface MakeAccountModalProps {
@@ -13,12 +14,13 @@ interface MakeAccountModalProps {
 
 export default function MakeAccountModal({account}: MakeAccountModalProps){
     const router = useRouter();
+    const { showAlert } = useAlertStore();
 
     const handleBtn = (register: boolean) => {
         if(register){
         console.log("앱에 등록하기");
         AddAccountRequest(account).then((res) => {
-            console.log("계좌가 등록됨");
+            showAlert("앱에 계좌가 등록되었습니다!", "success");
         });
         }else{
             console.log("나중에 등록하기");

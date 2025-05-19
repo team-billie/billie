@@ -51,11 +51,31 @@ type VerifyAccountResponseDto = {
     nickname: string;
 }
 
+type BillyAccountHistory= {
+    transactionUniqueNo: string;
+    transactionDate: string;
+    transactionTime: string;
+    transactionType: string;
+    transactionTypeName: string;
+    transactionAccountNo: string;
+    transactionBalance: string;
+    transactionAfterBalance: string;
+    transactionSummary: string;
+    transactionMemo: string;
+}
+
+type GetPaymentHistoryResponseDto = {
+    totalCount: string;
+    list: BillyAccountHistory[];
+}
+
 export type { 
     AddAccountResponseDto, 
     CreateFinUserResponseDto, 
     CreateFinAccountResponseDto,
     GetFinUserResponseDto,
     GetPaymentDataResponseDto,
-    VerifyAccountResponseDto
+    VerifyAccountResponseDto,
+    GetPaymentHistoryResponseDto,
+    BillyAccountHistory
 };

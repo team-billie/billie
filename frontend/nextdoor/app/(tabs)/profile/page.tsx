@@ -18,10 +18,6 @@ export default function ProfilePage() {
     router.push("/login");
   }
 
-  useEffect(() => {
-    console.log(userKey, userId);
-  }, []);
-
   return (
     <div className="flex flex-col min-h-[100dvh] pb-20">
       <div className="flex-1 flex flex-col bg-blue300 p-4">
