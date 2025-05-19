@@ -1,6 +1,5 @@
 package com.nextdoor.nextdoor.domain.chat.service;
 
-import com.nextdoor.nextdoor.domain.chat.domain.ChatMember;
 import com.nextdoor.nextdoor.domain.chat.domain.ChatRoom;
 import com.nextdoor.nextdoor.domain.chat.infrastructure.persistence.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
