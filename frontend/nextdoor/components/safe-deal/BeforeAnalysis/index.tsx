@@ -30,7 +30,12 @@ export default function BeforeAnalysis() {
             )}
           </>
         ) : (
-          <div>분석된 데이터가 없습니다.</div>
+          <div className="font-bold text-2xl">
+            <div className="bg-gray700 w-1 "></div>
+            <div className="text-lg px-4 py-3 w-full bg-transparentWhite10 text-white break-words">
+              손상 결과 없음
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -6,6 +6,8 @@ import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.SearchPostResult;
+import com.nextdoor.nextdoor.domain.post.service.dto.UpdatePostCommand;
+import com.nextdoor.nextdoor.domain.post.service.dto.UpdatePostResult;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,4 +55,19 @@ public interface PostService {
      * @return A page of posts liked by the member
      */
     Page<SearchPostResult> getLikedPostsByMember(SearchPostCommand command);
+
+    /**
+     * Updates a post
+     * @param command The command containing the post ID and the fields to update
+     * @return The result of the update operation
+     */
+    UpdatePostResult updatePost(UpdatePostCommand command);
+
+    /**
+     * Deletes a post
+     * @param postId The ID of the post to delete
+     * @param userId The ID of the user deleting the post
+     * @return true if the post was deleted, false otherwise
+     */
+    boolean deletePost(Long postId, Long userId);
 }

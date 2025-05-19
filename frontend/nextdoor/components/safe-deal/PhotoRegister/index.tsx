@@ -40,7 +40,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       const res =
         status === "before"
           ? await AiBeforePhotosPostRequest(rentalId)
-          : await AiAfterPhotosPostRequest(rentalId);
+          : AiAfterPhotosPostRequest(rentalId);
 
       if (status === "before") {
         console.log("res : ", res);

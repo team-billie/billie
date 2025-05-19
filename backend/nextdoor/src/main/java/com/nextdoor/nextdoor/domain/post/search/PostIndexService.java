@@ -1,6 +1,7 @@
 package com.nextdoor.nextdoor.domain.post.search;
 
 import com.nextdoor.nextdoor.domain.post.domain.Post;
+import com.nextdoor.nextdoor.domain.post.exception.PostIndexException;
 import com.nextdoor.nextdoor.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,13 +23,16 @@ public class PostIndexService {
 
   private final PostRepository postRepository;
   private final PostSearchRepository elasticSearchRepository;
+  private final IndexLockService indexLockService;
 
   @Scheduled(cron = "0 0 3 * * *")
   @Transactional(readOnly = true)
   public void reindexAll() {
-    try {
-      log.info("▶▶▶ 시작: 전체 Post 색인");
+    if(!indexLockService.acquireFullIndexLock()){
+      throw new PostIndexException("이미 전체 인덱싱 중입니다.");
+    }
 
+    try {
       elasticSearchRepository.deleteAll();
 
       int page = 0;
@@ -61,7 +64,48 @@ public class PostIndexService {
       log.info("◀◀◀ 완료: 총 {} 건 색인", total);
     } catch (Exception e) {
       log.error("전체 색인 중 오류 발생: {}", e.getMessage(), e);
+    } finally {
+      try {
+        List<PostDocument> docs = indexLockService.processPendingIndexQueue();
+        if(docs.size() > 0){
+          elasticSearchRepository.saveAll(docs);
+          log.info("  배치 색인 완료: {} 건 색인", docs.size());
+        }
+      } catch (Exception e) {
+        log.error("배치 색인 중 오류 발생: {}", e.getMessage(), e);
+      } finally {
+        indexLockService.releaseFullIndexLock();
+      }
     }
+  }
+
+  @Transactional
+  public void indexSinglePost(Long postId) {
+    Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new PostIndexException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
+
+    PostDocument doc = toDocument(post);
+
+    if(indexLockService.isFullIndexLocked()){
+      indexLockService.addToPendingIndexQueue(doc);
+      throw new PostIndexException("이미 전체 인덱싱 중입니다. 배치 색인을 기다려주세요.");
+    } else {
+      elasticSearchRepository.save(doc);
+      log.info("  단건 색인 완료: {} 건 색인", doc.getId());
+    }
+  }
+
+  @Transactional
+  public void deleteSingleIndex(Long postId) {
+    Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new PostIndexException("ID가 " + postId + "인 게시물이 존재하지 않습니다."));
+
+    if(indexLockService.isFullIndexLocked()){
+      throw new PostIndexException("이미 전체 인덱싱 중입니다.");
+    }
+
+    elasticSearchRepository.deleteById(post.getId());
+    log.info("  단건 삭제 완료: {} 건 색인", post.getId());
   }
 
   private PostDocument toDocument(Post p) {

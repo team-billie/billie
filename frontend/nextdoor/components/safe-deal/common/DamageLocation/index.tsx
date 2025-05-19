@@ -1,5 +1,5 @@
 import { DamageAnalysisItem } from "@/types/ai-analysis/response";
-import ResultItem from "../../BeforeAnalysis/ResultItem";
+import LocationItem from "../../AfterPayment/LocationItem";
 
 interface DamageLocationProps {
   damageAnalysis: DamageAnalysisItem[];
@@ -22,7 +22,7 @@ export default function DamageLocation({
           </div>
           {damageAnalysis.map((item, imageIndex) =>
             item.damages.map((damage, damageIndex) => (
-              <ResultItem
+              <LocationItem
                 key={`${imageIndex}-${damageIndex}`}
                 damage={damage}
               />
