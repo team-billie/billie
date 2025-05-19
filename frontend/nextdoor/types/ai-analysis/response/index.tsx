@@ -19,10 +19,22 @@ export type DamageAnalysisItem = {
   damages: Damage[];
 };
 
+export type PairComparisonResult = {
+  result: "DAMAGE_FOUND" | "NO_DAMAGE_FOUND";
+  damages: Damage[];
+};
+
+export type MatchingResult = {
+  beforeImage: string;
+  afterImage: string;
+  pairComparisonResult: PairComparisonResult;
+};
+
 export type AiAnalysisGetRequestDTO = {
   beforeImages: string[];
   afterImages: string[];
-  analysis: string;
+  overallComparisonResult: string | null;
+  matchingResults: MatchingResult[];
 };
 
 export type DamageAnalysis = DamageAnalysisItem[];

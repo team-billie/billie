@@ -1,6 +1,7 @@
 "use client";
 
 import CompareAnalysis from "@/components/safe-deal/CompareAnalysis";
+import DoneReport from "@/components/safe-deal/DoneReport";
 import Header from "@/components/safe-deal/Header";
 import useUserStore from "@/lib/store/useUserStore";
 
@@ -18,7 +19,7 @@ export default function SafeDealResult() {
 
       {/* 스크롤 가능한 본문 */}
       <div className="flex-1 overflow-y-auto">
-        <CompareAnalysis />
+        <DoneReport />
       </div>
     </main>
   );

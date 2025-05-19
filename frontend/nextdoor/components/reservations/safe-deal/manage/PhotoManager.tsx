@@ -91,7 +91,8 @@ export default function PhotoManager({
       return;
     }
 
-    onPhotoChange?.([...photos, ...filesArray]);
+    // 새로운 파일만 추가
+    onPhotoChange?.(filesArray);
 
     try {
       setUploading(true);
