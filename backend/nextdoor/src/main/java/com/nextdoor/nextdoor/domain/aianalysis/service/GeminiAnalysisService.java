@@ -1,5 +1,7 @@
 package com.nextdoor.nextdoor.domain.aianalysis.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.api.GenerateContentResponse;
 import com.google.cloud.vertexai.api.Part;
@@ -13,13 +15,15 @@ import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
+import com.nextdoor.nextdoor.domain.aianalysis.exception.GeminiResponseProcessingException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisMatcherCommandPort;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisRentalQueryPort;
 import com.nextdoor.nextdoor.domain.aianalysis.port.GeminiComparatorAsyncPort;
-import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherResponseDto;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherRequestDto;
+import com.nextdoor.nextdoor.domain.aianalysis.service.dto.ImageMatcherResponseDto;
 import com.nextdoor.nextdoor.domain.aianalysis.service.dto.RentalDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -37,6 +41,7 @@ import java.util.regex.Pattern;
 @Transactional
 public class GeminiAnalysisService implements AiAnalysisService {
 
+    private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher eventPublisher;
 
     private final GenerativeModel geminiAnalysisModel;
@@ -48,7 +53,9 @@ public class GeminiAnalysisService implements AiAnalysisService {
     private final AiAnalysisMatcherCommandPort aiAnalysisMatcherCommandPort;
     private final GeminiComparatorAsyncPort geminiComparatorAsyncPort;
 
+    @Autowired
     public GeminiAnalysisService(
+            ObjectMapper objectMapper,
             ApplicationEventPublisher eventPublisher,
             @Qualifier("geminiFlash")
             GenerativeModel geminiAnalysisModel,
@@ -62,6 +69,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
             AiAnalysisMatcherCommandPort aiAnalysisMatcherCommandPort,
             GeminiComparatorAsyncPort geminiComparatorAsyncPort
     ) {
+        this.objectMapper = objectMapper;
         this.eventPublisher = eventPublisher;
         this.geminiAnalysisModel = geminiAnalysisModel;
         this.damageAnalyzerPromptPart = damageAnalyzerPromptPart;
@@ -125,11 +133,15 @@ public class GeminiAnalysisService implements AiAnalysisService {
         List<DamageComparisonResponseDto.MatchingResult> responseMatchingResults = new ArrayList<>();
         List<AiCompareAnalysisCompletedEvent.MatchingResult> eventMatchingResults = new ArrayList<>();
         for (int i = 0; i < pairResponses.size(); i++) {
-            responseMatchingResults.add(new DamageComparisonResponseDto.MatchingResult(
-                    aiImagePairs.get(i)[0].getImageUrl(),
-                    aiImagePairs.get(i)[1].getImageUrl(),
-                    pairResponses.get(i)
-            ));
+            try {
+                responseMatchingResults.add(new DamageComparisonResponseDto.MatchingResult(
+                        aiImagePairs.get(i)[0].getImageUrl(),
+                        aiImagePairs.get(i)[1].getImageUrl(),
+                        objectMapper.readValue(pairResponses.get(i), DamageComparisonResponseDto.MatchingResult.PairComparisonResult.class)
+                ));
+            } catch (JsonProcessingException e) {
+                throw new GeminiResponseProcessingException("Gemini 응답 변환 도중 예외 발생: " + pairResponses.get(i), e);
+            }
             eventMatchingResults.add(new AiCompareAnalysisCompletedEvent.MatchingResult(
                     aiImagePairs.get(i)[0].getAiImageId(),
                     aiImagePairs.get(i)[1].getAiImageId(),
