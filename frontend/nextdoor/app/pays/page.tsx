@@ -11,6 +11,7 @@ import useUserStore from "@/lib/store/useUserStore";
 import { GetPaymentHistoryRequestDto } from "@/types/pays/request";
 import { BillyAccountHistory } from "@/types/pays/response";
 import { useEffect, useState } from "react";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 function pad(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
@@ -29,7 +30,7 @@ function getFormattedDateRange(date: Date) {
 export default function PayPage() {
   const { billyAccount, userKey, setBillyAccount } = useUserStore();
   const [historyList, setHistoryList] = useState<BillyAccountHistory[]>([]);
-
+  const { showAlert } = useAlertStore();
   const fetchHistory = async (accountNo: string) => {
     const { start, end } = getFormattedDateRange(new Date());
     const historyRequest: GetPaymentHistoryRequestDto = {
@@ -43,16 +44,15 @@ export default function PayPage() {
 
     try {
       const res = await GetPaymentHistoryRequest(historyRequest);
-      console.log(res);
       setHistoryList(res.REC.list);
     } catch (error) {
-      console.error("내역 조회 실패:", error);
+      // showAlert("계좌 내역 조회 실패", "error");
     }
   };
 
   const handleAddBtn = async () => {
     if (!userKey || !billyAccount) {
-      alert("빌리페이 계좌가 없습니다.");
+      showAlert("빌리페이 계좌가 없습니다.", "error");
       return;
     }
 
@@ -70,8 +70,7 @@ export default function PayPage() {
 
       await fetchHistory(updatedAccount.accountNo);
     } catch (error) {
-      console.error("입금 실패:", error);
-      alert("요청 중 오류가 발생했습니다.");
+      showAlert("빌리페이 입금 실패", "error");
     }
   };
 

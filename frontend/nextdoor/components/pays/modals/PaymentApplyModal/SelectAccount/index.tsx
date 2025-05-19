@@ -9,7 +9,7 @@ import { SelectOwnerAccountRequest } from "@/lib/api/pays";
 import { SelectOwnerAccountRequestDto } from "@/types/pays/request/index";
 import MyAccountListModal from "@/components/pays/modals/MyAccountListModal";
 import { AddAccountResponseDto } from "@/types/pays/response";
-import useAlertModal from "@/lib/hooks/alert/useAlertModal";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 type SelectAccountProps = {
   payCharge: number;
@@ -31,11 +31,12 @@ export default function SelectAccount({
     setBillySelected(!billySelected);
   };
 
-  const [selectedAccount, setSelectedAccount] =
-    useState<AddAccountResponseDto | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<AddAccountResponseDto | null>(null);
   const [isAccountListModalOpen, setIsAccountListModalOpen] = useState(false);
-  const { showAlert } = useAlertModal();
   const selectAccount = selectedAccount ?? mainAccount;
+  
+  const { showAlert } = useAlertStore();
+  
   const handleSelectAccount = async () => {
     try {
       if (billySelected) {
@@ -57,12 +58,11 @@ export default function SelectAccount({
           rentalId
         );
       }
-      showAlert("결제 요청", "계좌 등록을 성공 하셨습니다", "info");
+      showAlert("결제 요청이 완료되었습니다!", "success");
       // 계좌 선택 성공 시 모달 닫기
       setIsModalOpen(false);
     } catch (error) {
-      console.error("계좌 선택 실패:", error);
-      alert("계좌 선택 실패");
+      showAlert("결제 요청을 다시 시도해주세요.", "error");
       setIsModalOpen(false);
     }
   };
