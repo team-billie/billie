@@ -607,7 +607,7 @@ const FloatingWidget: React.FC = () => {
                   <p>예약 정보 로딩 중...</p>
                 </div>
               ) : pendingReservations.length > 0 ? (
-                pendingReservations.map((reservation: any) => (
+                [...pendingReservations].reverse().map((reservation: any) => (
                   <ReservationActionButton
                     key={`reservation-${reservation.reservationId}`}
                     id={reservation.reservationId}
@@ -644,7 +644,7 @@ const FloatingWidget: React.FC = () => {
               {/* 대여 요청 항목 */}
               {!rentalLoading &&
                 actionNeededRentals.length > 0 &&
-                actionNeededRentals.map((rental) => {
+                [...actionNeededRentals].reverse().map((rental) => {
                   const isOwner = userId === rental.rentalDetail?.ownerId;
                   const actionLink = getRentalActionLink(rental);
                   const buttonText = getRentalButtonText(rental);
