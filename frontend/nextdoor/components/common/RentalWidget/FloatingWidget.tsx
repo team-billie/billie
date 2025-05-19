@@ -15,7 +15,7 @@ import useUserStore from "@/lib/store/useUserStore";
 import { Portal } from "@/lib/utils/widget/portal";
 import PaymentApplyModal from "@/components/pays/modals/PaymentApplyModal";
 
-const FloatingWidget: React.FC = () => { 
+const FloatingWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 200 });
   const [isShining, setIsShining] = useState(false);
@@ -24,7 +24,7 @@ const FloatingWidget: React.FC = () => {
   const [shiningItems, setShiningItems] = useState<number[]>([]);
   const [prevRentals, setPrevRentals] = useState<RentalStatusMessage[]>([]);
   const [prevReservations, setPrevReservations] = useState<any[]>([]);
-  
+
   const dragStartPos = useRef({ x: 0, y: 0 });
   const wasDragged = useRef(false);
   const nodeRef = useRef(null);
@@ -61,7 +61,6 @@ const FloatingWidget: React.FC = () => {
   const savePosition = (pos: { x: number; y: number }) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("widgetPosition", JSON.stringify(pos));
-      console.log("위젯 위치 저장:", pos);
     }
   };
 
@@ -78,7 +77,7 @@ const FloatingWidget: React.FC = () => {
     const refreshTimer = setInterval(() => {
       refreshRentals();
     }, 300000); // 5분 = 300,000 밀리초
-    
+
     return () => {
       clearInterval(refreshTimer);
     };
@@ -93,17 +92,24 @@ const FloatingWidget: React.FC = () => {
         try {
           const parsedItems = JSON.parse(hiddenItemsJson);
           const currentTime = Date.now();
-          
+
           // 3분(180초)이 지나지 않은 항목만 필터링
-          const validHiddenItems = parsedItems.filter((item: { id: number, timestamp: number }) => {
-            return currentTime - item.timestamp < 180000;
-          });
-          
+          const validHiddenItems = parsedItems.filter(
+            (item: { id: number; timestamp: number }) => {
+              return currentTime - item.timestamp < 180000;
+            }
+          );
+
           // 유효한 항목만 상태로 설정
-          setHiddenItemIds(validHiddenItems.map((item: { id: number }) => item.id));
-          
+          setHiddenItemIds(
+            validHiddenItems.map((item: { id: number }) => item.id)
+          );
+
           // 로컬 스토리지 업데이트
-          localStorage.setItem("hiddenWidgetItems", JSON.stringify(validHiddenItems));
+          localStorage.setItem(
+            "hiddenWidgetItems",
+            JSON.stringify(validHiddenItems)
+          );
         } catch (e) {
           console.error("숨김 항목 정보 파싱 오류:", e);
           localStorage.removeItem("hiddenWidgetItems");
@@ -114,39 +120,44 @@ const FloatingWidget: React.FC = () => {
 
   // 새로운 항목이 추가되었는지 확인하고 빛나는 효과 적용
   useEffect(() => {
-    const isInitialLoad = prevRentals.length === 0 && prevReservations.length === 0;
-    
+    const isInitialLoad =
+      prevRentals.length === 0 && prevReservations.length === 0;
+
     // 새로운 항목 확인 로직 - 초기 로드가 아닐 때만 실행
     if (!isInitialLoad) {
       const newShiningItems: number[] = [];
-      
+
       // 새로운 예약 확인
-      pendingReservations.forEach(res => {
-        const found = prevReservations.find(prev => prev.reservationId === res.reservationId);
+      pendingReservations.forEach((res) => {
+        const found = prevReservations.find(
+          (prev) => prev.reservationId === res.reservationId
+        );
         if (!found) {
           newShiningItems.push(res.reservationId);
         }
       });
-      
+
       // 새로운 렌탈 확인
-      actionNeededRentals.forEach(rental => {
-        const found = prevRentals.find(prev => prev.rentalId === rental.rentalId);
+      actionNeededRentals.forEach((rental) => {
+        const found = prevRentals.find(
+          (prev) => prev.rentalId === rental.rentalId
+        );
         if (!found) {
           newShiningItems.push(rental.rentalId);
         }
       });
-      
+
       if (newShiningItems.length > 0) {
         console.log("새 항목 감지: ", newShiningItems);
         setShiningItems(newShiningItems);
-        
+
         // 5초 후에 빛나는 효과 제거
         setTimeout(() => {
           setShiningItems([]);
         }, 5000);
       }
     }
-    
+
     // 현재 상태를 이전 상태로 저장
     setPrevRentals(activeRentals);
     setPrevReservations(pendingReservations);
@@ -184,7 +195,8 @@ const FloatingWidget: React.FC = () => {
   });
 
   // 현재 총 요청 수 계산
-  const totalRequestCount = pendingReservations.length + actionNeededRentals.length;
+  const totalRequestCount =
+    pendingReservations.length + actionNeededRentals.length;
 
   useEffect(() => {
     if (totalRequestCount > prevRequestCount) {
@@ -228,7 +240,7 @@ const FloatingWidget: React.FC = () => {
           safeY = Math.min(Math.max(20, safeY), viewportHeight - 80);
 
           setPosition({ x: safeX, y: safeY });
-          console.log("위젯 위치 조정:", { safeX, safeY });
+          console.log(" 조정:", { safeX, safeY });
         } catch (e) {
           console.error("위치 정보 파싱 오류:", e);
 
@@ -313,7 +325,7 @@ const FloatingWidget: React.FC = () => {
       // 모달에 전달할 데이터 설정
       setSelectedRental({
         charge: rental.rentalDetail?.charge || 0,
-        rentalId: rental.rentalId.toString()
+        rentalId: rental.rentalId.toString(),
       });
       setIsModalOpen(true);
       setIsOpen(false); // 위젯 닫기
@@ -324,11 +336,11 @@ const FloatingWidget: React.FC = () => {
   const handleRentalNavigate = (rentalId: number) => {
     // 위젯 닫기
     setIsOpen(false);
-    
+
     // 해당 항목을 임시로 숨김 처리
-    setHiddenItemIds(prev => [...prev, rentalId]);
+    setHiddenItemIds((prev) => [...prev, rentalId]);
   };
-  
+
   // 예약 확정/취소
   const handleReservationAction = async (
     reservationId: number,
@@ -339,12 +351,12 @@ const FloatingWidget: React.FC = () => {
         const success = await confirmReservation(reservationId);
         if (success) {
           showAlert("예약 확정", "예약이 확정되었습니다.", "success");
-          
+
           // 확정된 예약 정보 찾기
           const confirmedReservation = pendingReservations.find(
-            res => res.reservationId === reservationId
+            (res) => res.reservationId === reservationId
           );
-          
+
           if (confirmedReservation) {
             // 초기 데이터가 반영될 시간을 확보하기 위해 짧은 지연 후 대여 목록 새로고침
             setTimeout(() => {
@@ -372,9 +384,9 @@ const FloatingWidget: React.FC = () => {
   const handleReservationNavigate = (reservationId: number) => {
     // 위젯 닫기
     setIsOpen(false);
-    
+
     // 해당 항목을 임시로 숨김 처리
-    setHiddenItemIds(prev => [...prev, reservationId]);
+    setHiddenItemIds((prev) => [...prev, reservationId]);
   };
 
   const getRentalActionLink = (rental: RentalStatusMessage) => {
@@ -492,31 +504,31 @@ const FloatingWidget: React.FC = () => {
           animation: shine 2s ease-in-out;
           animation-iteration-count: 3;
         }
-        
+
         @keyframes item-shine {
-  0% {
-    transform: translateX(0);
-    background-color: rgba(255, 255, 255, 1); /* 완전 불투명한 흰색 */
-  }
-  25% {
-    transform: translateX(5px);
-    background-color: rgba(237, 242, 255, 1); /* 연한 파란색 배경 */
-    box-shadow: 0 0 8px rgba(74, 157, 245, 0.6); /* 글로우 효과 추가 */
-  }
-  50% {
-    transform: translateX(0);
-    background-color: rgba(255, 255, 255, 1);
-  }
-  75% {
-    transform: translateX(5px);
-    background-color: rgba(237, 242, 255, 1);
-    box-shadow: 0 0 8px rgba(74, 157, 245, 0.6);
-  }
-  100% {
-    transform: translateX(0);
-    background-color: rgba(255, 255, 255, 1);
-  }
-}
+          0% {
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 1); /* 완전 불투명한 흰색 */
+          }
+          25% {
+            transform: translateX(5px);
+            background-color: rgba(237, 242, 255, 1); /* 연한 파란색 배경 */
+            box-shadow: 0 0 8px rgba(74, 157, 245, 0.6); /* 글로우 효과 추가 */
+          }
+          50% {
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 1);
+          }
+          75% {
+            transform: translateX(5px);
+            background-color: rgba(237, 242, 255, 1);
+            box-shadow: 0 0 8px rgba(74, 157, 245, 0.6);
+          }
+          100% {
+            transform: translateX(0);
+            background-color: rgba(255, 255, 255, 1);
+          }
+        }
 
         .animate-item-shine {
           animation: item-shine 2s ease-in-out;
@@ -640,9 +652,9 @@ const FloatingWidget: React.FC = () => {
                     rental.rentalDetail?.title || "대여 물품";
 
                   // 안심결제요청 버튼인지 확인
-                  const isPaymentRequestButton = 
-                    isOwner && 
-                    rental.process === "BEFORE_RENTAL" && 
+                  const isPaymentRequestButton =
+                    isOwner &&
+                    rental.process === "BEFORE_RENTAL" &&
                     rental.detailStatus === "CREATED";
 
                   return (
@@ -664,9 +676,10 @@ const FloatingWidget: React.FC = () => {
                       }
                       buttonText={buttonText}
                       actionLink={actionLink}
-                      onClick={isPaymentRequestButton 
-                        ? () => handleRentalAction(rental) 
-                        : undefined
+                      onClick={
+                        isPaymentRequestButton
+                          ? () => handleRentalAction(rental)
+                          : undefined
                       }
                       onNavigate={handleRentalNavigate}
                       isShining={shiningItems.includes(rental.rentalId)}
@@ -718,4 +731,4 @@ const FloatingWidget: React.FC = () => {
   );
 };
 
-export default FloatingWidget;    
+export default FloatingWidget;
