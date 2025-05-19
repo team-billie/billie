@@ -3,12 +3,14 @@ import { CircleAlert } from 'lucide-react';
 interface AlertMessageProps {
     txt: string;
     exiting: boolean;
+    type?: 'success' | 'error';
 }
 
-export default function AlertMessage({ txt, exiting = false }: AlertMessageProps) {
+export default function AlertMessage({ txt, exiting = false, type = 'success' }: AlertMessageProps) {
     return (
-        <div
-            className={`absolute border-blue200 border-2 overflow-hidden top-4 flex items-center bg-[#F9FCFF] rounded-lg w-[90dvw] p-4 shadow-popup
+        <div className='absolute top-4 w-full flex px-4'>
+            <div
+                className={`${type === 'success' ? 'bg-[#F9FCFF] border-blue200' : 'bg-[#FFF3F4] border-[#FF94A6]'} flex-1 border-2 overflow-hidden flex items-center rounded-lg p-4 shadow-popup
                 ${exiting ? 'animate-slide-exit' : 'animate-slide-enter'}`}
             style={{
                 animation: exiting
@@ -16,8 +18,8 @@ export default function AlertMessage({ txt, exiting = false }: AlertMessageProps
                     : 'slideEnter 0.5s ease forwards'
             }}
         >
-            {/* 별 이미지와 효과를 위한 컨테이너 */}
-            <div className="absolute bottom-[-13px] right-[-13px] w-16 h-16 z-10">
+            {type === 'success' && (<>
+                <div className="absolute bottom-[-13px] right-[-13px] w-16 h-16 z-10">
                 {/* 별 주변의 발광 효과 */}
                 <div
                     className="absolute w-10 h-10 bg-blue-300 rounded-full filter blur-md opacity-30"
@@ -122,9 +124,9 @@ export default function AlertMessage({ txt, exiting = false }: AlertMessageProps
                         animation: 'dynamicStar 2s ease-in-out infinite'
                     }}
                 />
-            </div>
+            </div></>)}
 
-            <div className=" text-blue300 font-bold flex items-center gap-2">
+            <div className={`${type === 'success' ? 'text-blue300' : 'text-[#FF637D]'} font-bold flex items-center gap-2`}>
                 <CircleAlert className="w-6 h-6" />
                 <span>{txt}</span>
             </div>
@@ -216,6 +218,7 @@ export default function AlertMessage({ txt, exiting = false }: AlertMessageProps
                     }
                 }
             `}</style>
+        </div>
         </div>
     );
 }

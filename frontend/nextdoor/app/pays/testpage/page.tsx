@@ -44,7 +44,7 @@ export default function TestPage() {
             </button>
 
             {(isAlertMessageOpen) && (
-                <AlertMessage txt="결제가 요청되었습니다!" exiting={alertExiting} />
+                <AlertMessage txt="결제가 요청되었습니다!" exiting={alertExiting}/>
             )}
         </div>
     );
