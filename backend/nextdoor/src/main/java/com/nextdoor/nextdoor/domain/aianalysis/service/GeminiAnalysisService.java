@@ -48,7 +48,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
     private final GenerativeModel geminiAnalysisModel;
     private final Part damageAnalyzerPromptPart;
-    private final Part overallDamageComparatorPromptPart;
+    private final Part summarizerPromptPart;
     private final Part pairDamageComparatorPromptPart;
 
     private final AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort;
@@ -63,8 +63,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
             GenerativeModel geminiAnalysisModel,
             @Qualifier("damageAnalyzerPromptPart")
             Part damageAnalyzerPromptPart,
-            @Qualifier("overallDamageComparatorPromptPart")
-            Part overallDamageComparatorPromptPart,
+            @Qualifier("summarizerPromptPart")
+            Part summarizerPromptPart,
             @Qualifier("pairDamageComparatorPromptPart")
             Part pairDamageComparatorPromptPart,
             AiAnalysisRentalQueryPort aiAnalysisRentalQueryPort,
@@ -75,7 +75,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         this.eventPublisher = eventPublisher;
         this.geminiAnalysisModel = geminiAnalysisModel;
         this.damageAnalyzerPromptPart = damageAnalyzerPromptPart;
-        this.overallDamageComparatorPromptPart = overallDamageComparatorPromptPart;
+        this.summarizerPromptPart = summarizerPromptPart;
         this.pairDamageComparatorPromptPart = pairDamageComparatorPromptPart;
         this.aiAnalysisRentalQueryPort = aiAnalysisRentalQueryPort;
         this.aiAnalysisMatcherCommandPort = aiAnalysisMatcherCommandPort;
@@ -127,19 +127,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
 
         // 이미지 쌍 만들고 비교
         List<RentalDto.AiImageDto[]> aiImagePairs = matchImages(beforeAiImages, afterAiImages);
-        List<String> geminiResponses = compareImages(beforeAiImages, afterAiImages, aiImagePairs);
-        String overallResponse;
-        try {
-            Map<String, String> overallGeminiResponse = objectMapper.readValue(geminiResponses.getFirst(), new TypeReference<>() {});
-            overallResponse = switch (overallGeminiResponse.get("result")) {
-                case "DAMAGE_FOUND" -> overallGeminiResponse.get("details");
-                case "NO_DAMAGE_FOUND" -> null;
-                default -> null;
-            };
-        } catch (JsonProcessingException e) {
-            throw new GeminiResponseProcessingException("Gemini 응답 변환 도중 예외 발생: " + geminiResponses.getFirst(), e);
-        }
-        List<String> pairResponses = geminiResponses.subList(1, geminiResponses.size());
+        List<String> pairResponses = compareImages(aiImagePairs);
 
         // 프론트로 전할 API 응답 및 이벤트 요소 생성
         List<DamageComparisonResponseDto.MatchingResult> responseMatchingResults = new ArrayList<>();
@@ -161,16 +149,28 @@ public class GeminiAnalysisService implements AiAnalysisService {
             ));
         }
 
+        // 손상이 하나라도 있으면 요약하고 아니면 null
+        List<String> damageDetails = new ArrayList<>();
+        responseMatchingResults
+                .forEach(matchingResult -> matchingResult.getPairComparisonResult().getDamages()
+                        .forEach(damage -> damageDetails.add(damage.getDetails())));
+        String summary = responseMatchingResults.stream()
+                .anyMatch(matchingResult ->
+                        matchingResult.getPairComparisonResult().getResult().equals("DAMAGE_FOUND"))
+                ? geminiComparatorAsyncPort.generateContent(createSummaryContent(damageDetails)).join()
+                        .getCandidates(0).getContent().getParts(0).getText()
+                : null;
+
         // 이벤트 발행 및 API 응답 리턴
         eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(
                 inspectDamageRequestDto.getRentalId(),
-                overallResponse,
+                summary,
                 eventMatchingResults
         ));
         return new DamageComparisonResponseDto(
                 beforeAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
                 afterAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
-                overallResponse,
+                summary,
                 responseMatchingResults);
     }
 
@@ -187,13 +187,8 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 }).toList();
     }
 
-    private List<String> compareImages(
-            List<RentalDto.AiImageDto> beforeAiImages,
-            List<RentalDto.AiImageDto> afterAiImages,
-            List<RentalDto.AiImageDto[]> aiImagePairs
-    ) {
+    private List<String> compareImages(List<RentalDto.AiImageDto[]> aiImagePairs) {
         List<CompletableFuture<GenerateContentResponse>> futures = new ArrayList<>();
-        futures.add(geminiComparatorAsyncPort.generateContent(createOverallComparisonContent(beforeAiImages, afterAiImages)));
         aiImagePairs.forEach(aiImagePair -> futures.add(geminiComparatorAsyncPort.generateContent(createPairComparisonContent(aiImagePair[0], aiImagePair[1]))));
         return futures.stream()
                 .map(CompletableFuture::join)
@@ -202,22 +197,11 @@ public class GeminiAnalysisService implements AiAnalysisService {
                 .toList();
     }
 
-    private Content createOverallComparisonContent(
-            List<RentalDto.AiImageDto> beforeAiImages,
-            List<RentalDto.AiImageDto> afterAiImages
-    ) {
+    private Content createSummaryContent(List<String> comparisonResults) {
         return Content.newBuilder()
-                .addParts(overallDamageComparatorPromptPart)
-                .addParts(Part.newBuilder().setText("These are before images.").build())
-                .addAllParts(beforeAiImages.stream()
-                        .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
-                        .map(this::convertToImagePart)
-                        .toList())
-                .addParts(Part.newBuilder().setText("These are after images.").build())
-                .addAllParts(afterAiImages.stream()
-                        .filter(aiImageDto -> aiImageDto.getType().equals(AiImageType.BEFORE))
-                        .map(this::convertToImagePart)
-                        .toList())
+                .addParts(summarizerPromptPart)
+                .addAllParts(comparisonResults.stream()
+                        .map(comparisonResult -> Part.newBuilder().setText(comparisonResult).build()).toList())
                 .setRole("user")
                 .build();
     }
