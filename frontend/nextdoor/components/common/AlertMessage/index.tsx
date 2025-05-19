@@ -126,7 +126,7 @@ export default function AlertMessage({ txt, exiting = false, type = 'success' }:
                 />
             </div></>)}
 
-            <div className={`${type === 'success' ? 'text-blue300' : 'text-[#FF637D]'} font-bold flex items-center gap-2`}>
+            <div className=" text-blue300 font-bold flex items-center gap-2">
                 <CircleAlert className="w-6 h-6" />
                 <span>{txt}</span>
             </div>

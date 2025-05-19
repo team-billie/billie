@@ -7,6 +7,7 @@ import useUserStore from '@/lib/store/useUserStore';
 import { GetUserInfoResponse } from '@/types/auth/response';
 import { GetAddedListRequest } from '@/lib/api/pays';
 import { AddAccountResponseDto } from '@/types/pays/response';
+import LoadingIcon from '@/components/common/LoadingIcon';
 
 function getPrimaryAccount(accounts: AddAccountResponseDto[]) {
   return accounts.find(account => account.isPrimary === true);
@@ -54,5 +55,8 @@ export default function OAuthRedirectPage() {
     }
   }, [searchParams, router]);
 
-  return <div>로그인 중입니다...</div>;
+  return (<div className='flex flex-col bg-blue100 items-center justify-center h-[100dvh] pb-20'>
+    <LoadingIcon/>
+    <div className='text-blue300 text-2xl font-bold'>Loading</div>
+  </div>);
 }
