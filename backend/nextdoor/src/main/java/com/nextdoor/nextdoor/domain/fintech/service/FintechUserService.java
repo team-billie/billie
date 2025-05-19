@@ -36,7 +36,7 @@ public class FintechUserService implements AuthFintechCommandPort {
                     return Mono.fromCallable(() -> {
                                 Member member = memberRepository.findById(memberId)
                                         .orElseThrow(() -> new RuntimeException("Member가 없습니다: " + memberId));
-                                member.setUserKey(userKey);
+                                member.updateUserKey(userKey);
                                 return memberRepository.save(member);
                             })
                             .subscribeOn(Schedulers.boundedElastic())
