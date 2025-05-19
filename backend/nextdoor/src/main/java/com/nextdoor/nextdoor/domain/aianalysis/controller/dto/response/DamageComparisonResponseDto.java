@@ -20,6 +20,34 @@ public class DamageComparisonResponseDto {
 
         private String beforeImage;
         private String afterImage;
-        private String pairComparisonResult;
+        private PairComparisonResult pairComparisonResult;
+
+        @AllArgsConstructor
+        @Getter
+        public static class PairComparisonResult {
+
+            private String result;
+            private List<Damage> damages;
+
+            @AllArgsConstructor
+            @Getter
+            public static class Damage {
+
+                private String damageType;
+                private String location;
+                private String details;
+                private float confidenceScore;
+
+                @AllArgsConstructor
+                @Getter
+                public static class BoundingBox {
+
+                    private float xMin;
+                    private float yMin;
+                    private float xMax;
+                    private float yMax;
+                }
+            }
+        }
     }
 }
