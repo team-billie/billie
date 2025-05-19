@@ -49,10 +49,13 @@ public class RentalMapper {
     public RemittanceResponse toResponse(RequestRemittanceResult result) {
         return RemittanceResponse.builder()
                 .ownerNickname(result.getOwnerNickname())
+                .ownerProfileImageUrl(result.getOwnerProfileImageUrl())
                 .rentalFee(result.getFinalAmount())
                 .deposit(result.getDeposit())
                 .accountNo(result.getAccountNo())
                 .bankCode(result.getBankCode())
+                .startDate(result.getStartDate())
+                .endDate(result.getEndDate())
                 .build();
     }
 
@@ -70,6 +73,7 @@ public class RentalMapper {
     public RentalDetailResponse toResponse(SearchRentalResult result) {
         return RentalDetailResponse.builder()
                 .reservationId(result.getId())
+                .postId(result.getPostId())
                 .startDate(result.getStartDate())
                 .endDate(result.getEndDate())
                 .rentalFee(result.getRentalFee())

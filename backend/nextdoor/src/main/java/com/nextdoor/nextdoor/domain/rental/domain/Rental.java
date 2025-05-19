@@ -109,7 +109,7 @@ public class Rental {
 
     public void updateDamageAnalysis(String damageAnalysis) {
         this.damageAnalysis = damageAnalysis;
-        updateStatus(RentalStatus.REMITTANCE_REQUESTED);
+        updateStatus(RentalStatus.BEFORE_PHOTO_ANALYZED);
     }
 
     public void updateComparedAnalysis(String comparedAnalysis) {
