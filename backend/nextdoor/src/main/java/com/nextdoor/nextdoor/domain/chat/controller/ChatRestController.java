@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -97,6 +99,16 @@ public class ChatRestController {
         Page<ChatMessage> results = messageService.searchMessages(roomId, keyword, page, size);
         Page<MessageDto> dtoPage = results.map(MessageDto::from);
         return ResponseEntity.ok(dtoPage);
+    }
+
+    /** 7) 채팅방 삭제 */
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity<Void> deleteRoom(
+            Principal principal,
+            @PathVariable Long roomId) {
+        Long userId = Long.valueOf(principal.getName());
+        chatRoomService.deleteRoom(roomId, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @Data
