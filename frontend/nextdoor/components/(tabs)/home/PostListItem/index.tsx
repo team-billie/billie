@@ -1,5 +1,5 @@
 import { Heart, DollarSign } from "lucide-react";
-import { PostListItemDto } from "@/types/posts/response";
+import { PostListItemDto } from "@/types/posts/response/index";
 import { useState } from "react";
 import { formatNumberWithCommas } from "@/lib/utils/money";
 import { PostLikeRequest, PostLikeDeleteRequest } from "@/lib/api/posts";
@@ -21,47 +21,35 @@ export default function PostListItem({ post }: PostListItemProps) {
   };
 
   return (
-    <div className="grid grid-cols-[1fr_3fr] items-center gap-4 border-b border-gray-200 pb-3">
+    <div className="grid grid-cols-[1fr_2fr] items-center gap-4 border-b border-gray-200 pb-3">
       {/* //이미지 사진 */}
       <img
         src={post.productImage || "/images/default/post_default.png"}
         className="w-full h-28 bg-gray-200 rounded-xl"
       />
-      <div className=" flex flex-col gap-1 flex-1">
+      <div className=" flex flex-col flex-1">
         <div className="flex justify-between pb-1">
-          <div className="text-xl font-bold">{post.title}</div>
-          {/* <Heart
-            className={`cursor-pointer transition-colors ${isLiked ? "text-pink-500 fill-pink-300" : "text-gray600"
-              }`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleLikeBtn();
-            }}
-          /> */}
-          <div className="flex gap-2">
-            <div className="flex gap-[6px] max-h-[24px] items-center text-blue400 border border-blue400 rounded-md px-1 ">
-              <Heart className="w-4 h-4" />
-              <div>{post.likeCount}</div>
-            </div>
-            <div className="flex gap-[3px] max-h-[24px] items-center text-sm text-blue400 border border-blue400 rounded-md px-1 py-[2px]">
-              <DollarSign className="w-4 h-4" />
-              <div>{post.dealCount}</div>
-            </div>
-          </div>
+          <div className="font-bold text-gray700">{post.title}</div>
         </div>
-        <div className="flex-1 flex flex-col">
-          <div className="flex gap-1 items-end">
-            <div className="text-sm mb-[2px] mr-2">대여료</div>
-            <div className="font-bold text-xl">
-              {formatNumberWithCommas(post.rentalFee)}원
+        <div className="flex justify-between items-end">
+          <div>
+            <div className="flex gap-1 items-end">
+              {/* 자간 늘리기 */}
+              <div className="font-bold text-2xl tracking-wide">
+                {formatNumberWithCommas(post.rentalFee)}₩
+              </div>
             </div>
-            <div className="text-sm mb-[2px]">/일</div>
+            <div className="flex  gap-1 items-end text-gray700">
+              <div className="mr-1">보증금</div>
+              <div className="font-bold text-lg tracking-wide">
+                {formatNumberWithCommas(post.deposit)}₩
+              </div>
+            </div>
           </div>
-          <div className="flex gap-1 items-end">
-            <div className="text-sm mb-[2px] mr-2">보증금</div>
-            <div className="font-bold text-xl">
-              {formatNumberWithCommas(post.deposit)}원
-            </div>
+          
+          <div className="flex gap-1 items-center">
+            <Heart className="w-5 h-5 text-blue400 fill-blue400" />
+            <div className="text-blue400 font-bold">{post.likeCount}</div>
           </div>
         </div>
       </div>
