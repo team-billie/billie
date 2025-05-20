@@ -26,10 +26,10 @@ If "DAMAGE_FOUND", include a "damages" array, where each element contains:
 Bounding box coordinates must be relative to the actual pixel width and height of each image.
 
 If no damage is found, return:
-[{"result":"NO_DAMAGE_FOUND","damages":[]},...]
+[{"imageIndex":[integer],"result":"NO_DAMAGE_FOUND","damages":[]},...]
 
 If damage is found, use this JSON format:
-[{"result":"DAMAGE_FOUND","damages":[{"location":"[Short location description, e.g., 'Upper left side']","details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox": {"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},...]
+[{"imageIndex":[integer],"result":"[DAMAGE_FOUND]","damages":[{"location":"[Short location description, e.g., 'Upper left side']","details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox": {"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},...]
 
 Only respond in this json format without any additional sentence.
 Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
