@@ -3,25 +3,14 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManager";
-import PhotoBox from "../CompareAnalysis/AllPhotos/PhotoBox";
 import Title from "../Title";
 import GrayButton from "../GrayButton";
 import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
-import {
-  AiAfterPhotosPostRequest,
-  AiBeforePhotosPostRequest,
-} from "@/lib/api/ai-analysis/request";
+import { AiBeforePhotosPostRequest } from "@/lib/api/ai-analysis/request";
 import useUserStore from "@/lib/store/useUserStore";
-import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 
 interface PhotoRegisterProps {
   status: "after" | "before";
-}
-
-interface AiAnalysisData {
-  beforeImages: string[];
-  afterImages: string[];
-  analysis: any | null;
 }
 
 export default function PhotoRegister({ status }: PhotoRegisterProps) {
@@ -29,8 +18,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const { id } = useParams();
   const router = useRouter();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
-  const [serverData, setServerData] = useState<AiAnalysisData | null>(null);
-  const { showAlert } = useAlertModal();
+  const [serverData, setServerData] = useState<null>(null);
 
   if (!userId) return null;
 
@@ -38,15 +26,8 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     try {
       if (!id) return;
       const rentalId = Number(id);
-      showAlert("분석 시작", "물품 분석을 시작하겠습니다", "info");
-      const res =
-        status === "before" && (await AiBeforePhotosPostRequest(rentalId));
-      showAlert("분석 완료", "물품 분석을 완료하였습니다", "info");
+
       if (status === "before") {
-        console.log("res : ", res);
-        useAnalysisStore
-          .getState()
-          .setDamageAnalysis(res.damageAnalysis || "[]");
         router.push(`/safe-deal/${rentalId}/before/analysis`);
       } else {
         router.push(`/safe-deal/${rentalId}/after/analysis`);
@@ -59,10 +40,10 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const photoKey = status === "before" ? "beforeImages" : "afterImages";
 
   return (
-    <main>
-      <div>
+    <div className="flex flex-col h-full">
+      <div className="flex-grow flex flex-col">
         <Title status={status} />
-        <div className="h-screen flex flex-col items-center gap-4">
+        <div className="w-full p-4 flex-grow flex flex-col justify-center">
           <PhotoManager
             rentalId={Number(id)}
             status={status}
@@ -71,13 +52,13 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
             photos={rentalPhotos}
             serverImages={serverData?.[photoKey] || []}
           />
-          <div className="fixed bottom-4 left-0 w-full px-4">
-            <div className="max-w-md mx-auto">
-              <GrayButton txt="AI 물품 상태 확인" onClick={handleAnalysis} />
-            </div>
-          </div>
         </div>
       </div>
-    </main>
+      <div className="w-full p-4 mt-auto">
+        <div className="max-w-md mx-auto">
+          <GrayButton txt="AI 물품 상태 확인" onClick={handleAnalysis} />
+        </div>
+      </div>
+    </div>
   );
 }

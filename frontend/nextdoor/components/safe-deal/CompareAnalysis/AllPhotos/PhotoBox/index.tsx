@@ -7,7 +7,6 @@ import { FreeMode, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
-import { stat } from "fs";
 
 interface PhotoBoxProps {
   images: string[];

@@ -13,7 +13,7 @@ export const AiBeforePhotosPostRequest = async (rentalId: number) => {
         },
       }
     );
-
+    console.log("AI 이미지 분석 결과 조회 성공:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("AI 이미지 분석 요청 실패:", error);

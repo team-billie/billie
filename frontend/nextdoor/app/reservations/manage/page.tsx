@@ -7,6 +7,7 @@ import ReservationManageNavbar from "@/components/reservations/manage/Reservatio
 import { fetchOwnerReservations } from "@/lib/api/reservations/request";
 import useUserStore from "@/lib/store/useUserStore";
 import { useEffect, useState } from "react";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface ReservationItem {
   id: number;
@@ -22,6 +23,7 @@ interface ReservationItem {
 export default function ReservationManagePage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
   const { userId } = useUserStore();
+  const { showAlert } = useAlertStore();
 
   const loadReservations = async () => {
     if (!userId) return;
@@ -48,7 +50,7 @@ export default function ReservationManagePage() {
 
       setItems(mappedItems);
     } catch (error) {
-      console.error("예약 목록 로딩 실패", error);
+      showAlert("예약 조회를 실패하였습니다", "error");
     }
   };
 

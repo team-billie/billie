@@ -20,7 +20,6 @@ export default function PostDetailPage() {
   const { id } = useParams();
   const feedId = Number(id);
   const router = useRouter();
-
   const [isLiked, setIsLiked] = useState(false);
 
   const handleLikeBtn = () => {
@@ -48,15 +47,14 @@ export default function PostDetailPage() {
       setIsLiked(data.liked);
     }
     fetchPostLike();
-
   }, [feedId]);
 
   if (!product) {
     return <LoadingSpinner />;
   }
 
-   // authorId가 null인 경우 대비 (옵셔널 체이닝 사용)
-   const authorId = product.authorId ?? 0;
+  // authorId가 null인 경우 대비 (옵셔널 체이닝 사용)
+  const authorId = product.authorId ?? 0;
 
   return (
     <main className="relative hakgyoansim-font" style={{ backgroundColor: "#F5F5F5" }}>

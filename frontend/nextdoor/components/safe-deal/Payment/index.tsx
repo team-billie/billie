@@ -13,11 +13,13 @@ import GrayButton from "../GrayButton";
 import PaymentTitle from "./PaymentTitle";
 import Header from "../Header";
 import GradientButton from "./GradientBtn";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 export default function Payment() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
+  const { showAlert } = useAlertStore();
 
   // 빌리 잔액 : zustand
   const { billyAccount, userKey } = useUserStore();
@@ -31,6 +33,7 @@ export default function Payment() {
   const [paymentData, setPaymentData] =
     useState<GetPaymentDataResponseDto | null>(null);
   console.log(paymentData);
+
   const sendBtnHandler = (isAfterRecharge: boolean = false) => {
     if (!isAfterRecharge && isChargeNeeded) {
       console.log("충전 필요");
@@ -50,11 +53,11 @@ export default function Payment() {
       })
         .then((res) => {
           console.log(res);
-          alert("대여 결제 완료");
+          showAlert("대여 결제 완료", "success");
           router.push("/profile");
         })
         .catch(() => {
-          alert("대여 결제 실패");
+          showAlert("대여 결제 실패", "error");
         });
 
       // 보증금 보관 api 호출
@@ -66,17 +69,14 @@ export default function Payment() {
       })
         .then((res) => {
           console.log(res);
-          alert("보증금 보관 완료");
+          showAlert("보증금 보관 완료", "success");
         })
         .catch(() => {
-          alert("보증금 보관 실패");
+          showAlert("보증금 보관 실패", "error");
         });
     } catch (error) {
-      alert("결제 실패");
+      showAlert("결제 실패", "error");
     }
-  };
-  const aIBtnHandler = () => {
-    console.log("AI분석 결과 다시 보기");
   };
 
   const [rentalFeeAmount, setRentalFeeAmount] = useState(0);
