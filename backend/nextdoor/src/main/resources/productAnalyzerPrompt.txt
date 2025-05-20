@@ -112,11 +112,11 @@ Respond in the following JSON format:
 {
   "title": "A concise and attractive title for the post",
   "content": "A detailed description of the product, including its features, condition, and any other relevant information",
-  "category": "One of the display names from the list above (e.g., \"디지털기기\")",
+  "category": "One of the Korean display names from the list above (e.g., \"디지털기기\") - you must use the Korean name in parentheses, not the English code",
   "condition": "One of the condition values from the list above (e.g., \"UNOPENED\")"
 }
 
 Only respond in this JSON format without any additional sentence.
 Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
 Output the JSON object with proper formatting and indentation.
-Respond with title and content fields in Korean while keeping all other keys and values in English and JSON format.
+Respond with title, content, and category fields in Korean while keeping all other keys and values in English and JSON format.
