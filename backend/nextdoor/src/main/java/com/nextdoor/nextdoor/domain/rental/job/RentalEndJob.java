@@ -18,6 +18,7 @@ public class RentalEndJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         Long rentalId = dataMap.getLong("rentalId");
+        System.out.println("[DEBUG_LOG] RentalEndJob executing for rental ID: " + rentalId);
         rentalEndService.rentalEnd(rentalId);
     }
 }
