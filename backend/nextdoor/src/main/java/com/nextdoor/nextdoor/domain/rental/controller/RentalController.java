@@ -76,6 +76,14 @@ public class RentalController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{rentalId}/remittance-data")
+    public ResponseEntity<RemittanceResponse> getRemittanceData(@PathVariable Long rentalId) {
+        RequestRemittanceResult result = rentalService.getRemittanceData(rentalId);
+        RemittanceResponse response = rentalMapper.toResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/{rentalId}/after/photos")
     public ResponseEntity<UploadImageResponse> registerAfterPhoto(
             @AuthenticationPrincipal Long userId,
