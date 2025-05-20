@@ -152,7 +152,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       !!userId
     );
 
-    if (!token || !uuid || !userId) {
+    if (!token || !uuid) {
       setLoading(false);
       setIsConnected(false);
       return;
