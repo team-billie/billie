@@ -9,7 +9,7 @@ export interface Message {
 
 // UI 전용 채팅방 타입
 export interface ChatRoomUI {
-  conversationId: string;
+  roomId: string;
   lastMessage?: {
     text: string;
     timestamp: Date;
@@ -25,7 +25,7 @@ export interface ChatRoomUI {
   rentalFee: number;
   deposit: number;
   chatStatus: string; // 상태없음 or 예약중 or 거래중
-  roomType?: 'borrowing' | 'lending';
+  roomType?: 'borrowing' | 'lending' | 'all';
 }
 
 // 사용자
@@ -47,7 +47,7 @@ export interface Product {
 
 // ChatMessageDto
 export interface ChatMessageDto {
-  conversationId: string;
+  roomId: string;
   senderId: number;
   content: string;
   sentAt: string;
@@ -62,30 +62,58 @@ export interface CreateChatRequest {
 }
 
 // 채팅방 생성 응답
-export interface Conversation {
-  conversationId: string;
-  participantIds: number[];
-  createdAt: string;
+export interface CreateChatRoomResponse {
+  roomId: number;
 }
 
-
-
 export interface ChatRoom {
-  conversationId: string;
+  roomId: number;
+  postId: number;
+  ownerId: number;
+  renterId: number;
   lastMessage: string;
   lastSentAt: string;
   unreadCount: number;
   otherNickname: string;
   otherProfileImageUrl: string;
   postImageUrl: string;
-  ownerId: number;
-  renterId: number;
-  postId: number;
   title: string;
   rentalFee: number;
   deposit: number;
-  chatStatus: string; // 상태없음 or 예약중 or 거래중
+  chatStatus: string;
 }
 
 // 사용자 역할
 export type UserRole = "borrower" | "lender";
+
+// 메시지 이력 조회 응답용 DTO
+export interface ChatMessageHistoryDto {
+  messageId: number;
+  senderId: number;
+  content: string;
+  sentAt: string;
+  deleted: boolean;
+}
+
+// 페이징 응답 타입
+export interface ChatMessageHistoryPage {
+  content: ChatMessageHistoryDto[];
+  pageable: any; // 필요시 상세 타입 정의 가능
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  sort: any;
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+}
+
+// 메시지 전송 요청
+export interface SendChatMessageRequest {
+  content: string;
+}
+
+// 메시지 전송 응답 (ChatMessageHistoryDto와 동일)
+export type SendChatMessageResponse = ChatMessageHistoryDto;
