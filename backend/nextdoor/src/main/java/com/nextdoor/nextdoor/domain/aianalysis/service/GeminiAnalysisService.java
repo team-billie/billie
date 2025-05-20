@@ -15,6 +15,7 @@ import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.DamageCom
 import com.nextdoor.nextdoor.domain.aianalysis.enums.AiImageType;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiAnalysisCompletedEvent;
 import com.nextdoor.nextdoor.domain.aianalysis.event.out.AiCompareAnalysisCompletedEvent;
+import com.nextdoor.nextdoor.domain.aianalysis.exception.DamageAnalysisPresentException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.ExternalApiException;
 import com.nextdoor.nextdoor.domain.aianalysis.exception.GeminiResponseProcessingException;
 import com.nextdoor.nextdoor.domain.aianalysis.port.AiAnalysisMatcherCommandPort;
@@ -85,9 +86,9 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public DamageAnalysisResponseDto analyzeDamage(Long loginUserId, DamageAnalysisRequestDto damageAnalysisRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(damageAnalysisRequestDto.getRentalId());
-        // if (rental.getDamageAnalysis() != null) {
-        //     throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
-        // }
+        if (rental.getDamageAnalysis() != null) {
+            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
+        }
         List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
         GenerateContentResponse response;
         try {
@@ -115,9 +116,9 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public DamageComparisonResponseDto compareDamage(Long loginUserId, DamageComparisonRequestDto inspectDamageRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
-        // if (rental.getDamageAnalysis() != null) {
-        //     throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
-        // }
+        if (rental.getDamageAnalysis() != null) {
+            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
+        }
 
         // 전 후 이미지 분리
         List<RentalDto.AiImageDto> beforeAiImages = rental.getAiImages().stream()
@@ -149,7 +150,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
             ));
         }
 
-        // 손상이 하나라도 있으면 요약하고 아니면 null
+        // 손상이 하나라도 있으면 요약하고 아니면 빈 문자열
         List<String> damageDetails = new ArrayList<>();
         responseMatchingResults
                 .forEach(matchingResult -> matchingResult.getPairComparisonResult().getDamages()
@@ -159,7 +160,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
                         matchingResult.getPairComparisonResult().getResult().equals("DAMAGE_FOUND"))
                 ? geminiComparatorAsyncPort.generateContent(createSummaryContent(damageDetails)).join()
                         .getCandidates(0).getContent().getParts(0).getText()
-                : null;
+                : "";
 
         // 이벤트 발행 및 API 응답 리턴
         eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(
@@ -170,7 +171,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         return new DamageComparisonResponseDto(
                 beforeAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
                 afterAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
-                summary,
+                summary.isEmpty() ? null : summary,
                 responseMatchingResults);
     }
 
