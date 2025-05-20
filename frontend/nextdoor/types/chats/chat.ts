@@ -9,7 +9,7 @@ export interface Message {
 
 // UI 전용 채팅방 타입
 export interface ChatRoomUI {
-  conversationId: string;
+  roomId: string;
   lastMessage?: {
     text: string;
     timestamp: Date;
@@ -25,7 +25,7 @@ export interface ChatRoomUI {
   rentalFee: number;
   deposit: number;
   chatStatus: string; // 상태없음 or 예약중 or 거래중
-  roomType?: 'borrowing' | 'lending';
+  roomType?: 'borrowing' | 'lending' | 'all';
 }
 
 // 사용자

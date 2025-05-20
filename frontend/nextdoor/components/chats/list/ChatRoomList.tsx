@@ -14,10 +14,10 @@ interface ChatRoomListProps {
   userRole: 'borrower' | 'lender' | 'all'; // 'all' 추가
 }
 
-const ChatRoomList: React.FC<ChatRoomListProps> = ({ 
-  chatRooms, 
-  isLoading, 
-  userRole 
+const ChatRoomList: React.FC<ChatRoomListProps> = ({
+  chatRooms,
+  isLoading,
+  userRole
 }) => {
   // 최신 메시지 기준으로 정렬
   const sortedChats = [...chatRooms].sort((a, b) => {
@@ -25,21 +25,21 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({
     const dateB = b.lastMessage?.timestamp ? new Date(b.lastMessage.timestamp) : new Date(0);
     return dateB.getTime() - dateA.getTime();
   });
-  
+
   if (isLoading) {
     return <LoadingSkeleton count={5} />;
   }
-  
+
   if (sortedChats.length === 0) {
     return <EmptyState userRole={userRole === 'all' ? 'borrower' : userRole} />;
   }
-  
+
   return (
     <div className="divide-y">
       {sortedChats.map(chat => (
-        <ChatRoomItem 
-          key={chat.conversationId} 
-          chat={chat} 
+        <ChatRoomItem
+          key={chat.roomId}
+          chat={chat}
           userRole={chat.roomType === 'borrowing' ? 'borrower' : 'lender'} // roomType에 따라 userRole 결정
         />
       ))}
