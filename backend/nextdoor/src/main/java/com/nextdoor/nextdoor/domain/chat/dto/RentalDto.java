@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.chat.application.dto;
+package com.nextdoor.nextdoor.domain.chat.dto;
 
 import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
 import lombok.AllArgsConstructor;

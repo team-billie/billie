@@ -6,13 +6,14 @@ import ProductPhotos from "@/components/posts/detail/ProductPhotos";
 import ProductReservation from "@/components/posts/detail/ProductReservation";
 import { GetPostLikeRequest } from "@/lib/api/posts";
 import { postDetailRequest } from "@/lib/api/posts/request";
-import { PostDetailResponseDTO } from "@/types/posts/response";
+import { PostDetailResponse } from "@/types/posts/response";
 import { ChevronLeft, Heart, MessageCircle, Share2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PostLikeDeleteRequest, PostLikeRequest } from "@/lib/api/posts";
 // CSS 파일 import (아래 2번 방법에서 생성할 CSS)
 import '@/styles/fonts.css';
+import { PostDetailResponseDTO } from "@/types/posts/response/index";
 
 export default function PostDetailPage() {
   const [product, setProduct] = useState<PostDetailResponseDTO | null>(null);

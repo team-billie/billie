@@ -1,3 +1,415 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Camera, Loader2, X, Plus, Image as ImageIcon, Pencil, FileText, Tag, MapPin, CircleDollarSign } from "lucide-react";
+import { analyzeProductImage, createPost } from "@/lib/api/posts/request";
+import useProductRegisterStore from "@/lib/store/posts/useProductRegisterStore";
+import ProductRegisterHeader from "@/components/posts/register/ProductRegisterHeader";
+import ProductRegisterFormGroup from "@/components/posts/register/ProductRegisterFormGroup";
+import ProductRegisterTextInput from "@/components/posts/register/ProductRegisterTextInput";
+import ProductRegisterCategorySelector from "@/components/posts/register/ProductRegisterCategorySelector";
+import ProductRegisterLocationSelector from "@/components/posts/register/ProductRegisterLocationSelector";
+import ProductRegisterPriceInput from "@/components/posts/register/ProductRegisterPriceInput";
+import ProductRegisterSubmitButton from "@/components/posts/register/ProductRegisterSubmitButton";
+
 export default function NewPostPage() {
-    return <div>NewPost</div>;
-  }
+    const router = useRouter();
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [additionalImages, setAdditionalImages] = useState<File[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [showAnalysisResult, setShowAnalysisResult] = useState(false);
+    const [analysisError, setAnalysisError] = useState<string | null>(null);
+    const [progress, setProgress] = useState(0);
+    const progressRef = useRef<NodeJS.Timeout | null>(null);
+
+    const {
+        title,
+        content,
+        rentalFee,
+        deposit,
+        category,
+        preferredLocation,
+        setTitle,
+        setContent,
+        setRentalFee,
+        setDeposit,
+        setCategory,
+        setPreferredLocation,
+        resetForm,
+    } = useProductRegisterStore();
+
+    useEffect(() => {
+        if (isAnalyzing) {
+            setProgress(0);
+            if (progressRef.current) clearInterval(progressRef.current);
+            let localProgress = 0;
+            let interval: NodeJS.Timeout;
+            const updateProgress = () => {
+                // 0~90%까지는 랜덤하게 보통 속도로 증가
+                if (localProgress < 90) {
+                    // 0.7~2.2% 랜덤 증가
+                    const increment = Math.random() * 1.5 + 0.7;
+                    // 120~350ms 랜덤 간격
+                    const delay = Math.random() * 230 + 120;
+                    localProgress = Math.min(localProgress + increment, 90);
+                    setProgress(localProgress);
+                    interval = setTimeout(updateProgress, delay);
+                }
+            };
+            interval = setTimeout(updateProgress, 200);
+            progressRef.current = interval as unknown as NodeJS.Timeout;
+        } else {
+            // 분석이 끝나면 100%로 애니메이션
+            setProgress(100);
+            if (progressRef.current) {
+                clearTimeout(progressRef.current);
+                progressRef.current = null;
+            }
+        }
+        return () => {
+            if (progressRef.current) {
+                clearTimeout(progressRef.current);
+                progressRef.current = null;
+            }
+        };
+    }, [isAnalyzing]);
+
+    useEffect(() => {
+        const storedLocation = localStorage.getItem("selectedLocation");
+        if (storedLocation) {
+            setPreferredLocation(storedLocation);
+            localStorage.removeItem("selectedLocation");
+        }
+    }, [setPreferredLocation]);
+
+    const handleMainImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setSelectedImage(file);
+        setPreviewUrls([URL.createObjectURL(file)]);
+        await analyzeImage(file);
+    };
+
+    const analyzeImage = async (file: File) => {
+        setIsAnalyzing(true);
+        setAnalysisError(null);
+
+        try {
+            const result = await analyzeProductImage(file);
+            setTitle(result.title);
+            setContent(result.content);
+            setCategory(result.category);
+            setShowAnalysisResult(true);
+        } catch (error) {
+            console.error("이미지 분석 실패:", error);
+            setAnalysisError("이미지 분석에 실패했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    const handleRetry = async () => {
+        if (selectedImage) {
+            await analyzeImage(selectedImage);
+        }
+    };
+
+    const handleAdditionalImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        const newImages = [...additionalImages, ...files];
+        setAdditionalImages(newImages);
+        setPreviewUrls(prev => [...prev, ...files.map(file => URL.createObjectURL(file))]);
+    };
+
+    const removeImage = (index: number) => {
+        if (index === 0) {
+            setSelectedImage(null);
+            setPreviewUrls(prev => prev.slice(1));
+            setShowAnalysisResult(false);
+            setTitle("");
+            setContent("");
+            setCategory("");
+        } else {
+            setAdditionalImages(prev => prev.filter((_, i) => i !== index - 1));
+            setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (!selectedImage) {
+            alert("이미지를 선택해주세요.");
+            return;
+        }
+
+        if (!title || !content || !category || !preferredLocation) {
+            alert("필수 항목을 모두 입력해주세요.");
+            return;
+        }
+
+        try {
+            const postData = {
+                title,
+                content,
+                category,
+                rentalFee: Number(rentalFee),
+                deposit: Number(deposit),
+                preferredLocation: {
+                    latitude: 37.517236,
+                    longitude: 127.047325
+                },
+                address: preferredLocation
+            };
+
+            await createPost(postData, [selectedImage, ...additionalImages]);
+            alert("게시물이 등록되었습니다.");
+            resetForm();
+            router.push("/home");
+        } catch (error) {
+            console.error("게시물 등록 실패:", error);
+            alert("게시물 등록에 실패했습니다.");
+        }
+    };
+
+    if (isAnalyzing) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+                <div className="mb-4">
+                    <div className="inline-block bg-green-200 text-green-800 px-4 py-2 rounded-full text-lg font-semibold shadow">
+                        기다려주셔서 감사합니다
+                    </div>
+                </div>
+                <div className="relative mb-6">
+                    <Image
+                        src="/images/doctorBlueStar.png"
+                        alt="분석 대기 캐릭터"
+                        width={195}
+                        height={195}
+                        className="animate-bounce drop-shadow-lg"
+                        priority
+                    />
+                </div>
+                <div className="text-center mb-6">
+                    <p className="text-gray-700 text-lg font-medium mb-1">AI가 이미지를 분석하고 있어요</p>
+                    <p className="text-gray-500 text-base">조금만 기다려주시면 곧 결과를 보여드릴게요!</p>
+                </div>
+                <div className="w-64 h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
+                    <div
+                        className="h-full bg-blue-400 transition-all duration-200"
+                        style={{ width: `${progress}%` }}
+                    />
+                </div>
+                <div className="text-gray-400 text-xs">분석이 완료될 때까지 창을 닫지 말아주세요.</div>
+            </div>
+        );
+    }
+
+    if (!showAnalysisResult) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+                <ProductRegisterHeader />
+                <div className="flex-1 flex flex-col items-center justify-center px-4">
+                    <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto">
+                        <div className="relative w-60 max-w-full bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center animate-float mb-5">
+                            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-3 animate-pulse">
+                                <ImageIcon className="w-9 h-9 text-blue-400" />
+                            </div>
+                            <div className="w-28 h-4 bg-gray-200 rounded mb-2" />
+                            <div className="w-36 h-3 bg-gray-100 rounded mb-1" />
+                            <div className="w-32 h-3 bg-gray-100 rounded mb-1" />
+                            <div className="w-24 h-3 bg-gray-100 rounded" />
+                        </div>
+                        <div className="text-center mb-5">
+                            <h2 className="text-xl font-semibold text-gray-800 mb-2">사진을 등록해주세요</h2>
+                            <p className="text-gray-500 text-base">AI가 게시물의 내용을 제안해줍니다!</p>
+                        </div>
+                        <label className="flex flex-col items-center cursor-pointer select-none mb-2">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                className="hidden"
+                                onChange={handleMainImageSelect}
+                            />
+                            <div className="relative flex flex-col items-center">
+                                <div className="bg-blue-500 hover:bg-blue-600 transition-all w-20 h-20 rounded-full flex items-center justify-center shadow-2xl animate-pulse ring-4 ring-blue-100">
+                                    <Camera className="w-10 h-10 text-white" />
+                                </div>
+                                <span className="mt-2 text-blue-500 font-semibold text-base">사진 추가</span>
+                            </div>
+                        </label>
+                        {previewUrls[0] && (
+                            <div className="relative aspect-square w-full max-w-xs mx-auto mt-8 mb-4">
+                                <Image
+                                    src={previewUrls[0]}
+                                    alt="Preview"
+                                    fill
+                                    className="object-cover rounded-xl"
+                                />
+                                <button
+                                    onClick={() => {
+                                        setSelectedImage(null);
+                                        setPreviewUrls([]);
+                                        setAnalysisError(null);
+                                    }}
+                                    className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        )}
+                        <div className="mt-4 text-gray-400 text-sm">사진을 선택하거나 촬영하세요</div>
+                        {analysisError && (
+                            <div className="text-center mt-4">
+                                <p className="text-red-500 mb-2">{analysisError}</p>
+                                <button
+                                    onClick={handleRetry}
+                                    className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors"
+                                >
+                                    다시 시도하기
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <main className="min-h-screen bg-gray-50 pb-20">
+            <ProductRegisterHeader />
+            <div className="max-w-md mx-auto px-4 py-8">
+                <div className="bg-white rounded-2xl shadow p-5 mb-8">
+                    <div className="mb-3 text-gray-800 font-semibold text-base">이미지 등록</div>
+                    <div className="grid grid-cols-3 gap-3 mb-2">
+                        {previewUrls.map((url, index) => (
+                            <div key={index} className="relative aspect-square">
+                                <Image
+                                    src={url}
+                                    alt={`Image ${index + 1}`}
+                                    fill
+                                    className="object-cover rounded-lg"
+                                />
+                                <button
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                        {previewUrls.length < 5 && (
+                            <label className="relative aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors flex items-center justify-center">
+                                <Plus className="w-8 h-8 text-gray-400" />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={handleAdditionalImageSelect}
+                                />
+                            </label>
+                        )}
+                    </div>
+                    <div className="text-gray-400 text-xs">최대 5장까지 등록할 수 있어요</div>
+                </div>
+                <div className="space-y-6">
+                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700 mb-1">제목</label>
+                        <div className="flex items-center gap-2">
+                            <Pencil className="w-5 h-5 text-blue-400 shrink-0" />
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
+                                placeholder="글 제목을 입력하세요"
+                                maxLength={40}
+                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-3 text-gray-900 placeholder-gray-300 outline-none"
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700 mb-1">설명</label>
+                        <div className="flex items-start gap-2">
+                            <FileText className="w-5 h-5 text-blue-400 shrink-0 mt-1" />
+                            <textarea
+                                value={content}
+                                onChange={e => setContent(e.target.value)}
+                                placeholder="나의 물건을 소개해주세요."
+                                rows={4}
+                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-3 text-gray-900 placeholder-gray-300 outline-none resize-none"
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700 mb-1">1일 대여금</label>
+                        <div className="flex items-center gap-2">
+                            <CircleDollarSign className="w-5 h-5 text-blue-400 shrink-0" />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                value={rentalFee}
+                                onChange={e => setRentalFee(e.target.value.replace(/[^0-9]/g, ""))}
+                                placeholder="가격 입력"
+                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-3 text-gray-900 placeholder-gray-300 outline-none"
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700 mb-1">보증금</label>
+                        <div className="flex items-center gap-2">
+                            <CircleDollarSign className="w-5 h-5 text-blue-200 shrink-0" />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                value={deposit}
+                                onChange={e => setDeposit(e.target.value.replace(/[^0-9]/g, ""))}
+                                placeholder="선택 입력"
+                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-200 focus:ring-2 focus:ring-blue-50 p-3 text-gray-900 placeholder-gray-300 outline-none"
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700 mb-1">카테고리</label>
+                        <div className="flex items-center gap-2">
+                            <Tag className="w-5 h-5 text-blue-400 shrink-0" />
+                            <div className="flex-1">
+                                <ProductRegisterCategorySelector
+                                    value={category}
+                                    onChange={setCategory}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700 mb-1">위치</label>
+                        <div className="flex items-center gap-2">
+                            <MapPin className="w-5 h-5 text-blue-400 shrink-0" />
+                            <div className="flex-1">
+                                <ProductRegisterLocationSelector
+                                    value={preferredLocation}
+                                    onChange={setPreferredLocation}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="sticky bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10 mt-8">
+                    <button
+                        className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-semibold text-lg shadow-lg transition-all"
+                        onClick={handleSubmit}
+                        aria-label="상품 등록 완료"
+                    >
+                        작성 완료
+                    </button>
+                </div>
+            </div>
+        </main>
+    );
+}
