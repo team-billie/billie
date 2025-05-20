@@ -7,7 +7,7 @@ import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
 import ChatAccordion from "@/components/chats/chatdetail/ChatProductInfoCard";
 import { Message } from "@/types/chats/chat";
-import { getChatMessages, getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
+import { getChatRooms, convertToChatRoomUI, getChatMessageHistory } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
 import { useWebSocket } from "@/lib/hooks/chats/useWebSocket";
 import ProductInfoCard from "@/components/chats/chatdetail/ChatProductInfoCard";
@@ -147,10 +147,12 @@ export default function ChatDetailPage() {
         setIsLoading(true);
         console.log(`메시지 이력 조회: roomId=${roomId}`);
 
-        const chatMessages = await getChatMessages(roomId);
+        // getChatMessageHistory로 변경 (0페이지, 50개)
+        const historyPage = await getChatMessageHistory(roomId, 0, 50);
+        const chatMessages = historyPage.content;
 
         const formattedMessages = chatMessages.map((msg) => ({
-          id: `${msg.roomId}_${msg.senderId}_${new Date(msg.sentAt).getTime()}`,
+          id: `${msg.messageId}`,
           text: msg.content,
           sender: Number(msg.senderId) === Number(userId) ? "user" : "other",
           timestamp: new Date(msg.sentAt),

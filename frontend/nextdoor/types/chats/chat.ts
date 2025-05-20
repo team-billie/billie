@@ -85,3 +85,35 @@ export interface ChatRoom {
 
 // 사용자 역할
 export type UserRole = "borrower" | "lender";
+
+// 메시지 이력 조회 응답용 DTO
+export interface ChatMessageHistoryDto {
+  messageId: number;
+  senderId: number;
+  content: string;
+  sentAt: string;
+  deleted: boolean;
+}
+
+// 페이징 응답 타입
+export interface ChatMessageHistoryPage {
+  content: ChatMessageHistoryDto[];
+  pageable: any; // 필요시 상세 타입 정의 가능
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  sort: any;
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+}
+
+// 메시지 전송 요청
+export interface SendChatMessageRequest {
+  content: string;
+}
+
+// 메시지 전송 응답 (ChatMessageHistoryDto와 동일)
+export type SendChatMessageResponse = ChatMessageHistoryDto;

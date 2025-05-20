@@ -2,6 +2,9 @@ import {
   ChatMessageDto,
   ChatRoom,
   CreateChatRequest,
+  ChatMessageHistoryPage,
+  SendChatMessageRequest,
+  SendChatMessageResponse,
 } from "@/types/chats/chat";
 import useUserStore from "@/lib/store/useUserStore";
 import axiosInstance from "@/lib/api/instance";
@@ -31,22 +34,6 @@ export const getChatRooms = async (): Promise<ChatRoom[]> => {
   } catch (error) {
     console.error("채팅방 목록 조회에 실패했습니다:", error);
     throw new Error("채팅방 목록 조회에 실패했습니다.");
-  }
-};
-
-/**
- * 메시지 목록 조회 API - userId 파라미터 제거
- * @param conversationId 채팅방 ID
- */
-export const getChatMessages = async (
-  conversationId: string
-): Promise<ChatMessageDto[]> => {
-  try {
-    const response = await axiosInstance.get(`/api/v1/chats/${conversationId}/messages`);
-    return response.data;
-  } catch (error) {
-    console.error("메시지 조회에 실패했습니다:", error);
-    throw new Error("메시지 조회에 실패했습니다.");
   }
 };
 
@@ -114,4 +101,30 @@ export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
     deposit: room.deposit || 0,
     chatStatus: room.chatStatus || "상태없음"
   };
+};
+
+// 메시지 이력 조회 (페이징)
+export const getChatMessageHistory = async (
+  roomId: string | number,
+  page: number = 0,
+  size: number = 50
+): Promise<ChatMessageHistoryPage> => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const response = await axiosInstance.get(`/api/v1/chats/rooms/${roomId}/messages`, {
+    params: { page, size },
+    headers,
+  });
+  return response.data;
+};
+
+// 메시지 전송
+export const sendChatMessage = async (
+  roomId: string | number,
+  data: SendChatMessageRequest
+): Promise<SendChatMessageResponse> => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const response = await axiosInstance.post(`/api/v1/chats/rooms/${roomId}/messages`, data, { headers });
+  return response.data;
 };
