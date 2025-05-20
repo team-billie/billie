@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Camera,
-  Loader2,
   X,
   Plus,
   Image as ImageIcon,
