@@ -20,6 +20,7 @@ public class AiCompareAnalysisCompletedEventListener {
                 aiCompareAnalysisCompletedEvent.getRentalId(),
                 aiCompareAnalysisCompletedEvent.getOverallComparisonResult()
         );
+        rentalService.deleteAiImageComparisonPairByRentalId(aiCompareAnalysisCompletedEvent.getRentalId());
         aiCompareAnalysisCompletedEvent.getMatchingResults()
                 .forEach(matchingResult -> rentalService.createAiImageComparisonPair(
                         aiCompareAnalysisCompletedEvent.getRentalId(),
