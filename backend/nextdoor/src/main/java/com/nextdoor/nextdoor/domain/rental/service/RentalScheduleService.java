@@ -23,14 +23,12 @@ public class RentalScheduleService {
                     .usingJobData("rentalId", rentalId)
                     .build();
 
-            Date endDateTime = Date.from(
-                    endDate.atStartOfDay(ZoneId.systemDefault())
-                            .toInstant()
-            );
+            //테스트 : 스케줄러 생성 20초 후에 실행
+            Date runDateTime = new Date(System.currentTimeMillis() + 20 * 1000);
 
             Trigger endTrigger = TriggerBuilder.newTrigger()
                     .withIdentity("rentalEndTrigger_" + rentalId, "rentalTriggers")
-                    .startAt(endDateTime)
+                    .startAt(runDateTime)
                     .build();
 
             scheduler.scheduleJob(endJob, endTrigger);
