@@ -29,9 +29,9 @@ export default function MyAccountListModal({ setIsModalOpen, setSelectedAccount,
 
     return (
         <>
-        <div className={`h-[40dvh] absolute bottom-0 bg-white rounded-t-2xl w-full flex flex-col gap-2 border-t ${type === "small" ? "p-4 py-6" : "p-6"} transform transition-transform duration-500 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+        <div className={`h-[40dvh] absolute bottom-0 bg-white rounded-t-2xl w-full flex flex-col items-start gap-2 border-t ${type === "small" ? "p-4 py-6" : "p-6"} transform transition-transform duration-500 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
             <div className="text-gray900 text-2xl font-semibold mb-2">어떤 계좌에서 가져올까요?</div>
-            <div className="overflow-y-auto flex flex-col gap-3">
+            <div className="w-full overflow-y-auto flex flex-col gap-3">
                 {addedAccounts?.map((account: AddAccountResponseDto) => (
                     <button key={account.bankCode} onClick={() => handleBankBtnClick(account)}>
                         <MyAccountItem type={type} account={account} />
