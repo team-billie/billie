@@ -12,7 +12,9 @@ import { useRouter } from "next/navigation";
 import { VerifyAccountResponseDto } from "@/types/pays/response";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
 import { useAlertStore } from "@/lib/store/useAlertStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Loading from "@/components/pays/common/Loading";
+import Header from "../../common/Header";
 
 type FormValues = TransferAccountRequestDto;
 
@@ -24,6 +26,9 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
     const { userKey, billyAccount } = useUserStore();
     const router = useRouter();
     const { showAlert } = useAlertStore();
+
+    const [status, setStatus] = useState<'loading' | 'success' | 'error' | null>(null);
+    
     const withdrawForm = useForm<FormValues>({
         defaultValues: {
             userKey: userKey,
@@ -58,12 +63,18 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
             return;
         }
 
-        console.log(data);
+        setStatus('loading');
+
         TransferAccountRequest(data).then((res) => {
-            showAlert("빌리에서 계좌로 이체가 완료되었습니다.", "success");
-            router.push("/profile");
+            setTimeout(() => {
+                setStatus('success');
+                showAlert("빌리에서 계좌로 이체가 완료되었습니다.", "success");
+            }, 1500);
         }).catch((err) => {
-            showAlert("빌리에서 계좌로 이체에 실패했습니다.", "error");
+            setTimeout(() => {
+                setStatus('error');
+                showAlert("빌리에서 계좌로 이체에 실패했습니다.", "error");
+            }, 1500);
         });
     }
 
@@ -92,10 +103,15 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
 
     return (
         <FormProvider {...withdrawForm}>
-            <div className="flex-1 flex flex-col items-center">
-                <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
-                    <div className="text-gray900 text-lg font-semibold">{verifiedAccount?.nickname}에게</div>
-                    <div className="flex gap-2 items-center justify-center">
+            {status
+                ? <Loading type="withdraw" status={status} headerTxt="송금" />
+                : 
+                <>
+                <Header txt="계좌송금"/>
+                <div className="flex-1 flex flex-col items-center">
+                    <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
+                        <div className="text-gray900 text-lg font-semibold">{verifiedAccount?.nickname}에게</div>
+                        <div className="flex gap-2 items-center justify-center">
                         <img
                             src={getBankInfo(verifiedAccount?.bankCode ?? "000")?.image}
                             alt={getBankInfo(verifiedAccount?.bankCode ?? "000")?.bankName}
@@ -118,8 +134,10 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
 
                 <div className="p-4 w-full flex-1 flex items-end">
                     <Button onClick={withdrawForm.handleSubmit(onSubmit)} txt="송금하기" state={true} />
+                    </div>
                 </div>
-            </div>
+                </>
+            }
         </FormProvider>
     );
 }

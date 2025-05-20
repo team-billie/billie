@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "../../common/Header";
 import EnterAccount from "@/components/pays/common/EnterAccount";
 import MyAccountItem from "@/components/pays/common/MyAccountItem";
 import useUserStore from "@/lib/store/useUserStore";
@@ -21,6 +22,8 @@ export default function AccountCheck({setIsPossibleAccount, setSelectedAccount, 
     }
      
     return (
+        <>
+        <Header txt="계좌송금"/>
         <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
             <EnterAccount 
                 btnTxt="다음" 
@@ -41,5 +44,6 @@ export default function AccountCheck({setIsPossibleAccount, setSelectedAccount, 
                 ))}
             </div>
         </div>
+        </>
     );
 }

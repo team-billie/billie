@@ -6,13 +6,14 @@ import { ChevronLeft } from "lucide-react";
 interface HeaderProps {
   txt: string;
   x?: boolean;
+  color?: string;
 }
 
-export default function Header({ txt, x = true }: HeaderProps) {
+export default function Header({ txt, x = true, color = "bg-white text-gray900" }: HeaderProps) {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 flex min-h-[60px] items-center px-4 text-gray900 bg-white">
+    <div className={`sticky top-0 flex min-h-[60px] items-center px-4 ${color}`}>
         <button onClick={() => router.back()}>
           {x && <ChevronLeft className="w-6 h-6" />}
         </button>

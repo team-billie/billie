@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { TransferAccountRequest } from "@/lib/api/pays";
 import { useAlertStore } from "@/lib/store/useAlertStore";
 import { formatNumberWithCommas } from "@/lib/utils/money";
+import Loading from "@/components/pays/common/Loading";
 
 type FormValues = TransferAccountRequestDto;
 
@@ -26,6 +27,8 @@ export default function RechargePage() {
     const router = useRouter();
     const rechargeAccount = selectedAccount ?? mainAccount;
     const { showAlert } = useAlertStore();
+
+    const [status, setStatus] = useState<'loading' | 'success' | 'error' | null>(null);
 
     const rechargeForm = useForm<FormValues>({
         defaultValues: {
@@ -62,18 +65,24 @@ export default function RechargePage() {
 
 
         rechargeForm.setValue("withdrawalAccountNo", rechargeAccount?.accountNo ?? "");
-
-        TransferAccountRequest(rechargeForm.getValues()).then((res) => {
-            showAlert("빌리페이 충전 완료", "success");
-            router.push("/profile");
-
-        }).catch((err) => {
-            if (err.code === "A1014") {
-                showAlert("계좌 잔액 부족으로 충전 불가", "error");
-            } else {
-                showAlert("빌리페이 충전 실패", "error");
-            }
-        });
+        setStatus('loading');
+        TransferAccountRequest(rechargeForm.getValues())
+            .then((res) => {
+                setTimeout(() => {
+                    setStatus('success');
+                    showAlert("빌리페이 충전 완료", "success");
+                }, 1500);
+            })
+            .catch((err) => {
+                setTimeout(() => {
+                    setStatus('error');
+                    if (err.code === "A1014") {
+                        showAlert("계좌 잔액 부족으로 충전 불가", "error");
+                    } else {
+                        showAlert("빌리페이 충전 실패", "error");
+                    }
+                }, 1500);
+            });
     }
 
     const handleAmountChange = (amount: number) => {
@@ -96,9 +105,12 @@ export default function RechargePage() {
 
     return (
         <div className="relative flex flex-col min-h-[100dvh]">
-            <Header txt="충전" />
-            <FormProvider {...rechargeForm}>
-                <div className="flex-1 flex flex-col items-center">
+            {status
+                ? <Loading type="recharge" status={status} headerTxt="충전" />
+                : <>
+                    <Header txt="충전" />
+                    <FormProvider {...rechargeForm}>
+                        <div className="flex-1 flex flex-col items-center">
                     <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
                         <div className="flex gap-2 items-center justify-center" onClick={() => setIsAccountListModalOpen(true)}>
                             <img
@@ -132,6 +144,8 @@ export default function RechargePage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
                     <MyAccountListModal setIsModalOpen={setIsAccountListModalOpen} setSelectedAccount={setSelectedAccount} />
                 </div>
+            }
+            </>
             }
         </div>
     );

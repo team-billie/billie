@@ -16,8 +16,7 @@ import { CircleAlert } from "lucide-react";
 
 export default function Payment() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'success' | 'error' | null>(null);
   const router = useRouter();
 
   // 빌리 잔액 : zustand
@@ -37,43 +36,37 @@ export default function Payment() {
       return;
     }
 
-    setIsLoading(true);
-    try {
+    setStatus('loading');
+    Promise.all([
       PayItemRequest({
-        userKey: userKey,
+        userKey,
         depositAccountNo: paymentData?.accountNo ?? "",
         transactionBalance: rentalFeeAmount,
         withdrawalAccountNo: billyAccount?.accountNo ?? "",
         depositTransactionSummary: "빌리페이 입금",
         withdrawalTransactionSummary: "빌리페이 출금",
         rentalId: Number(id),
-      })
-        .then((res) => {
-          console.log(res);
-          showAlert("대여 결제 완료", "success");
-          router.push("/profile");
-        })
-        .catch(() => {
-          showAlert("대여 결제 실패", "error");
-        });
-
-      // 보증금 보관 api 호출
+      }),
       HoldDepositRequest({
-        userKey: userKey,
+        userKey,
         rentalId: Number(id),
         accountNo: billyAccount?.accountNo ?? "",
         amount: depositAmount,
+      }),
+    ])
+      .then(([payRes, depositRes]) => {
+        console.log(payRes, depositRes);
+        showAlert("결제 및 보증금 처리 완료", "success");
+        setTimeout(() => {
+          setStatus("success");
+          // router.push("/profile");
+        }, 2500);
       })
-        .then((res) => {
-          console.log(res);
-          showAlert("보증금 보관 완료", "success");
-        })
-        .catch(() => {
-          showAlert("보증금 보관 실패", "error");
-        });
-    } catch (error) {
-      showAlert("결제 실패", "error");
-    }
+      .catch((err) => {
+        console.error(err);
+        showAlert("결제 또는 보증금 처리 실패", "error");
+        setTimeout(() => setStatus("error"), 2500);
+      });
   };
 
   const [rentalFeeAmount, setRentalFeeAmount] = useState(0);
@@ -89,7 +82,7 @@ export default function Payment() {
         setPaymentData(res);
         setRentalFeeAmount(res.rentalFee);
         setDepositAmount(res.deposit);
-        const chargeAmount = rentalFeeAmount + depositAmount - balance;
+        const chargeAmount = res.rentalFee + res.deposit - balance;
         setChargeNeeded(chargeAmount);
         setIsChargeNeeded(chargeAmount > 0);
       }
@@ -98,20 +91,11 @@ export default function Payment() {
 
   return (
     <div className="relative flex flex-col min-h-[100dvh]">
-      {isLoading
-        ? <Loading type="payment" isSuccess={isSuccess} headerTxt="결제" />
+      {status
+        ? <Loading type="payment" status={status} headerTxt="결제" />
         : <><Header txt="결제하기" />
           <div className="flex-1 flex flex-col items-center px-6 py-4">
             <div className="w-full flex-1 flex flex-col gap-4">
-
-              {/* 물품정보 */}
-              {/* <div className="flex items-center gap-3 border-b border-gray300 pb-4">
-                <div className="w-16 h-16 rounded-lg bg-gray500" />
-                <div className="flex flex-col gap-1">
-                  <div className="text-gray900 text-lg">다이슨 헤어 드라이기(임시)</div>
-                  <div className="text-gray600 text-sm">3일</div>
-                </div>
-                </div> */}
 
               <div className="flex-1 flex flex-col text-3xl items-center justify-center gap-2 border-b border-gray300 pb-16">
                 <div className="text-blue400 font-semibold">{formatNumberWithCommas(rentalFeeAmount + depositAmount)}원을</div>
@@ -143,9 +127,8 @@ export default function Payment() {
                   <CircleAlert className="w-5 h-5" />
                   <span>보증금은 빌리페이에서 안전하게 보관됩니다.</span>
                 </div>
-
               </div>
-
+              
             </div>
 
             <div className="flex flex-col w-full  gap-2">
