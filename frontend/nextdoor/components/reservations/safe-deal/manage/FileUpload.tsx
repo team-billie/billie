@@ -28,7 +28,7 @@ export default function FileUpload({
         className={`flex flex-col items-center justify-center w-full h-full cursor-pointer rounded-lg transition-all
           ${
             disabled
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "hover:bg-black hover:bg-opacity-70 text-gray-400 cursor-not-allowed"
               : "hover:bg-black hover:bg-opacity-60 text-gray-500"
           }
         `}

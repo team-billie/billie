@@ -8,6 +8,8 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import Image from "next/image";
+import ErrorMessage from "@/components/common/ErrorMessage";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface PhotoManagerProps {
   status: string;
@@ -38,7 +40,7 @@ export default function PhotoManager({
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
+  const { showAlert } = useAlertStore();
   // 서버 이미지 불러오기
   const fetchImages = async () => {
     try {
@@ -95,7 +97,7 @@ export default function PhotoManager({
     const totalCount = photos.length + serverImageUrls.length;
 
     if (totalCount + filesArray.length > 10) {
-      alert("최대 10장까지만 업로드할 수 있습니다.");
+      showAlert("최대 10장까지만 업로드할 수 있습니다.", "error");
       return;
     }
 
@@ -113,7 +115,7 @@ export default function PhotoManager({
       setTimeout(() => setUploadSuccess(false), 3000);
     } catch (error) {
       console.error("사진 업로드 오류:", error);
-      alert("사진 업로드에 실패했습니다.");
+      showAlert("사진 업로드에 실패했습니다.", "error");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -150,9 +152,7 @@ export default function PhotoManager({
                 disabled={uploading}
               />
             ) : (
-              <div className="text-sm text-red-500 mt-2">
-                최대 업로드 수(10장)에 도달했습니다.
-              </div>
+              <ErrorMessage message="최대 업로드 수(10장)에 도달했습니다." />
             )}
           </div>
 
@@ -160,16 +160,6 @@ export default function PhotoManager({
             <div className="text-sm text-gray-600">
               {`${totalImages}장 등록됨 (최대 10장)`}
             </div>
-            {uploading && (
-              <div className="mt-2 bg-blue-100 text-blue-700 p-2 rounded">
-                사진 업로드 중...
-              </div>
-            )}
-            {uploadSuccess && (
-              <div className="mt-2 bg-green-100 text-green-700 p-2 rounded">
-                사진이 성공적으로 업로드되었습니다.
-              </div>
-            )}
           </div>
 
           <div className="w-full relative mt-4 mb-4">

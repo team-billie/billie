@@ -9,7 +9,7 @@ export default function SafeDealAfter() {
       <div className="z-10">
         <Header txt="반납하기" />
       </div>
-      <div className="flex-1 overflow-y-auto max-w-screen-sm mx-auto">
+      <div className="flex-1 overflow-y-auto">
         <PhotoRegister status={"after"} />
       </div>
     </main>

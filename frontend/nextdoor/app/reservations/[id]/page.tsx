@@ -3,6 +3,7 @@ import Header from "@/components/pays/common/Header";
 import DetailCard from "@/components/reservations/DetailCard";
 import axiosInstance from "@/lib/api/instance";
 import { GetReservationDetailRequest } from "@/lib/api/rental/request";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 import { GetReservationDetailRequestDTO } from "@/types/rental/request";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +19,8 @@ export default function ReservationDetailPage() {
   };
 
   const router = useRouter();
+
+  const { showAlert } = useAlertStore();
   useEffect(() => {
     if (id) {
       fetchReservationDetail();
@@ -37,12 +40,12 @@ export default function ReservationDetailPage() {
   const handleDelete = () => {
     try {
       axiosInstance.delete(`/api/v1/rentals/${id}`);
-      alert("거래 취소를 성공하셨습니다");
+      showAlert("거래 취소를 성공하셨습니다.", "success");
       router.push("/reservations");
       return;
     } catch (err) {
       console.log(err);
-      alert("거래 취소를 실패하였습니다");
+      showAlert("거래 취소를 실패샜습니다.", "error");
     }
   };
 

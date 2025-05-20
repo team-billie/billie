@@ -33,7 +33,6 @@ export default function BeforeAnalysis() {
           }
         }
       } catch (err) {
-        setError("분석 결과를 불러오는 중 오류가 발생했습니다.");
         showAlert("데이터를 불러오는 중 오류가 발생했습니다.", "error");
         console.error("Error fetching damage analysis:", err);
       } finally {

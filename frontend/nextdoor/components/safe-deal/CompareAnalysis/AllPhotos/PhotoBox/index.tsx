@@ -3,11 +3,10 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Pagination } from "swiper/modules";
+import { EffectCards } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/free-mode";
+import "swiper/css/effect-cards";
 import "swiper/css/pagination";
-
 interface PhotoBoxProps {
   images: string[];
   status: "before" | "after" | null;
@@ -24,22 +23,21 @@ export default function PhotoBox({ images, status }: PhotoBoxProps) {
   }, [status]);
 
   return (
-    <div className="w-full relative  mb-4">
-      <div className="text-gray400 my-2">{title}</div>
+    <div className="w-1/2 relative  mb-4 p-3">
+      <div className="text-gray400 ">{title}</div>
       {/* 이미지 슬라이더 */}
       <Swiper
-        slidesPerView={2.4}
-        spaceBetween={8}
-        freeMode={true}
+        effect={"cards"}
+        grabCursor={true}
         pagination={{ clickable: true }}
-        modules={[FreeMode]}
+        modules={[EffectCards]}
         onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
         className="mySwiper"
       >
         {images.map((image, idx) => (
           <SwiperSlide key={idx}>
             <div
-              className="relative w-full h-44 cursor-pointer"
+              className="relative w-full h-44 cursor-pointer rounded-2xl"
               onClick={() => setSelectedImage(image)}
             >
               <Image
@@ -58,7 +56,7 @@ export default function PhotoBox({ images, status }: PhotoBoxProps) {
           className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative w-[90vw] max-w-3xl h-[80vh]">
+          <div className="relative w-[90vw] max-w-3xl h-[80vh] ">
             <Image
               src={selectedImage}
               alt="확대된 이미지"
