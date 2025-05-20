@@ -73,6 +73,7 @@ custom:
   summarizer-prompt-location: summarizerPrompt.txt
   pair-damage-comparator-prompt-location: pairDamageComparatorPrompt.txt
   product-analyzer-prompt-location: productAnalyzerPrompt.txt
+  product-condition-analyzer-prompt-location: productConditionAnalyzerPrompt.txt
 
 cloud:
   aws:

@@ -39,6 +39,9 @@ public class GeminiConfig {
     @Value("${custom.product-analyzer-prompt-location}")
     private String productAnalyzerPromptLocation;
 
+    @Value("${custom.product-condition-analyzer-prompt-location}")
+    private String productConditionAnalyzerPromptLocation;
+
     @Bean
     public VertexAI vertexAI() {
         return new VertexAI(geminiProjectId, geminiLocation);
@@ -72,6 +75,11 @@ public class GeminiConfig {
     @Bean(name = "productAnalyzerPromptPart")
     public Part productAnalyzerPromptPart(ResourceLoader resourceLoader) {
         return loadPromptPart(resourceLoader, productAnalyzerPromptLocation);
+    }
+
+    @Bean(name = "productConditionAnalyzerPromptPart")
+    public Part productConditionAnalyzerPromptPart(ResourceLoader resourceLoader) {
+        return loadPromptPart(resourceLoader, productConditionAnalyzerPromptLocation);
     }
 
     private Part loadPromptPart(ResourceLoader resourceLoader, String location) {
