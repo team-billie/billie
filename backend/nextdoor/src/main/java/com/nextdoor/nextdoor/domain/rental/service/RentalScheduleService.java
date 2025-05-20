@@ -25,6 +25,7 @@ public class RentalScheduleService {
 
             //테스트 : 스케줄러 생성 20초 후에 실행
             Date runDateTime = new Date(System.currentTimeMillis() + 20 * 1000);
+            System.out.println("[DEBUG_LOG] Scheduling job for rental ID: " + rentalId + " to run at: " + runDateTime);
 
             Trigger endTrigger = TriggerBuilder.newTrigger()
                     .withIdentity("rentalEndTrigger_" + rentalId, "rentalTriggers")
@@ -32,7 +33,16 @@ public class RentalScheduleService {
                     .build();
 
             scheduler.scheduleJob(endJob, endTrigger);
+            System.out.println("[DEBUG_LOG] Job scheduled successfully for rental ID: " + rentalId);
+
+            // Verify scheduler is running
+            if (scheduler.isStarted()) {
+                System.out.println("[DEBUG_LOG] Scheduler is running");
+            } else {
+                System.out.println("[DEBUG_LOG] Scheduler is NOT running");
+            }
         } catch (SchedulerException e) {
+            System.out.println("[DEBUG_LOG] Error scheduling job: " + e.getMessage());
             throw new RentalScheduleException("대여 종료 스케줄 생성 실패", e);
         }
     }

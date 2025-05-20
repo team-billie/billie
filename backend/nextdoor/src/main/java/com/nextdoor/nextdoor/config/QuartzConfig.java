@@ -8,6 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import javax.annotation.PostConstruct;
+import java.util.Properties;
 
 @Configuration
 @EnableScheduling
@@ -15,6 +19,21 @@ public class QuartzConfig {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private Scheduler scheduler;
+
+    @PostConstruct
+    public void init() {
+        try {
+            System.out.println("[DEBUG_LOG] Starting Quartz scheduler...");
+            scheduler.start();
+            System.out.println("[DEBUG_LOG] Quartz scheduler started successfully");
+        } catch (SchedulerException e) {
+            System.out.println("[DEBUG_LOG] Error starting Quartz scheduler: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     @Bean
     public SpringBeanJobFactory springBeanJobFactory() {
@@ -27,6 +46,16 @@ public class QuartzConfig {
     public SchedulerFactoryBean schedulerFactoryBean() {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setJobFactory(springBeanJobFactory());
+        schedulerFactory.setAutoStartup(true);
+
+        Properties quartzProperties = new Properties();
+        quartzProperties.put("org.quartz.threadPool.threadCount", "5");
+        quartzProperties.put("org.quartz.jobStore.misfireThreshold", "60000");
+        quartzProperties.put("org.quartz.scheduler.instanceName", "NextdoorScheduler");
+        quartzProperties.put("org.quartz.scheduler.instanceId", "AUTO");
+        quartzProperties.put("org.quartz.scheduler.skipUpdateCheck", "true");
+        schedulerFactory.setQuartzProperties(quartzProperties);
+
         return schedulerFactory;
     }
 

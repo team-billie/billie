@@ -15,6 +15,13 @@ public class RentalEndService {
     private final SimpMessagingTemplate messagingTemplate;
 
     public void rentalEnd(Long rentalId) {
-        rentalService.completeRentalEndProcessing(rentalId);
+        System.out.println("[DEBUG_LOG] RentalEndService.rentalEnd called for rental ID: " + rentalId);
+        try {
+            rentalService.completeRentalEndProcessing(rentalId);
+            System.out.println("[DEBUG_LOG] completeRentalEndProcessing completed successfully for rental ID: " + rentalId);
+        } catch (Exception e) {
+            System.out.println("[DEBUG_LOG] Error in completeRentalEndProcessing: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
