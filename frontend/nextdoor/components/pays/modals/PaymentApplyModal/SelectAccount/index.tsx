@@ -3,7 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
 import Button from "@/components/pays/common/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useUserStore from "@/lib/store/useUserStore";
 import { SelectOwnerAccountRequest } from "@/lib/api/pays";
 import { SelectOwnerAccountRequestDto } from "@/types/pays/request/index";
@@ -16,6 +16,7 @@ type SelectAccountProps = {
   setChangeBtnClicked: React.Dispatch<React.SetStateAction<boolean>>;
   rentalId: string;
   setIsModalOpen: (isModalOpen: boolean) => void;
+  onReadyToSubmit?: (callback: () => Promise<void>) => void;
 };
 
 export default function SelectAccount({
@@ -23,6 +24,7 @@ export default function SelectAccount({
   payCharge,
   rentalId,
   setIsModalOpen,
+  onReadyToSubmit,
 }: SelectAccountProps) {
   const [billySelected, setBillySelected] = useState(true);
 
@@ -34,9 +36,9 @@ export default function SelectAccount({
   const [selectedAccount, setSelectedAccount] = useState<AddAccountResponseDto | null>(null);
   const [isAccountListModalOpen, setIsAccountListModalOpen] = useState(false);
   const selectAccount = selectedAccount ?? mainAccount;
-  
+
   const { showAlert } = useAlertStore();
-  
+
   const handleSelectAccount = async () => {
     try {
       if (billySelected) {
@@ -67,6 +69,12 @@ export default function SelectAccount({
     }
   };
 
+  useEffect(() => {
+    if (onReadyToSubmit) {
+      onReadyToSubmit(handleSelectAccount);
+    }
+  }, [handleSelectAccount, onReadyToSubmit]);
+
   return (
     <>
       <div className="flex justify-between items-center">
@@ -87,9 +95,8 @@ export default function SelectAccount({
       <div className=" flex-1 flex flex-col gap-3 justify-end">
         <button
           onClick={btnClickHandler}
-          className={` ${
-            billySelected ? "border-blue200" : "border-gray400"
-          } flex items-center gap-2 p-3 border rounded-lg`}
+          className={` ${billySelected ? "border-blue200" : "border-gray400"
+            } flex items-center gap-2 p-3 border rounded-lg`}
         >
           <img
             src="/images/banks/ssafy.png"
@@ -106,9 +113,8 @@ export default function SelectAccount({
 
         <button
           onClick={btnClickHandler}
-          className={`${
-            billySelected ? "border-gray400" : "border-blue200"
-          } flex items-center gap-2 p-3 border rounded-lg`}
+          className={`${billySelected ? "border-gray400" : "border-blue200"
+            } flex items-center gap-2 p-3 border rounded-lg`}
         >
           <img
             src={getBankInfo(selectAccount?.bankCode || "000")?.image || ""}
@@ -130,7 +136,7 @@ export default function SelectAccount({
           </div>
         </button>
 
-        <div className="mt-5">
+        <div className="mt-2">
           <Button txt="확인" onClick={handleSelectAccount} state={true} />
         </div>
       </div>
