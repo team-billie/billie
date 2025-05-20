@@ -17,7 +17,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] w-full bg-gradient-to-b from-[#81AEF3] to-gray100 flex justify-center px-5 overflow-hidden font-local-geekble">
+    <div className="relative min-h-[100dvh] w-full bg-gradient-to-tr from-[#81AEF2] to-gray100 flex justify-center px-5 overflow-hidden font-local-geekble">
       {/* vector 이미지: 하단 고정 */}
       <Image
         src="/images/vector.png"
