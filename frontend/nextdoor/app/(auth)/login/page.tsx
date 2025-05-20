@@ -6,11 +6,6 @@ import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
-
-  const handleGuestStart = () => {
-    router.push("/home"); // 홈 페이지로 이동
-  };
-
   const [baseUrl, setBaseUrl] = useState("");
 
   useEffect(() => {
@@ -22,20 +17,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-gradient-to-b from-blue300 to-blue200 flex justify-center px-5">
-      <div className="w-full max-w-[400px] py-12 text-white flex flex-col">
-        <h1 className="text-4xl font-bold mt-12 flex-1">옆집 물건</h1>
+    <div className="relative min-h-[100dvh] w-full bg-gradient-to-b from-[#81AEF3] to-gray100 flex justify-center px-5 overflow-hidden font-local-geekble">
+      {/* vector 이미지: 하단 고정 */}
+      <Image
+        src="/images/vector.png"
+        alt="배경"
+        width={320}
+        height={320}
+        className="absolute bottom-0 left-0 object-contain pointer-events-none select-none"
+      />
 
-        <div className="text-2xl font-bold mb-10">
-          <div className="mb-2">원하는 물건을</div>
-          <div className="mb-2">언제든지 어디서든</div>
+      {/* 콘텐츠 박스 */}
+      <div className="w-full max-w-[400px] py-12 text-white flex flex-col justify-end z-10 relative">
+        {/* 팀 로고 */}
+        <Image
+          src="/images/teamlogo.png"
+          alt="로고"
+          width={200}
+          height={200}
+          className="absolute top-10 right-1"
+        />
+
+        <div className="absolute bottom-56 left-12 text-[25px] leading-tight text-white z-10">
+          <p className="mb-1">원하는 물건을</p>
+          <p>언제든지 안전하게</p>
         </div>
 
-        <div className="flex flex-col gap-4">
+        {/* 카카오 로그인 버튼 */}
+        <div className="mt-auto pb-10 z-10">
           <button
             onClick={handleKakaoLogin}
-            className="w-full py-5 bg-[#FEE500] hover:bg-[#FDD835] rounded-lg text-black font-bold flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-5 px-4 bg-[#FEE500] hover:bg-[#FDD835] rounded-full text-black font-bold font-sans flex items-center justify-center gap-2 transition-colors"
           >
+            {/* 카카오 아이콘 */}
             <svg
               aria-label="Kakao logo"
               width="18"
@@ -54,19 +68,33 @@ export default function LoginPage() {
           {/* <button 
             className="w-full py-5 border-2 border-white text-white rounded-lg font-bold hover:bg-white/10 transition-colors"
             onClick={handleGuestStart}
-            >
+          >
             비회원으로 시작하기
           </button> */}
+
           {/* <button 
             className="w-full py-5 border-2 border-white text-white rounded-lg font-bold hover:bg-white/10 transition-colors"
             onClick={() => {
               router.push('/pays/testlogin');
             }}
-            >
+          >
             테스트 유저 로그인
           </button> */}
         </div>
       </div>
+
+      {/* 👇 이 페이지에만 폰트 적용 */}
+      <style jsx global>{`
+        @font-face {
+          font-family: "GeekbleMalang";
+          src: url("/fonts/GeekbleMalang2TTF.ttf") format("truetype");
+          font-weight: normal;
+          font-style: normal;
+        }
+        .font-local-geekble {
+          font-family: "GeekbleMalang", sans-serif;
+        }
+      `}</style>
     </div>
   );
 }
