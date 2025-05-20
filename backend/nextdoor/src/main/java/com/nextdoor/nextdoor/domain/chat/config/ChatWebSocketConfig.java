@@ -21,7 +21,7 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry
                 .enableSimpleBroker("/topic")
                 .setHeartbeatValue(new long[]{10_000, 10_000})
-                .setTaskScheduler(heartBeatScheduler());
+                .setTaskScheduler(chatHeartBeatScheduler());
         registry.setApplicationDestinationPrefixes("/app");
     }
 
@@ -51,8 +51,8 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     /**
      * 3) heartbeat 처리를 위한 스케줄러
      */
-    @Bean
-    public ThreadPoolTaskScheduler heartBeatScheduler() {
+    @Bean("chatHeartBeatScheduler")
+    public ThreadPoolTaskScheduler chatHeartBeatScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setThreadNamePrefix("ws-heartbeat-thread-");
         scheduler.initialize();
