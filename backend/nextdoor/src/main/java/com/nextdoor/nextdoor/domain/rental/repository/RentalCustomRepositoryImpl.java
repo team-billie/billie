@@ -64,6 +64,7 @@ public class RentalCustomRepositoryImpl implements RentalCustomRepository {
         return new AiComparisonResult(
                 beforeImages,
                 afterImages,
+                foundRental.getDamageAnalysis(),
                 foundRental.getComparedAnalysis(),
                 matchingResults
         );
