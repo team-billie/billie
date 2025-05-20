@@ -39,7 +39,7 @@ export default function ReservationPage() {
 
   const stompClient = new Client({
     webSocketFactory: () =>
-      new SockJS("http://k12e205.p.ssafy.io:8081/ws-rental"),
+      new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws-rental`),
     reconnectDelay: 5000,
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
