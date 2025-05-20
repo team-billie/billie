@@ -406,4 +406,10 @@ public class RentalServiceImpl implements RentalService {
     public void createAiImageComparisonPair(Long rentalId, Long beforeImageId, Long afterImageId, String pairComparisonResult) {
         aiImageComparisonPairRepository.save(new AiImageComparisonPair(rentalId, beforeImageId, afterImageId, pairComparisonResult));
     }
+
+    @Override
+    @Transactional
+    public void deleteAiImageComparisonPairByRentalId(Long rentalId) {
+        aiImageComparisonPairRepository.deleteByRentalId(rentalId);
+    }
 }
