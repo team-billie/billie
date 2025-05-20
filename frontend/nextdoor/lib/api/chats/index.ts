@@ -10,17 +10,28 @@ import axiosInstance from "@/lib/api/instance";
 // 채팅방 생성
 export const createChatRoom = async (
   data: CreateChatRequest
-): Promise<Conversation> => {
+): Promise<{ roomId: number }> => {
   try {
-    const response = await axiosInstance.post("/api/v1/chats/create", {
+    const response = await axiosInstance.post("/api/v1/chats/rooms", {
+      postId: data.postId,
       ownerId: data.ownerId,
       renterId: data.renterId,
-      postId: data.postId,
     });
     return response.data;
   } catch (error) {
     console.error("채팅방 생성에 실패했습니다:", error);
     throw new Error("채팅방 생성에 실패했습니다.");
+  }
+};
+
+// 채팅방 목록 조회 API
+export const getChatRooms = async (): Promise<ChatRoom[]> => {
+  try {
+    const response = await axiosInstance.get("/api/v1/chats/rooms");
+    return response.data;
+  } catch (error) {
+    console.error("채팅방 목록 조회에 실패했습니다:", error);
+    throw new Error("채팅방 목록 조회에 실패했습니다.");
   }
 };
 
@@ -103,7 +114,7 @@ export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
     participants: [
       {
         id: currentUserId,
-        name: "나", 
+        name: "나",
         avatar: "/images/profileimg.png",
       },
       {
@@ -114,17 +125,17 @@ export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
     ],
     product: {
       id: room.postId || 1,
-      name: room.title || "상품", 
+      name: room.title || "상품",
       image: formatImageUrl(room.postImageUrl),
-      price: `${room.rentalFee?.toLocaleString()}원/일`, 
+      price: `${room.rentalFee?.toLocaleString()}원/일`,
     },
     ownerId: room.ownerId,
     renterId: room.renterId,
     postId: room.postId,
-    title: room.title || "",             
-    rentalFee: room.rentalFee || 0,      
-    deposit: room.deposit || 0,          
-    chatStatus: room.chatStatus || "상태없음"  
+    title: room.title || "",
+    rentalFee: room.rentalFee || 0,
+    deposit: room.deposit || 0,
+    chatStatus: room.chatStatus || "상태없음"
   };
 };
 
@@ -141,41 +152,41 @@ export const findOrCreateChatRoom = async (
 ): Promise<string> => {
   try {
     const currentUserId = useUserStore.getState().userId;
-    
+
     // 현재 사용자가 렌터인 경우
     if (currentUserId === renterId) {
       const borrowingRooms = await getBorrowingChatRooms();
-      
+
       // 같은 소유자, 같은 게시물의 채팅방 찾기
-      const existingRoom = borrowingRooms.find(room => 
+      const existingRoom = borrowingRooms.find(room =>
         room.postId === postId && room.ownerId === ownerId
       );
-      
-      if (existingRoom) {
-        return existingRoom.conversationId;
-      }
-    } 
-    // 현재 사용자가 소유자인 경우
-    else if (currentUserId === ownerId) {
-      const lendingRooms = await getLendingChatRooms();
-      
-      // 같은 렌터, 같은 게시물의 채팅방 찾기
-      const existingRoom = lendingRooms.find(room => 
-        room.postId === postId && room.renterId === renterId
-      );
-      
+
       if (existingRoom) {
         return existingRoom.conversationId;
       }
     }
-    
+    // 현재 사용자가 소유자인 경우
+    else if (currentUserId === ownerId) {
+      const lendingRooms = await getLendingChatRooms();
+
+      // 같은 렌터, 같은 게시물의 채팅방 찾기
+      const existingRoom = lendingRooms.find(room =>
+        room.postId === postId && room.renterId === renterId
+      );
+
+      if (existingRoom) {
+        return existingRoom.conversationId;
+      }
+    }
+
     // 기존 채팅방이 없으면 새로 생성
     const response = await createChatRoom({
       ownerId,
       renterId,
       postId
     });
-    
+
     return response.conversationId;
   } catch (error) {
     console.error('채팅방 생성 오류:', error);

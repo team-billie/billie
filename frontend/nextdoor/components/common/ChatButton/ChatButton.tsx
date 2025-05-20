@@ -1,6 +1,6 @@
 "use client";
 
-import { findOrCreateChatRoom } from "@/lib/api/chats";
+import { createChatRoom } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
 import { MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -22,35 +22,35 @@ export default function ChatButton({ ownerId, postId, className = "" }: ChatButt
       alert("로그인이 필요합니다.");
       return;
     }
-    
+
     if (ownerId === userId) {
       alert("자신의 게시글에는 채팅을 보낼 수 없습니다.");
       return;
     }
-    
+
     try {
       setIsLoading(true);
-      
-      // findOrCreateChatRoom 함수 호출
-      const conversationId = await findOrCreateChatRoom(
-        ownerId,       // 소유자 ID
-        userId,        // 현재 사용자 ID (렌터)
-        postId         // 게시글 ID
-      );
-      
+
+      // 채팅방 생성 API 호출
+      const response = await createChatRoom({
+        postId,
+        ownerId,
+        renterId: userId
+      });
+
       // 채팅방으로 이동
-      router.push(`/chats/${conversationId}`);
+      router.push(`/chats/${response.roomId}`);
     } catch (error) {
-      console.error('채팅방 접속 오류:', error);
-      alert('채팅방에 접속할 수 없습니다. 다시 시도해주세요.');
+      console.error('채팅방 생성 오류:', error);
+      alert('채팅방을 생성할 수 없습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <button 
-      onClick={handleChatClick} 
+    <button
+      onClick={handleChatClick}
       disabled={isLoading}
       className={`bg-gradient-to-r from-blue300 to-blue400 text-white rounded-full p-2 flex items-center justify-center ${className}`}
     >

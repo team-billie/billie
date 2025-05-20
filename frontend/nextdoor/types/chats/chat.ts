@@ -47,7 +47,7 @@ export interface Product {
 
 // ChatMessageDto
 export interface ChatMessageDto {
-  conversationId: string;
+  roomId: string;
   senderId: number;
   content: string;
   sentAt: string;
@@ -62,29 +62,25 @@ export interface CreateChatRequest {
 }
 
 // 채팅방 생성 응답
-export interface Conversation {
-  conversationId: string;
-  participantIds: number[];
-  createdAt: string;
+export interface CreateChatRoomResponse {
+  roomId: number;
 }
 
-
-
 export interface ChatRoom {
-  conversationId: string;
+  roomId: number;
+  postId: number;
+  ownerId: number;
+  renterId: number;
   lastMessage: string;
   lastSentAt: string;
   unreadCount: number;
   otherNickname: string;
   otherProfileImageUrl: string;
   postImageUrl: string;
-  ownerId: number;
-  renterId: number;
-  postId: number;
   title: string;
   rentalFee: number;
   deposit: number;
-  chatStatus: string; // 상태없음 or 예약중 or 거래중
+  chatStatus: string;
 }
 
 // 사용자 역할
