@@ -61,7 +61,7 @@ export default function PostDetailPage() {
     <main className="relative hakgyoansim-font" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="min-h-screen flex flex-col pb-24">
          {/* 물품 페이지 헤더 */}
-         <div className="absolute top-0 left-0 right-0 flex items-center justify-between z-10 h-16 px-4 bg-gradient-to-r from-[#596DCA] to-[#66A3FF]">
+         <div className="absolute top-0 left-0 right-0 flex items-center justify-between z-10 h-24 px-4 bg-gradient-to-r from-[#596DCA] to-[#66A3FF]">
           <div onClick={() => router.back()} className="flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray800 w-10 h-10">
             <ChevronLeft className="w-6 h-6" />
           </div>
@@ -80,7 +80,7 @@ export default function PostDetailPage() {
         </div>
 
         {/* 물품 사진 */}
-        <div className="pt-16 "> {/* 헤더 높이만큼 패딩 추가 */}
+        <div className="pt-24 "> {/* 헤더 높이만큼 패딩 추가 */}
           <ProductPhotos images={product.productImage} />
         </div>
 
