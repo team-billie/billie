@@ -12,7 +12,7 @@ import {
   SelectOwnerAccountRequestDto,
   PayItemRequestDto,
   VerifyAccountRequestDto,
-  GetPaymentHistoryRequestDto
+  GetPaymentHistoryRequestDto,
 } from "@/types/pays/request/index";
 
 // 공통 에러 처리 함수
@@ -40,7 +40,8 @@ export const CreateFinUserRequest = (requestBody: CreateFinUserRequestDto) =>
 
 //사용자 계정 조회
 export const GetFinUserRequest = (requestBody: GetFinUserRequestDto) =>
-  axios.post(`https://finopenapi.ssafy.io/ssafy/api/v1/member/search`, requestBody)
+  axios
+    .post(`https://finopenapi.ssafy.io/ssafy/api/v1/member/search`, requestBody)
     .then((response) => {
       return response.data;
     })
@@ -49,8 +50,9 @@ export const GetFinUserRequest = (requestBody: GetFinUserRequestDto) =>
     });
 
 //계좌 생성
-export const CreateFinAccountRequest = (requestBody: CreateFinAccountRequestDto) =>
-  apiCall("/api/v1/fintechs/accounts", requestBody, "계좌 생성");
+export const CreateFinAccountRequest = (
+  requestBody: CreateFinAccountRequestDto
+) => apiCall("/api/v1/fintechs/accounts", requestBody, "계좌 생성");
 
 //계좌 목록 조회
 export const GetAccountListRequest = (requestBody: GetAccountListRequestDto) =>
@@ -62,7 +64,8 @@ export const AddAccountRequest = (requestBody: AddAccountRequestDto) =>
 
 //등록된 계좌 목록 조회
 export const GetAddedListRequest = (userKey: string) =>
-  axiosInstance.get(`/api/v1/fintechs/regist-accounts?userKey=${userKey}`)
+  axiosInstance
+    .get(`/api/v1/fintechs/regist-accounts?userKey=${userKey}`)
     .then((response) => {
       return response.data;
     })
@@ -75,8 +78,9 @@ export const VerifyAccountRequest = (requestBody: VerifyAccountRequestDto) =>
   apiCall("/api/v1/fintechs/accounts/verify", requestBody, "계좌 확인");
 
 //계좌 이체
-export const TransferAccountRequest = (requestBody: TransferAccountRequestDto) =>
-  apiCall("/api/v1/fintechs/accounts/transfer", requestBody, "계좌 이체");
+export const TransferAccountRequest = (
+  requestBody: TransferAccountRequestDto
+) => apiCall("/api/v1/fintechs/accounts/transfer", requestBody, "계좌 이체");
 
 //물품 결제하기
 export const PayItemRequest = (requestBody: PayItemRequestDto) =>
@@ -91,15 +95,20 @@ export const ReturnDepositRequest = (requestBody: ReturnDepositRequestDto) =>
   apiCall("/api/v1/fintechs/deposits/return", requestBody, "보증금 반환");
 
 //거래 내역 조회
-export const GetPaymentHistoryRequest = (requestBody: GetPaymentHistoryRequestDto) =>
-  apiCall("/api/v1/fintechs/accounts/transactions/history", requestBody, "거래 내역 조회");
-
-
+export const GetPaymentHistoryRequest = (
+  requestBody: GetPaymentHistoryRequestDto
+) =>
+  apiCall(
+    "/api/v1/fintechs/accounts/transactions/history",
+    requestBody,
+    "거래 내역 조회"
+  );
 
 // -----------------------------------------
 // 대여 결제 데이터 호출
 export const GetPaymentDataRequest = (rentalId: string) =>
-  axiosInstance.get(`/api/v1/rentals/${rentalId}/request-remittance`)
+  axiosInstance
+    .get(`/api/v1/rentals/${rentalId}/remittance-data`)
     .then((response) => {
       return response.data;
     })
@@ -107,10 +116,13 @@ export const GetPaymentDataRequest = (rentalId: string) =>
       return handleApiError(error, "등록된 계좌 목록 조회");
     });
 
-
 // Owner 계좌 선택후 결제 요청
-export const SelectOwnerAccountRequest = (requestBody: SelectOwnerAccountRequestDto, rentalId: string) =>
-  axiosInstance.patch(`/api/v1/rentals/${rentalId}/account`, requestBody)
+export const SelectOwnerAccountRequest = (
+  requestBody: SelectOwnerAccountRequestDto,
+  rentalId: string
+) =>
+  axiosInstance
+    .patch(`/api/v1/rentals/${rentalId}/account`, requestBody)
     .then((response) => {
       return response.data;
     })
