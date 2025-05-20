@@ -42,6 +42,7 @@ public class RentalCustomRepositoryImpl implements RentalCustomRepository {
                 .from(aiImageComparisonPair)
                 .leftJoin(beforeAiImage).on(aiImageComparisonPair.beforeImageId.eq(beforeAiImage.id)).fetchJoin()
                 .leftJoin(afterAiImage).on(aiImageComparisonPair.afterImageId.eq(afterAiImage.id)).fetchJoin()
+                .where(aiImageComparisonPair.rentalId.eq(rentalId))
                 .fetch();
 
         AiComparisonResult result = getAiComparisonResult(foundRental, matchingResults);
