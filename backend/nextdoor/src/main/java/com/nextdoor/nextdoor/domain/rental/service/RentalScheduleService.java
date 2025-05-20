@@ -15,12 +15,14 @@ import java.util.Date;
 public class RentalScheduleService {
 
     private final Scheduler scheduler;
+    private final RentalEndService rentalEndService; // 주입받기
 
-    public void scheduleRentalEnd(Long rentalId, LocalDate endDate) {
+    public void scheduleRentalEnd(Long rentalId) {
         try {
             JobDetail endJob = JobBuilder.newJob(RentalEndJob.class)
                     .withIdentity("rentalEndJob" + rentalId, "rentalJobs")
                     .usingJobData("rentalId", rentalId)
+                    .usingJobData("rentalEndServiceBeanName", "rentalEndService") // 서비스 빈 이름 추가
                     .build();
 
             //테스트 : 스케줄러 생성 20초 후에 실행

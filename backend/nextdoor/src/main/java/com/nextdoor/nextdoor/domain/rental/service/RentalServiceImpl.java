@@ -52,7 +52,7 @@ public class RentalServiceImpl implements RentalService {
     public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
-        rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
+//        rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
 
         eventPublisher.publishEvent(RentalCreatedEvent.builder()
                 .rentalId(createdRental.getRentalId())
@@ -158,6 +158,9 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
         rental.processRemittanceCompletion();
+
+        //테스트 용도
+        rentalScheduleService.scheduleRentalEnd(rental.getRentalId());
 
         String ownerUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
                 rental.getRentalId(),
