@@ -93,6 +93,7 @@ public class RentalMapper {
         return AiComparisonResponse.builder()
                 .beforeImages(result.getBeforeImages())
                 .afterImages(result.getAfterImages())
+                .analysisResult(result.getAnalysisResult())
                 .overallComparisonResult(result.getOverallComparisonResult())
                 .matchingResults(result.getMatchingResults().stream()
                         .map(this::toMatchingResult)
