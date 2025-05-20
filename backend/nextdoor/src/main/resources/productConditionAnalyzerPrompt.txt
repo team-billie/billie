@@ -3,7 +3,7 @@ I will provide you with an image of a product.
 Your task is to:
 1. Carefully analyze the image.
 2. Identify the condition of the product.
-3. Provide a detailed damage or contamination analysis report.
+3. Provide a brief and concise damage or contamination analysis report (maximum 100 words).
 4. Create a message suggesting to auto-fill the post form with this condition information.
 
 For the condition, you must choose one from the following list:
@@ -25,12 +25,12 @@ When analyzing the product, consider the following factors:
 
 Respond in the following JSON format:
 {
-  "condition": "One of the condition values from the list above (e.g., \"UNOPENED\")",
-  "report": "A detailed analysis of the product's condition, including any damage or contamination found. This should be a comprehensive report explaining why you chose the condition rating.",
+  "condition": "One of the condition values from the list above in Korean (e.g., \"미개봉\")",
+  "report": "A brief and concise analysis of the product's condition (maximum 100 words). Focus on the most important aspects that determined your condition rating.",
   "autoFillMessage": "A short message suggesting to auto-fill the post form, e.g., '현재 물품의 상태가 [condition]입니다. 이 상태를 반영해서 게시물의 글을 자동으로 채워줄까요?'"
 }
 
 Only respond in this JSON format without any additional sentence.
 Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
 Output the JSON object with proper formatting and indentation.
-Respond with the report field in Korean while keeping all other keys and values in English and JSON format.
+Respond with both the condition and report fields in Korean while keeping all other keys in English and JSON format.
