@@ -8,7 +8,11 @@ interface DetailPhoto {
   boundingBox?: BoundingBox;
 }
 
-export default function DetailPhoto({ imageUrl, idx, boundingBox }: DetailPhoto) {
+export default function DetailPhoto({
+  imageUrl,
+  idx,
+  boundingBox,
+}: DetailPhoto) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // boundingBox 영역을 중심으로 확대된 스타일 계산
@@ -19,24 +23,27 @@ export default function DetailPhoto({ imageUrl, idx, boundingBox }: DetailPhoto)
     const baseScale = 3;
     // 모달일 때는 더 크게 확대
     const scale = baseScale * (isModal ? 1.5 : 1);
-    
+
     const translateX = -(box.xMin + width / 2) * 100 + 50;
     const translateY = -(box.yMin + height / 2) * 100 + 50;
 
     return {
       transform: `scale(${scale}) translate(${translateX}%, ${translateY}%)`,
-      transformOrigin: 'center',
+      transformOrigin: "center",
     };
   };
 
   const renderImage = (isModal: boolean = false) => (
-    <div className="relative w-full h-full" style={boundingBox ? getZoomedStyle(boundingBox, isModal) : undefined}>
+    <div
+      className="relative w-full h-full"
+      style={boundingBox ? getZoomedStyle(boundingBox, isModal) : undefined}
+    >
       <Image
         src={imageUrl}
-        alt={`Product ${idx}${isModal ? ' enlarged' : ''}`}
+        alt={`Product ${idx}${isModal ? " enlarged" : ""}`}
         fill
         sizes="(max-width: 768px) 100vw, 50vw"
-        className="object-contain"
+        className="object-cover"
         priority={idx === 1}
       />
     </div>
@@ -44,7 +51,7 @@ export default function DetailPhoto({ imageUrl, idx, boundingBox }: DetailPhoto)
 
   return (
     <>
-      <div 
+      <div
         className="relative w-full aspect-square rounded-md overflow-hidden bg-gray400 cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
@@ -53,7 +60,7 @@ export default function DetailPhoto({ imageUrl, idx, boundingBox }: DetailPhoto)
 
       {/* 모달 */}
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
           onClick={() => setIsModalOpen(false)}
         >
@@ -63,8 +70,19 @@ export default function DetailPhoto({ imageUrl, idx, boundingBox }: DetailPhoto)
               className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-black/70"
               onClick={() => setIsModalOpen(false)}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>

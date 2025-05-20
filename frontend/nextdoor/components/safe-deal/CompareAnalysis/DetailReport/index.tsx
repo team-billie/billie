@@ -18,31 +18,36 @@ export default function DetailReport({ matchingResults }: DamageReportProps) {
               다음과 같은 손상이 AI에 감지되었습니다.
             </div>
           </div>
-          {matchingResults.map((item, idx) => (
-            item.pairComparisonResult.result === "DAMAGE_FOUND" && (
-              <div key={idx}>
-                <div className="flex items-center gap-2 mb-2">
-                  <DetailItem
-                  sequence={idx+1}
-                    damage={item.pairComparisonResult.damages}
-                  />
+          {matchingResults.map(
+            (item, idx) =>
+              item.pairComparisonResult.result === "DAMAGE_FOUND" && (
+                <div key={idx}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <DetailItem
+                      sequence={idx + 1}
+                      damage={item.pairComparisonResult.damages}
+                    />
+                  </div>
+                  <div className="flex gap-2 my-2">
+                    <DetailPhoto
+                      imageUrl={item.beforeImage}
+                      idx={1}
+                      boundingBox={
+                        item.pairComparisonResult.damages[0]?.boundingBox
+                      }
+                    />
+                    <DetailPhoto
+                      imageUrl={item.afterImage}
+                      idx={2}
+                      boundingBox={
+                        item.pairComparisonResult.damages[0]?.boundingBox
+                      }
+                    />
+                  </div>
+                  <div className="w-full bg-gray800 h-0.5 my-3"></div>
                 </div>
-                <div className="flex gap-2 my-2">
-                  <DetailPhoto 
-                    imageUrl={item.beforeImage} 
-                    idx={1}
-                    boundingBox={item.pairComparisonResult.damages[0]?.boundingBox}
-                  />
-                  <DetailPhoto 
-                    imageUrl={item.afterImage} 
-                    idx={2}
-                    boundingBox={item.pairComparisonResult.damages[0]?.boundingBox}
-                  />
-                </div>
-                <div className="w-full bg-gray800 h-0.5 my-3"></div>
-              </div>
-            )
-          ))}
+              )
+          )}
         </>
       ) : (
         <div>분석된 데이터가 없습니다.</div>

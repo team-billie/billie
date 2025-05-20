@@ -1,6 +1,5 @@
 import { AiAnalysisGetRequestDTO } from "@/types/ai-analysis/response";
 import axiosInstance from "../../instance";
-
 //대여 전 사진 분석
 export const AiBeforePhotosPostRequest = async (rentalId: number) => {
   try {
@@ -49,11 +48,10 @@ export const AiAfterPhotosPostRequest = async (rentalId: number) => {
         },
       }
     );
-    alert("AI 이미지 비교 분석 요청이 완료되었습니다 ✅"); // ✅ 알림 추가
     return response.data;
   } catch (error: any) {
     console.error("AI 이미지 분석 요청 실패:", error);
-    alert("AI 이미지 분석 요청에 실패했습니다 ❌");
+
     throw error;
   }
 };

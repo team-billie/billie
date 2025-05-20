@@ -6,8 +6,12 @@ import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManage
 import Title from "../Title";
 import GrayButton from "../GrayButton";
 import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
-import { AiBeforePhotosPostRequest } from "@/lib/api/ai-analysis/request";
+import {
+  AiAfterPhotosPostRequest,
+  AiBeforePhotosPostRequest,
+} from "@/lib/api/ai-analysis/request";
 import useUserStore from "@/lib/store/useUserStore";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface PhotoRegisterProps {
   status: "after" | "before";
@@ -19,7 +23,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const router = useRouter();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
   const [serverData, setServerData] = useState<null>(null);
-
+  const { showAlert } = useAlertStore();
   if (!userId) return null;
 
   const handleAnalysis = async () => {
@@ -30,10 +34,11 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       if (status === "before") {
         router.push(`/safe-deal/${rentalId}/before/analysis`);
       } else {
+        AiAfterPhotosPostRequest(Number(id));
         router.push(`/safe-deal/${rentalId}/after/analysis`);
       }
     } catch (error) {
-      alert("AI 분석 중 오류가 발생했습니다.");
+      showAlert("AI 분석 중 오류가 발생했습니다.", "error");
     }
   };
 
@@ -43,7 +48,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     <div className="flex flex-col h-full">
       <div className="flex-grow flex flex-col">
         <Title status={status} />
-        <div className="w-full p-4 flex-grow flex flex-col justify-center">
+        <div className="w-full flex-grow flex flex-col justify-center">
           <PhotoManager
             rentalId={Number(id)}
             status={status}

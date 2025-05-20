@@ -6,6 +6,7 @@ export type BoundingBox = {
 };
 
 export type Damage = {
+  damageType: "DENT" | "SCRATCH" | "CONTAMINATION" | "ETC";
   location: string;
   details: string;
   boundingBox: BoundingBox;
