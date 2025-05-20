@@ -16,20 +16,44 @@ export default function SafeDealAfter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id } = useParams();
   const { userId } = useUserStore();
-
+  const [isLoading, setIsLoading] = useState(true);
   const fetchReservationDetail = async () => {
-    if (!id) return;
-    const data = await GetReservationDetailRequest(Number(id));
+    try {
+      setIsLoading(true);
+      if (!id) {
+        console.error("예약 ID가 없습니다");
+        return;
+      }
 
-    setReservation(data);
+      console.log("데이터 요청 시작:", id);
+      const data = await GetReservationDetailRequest(Number(id));
+      console.log("받은 데이터:", data);
+
+      if (data) {
+        setReservation(data);
+      } else {
+        console.error("응답 데이터가 없습니다");
+      }
+    } catch (error) {
+      console.error("예약 정보 가져오기 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   useEffect(() => {
     if (!userId) {
+      console.log("userId가 없습니다. 로그인이 필요합니다.");
       return;
     }
+    console.log("userId 확인됨:", userId);
     fetchReservationDetail();
-  }, [id]);
+  }, [id, userId]);
 
+  const handleOpenModal = () => {
+    console.log("모달 열기 시도", { isModalOpen: true, reservation });
+    setIsModalOpen(true);
+  };
   return (
     <main className="flex flex-col min-h-screen bg-graygradient">
       <div className="flex-1 overflow-y-auto">

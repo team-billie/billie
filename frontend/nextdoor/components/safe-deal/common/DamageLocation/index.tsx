@@ -7,7 +7,6 @@ interface DamageLocationProps {
 export default function DamageLocation({
   damageAnalysis,
 }: DamageLocationProps) {
-  console.log("❤️❤️❤️", damageAnalysis);
   return (
     <div className="flex flex-col gap-2 p-5">
       {damageAnalysis && damageAnalysis.length > 0 ? (
