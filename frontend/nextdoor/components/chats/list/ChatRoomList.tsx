@@ -11,7 +11,7 @@ import LoadingSkeleton from '@/components/chats/list/LoadingSkeleton';
 interface ChatRoomListProps {
   chatRooms: ChatRoomUI[];
   isLoading: boolean;
-  userRole: 'borrower' | 'lender';
+  userRole: 'borrower' | 'lender' | 'all'; // 'all' 추가
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ 
@@ -31,7 +31,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({
   }
   
   if (sortedChats.length === 0) {
-    return <EmptyState userRole={userRole} />;
+    return <EmptyState userRole={userRole === 'all' ? 'borrower' : userRole} />;
   }
   
   return (
@@ -40,7 +40,7 @@ const ChatRoomList: React.FC<ChatRoomListProps> = ({
         <ChatRoomItem 
           key={chat.conversationId} 
           chat={chat} 
-          userRole={userRole} 
+          userRole={chat.roomType === 'borrowing' ? 'borrower' : 'lender'} // roomType에 따라 userRole 결정
         />
       ))}
     </div>

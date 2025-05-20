@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
-import com.nextdoor.nextdoor.domain.chat.application.dto.PostDto;
+import com.nextdoor.nextdoor.domain.chat.dto.PostDto;
 import com.nextdoor.nextdoor.domain.chat.port.ChatPostQueryPort;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
@@ -35,7 +35,7 @@ public class ChatPostQueryAdapter implements ChatPostQueryPort {
                 .leftJoin(qProductImage).on(qPost.id.eq(qProductImage.post.id))
                 .where(qPost.id.eq(postId))
                 .fetchFirst());
-        
+
         return postDto;
     }
 }

@@ -6,11 +6,11 @@ import React from 'react';
 import Link from 'next/link';
 
 interface EmptyStateProps {
-  userRole: 'borrower' | 'lender';
+  userRole: 'borrower' | 'lender' | 'all';
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ userRole }) => {
-  const isBorrower = userRole === 'borrower';
+  const isBorrower = userRole === 'borrower' || userRole === 'all';
   
   return (
     <div className="flex flex-col items-center justify-center py-16">
@@ -20,7 +20,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ userRole }) => {
           : '아직 빌려준 내역이 없습니다.'}
       </p>
       <Link
-        href={isBorrower ? '/home' : '/posts/register'}
+        href={isBorrower ? '/home' : '/posts/new'}
         className="bg-blue-500 text-white px-6 py-3 rounded-full font-medium"
       >
         {isBorrower ? '물건 빌리러 가기' : '물건 등록하기'}

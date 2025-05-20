@@ -25,6 +25,7 @@ export interface ChatRoomUI {
   rentalFee: number;
   deposit: number;
   chatStatus: string; // 상태없음 or 예약중 or 거래중
+  roomType?: 'borrowing' | 'lending';
 }
 
 // 사용자

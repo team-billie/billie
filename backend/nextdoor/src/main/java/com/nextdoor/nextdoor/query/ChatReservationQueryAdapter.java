@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
-import com.nextdoor.nextdoor.domain.chat.application.dto.ReservationDto;
+import com.nextdoor.nextdoor.domain.chat.dto.ReservationDto;
 import com.nextdoor.nextdoor.domain.chat.port.ChatReservationQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.domain.QReservation;
 import com.querydsl.core.types.Projections;

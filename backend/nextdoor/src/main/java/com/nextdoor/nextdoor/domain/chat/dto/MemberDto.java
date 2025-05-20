@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.chat.application.dto;
+package com.nextdoor.nextdoor.domain.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 public class MemberDto {
     /** Member ID */
     private Long id;
-    
+
     /** Member nickname */
     private String nickname;
-    
+
     /** Member profile image URL */
     private String profileImageUrl;
 }

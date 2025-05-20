@@ -31,3 +31,19 @@
 @layer utilities {
   /* 유틸리티 스타일 정의 */
 }
+
+@font-face {
+  font-family: 'Hakgyoansim';
+  src: url('/fonts/hakgyoansim-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hakgyoansim';
+  src: url('/fonts/hakgyoansim-bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

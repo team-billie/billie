@@ -14,4 +14,5 @@ public class AnalyzeProductImageResponse {
     private String title;
     private String content;
     private Category category;
+    private String condition;
 }

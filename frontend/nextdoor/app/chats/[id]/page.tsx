@@ -218,7 +218,7 @@ export default function ChatDetailPage() {
   };
 
   const handleBackClick = () => {
-    router.push("/chat/borrow");
+    router.push("/chat");
   };
 
   return (
