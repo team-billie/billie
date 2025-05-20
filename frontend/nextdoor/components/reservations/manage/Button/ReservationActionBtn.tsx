@@ -1,5 +1,6 @@
 import axiosInstance from "@/lib/api/instance";
-import useAlertModal from "@/lib/hooks/alert/useAlertModal";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+
 import useUserStore from "@/lib/store/useUserStore";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +15,7 @@ export default function ReservationActionBtn({
   onSuccess,
 }: ReservationBtnProps) {
   const { userId } = useUserStore();
-  const { showAlert } = useAlertModal(); // ✅ 모달 훅 사용
+  const { showAlert } = useAlertStore();
   const router = useRouter();
   const getLabel = (status: ReservationBtnProps["status"]) => {
     switch (status) {
@@ -52,7 +53,7 @@ export default function ReservationActionBtn({
               },
             }
           );
-          showAlert("예약 확정", "예약이 확정되었습니다.", "success");
+          showAlert("예약이 확정되었습니다.", "success");
           router.push("/reservations/lend");
 
           break;
@@ -63,14 +64,14 @@ export default function ReservationActionBtn({
               "X-User-Id": userId,
             },
           });
-          showAlert("예약 취소", "예약이 성공적으로 취소되었습니다.", "info");
+          showAlert("예약이 취소되었습니다.", "success");
           break;
       }
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("예약 요청 실패:", error);
-      showAlert("오류 발생", "요청 처리 중 문제가 발생했습니다.", "error");
-      onSuccess?.(); // ✅ 성공 시 부모에게 알리기
+      showAlert("요청 처리 중 문제가 발생했습니다.", "error");
+      onSuccess?.();
     }
   };
 

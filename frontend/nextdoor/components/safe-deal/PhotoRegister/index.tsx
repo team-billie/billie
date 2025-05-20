@@ -18,7 +18,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const { id } = useParams();
   const router = useRouter();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
-  const [serverData, setServerData] = useState<| null>(null);
+  const [serverData, setServerData] = useState<null>(null);
 
   if (!userId) return null;
 
@@ -28,8 +28,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       const rentalId = Number(id);
 
       if (status === "before") {
-
-          router.push(`/safe-deal/${rentalId}/before/analysis`);
+        router.push(`/safe-deal/${rentalId}/before/analysis`);
       } else {
         router.push(`/safe-deal/${rentalId}/after/analysis`);
       }
@@ -41,10 +40,10 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const photoKey = status === "before" ? "beforeImages" : "afterImages";
 
   return (
-    <main className="min-h-[calc(100dvh-4rem)]">
-      <div>
+    <div className="flex flex-col h-full">
+      <div className="flex-grow flex flex-col">
         <Title status={status} />
-        <div className="w-full p-4 flex flex-col items-center gap-4">
+        <div className="w-full p-4 flex-grow flex flex-col justify-center">
           <PhotoManager
             rentalId={Number(id)}
             status={status}
@@ -53,13 +52,13 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
             photos={rentalPhotos}
             serverImages={serverData?.[photoKey] || []}
           />
-          <div className="w-full">
-            <div className="max-w-md mx-auto">
-              <GrayButton txt="AI 물품 상태 확인" onClick={handleAnalysis} />
-            </div>
-          </div>
         </div>
       </div>
-    </main>
+      <div className="w-full p-4 mt-auto">
+        <div className="max-w-md mx-auto">
+          <GrayButton txt="AI 물품 상태 확인" onClick={handleAnalysis} />
+        </div>
+      </div>
+    </div>
   );
 }

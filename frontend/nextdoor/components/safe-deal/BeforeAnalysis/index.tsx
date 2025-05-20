@@ -5,15 +5,18 @@ import { AiBeforePhotosPostRequest } from "@/lib/api/ai-analysis/request";
 import { useParams, useRouter } from "next/navigation";
 import AILoading from "../AILoading";
 import { motion } from "framer-motion";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+import ErrorMessage from "@/components/common/ErrorMessage";
 
 export default function BeforeAnalysis() {
   const [damageAnalysis, setDamageAnalysis] = useState<DamageAnalysis | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
   const router = useRouter();
+  const { showAlert } = useAlertStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,11 +30,11 @@ export default function BeforeAnalysis() {
             setDamageAnalysis(parsedData);
           } catch (parseError) {
             console.error("Error parsing damage analysis:", parseError);
-            setError("데이터 파싱 중 오류가 발생했습니다.");
           }
         }
       } catch (err) {
-        setError("데이터를 불러오는 중 오류가 발생했습니다.");
+        setError("분석 결과를 불러오는 중 오류가 발생했습니다.");
+        showAlert("데이터를 불러오는 중 오류가 발생했습니다.", "error");
         console.error("Error fetching damage analysis:", err);
       } finally {
         setIsLoading(false);
@@ -46,31 +49,28 @@ export default function BeforeAnalysis() {
   return (
     <div className="relative flex flex-col p-5">
       {isLoading ? (
-        <AILoading />
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <AILoading status="before" />
+        </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center mt-4">
-          <div className="p-6 bg-white rounded-xl shadow-sm border border-red-100">
-            <div className="text-red-500 font-medium text-center">{error}</div>
-            <div className="mt-4 text-sm text-gray-500 text-center">
-              잠시 후 다시 시도해주세요
-            </div>
-          </div>
+          {error && <ErrorMessage message={error} />}
         </div>
       ) : damageAnalysis && damageAnalysis.length > 0 ? (
         <>
           {/* Header for damage found */}
           <div className="mb-6">
-            <div className="text-2xl font-bold text-purple-600 mb-1">
+            <div className="text-3xl font-bold text-blue200 mb-1">
               AI 분석결과
             </div>
-            <div className="text-lg font-medium text-gray-700">
+            <div className="text-lg font-medium text-gray100">
               다음과 같은 손상이 발견됐어요!
             </div>
           </div>
 
           {/* Damage Results */}
           <div className="space-y-4 mb-6">
-            {damageAnalysis.map((item) =>
+            {damageAnalysis.flatMap((item) =>
               item.damages.map((damage, damageIndex) => (
                 <ResultItem
                   key={`${item.imageIndex}-${damageIndex}`}
@@ -84,7 +84,7 @@ export default function BeforeAnalysis() {
           <div className="flex gap-3 mb-8">
             <button
               onClick={() => window.location.reload()}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 rounded-xl py-3 font-medium text-gray-700 transition-colors duration-200 text-sm"
+              className="flex-1 bg-gray-100 hover:bg-gray-200 rounded-xl py-3 text-semibold font-lg text-gray-700 transition-colors duration-200 text-sm"
             >
               분석 재시도
             </button>
@@ -92,16 +92,16 @@ export default function BeforeAnalysis() {
               onClick={() =>
                 router.push(`/safe-deal/${id}/before/photos-register`)
               }
-              className="flex-1 bg-purple-50 hover:bg-purple-100 rounded-xl py-3 font-medium text-purple-600 transition-colors duration-200 text-sm"
+              className="flex-1 bg-blue200 hover:bg-blue300 rounded-xl  text-semibold font-lg text-white transition-colors duration-200 text-sm"
             >
               사진 재등록
             </button>
           </div>
         </>
       ) : (
-        <>
-          <div className="text-center mt-20 mb-6 ">
-            <div className="text-2xl font-bold text-purple  mb-1">
+        <div className="relative">
+          <div className="text-center mt-24 mb-4 ">
+            <div className="text-3xl font-bold text-white  mb-1">
               AI 분석결과
             </div>
           </div>
@@ -142,24 +142,26 @@ export default function BeforeAnalysis() {
           <div className="text-lg font-medium text-white text-center">
             손상이 발견되지 않았습니다
           </div>
-          {/* Action buttons within the content area */}
-          <div className="flex gap-3 mb-6 fixed bottom-16 w-full right-0 left-0 px-4">
-            <button
-              onClick={() => window.location.reload()}
-              className="flex-1 font-semibold bg-gray-100 hover:bg-gray-200 rounded-xl py-4 font-medium text-gray-700 transition-colors duration-200 text-sm"
-            >
-              분석 재시도
-            </button>
-            <button
-              onClick={() =>
-                router.push(`/safe-deal/${id}/before/photos-register`)
-              }
-              className="flex-1 bg-blue200 font-semibold  hover:bg-purple-100 rounded-xl py-3 font-medium text-purple-600 transition-colors duration-200 text-sm"
-            >
-              사진 재등록
-            </button>
+          {/* Action buttons fixed at bottom */}
+          <div className="fixed bottom-24 left-0 right-0 px-4  z-40">
+            <div className="flex gap-3 max-w-md mx-auto ">
+              <button
+                onClick={() => window.location.reload()}
+                className="flex-1 font-semibold bg-gray-100 hover:bg-gray-200 rounded-xl py-4 text-gray-700 transition-colors duration-200"
+              >
+                분석 재시도
+              </button>
+              <button
+                onClick={() =>
+                  router.push(`/safe-deal/${id}/before/photos-register`)
+                }
+                className="flex-1 bg-blue200 font-semibold hover:bg-blue300 rounded-xl py-4 text-white transition-colors duration-200"
+              >
+                사진 재등록
+              </button>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

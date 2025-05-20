@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
 import { createReservation } from "@/lib/api/reservations/request";
 import useUserStore from "@/lib/store/useUserStore";
-import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import { formatKoreanDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { formatNumberWithCommas } from "@/lib/utils/money";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface ProductReservationProps {
   feedId: number;
@@ -26,9 +26,8 @@ export default function ProductReservation({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
   const { userId } = useUserStore();
-  const { showAlert } = useAlertModal();
+  const { showAlert } = useAlertStore();
   const router = useRouter();
-  console.log("❤️❤️❤️", userId);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,7 +84,7 @@ export default function ProductReservation({
 
   const handleConfirmReservation = async () => {
     if (!startDate || !endDate) {
-      alert("시작일과 종료일을 선택해주세요.");
+      showAlert("시작일과 종료일을 선택해주세요", "error");
       return;
     }
 
@@ -104,7 +103,6 @@ export default function ProductReservation({
       const result = await createReservation(reservation, userId);
       console.log("예약 성공:", result);
       showAlert(
-        "옆집 물건 예약",
         `${formatKoreanDate(startDate)}부터 ${formatKoreanDate(
           endDate
         )}까지 예약이 완료되었습니다.`,

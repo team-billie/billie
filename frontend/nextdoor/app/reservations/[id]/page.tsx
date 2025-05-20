@@ -12,7 +12,6 @@ export default function ReservationDetailPage() {
     useState<GetReservationDetailRequestDTO | null>(null);
   const { id } = useParams();
   const [date, setDate] = useState(0);
-
   const fetchReservationDetail = async () => {
     const data = await GetReservationDetailRequest(Number(id));
     setReservation(data);

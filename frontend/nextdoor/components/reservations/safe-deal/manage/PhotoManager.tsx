@@ -40,27 +40,27 @@ export default function PhotoManager({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // 서버 이미지 불러오기
+  const fetchImages = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.get(
+        `/api/v1/rentals/${rentalId}/ai-analysis`
+      );
+      const data = response.data;
+
+      const images =
+        uploadType === "before"
+          ? data.beforeImages || []
+          : data.afterImages || [];
+      setServerImageUrls(images);
+    } catch (error) {
+      console.error("이미지 로드 오류:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axiosInstance.get(
-          `/api/v1/rentals/${rentalId}/ai-analysis`
-        );
-        const data = response.data;
-
-        const images =
-          uploadType === "before"
-            ? data.beforeImages || []
-            : data.afterImages || [];
-        setServerImageUrls(images);
-      } catch (error) {
-        console.error("이미지 로드 오류:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (serverImages.length === 0 && rentalId) {
       fetchImages();
     } else {
@@ -104,8 +104,12 @@ export default function PhotoManager({
 
     try {
       setUploading(true);
-      await uploadPhotos(filesArray);
+      const result = await uploadPhotos(filesArray);
       setUploadSuccess(true);
+
+      // 업로드 성공 후 서버 이미지 목록 새로고침
+      await fetchImages();
+
       setTimeout(() => setUploadSuccess(false), 3000);
     } catch (error) {
       console.error("사진 업로드 오류:", error);
@@ -134,9 +138,9 @@ export default function PhotoManager({
   const totalImages = serverImageUrls.length + photos.length;
 
   return (
-    <div className="flex justify-center overflow-hidden w-full  flex-1">
+    <div className="flex justify-center items-center overflow-hidden w-full flex-1">
       <div className="w-full max-w-screen-sm px-4">
-        <div className="mt-2 mb-4 w-full flex flex-col">
+        <div className="w-full flex flex-col">
           <div className="flex justify-center">
             {totalImages < 10 ? (
               <FileUpload
@@ -168,32 +172,36 @@ export default function PhotoManager({
             )}
           </div>
 
-          <div className="w-full relative mb-4 ">
-            <Swiper
-              slidesPerView={2.4}
-              spaceBetween={8}
-              freeMode={true}
-              pagination={{ clickable: true }}
-              modules={[FreeMode]}
-              onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
-              className="mySwiper"
-            >
-              {serverImageUrls.map((image, idx) => (
-                <SwiperSlide key={idx}>
-                  <div
-                    className="relative w-full h-44 cursor-pointer"
-                    onClick={() => setSelectedImage(image)}
-                  >
-                    <Image
-                      src={image}
-                      alt={`Product ${idx + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div className="w-full relative mt-4 mb-4">
+            {isLoading ? (
+              <div className="text-center py-4">이미지를 불러오는 중...</div>
+            ) : (
+              <Swiper
+                slidesPerView={2.4}
+                spaceBetween={8}
+                freeMode={true}
+                pagination={{ clickable: true }}
+                modules={[FreeMode]}
+                onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+                className="mySwiper"
+              >
+                {serverImageUrls.map((image, idx) => (
+                  <SwiperSlide key={`${image}-${idx}`}>
+                    <div
+                      className="relative w-full h-44 cursor-pointer"
+                      onClick={() => setSelectedImage(image)}
+                    >
+                      <Image
+                        src={image}
+                        alt={`Product ${idx + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ import ProductReservation from "@/components/posts/detail/ProductReservation";
 import { GetPostLikeRequest } from "@/lib/api/posts";
 import { postDetailRequest } from "@/lib/api/posts/request";
 import { PostDetailResponseDTO } from "@/types/posts/response";
-import { ChevronLeft, Heart, MessageCircle } from "lucide-react";
+import { ChevronLeft, Heart } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PostLikeDeleteRequest, PostLikeRequest } from "@/lib/api/posts";
@@ -17,7 +17,6 @@ export default function PostDetailPage() {
   const { id } = useParams();
   const feedId = Number(id);
   const router = useRouter();
-
   const [isLiked, setIsLiked] = useState(false);
 
   const handleLikeBtn = () => {
@@ -45,27 +44,33 @@ export default function PostDetailPage() {
       setIsLiked(data.liked);
     }
     fetchPostLike();
-
   }, [feedId]);
 
   if (!product) {
     return <LoadingSpinner />;
   }
 
-   // authorId가 null인 경우 대비 (옵셔널 체이닝 사용)
-   const authorId = product.authorId ?? 0;
+  // authorId가 null인 경우 대비 (옵셔널 체이닝 사용)
+  const authorId = product.authorId ?? 0;
 
   return (
     <main className="relative">
       <div className="min-h-screen flex flex-col pb-24">
         {/* 물품 페이지 헤더 */}
         <div className="absolute top-4 left-2 right-2 flex justify-between z-10 px-2">
-          <div onClick={() => router.back()} className="flex items-center justify-center bg-blue100 bg-opacity-70 rounded-full text-gray800 w-11 h-11 p-1.5">
+          <div
+            onClick={() => router.back()}
+            className="flex items-center justify-center bg-blue100 bg-opacity-70 rounded-full text-gray800 w-11 h-11 p-1.5"
+          >
             <ChevronLeft className="w-6 h-6" />
           </div>
           <button className="flex items-center justify-center bg-blue100 bg-opacity-70 rounded-full text-gray-700 w-11 h-11 p-1.5">
-            <Heart 
-              className={`cursor-pointer transition-colors w-6 h-6 ${isLiked ? "text-pink-500 fill-pink-300" : "text-gray800 fill-gray400"}`}
+            <Heart
+              className={`cursor-pointer transition-colors w-6 h-6 ${
+                isLiked
+                  ? "text-pink-500 fill-pink-300"
+                  : "text-gray800 fill-gray400"
+              }`}
               onClick={(e) => {
                 e.preventDefault();
                 handleLikeBtn();
