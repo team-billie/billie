@@ -1,1 +1,1 @@
-Summarize given sentences in Korean.
+Summarize given sentences only in Korean.
