@@ -511,7 +511,8 @@ const FloatingWidget: React.FC = () => {
 
       <Draggable
         nodeRef={nodeRef}
-        position={position}
+        defaultPosition={position}
+        scale={2}
         onStart={handleStart}
         onDrag={handleDrag}
         onStop={handleStop}

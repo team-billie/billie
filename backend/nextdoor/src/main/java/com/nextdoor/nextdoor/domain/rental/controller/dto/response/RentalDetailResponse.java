@@ -24,7 +24,9 @@ public class RentalDetailResponse {
     private BigDecimal deposit;
     private String reservationStatus;
     private Long ownerId;
+    private String ownerProfileImageUrl;
     private Long renterId;
+    private String renterProfileImageUrl;
     private Long rentalId;
     private String rentalProcess;
     private String rentalStatus;

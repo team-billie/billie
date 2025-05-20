@@ -83,14 +83,14 @@ export default function useReservationWebSocket() {
     let client: Client | null = null;
     
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://k12e205.p.ssafy.io:8081';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://k12e205.p.ssafy.io:8081';
         const socket = new SockJS(`${baseUrl}/ws-reservation`);
       
       // STOMP 클라이언트 생성
       client = new Client({
         webSocketFactory: () => socket,
         debug: (str) => {
-          console.log('STOMP: ' + str);
+          console.log('STOMP Reservation: ' + str);
         },
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
@@ -112,7 +112,7 @@ export default function useReservationWebSocket() {
             const formattedReservation = {
               reservationId: reservationData.reservationId,
               postTitle: reservationData.postTitle || reservationData.title,
-              postProductImage: reservationData.postProductImages || reservationData.productImageUrl,
+              postProductImage: reservationData.postProductImage || reservationData.productImageUrl,
               startDate: reservationData.startDate,
               endDate: reservationData.endDate,
               rentalFee: reservationData.rentalFee,
