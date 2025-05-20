@@ -15,7 +15,6 @@ public interface RentalService {
     RequestRemittanceResult requestRemittance(RequestRemittanceCommand command);
     RequestRemittanceResult getRemittanceData(Long rentalId);
     void completeRemittanceProcessing(RemittanceCompletedEvent remittanceCompletedEvent);
-    void completeRentalEndProcessing(Long rentalId);
     UploadImageResult registerAfterPhoto(UploadImageCommand command);
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
