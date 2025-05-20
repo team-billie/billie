@@ -92,7 +92,7 @@ public class Rental {
     }
 
     public void processRemittanceCompletion() {
-        if(rentalStatus != RentalStatus.REMITTANCE_REQUESTED){
+        if(rentalStatus != RentalStatus.BEFORE_PHOTO_ANALYZED){
             throw new InvalidRentalStatusException("결제 완료 처리가 불가능한 대여 상태입니다");
         }
 
