@@ -17,6 +17,7 @@ public class RentalDto {
     private Long reservationId;
     private String rentalStatus;
     private String damageAnalysis;
+    private String comparedAnalysis;
     private List<AiImageDto> aiImages;
 
     @AllArgsConstructor

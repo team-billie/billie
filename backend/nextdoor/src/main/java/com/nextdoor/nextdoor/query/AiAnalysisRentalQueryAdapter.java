@@ -35,6 +35,7 @@ public class AiAnalysisRentalQueryAdapter implements AiAnalysisRentalQueryPort {
                 .reservationId(rental.getReservationId())
                 .rentalStatus(rental.getRentalStatus().name())
                 .damageAnalysis(rental.getDamageAnalysis())
+                .comparedAnalysis(rental.getComparedAnalysis())
                 .aiImages(rental.getAiImages().stream().map(aiImage -> RentalDto.AiImageDto.builder()
                         .aiImageId(aiImage.getId())
                         .type(AiImageType.valueOf(aiImage.getType().name()))
