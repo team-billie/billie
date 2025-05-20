@@ -31,7 +31,7 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
     private final ObjectMapper objectMapper;
 
     public GeminiProductImageAnalysisAdapter(
-            @Qualifier("geminiPro")
+            @Qualifier("geminiFlash")
             GenerativeModel generativeModel,
             @Qualifier("productAnalyzerPromptPart") Part productAnalyzerPromptPart,
             ObjectMapper objectMapper
