@@ -13,6 +13,7 @@ public interface RentalService {
     void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent);
     UploadImageResult registerBeforePhoto(UploadImageCommand command);
     RequestRemittanceResult requestRemittance(RequestRemittanceCommand command);
+    RequestRemittanceResult getRemittanceData(Long rentalId);
     void completeRemittanceProcessing(RemittanceCompletedEvent remittanceCompletedEvent);
     void completeRentalEndProcessing(Long rentalId);
     UploadImageResult registerAfterPhoto(UploadImageCommand command);

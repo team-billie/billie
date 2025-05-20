@@ -106,6 +106,13 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public RequestRemittanceResult getRemittanceData(Long rentalId) {
+        return rentalQueryPort.findRemittanceRequestViewData(rentalId)
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+    }
+
+    @Override
     @Transactional
     public UploadImageResult registerBeforePhoto(UploadImageCommand command) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
