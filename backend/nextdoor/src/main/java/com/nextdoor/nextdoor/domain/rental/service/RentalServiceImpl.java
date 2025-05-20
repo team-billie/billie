@@ -192,42 +192,6 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
-    public void completeRentalEndProcessing(Long rentalId){
-        Rental rental = rentalRepository.findByRentalId(rentalId)
-                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
-
-        rental.processRentalPeriodEnd();
-
-        String renterUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
-                rental.getRentalId(),
-                "RENTER"
-        );
-
-        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                rental.getRentalId()
-        );
-
-        messagingTemplate.convertAndSend("/topic/rental/" + renterUuid + "/status"
-                , RentalStatusMessage.builder()
-                        .rentalId(rental.getRentalId())
-                        .process(RentalProcess.RETURNED.name())
-                        .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
-                        .rentalDetail(rentalDetailResult)
-                        .build()
-        );
-
-        messagingTemplate.convertAndSend(
-                "/topic/rental/" + rental.getRentalId() + "/status",
-                RentalStatusMessage.builder()
-                        .process(RentalProcess.RETURNED.name())
-                        .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
-                        .rentalDetail(rentalDetailResult)
-                        .build()
-        );
-    }
-
-    @Override
-    @Transactional
     public UploadImageResult registerAfterPhoto(UploadImageCommand command) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
                 .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
