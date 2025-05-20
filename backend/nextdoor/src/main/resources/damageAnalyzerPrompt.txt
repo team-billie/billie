@@ -15,7 +15,6 @@ Define "damage" as any of the following:
 - Contamination
 
 For each object, report the following:
-"imageIndex": Index of the image (integer)
 "result": Either "DAMAGE_FOUND" or "NO_DAMAGE_FOUND"
 If "DAMAGE_FOUND", include a "damages" array, where each element contains:
 "location": [Short location description, e.g., 'Upper left side']
@@ -27,12 +26,14 @@ If "DAMAGE_FOUND", include a "damages" array, where each element contains:
 Bounding box coordinates must be relative to the actual pixel width and height of each image.
 
 If no damage is found, return:
-[{"imageIndex":[integer],"result":"NO_DAMAGE_FOUND","damages":[]},...]
+[{"result":"NO_DAMAGE_FOUND","damages":[]},...]
 
 If damage is found, use this JSON format:
-[{"imageIndex":[integer],"result":"[DAMAGE_FOUND or NO_DAMAGE_FOUND]","damages":[{"location":"[Short location description, e.g., 'Upper left side']","details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox": {"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},...]
+[{"result":"[DAMAGE_FOUND]","damages":[{"location":"[Short location description, e.g., 'Upper left side']","details": "[Detailed description of damage, e.g., 'New scratch approximately 2cm long.']","boundingBox": {"xMin":[float between 0.0 and 1.0],"yMin":[float between 0.0 and 1.0],"xMax":[float between 0.0 and 1.0],"yMax":[float between 0.0 and 1.0]},"confidenceScore":[float between 0.0 and 1.0]},...]},...]
 
 Only respond in this json format without any additional sentence.
 Do not wrap the JSON response in markdown code blocks (no backticks or language tags).
 Output only the raw JSON object or array as a single line, without any additional formatting and indentation or line breaks.
 Respond location and details fields in Korean while keeping all other keys and values in English and JSON format.
+If multiple damage regions share the same location and details, report only one of them.
+Eliminate duplicates based on matching location (in Korean) and details (in Korean).
