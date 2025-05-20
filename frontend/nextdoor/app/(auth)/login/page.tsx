@@ -13,7 +13,7 @@ export default function LoginPage() {
   }, []);
 
   const handleKakaoLogin = () => {
-    window.location.href = `http://k12e205.p.ssafy.io:8081/api/v1/auth/oauth2/authorization/kakao?redirectUrl=${baseUrl}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/oauth2/authorization/kakao?redirectUrl=${baseUrl}`;
   };
 
   return (

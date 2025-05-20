@@ -13,6 +13,11 @@ import ProductRegisterCategorySelector from "@/components/posts/register/Product
 import ProductRegisterLocationSelector from "@/components/posts/register/ProductRegisterLocationSelector";
 import ProductRegisterPriceInput from "@/components/posts/register/ProductRegisterPriceInput";
 import ProductRegisterSubmitButton from "@/components/posts/register/ProductRegisterSubmitButton";
+import AnalyzingPage from '@/components/posts/register/AnalyzingPage';
+import { ProductCondition } from '@/components/posts/register/ProductConditionModal';
+import axiosInstance from "@/lib/api/instance";
+import classNames from "classnames";
+import LoadingIcon from '@/components/common/LoadingIcon';
 
 export default function NewPostPage() {
     const router = useRouter();
@@ -24,6 +29,17 @@ export default function NewPostPage() {
     const [analysisError, setAnalysisError] = useState<string | null>(null);
     const [progress, setProgress] = useState(0);
     const progressRef = useRef<NodeJS.Timeout | null>(null);
+
+    // 분석 결과 안내/다음 버튼 상태
+    const [aiResult, setAiResult] = useState<{
+        title: string;
+        content: string;
+        category: string;
+        condition: ProductCondition;
+        report: string;
+        autoFillMessage: string;
+    } | null>(null);
+    const [showAiResultModal, setShowAiResultModal] = useState(false);
 
     const {
         title,
@@ -40,6 +56,53 @@ export default function NewPostPage() {
         setPreferredLocation,
         resetForm,
     } = useProductRegisterStore();
+
+    const [showResultAnimation, setShowResultAnimation] = useState(false);
+    const [showSmartStar, setShowSmartStar] = useState(false);
+
+    const conditionMap: Record<string, ProductCondition> = {
+        "UNOPENED": "미개봉",
+        "ALMOST_NEW": "거의 새 제품",
+        "GOOD": "양호",
+        "NORMAL": "보통",
+        "USED": "사용감 있음",
+        "NEEDS_REPAIR": "수리 필요함"
+    };
+
+    // 폼 임시 저장/복원 키
+    const FORM_DRAFT_KEY = 'postFormDraft';
+
+    // 폼 임시 저장 함수
+    const saveFormDraft = () => {
+        const draft = {
+            title,
+            content,
+            category,
+            rentalFee,
+            deposit,
+            preferredLocation,
+            previewUrls,
+        };
+        localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(draft));
+    };
+
+    // 폼 임시 복원 함수 (마운트 시)
+    useEffect(() => {
+        const draftStr = localStorage.getItem(FORM_DRAFT_KEY);
+        if (draftStr) {
+            try {
+                const draft = JSON.parse(draftStr);
+                if (draft.title) setTitle(draft.title);
+                if (draft.content) setContent(draft.content);
+                if (draft.category) setCategory(draft.category);
+                if (draft.rentalFee) setRentalFee(draft.rentalFee);
+                if (draft.deposit) setDeposit(draft.deposit);
+                if (draft.preferredLocation) setPreferredLocation(draft.preferredLocation);
+                if (draft.previewUrls) setPreviewUrls(draft.previewUrls);
+            } catch {}
+            localStorage.removeItem(FORM_DRAFT_KEY);
+        }
+    }, []);
 
     useEffect(() => {
         if (isAnalyzing) {
@@ -85,30 +148,93 @@ export default function NewPostPage() {
         }
     }, [setPreferredLocation]);
 
+    // 분석 결과가 나오면 애니메이션 트리거
+    useEffect(() => {
+        if (showAiResultModal && aiResult) {
+            setTimeout(() => {
+                setShowResultAnimation(true);
+                setTimeout(() => setShowSmartStar(true), 700); // 올라간 후 이미지 변경
+            }, 400); // 결과 모달 뜨고 0.4초 후 애니메이션 시작
+        } else {
+            setShowResultAnimation(false);
+            setShowSmartStar(false);
+        }
+    }, [showAiResultModal, aiResult]);
+
     const handleMainImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("handleMainImageSelect 시작");
         const file = e.target.files?.[0];
-        if (!file) return;
+        if (!file) {
+            console.log("파일이 선택되지 않음");
+            return;
+        }
+        console.log("선택된 파일:", file.name);
 
         setSelectedImage(file);
         setPreviewUrls([URL.createObjectURL(file)]);
+        console.log("이미지 분석 시작 전");
         await analyzeImage(file);
     };
 
     const analyzeImage = async (file: File) => {
+        console.log("analyzeImage 함수 시작");
         setIsAnalyzing(true);
         setAnalysisError(null);
-
+    
         try {
-            const result = await analyzeProductImage(file);
-            setTitle(result.title);
-            setContent(result.content);
-            setCategory(result.category);
+            console.log("이미지 분석 API 호출 시작");
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const response = await axiosInstance.post('/api/v1/posts/analyze', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            
+            const result = response.data;
+            console.log("API 응답 받음:", result);
+            
+            if (!result) {
+                console.error("API 응답이 없음");
+                throw new Error("API 응답이 없습니다.");
+            }
+
+            const condition = result.condition || "GOOD";
+            const mappedCondition = conditionMap[condition] || "양호";
+            console.log("상태 매핑:", { original: condition, mapped: mappedCondition });
+            
+            const newAiResult = {
+                title: result.title || "",
+                content: result.content || "",
+                category: result.category || "",
+                condition: mappedCondition,
+                report: result.report || "",
+                autoFillMessage: result.autoFillMessage || ""
+            };
+            setAiResult(newAiResult);
+            // 분석 결과를 바로 폼에 삽입
+            setTitle(newAiResult.title);
+            setContent(newAiResult.content);
+            setCategory(newAiResult.category);
             setShowAnalysisResult(true);
         } catch (error) {
-            console.error("이미지 분석 실패:", error);
+            console.error("이미지 분석 중 에러 발생:", error);
             setAnalysisError("이미지 분석에 실패했습니다. 다시 시도해주세요.");
         } finally {
             setIsAnalyzing(false);
+        }
+    };
+
+    const handleAiResultConfirm = () => {
+        console.log("AI 결과 확인 버튼 클릭");
+        if (aiResult) {
+            console.log("AI 결과 적용:", aiResult);
+            setTitle(aiResult.title);
+            setContent(aiResult.content);
+            setCategory(aiResult.category);
+            setShowAiResultModal(false);
+            setShowAnalysisResult(true);
         }
     };
 
@@ -147,7 +273,7 @@ export default function NewPostPage() {
             return;
         }
 
-        if (!title || !content || !category || !preferredLocation) {
+        if (!title || !content || !category) {
             alert("필수 항목을 모두 입력해주세요.");
             return;
         }
@@ -178,19 +304,17 @@ export default function NewPostPage() {
 
     if (isAnalyzing) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-                <div className="mb-4">
-                    <div className="inline-block bg-green-200 text-green-800 px-4 py-2 rounded-full text-lg font-semibold shadow">
-                        기다려주셔서 감사합니다
-                    </div>
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="mb-6">
+                    <LoadingIcon />
                 </div>
-                <div className="relative mb-6">
+                <div className="mb-4">
                     <Image
-                        src="/images/doctorBlueStar.png"
+                        src="/images/magicianBlueStar.png"
                         alt="분석 대기 캐릭터"
-                        width={195}
-                        height={195}
-                        className="animate-bounce drop-shadow-lg"
+                        width={180}
+                        height={180}
+                        className="drop-shadow-lg"
                         priority
                     />
                 </div>
@@ -198,13 +322,59 @@ export default function NewPostPage() {
                     <p className="text-gray-700 text-lg font-medium mb-1">AI가 이미지를 분석하고 있어요</p>
                     <p className="text-gray-500 text-base">조금만 기다려주시면 곧 결과를 보여드릴게요!</p>
                 </div>
-                <div className="w-64 h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
-                    <div
-                        className="h-full bg-blue-400 transition-all duration-200"
-                        style={{ width: `${progress}%` }}
-                    />
+            </div>
+        );
+    }
+
+    if (showAiResultModal && aiResult) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+                {/* 위로 올라간 smartBlueStar */}
+                <div className="flex flex-col items-center w-full">
+                    <div className="relative flex flex-col items-center mb-4 transition-all duration-700" style={{ minHeight: 120 }}>
+                        <Image
+                            src="/images/smartBlueStar.png"
+                            alt="스마트 블루스타"
+                            width={120}
+                            height={120}
+                            className="drop-shadow-lg"
+                        />
+                    </div>
+                    <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold">AI 분석 결과</span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">이런 결과가 나왔어요!</h2>
+                        <div className="space-y-3">
+                            <div className="bg-blue-50 rounded-xl p-4 flex items-center gap-3">
+                                <div>
+                                    <div className="text-sm text-blue-700 font-semibold mb-1">AI가 본 상태</div>
+                                    <div className="text-base text-gray-800">{aiResult.report}</div>
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+                                <div>
+                                    <div className="text-sm text-gray-500 font-semibold mb-1">자동 작성 제안</div>
+                                    <div className="text-base text-gray-800">{aiResult.autoFillMessage}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-3 mt-4">
+                            <button
+                                onClick={handleAiResultConfirm}
+                                className="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                            >
+                                제안된 내용으로 작성하기
+                            </button>
+                            <button
+                                onClick={handleRetry}
+                                className="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                            >
+                                다시 분석하기
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div className="text-gray-400 text-xs">분석이 완료될 때까지 창을 닫지 말아주세요.</div>
             </div>
         );
     }
@@ -284,10 +454,10 @@ export default function NewPostPage() {
     return (
         <main className="min-h-screen bg-gray-50 pb-20">
             <ProductRegisterHeader />
-            <div className="max-w-md mx-auto px-4 py-8">
-                <div className="bg-white rounded-2xl shadow p-5 mb-8">
-                    <div className="mb-3 text-gray-800 font-semibold text-base">이미지 등록</div>
-                    <div className="grid grid-cols-3 gap-3 mb-2">
+            <div className="max-w-md mx-auto px-2 py-6">
+                <div className="bg-white rounded-2xl shadow p-4 mb-4">
+                    <div className="mb-2 text-gray-800 font-semibold text-base">이미지 등록</div>
+                    <div className="grid grid-cols-3 gap-2 mb-1">
                         {previewUrls.map((url, index) => (
                             <div key={index} className="relative aspect-square">
                                 <Image
@@ -317,92 +487,104 @@ export default function NewPostPage() {
                             </label>
                         )}
                     </div>
-                    <div className="text-gray-400 text-xs">최대 5장까지 등록할 수 있어요</div>
+                    <div className="text-gray-400 text-xs mb-2">최대 5장까지 등록할 수 있어요</div>
+                    {/* 분석 결과가 있으면 대표 이미지 아래에 상태 표시 */}
+                    {aiResult && (
+                        <div className="mt-2 bg-blue-50 rounded-lg p-3">
+                            <div className="text-xs text-blue-700 font-semibold mb-1">AI가 본 상태</div>
+                            <div className="text-sm text-gray-800 whitespace-pre-line">{aiResult.report}</div>
+                        </div>
+                    )}
                 </div>
-                <div className="space-y-6">
-                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700 mb-1">제목</label>
-                        <div className="flex items-center gap-2">
-                            <Pencil className="w-5 h-5 text-blue-400 shrink-0" />
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                                placeholder="글 제목을 입력하세요"
-                                maxLength={40}
-                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-3 text-gray-900 placeholder-gray-300 outline-none"
-                            />
-                        </div>
+                {/* 제목 */}
+                <div className="bg-white rounded-2xl shadow p-3 flex flex-col gap-1 mb-3">
+                    <label className="text-xs font-semibold text-gray-700 mb-1">제목</label>
+                    <div className="flex items-center gap-2">
+                        <Pencil className="w-4 h-4 text-blue-400 shrink-0" />
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            placeholder="글 제목을 입력하세요"
+                            maxLength={40}
+                            className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-2 text-gray-900 placeholder-gray-300 outline-none"
+                        />
                     </div>
-                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700 mb-1">설명</label>
-                        <div className="flex items-start gap-2">
-                            <FileText className="w-5 h-5 text-blue-400 shrink-0 mt-1" />
-                            <textarea
-                                value={content}
-                                onChange={e => setContent(e.target.value)}
-                                placeholder="나의 물건을 소개해주세요."
-                                rows={4}
-                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-3 text-gray-900 placeholder-gray-300 outline-none resize-none"
-                            />
-                        </div>
+                </div>
+                {/* 설명 */}
+                <div className="bg-white rounded-2xl shadow p-3 flex flex-col gap-1 mb-3">
+                    <label className="text-xs font-semibold text-gray-700 mb-1">설명</label>
+                    <div className="flex items-start gap-2">
+                        <FileText className="w-4 h-4 text-blue-400 shrink-0 mt-1" />
+                        <textarea
+                            value={content}
+                            onChange={e => setContent(e.target.value)}
+                            placeholder="나의 물건을 소개해주세요."
+                            rows={3}
+                            className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-2 text-gray-900 placeholder-gray-300 outline-none resize-none"
+                        />
                     </div>
-                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700 mb-1">1일 대여금</label>
+                </div>
+                {/* 대여금, 보증금 2단 그리드 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div className="bg-white rounded-2xl shadow p-3 flex flex-col gap-1">
+                        <label className="text-xs font-semibold text-gray-700 mb-1">1일 대여금</label>
                         <div className="flex items-center gap-2">
-                            <CircleDollarSign className="w-5 h-5 text-blue-400 shrink-0" />
+                            <CircleDollarSign className="w-4 h-4 text-blue-400 shrink-0" />
                             <input
                                 type="text"
                                 inputMode="numeric"
                                 value={rentalFee}
                                 onChange={e => setRentalFee(e.target.value.replace(/[^0-9]/g, ""))}
                                 placeholder="가격 입력"
-                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-3 text-gray-900 placeholder-gray-300 outline-none"
+                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 p-2 text-gray-900 placeholder-gray-300 outline-none"
                             />
                         </div>
                     </div>
-                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700 mb-1">보증금</label>
+                    <div className="bg-white rounded-2xl shadow p-3 flex flex-col gap-1">
+                        <label className="text-xs font-semibold text-gray-700 mb-1">보증금</label>
                         <div className="flex items-center gap-2">
-                            <CircleDollarSign className="w-5 h-5 text-blue-200 shrink-0" />
+                            <CircleDollarSign className="w-4 h-4 text-blue-200 shrink-0" />
                             <input
                                 type="text"
                                 inputMode="numeric"
                                 value={deposit}
                                 onChange={e => setDeposit(e.target.value.replace(/[^0-9]/g, ""))}
                                 placeholder="선택 입력"
-                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-200 focus:ring-2 focus:ring-blue-50 p-3 text-gray-900 placeholder-gray-300 outline-none"
+                                className="w-full bg-gray-50 rounded-lg border border-gray-200 focus:border-blue-200 focus:ring-2 focus:ring-blue-50 p-2 text-gray-900 placeholder-gray-300 outline-none"
                             />
                         </div>
                     </div>
-                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700 mb-1">카테고리</label>
-                        <div className="flex items-center gap-2">
-                            <Tag className="w-5 h-5 text-blue-400 shrink-0" />
-                            <div className="flex-1">
-                                <ProductRegisterCategorySelector
-                                    value={category}
-                                    onChange={setCategory}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl shadow p-5 flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700 mb-1">위치</label>
-                        <div className="flex items-center gap-2">
-                            <MapPin className="w-5 h-5 text-blue-400 shrink-0" />
-                            <div className="flex-1">
-                                <ProductRegisterLocationSelector
-                                    value={preferredLocation}
-                                    onChange={setPreferredLocation}
-                                />
-                            </div>
+                </div>
+                {/* 카테고리 */}
+                <div className="bg-white rounded-2xl shadow p-3 flex flex-col gap-1 mb-3">
+                    <label className="text-xs font-semibold text-gray-700 mb-1">카테고리</label>
+                    <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-blue-400 shrink-0" />
+                        <div className="flex-1">
+                            <ProductRegisterCategorySelector
+                                value={category}
+                                onChange={setCategory}
+                            />
                         </div>
                     </div>
                 </div>
-                <div className="sticky bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10 mt-8">
+                {/* 위치 */}
+                <div className="bg-white rounded-2xl shadow p-3 flex flex-col gap-1 mb-3">
+                    <label className="text-xs font-semibold text-gray-700 mb-1">위치</label>
+                    <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-blue-400 shrink-0" />
+                        <div className="flex-1">
+                            <ProductRegisterLocationSelector
+                                value={preferredLocation}
+                                onChange={setPreferredLocation}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="sticky bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 z-10 mt-6">
                     <button
-                        className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-semibold text-lg shadow-lg transition-all"
+                        className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-semibold text-lg shadow-lg transition-all"
                         onClick={handleSubmit}
                         aria-label="상품 등록 완료"
                     >

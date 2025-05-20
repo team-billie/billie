@@ -1,10 +1,12 @@
 import axiosInstance from "@/lib/api/instance";
 import { Category } from "@/types/posts/response";
 
+// request.ts 수정
 interface AnalyzeProductImageResponse {
     title: string;
     content: string;
     category: Category;
+    condition: string; // 'UNOPENED', 'ALMOST_NEW', 'GOOD', 'NORMAL', 'USED', 'NEEDS_REPAIR' 중 하나
 }
 
 interface CreatePostRequest {
