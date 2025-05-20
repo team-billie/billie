@@ -150,7 +150,7 @@ export default function CompareAnalysis() {
           </div>
 
           {/* 전체 사진 확인 */}
-          <div>
+          <div className="relative w-full">
             <AllPhotos afterPhotos={afterPhotos} beforePhotos={beforePhotos} />
           </div>
         </>

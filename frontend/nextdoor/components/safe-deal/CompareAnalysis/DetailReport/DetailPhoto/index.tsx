@@ -33,26 +33,30 @@ export default function DetailPhoto({
     };
   };
 
-  const renderImage = (isModal: boolean = false) => (
-    <div
-      className="relative w-full h-full"
-      style={boundingBox ? getZoomedStyle(boundingBox, isModal) : undefined}
-    >
-      <Image
-        src={imageUrl}
-        alt={`Product ${idx}${isModal ? " enlarged" : ""}`}
-        fill
-        sizes="(max-width: 768px) 100vw, 50vw"
-        className="object-cover"
-        priority={idx === 1}
-      />
-    </div>
-  );
+  const renderImage = (isModal: boolean = false) => {
+    const transformStyle = boundingBox
+      ? getZoomedStyle(boundingBox, isModal)
+      : undefined;
+
+    return (
+      <div className="relative w-full h-full rounded-2xl">
+        <Image
+          src={imageUrl}
+          alt={`Product ${idx}${isModal ? " enlarged" : ""}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover transform"
+          priority={idx === 1}
+          style={transformStyle}
+        />
+      </div>
+    );
+  };
 
   return (
     <>
       <div
-        className="relative w-full aspect-square rounded-md overflow-hidden bg-gray400 cursor-pointer"
+        className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray400 cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
         {renderImage()}

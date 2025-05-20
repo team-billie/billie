@@ -28,7 +28,7 @@ export default function DetailReport({ matchingResults }: DamageReportProps) {
                       damage={item.pairComparisonResult.damages}
                     />
                   </div>
-                  <div className="flex gap-2 my-2">
+                  <div className="flex gap-2 my-2 ">
                     <DetailPhoto
                       imageUrl={item.beforeImage}
                       idx={1}
