@@ -4,10 +4,9 @@ import com.nextdoor.nextdoor.domain.rental.exception.RentalScheduleException;
 import com.nextdoor.nextdoor.domain.rental.job.RentalEndJob;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -15,6 +14,7 @@ import java.util.Date;
 public class RentalScheduleService {
 
     private final Scheduler scheduler;
+    @Lazy
     private final RentalEndService rentalEndService; // 주입받기
 
     public void scheduleRentalEnd(Long rentalId) {
