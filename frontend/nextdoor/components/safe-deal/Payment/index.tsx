@@ -18,11 +18,11 @@ export default function Payment() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | null>(null);
   const router = useRouter();
+  const { showAlert } = useAlertStore();
 
   // 빌리 잔액 : zustand
   const { billyAccount, userKey } = useUserStore();
   const balance = billyAccount?.balance ?? 0;
-  const { showAlert } = useAlertStore();
 
   const [isChargeNeeded, setIsChargeNeeded] = useState(false);
 
@@ -78,7 +78,6 @@ export default function Payment() {
   useEffect(() => {
     GetPaymentDataRequest(id as string).then(
       (res: GetPaymentDataResponseDto) => {
-
         setPaymentData(res);
         setRentalFeeAmount(res.rentalFee);
         setDepositAmount(res.deposit);
@@ -128,7 +127,6 @@ export default function Payment() {
                   <span>보증금은 빌리페이에서 안전하게 보관됩니다.</span>
                 </div>
               </div>
-              
             </div>
 
             <div className="flex flex-col w-full  gap-2">

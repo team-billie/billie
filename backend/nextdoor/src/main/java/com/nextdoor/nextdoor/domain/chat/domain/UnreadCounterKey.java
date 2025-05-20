@@ -1,20 +1,22 @@
 package com.nextdoor.nextdoor.domain.chat.domain;
 
-import java.io.Serializable;
-import java.util.UUID;
-
 import lombok.*;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.*;
 
+/**
+ * UnreadCounter 복합키: 방ID + 유저ID
+ */
 @PrimaryKeyClass
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
-public class UnreadCounterKey implements Serializable {
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UnreadCounterKey {
 
-    @PrimaryKeyColumn(name = "conversation_id", type = PrimaryKeyType.PARTITIONED)
-    private UUID   conversationId;
+    @PrimaryKeyColumn(name = "room_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+    private Long roomId;
 
-    @PrimaryKeyColumn(name = "user_id",         type = PrimaryKeyType.CLUSTERED)
-    private Long   userId;
+    @PrimaryKeyColumn(name = "user_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+    private Long userId;
 }

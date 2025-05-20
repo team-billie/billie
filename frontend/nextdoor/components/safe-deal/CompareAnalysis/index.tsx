@@ -1,38 +1,142 @@
-import { DamageAnalysisItem } from "@/types/ai-analysis/response";
+import {
+  DamageAnalysisItem,
+  MatchingResult,
+  Damage,
+  BoundingBox,
+} from "@/types/ai-analysis/response";
 import DamageLocation from "../common/DamageLocation";
 import ReportTitle from "../ReportTitle";
 import ColorBox from "./ColorBox";
 import DetailReport from "./DetailReport";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { AiAnalysisGetRequest } from "@/lib/api/ai-analysis/request";
+import {
+  AiAfterPhotosPostRequest,
+  AiAnalysisGetRequest,
+} from "@/lib/api/ai-analysis/request";
 import { useParams } from "next/navigation";
 import AllPhotos from "./AllPhotos";
+import { GetReservationDetailRequestDTO } from "@/types/rental/request";
+import { GetReservationDetailRequest } from "@/lib/api/rental/request";
 
 export default function CompareAnalysis() {
   const { id } = useParams();
   const [afterPhotos, setAfterPhotos] = useState<string[] | null>(null);
   const [beforePhotos, setBeforePhotos] = useState<string[] | null>(null);
-  const [analysis, setAnalysis] = useState<DamageAnalysisItem[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [analysis, setAnalysis] = useState<DamageAnalysisItem[] | null>(null);
   const [hasAnalysis, setHasAnalysis] = useState(false);
+  const [overallComparisonResult, setOverallComparisonResult] = useState<
+    string | null
+  >(null);
+  const [matchingResults, setMatchingResults] = useState<
+    MatchingResult[] | null
+  >(null);
 
+ 
   const fetchAiAnalysis = useCallback(async () => {
     if (!id) return;
-    
+
     try {
-      const res = await AiAnalysisGetRequest(Number(id));
+      // const res = await AiAnalysisGetRequest(Number(id));
+      const res = {
+        beforeImages: [
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_1.jpg",
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_2.jpg",
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_3.jpg",
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_4.jpg",
+        ],
+        afterImages: [
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_1.jpg",
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_2.jpg",
+          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_3.jpg",
+        ],
+        overallComparisonResult:
+          "신발 한 쌍의 흰색 고무 부분(앞코, 옆면)과 신발끈 전체에 걸쳐 이전에는 없던 광범위한 오염 및 마모 흔적이 새로 발견되었습니다.",
+        matchingResults: [
+          {
+            beforeImage:
+              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_1.jpg",
+            afterImage:
+              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_2.jpg",
+            pairComparisonResult: {
+              result: "DAMAGE_FOUND" as const,
+              damages: [
+                {
+                  damageType: "OTHER" as const,
+                  location: "내부 투명 관 입구 위쪽 가장자리",
+                  details:
+                    "내부 투명 관 입구 위쪽 가장자리에서 작은 조각이 떨어져 나간 것으로 보임 (칩).",
+                  boundingBox: {
+                    yMin: 0.458,
+                    xMax: 0.4303,
+                    yMax: 0.4646,
+                    xMin: 0.4246,
+                  },
+                  confidenceScore: 0.65,
+                },
+              ],
+            },
+          },
+          {
+            beforeImage:
+              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_2.jpg",
+            afterImage:
+              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_3.jpg",
+            pairComparisonResult: {
+              result: "DAMAGE_FOUND" as const,
+              damages: [
+                {
+                  damageType: "SCRATCH" as const,
+                  location: "투명 원통 좌측 중상단",
+                  details:
+                    "새로운 흰색의 수평 방향 긁힘 또는 쓸림 자국이 관찰됨.",
+                  boundingBox: {
+                    yMin: 0.47,
+                    xMax: 0.42,
+                    yMax: 0.51,
+                    xMin: 0.32,
+                  },
+                  confidenceScore: 0.85,
+                },
+              ],
+            },
+          },
+          {
+            beforeImage:
+              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_3.jpg",
+            afterImage:
+              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_1.jpg",
+            pairComparisonResult: {
+              result: "NO_DAMAGE_FOUND" as const,
+              damages: [],
+            },
+          },
+        ],
+      };
       if (res) {
         setAfterPhotos(res.afterImages);
         setBeforePhotos(res.beforeImages);
-        if (res.analysis) {
-          const parsedAnalysis: DamageAnalysisItem[] = JSON.parse(res.analysis);
-          setAnalysis(parsedAnalysis);
+        setOverallComparisonResult(res.overallComparisonResult);
+        if (res.matchingResults) {
+          setMatchingResults(res.matchingResults);
+          // matchingResults를 DamageAnalysisItem[] 형식으로 변환
+          const analysisItems: DamageAnalysisItem[] = res.matchingResults.map(
+            (match, index) => ({
+              imageIndex: index,
+              result:
+                match.pairComparisonResult.result === "DAMAGE_FOUND"
+                  ? "DAMAGE_FOUND"
+                  : "NO_DAMAGE",
+              damages: match.pairComparisonResult.damages,
+            })
+          );
+          setAnalysis(analysisItems);
           setHasAnalysis(true);
         }
         setIsLoading(false);
       }
     } catch (error) {
-      console.error('Failed to fetch analysis:', error);
+      console.error("Failed to fetch analysis:", error);
       setIsLoading(false);
     }
   }, [id]);
@@ -55,9 +159,9 @@ export default function CompareAnalysis() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     fetchAiAnalysis();
-    
+
     // 분석 결과가 없을 때만 주기적으로 확인
     if (!hasAnalysis) {
       const intervalId = setInterval(fetchAiAnalysis, 5000);
@@ -82,18 +186,27 @@ export default function CompareAnalysis() {
         <ReportTitle />
       </div>
       {/* 박스들 */}
-      <div className="px-5 flex justify-between gap-2">
+      <div className="px-5 flex justify-between gap-2 w-full">
         <ColorBox txt="찌그러짐" num={damageCounts["DENT"] || 0} />
         <ColorBox txt="스크래치" num={damageCounts["SCRATCH"] || 0} />
         <ColorBox txt="오염" num={damageCounts["CONTAMINATION"] || 0} />
         <ColorBox txt="기타" num={damageCounts["OTHER"] || 0} />
       </div>
       {/* 요약 */}
-      <div></div>
       {/* 손상 감지 위치 */}
       <div>{analysis && <DamageLocation damageAnalysis={analysis} />}</div>
       {/* 상세 결과 보고서  */}
-      <div>{analysis && <DetailReport damageAnalysis={analysis} />}</div>
+      <div>
+        {analysis && matchingResults && (
+          <DetailReport matchingResults={matchingResults} />
+          // <DetailReport
+          //   key={index}
+          //   afterImage={match.afterImage}
+          //   beforeImage={match.beforeImage}
+          //   pairComparisonResult={match.pairComparisonResult}
+          // />
+        )}
+      </div>
 
       {/* 전체 사진 확인 */}
       <div>

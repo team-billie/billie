@@ -4,21 +4,27 @@ import { useEffect, useRef, useState } from "react";
 import CalendarModal from "./Calender/CalenderModal";
 import { createReservation } from "@/lib/api/reservations/request";
 import useUserStore from "@/lib/store/useUserStore";
-import useAlertModal from "@/lib/hooks/alert/useAlertModal";
 import { formatKoreanDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { formatNumberWithCommas } from "@/lib/utils/money";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface ProductReservationProps {
   feedId: number;
   rentalFee: number;
   deposit: number;
+  customButtonClass?: string;
+  buttonText?: string;
+  hidePrice?: boolean;
 }
 
 export default function ProductReservation({
   feedId,
   rentalFee,
   deposit,
+  customButtonClass,
+  buttonText = "예약하기",
+  hidePrice = false,
 }: ProductReservationProps) {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -26,9 +32,8 @@ export default function ProductReservation({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
   const { userId } = useUserStore();
-  const { showAlert } = useAlertModal();
+  const { showAlert } = useAlertStore();
   const router = useRouter();
-  console.log("❤️❤️❤️", userId);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,7 +90,7 @@ export default function ProductReservation({
 
   const handleConfirmReservation = async () => {
     if (!startDate || !endDate) {
-      alert("시작일과 종료일을 선택해주세요.");
+      showAlert("시작일과 종료일을 선택해주세요", "error");
       return;
     }
 
@@ -104,7 +109,6 @@ export default function ProductReservation({
       const result = await createReservation(reservation, userId);
       console.log("예약 성공:", result);
       showAlert(
-        "옆집 물건 예약",
         `${formatKoreanDate(startDate)}부터 ${formatKoreanDate(
           endDate
         )}까지 예약이 완료되었습니다.`,
@@ -120,30 +124,36 @@ export default function ProductReservation({
 
   return (
     <div className="w-full h-full relative">
-      <div className="w-full h-full  flex justify-between p-3 bg-white">
-        <div>
+      <div className="w-full h-full flex justify-between p-3 bg-white">
+        {/* 가격 정보 - hidePrice가 true면 숨김 */}
+        {!hidePrice && (
           <div>
-            <span className="text-xl">
-              ₩ {formatNumberWithCommas(rentalFee)}
-            </span>
-            <span> / 일 </span>
+            <div>
+              <span className="text-xl">
+                ₩ {formatNumberWithCommas(rentalFee)}
+              </span>
+              <span> / 일 </span>
+            </div>
+            <div>
+              <span>보증금</span>
+              <span className="text-xl">
+                {" "}
+                ₩ {formatNumberWithCommas(deposit)}
+              </span>
+            </div>
           </div>
-          <div>
-            <span>보증금</span>
-            <span className="text-xl">
-              {" "}
-              ₩ {formatNumberWithCommas(deposit)}
-            </span>
-          </div>
-        </div>
+        )}
+        
+        {/* 예약하기 버튼 - 새로운 색상과 크기 적용 */}
         <div
-          className="bg-gradient-to-r from-blue400 to-blue300 text-white flex items-center px-10 rounded-full"
+          className={`bg-gradient-to-r to-[#66A3FF] text-white flex items-center justify-center px-10 rounded-full cursor-pointer h-16 ${customButtonClass || ''}`}
           onClick={toggleCalendar}
         >
-          예약하기
+          {buttonText}
         </div>
       </div>
-      {/* 달력*/}
+      
+      {/* 달력 모달 */}
       {showCalendar && (
         <CalendarModal
           calendarRef={calendarRef}

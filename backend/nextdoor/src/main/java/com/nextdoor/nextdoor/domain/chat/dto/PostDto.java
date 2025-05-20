@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.chat.application.dto;
+package com.nextdoor.nextdoor.domain.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 public class PostDto {
     /** Post ID */
     private Long id;
-    
+
     /** Post title */
     private String title;
-    
+
     /** Post image URL */
     private String imageUrl;
 
     /** 대여료 */
     private Long rentalFee;
-    
+
     /** 보증금 */
     private Long deposit;
 }

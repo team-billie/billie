@@ -1,7 +1,7 @@
 package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
-import com.nextdoor.nextdoor.domain.chat.application.dto.RentalDto;
+import com.nextdoor.nextdoor.domain.chat.dto.RentalDto;
 import com.nextdoor.nextdoor.domain.chat.port.ChatRentalQueryPort;
 import com.nextdoor.nextdoor.domain.rental.domain.QRental;
 import com.querydsl.core.types.Projections;
