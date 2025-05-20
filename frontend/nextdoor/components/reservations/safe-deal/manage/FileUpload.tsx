@@ -16,7 +16,6 @@ export default function FileUpload({
   maxFiles = 10,
 }: FileUploadProps) {
   const { userId } = useUserStore();
-  console.log("FileUpload userId:", userId);
 
   if (!userId) {
     return null;

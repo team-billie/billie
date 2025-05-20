@@ -1,20 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PhotoManager from "@/components/reservations/safe-deal/manage/PhotoManager";
 import Title from "../Title";
 import GrayButton from "../GrayButton";
-import useAnalysisStore from "@/lib/store/useAiAnalysisStore";
 import {
   AiAfterPhotosPostRequest,
   AiBeforePhotosPostRequest,
 } from "@/lib/api/ai-analysis/request";
 import useUserStore from "@/lib/store/useUserStore";
 import { useAlertStore } from "@/lib/store/useAlertStore";
+import axiosInstance from "@/lib/api/instance";
 
 interface PhotoRegisterProps {
   status: "after" | "before";
+}
+
+interface ServerData {
+  beforeImages?: string[];
+  afterImages?: string[];
+  analysis?: string;
 }
 
 export default function PhotoRegister({ status }: PhotoRegisterProps) {
@@ -22,9 +28,25 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const { id } = useParams();
   const router = useRouter();
   const [rentalPhotos, setRentalPhotos] = useState<File[]>([]);
-  const [serverData, setServerData] = useState<null>(null);
+  const [serverData, setServerData] = useState<ServerData | null>(null);
   const { showAlert } = useAlertStore();
-  if (!userId) return null;
+
+  useEffect(() => {
+    if (!userId || !id) return;
+
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/api/v1/rentals/${id}/ai-analysis`
+        );
+        setServerData(response.data);
+      } catch (error) {
+        console.error("데이터 로드 오류:", error);
+      }
+    };
+
+    fetchData();
+  }, [id, userId]);
 
   const handleAnalysis = async () => {
     try {
@@ -42,6 +64,20 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     }
   };
 
+  // 사진 변경 시 로컬 상태만 업데이트 (상태 관리 및 UI 표시용)
+  const handlePhotoChange = (files: File[]) => {
+    setRentalPhotos((prevPhotos) => [...prevPhotos, ...files]);
+  };
+
+  // 서버 이미지가 로드되면 로컬 photos 배열을 비워서 중복 계산 방지
+  // 서버 이미지가 있을 때만 호출되도록 수정
+  const handleServerImagesLoaded = (serverImages: string[]) => {
+    // 서버 이미지가 실제로 있을 때만 photos 배열을 비움
+    if (serverImages && serverImages.length > 0) {
+      setRentalPhotos([]);
+    }
+  };
+
   const photoKey = status === "before" ? "beforeImages" : "afterImages";
 
   return (
@@ -53,7 +89,8 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
             rentalId={Number(id)}
             status={status}
             uploadType={status}
-            onPhotoChange={setRentalPhotos}
+            onPhotoChange={handlePhotoChange}
+            onServerImagesLoaded={handleServerImagesLoaded}
             photos={rentalPhotos}
             serverImages={serverData?.[photoKey] || []}
           />
