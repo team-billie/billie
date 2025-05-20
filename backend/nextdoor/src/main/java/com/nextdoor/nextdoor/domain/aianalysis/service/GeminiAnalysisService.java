@@ -114,7 +114,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public DamageComparisonResponseDto compareDamage(Long loginUserId, DamageComparisonRequestDto inspectDamageRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
-        if (rental.getDamageAnalysis() != null) {
+        if (rental.getComparedAnalysis() != null) {
             throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
         }
 
