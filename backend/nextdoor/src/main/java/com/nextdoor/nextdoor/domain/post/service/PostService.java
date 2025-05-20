@@ -1,6 +1,8 @@
 package com.nextdoor.nextdoor.domain.post.service;
 
+import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.ProductConditionAnalysisResponseDto;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.CombinedProductAnalysisResponse;
 import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostCommand;
 import com.nextdoor.nextdoor.domain.post.service.dto.CreatePostResult;
 import com.nextdoor.nextdoor.domain.post.service.dto.PostDetailCommand;
@@ -18,6 +20,8 @@ public interface PostService {
     PostDetailResult getPostDetail(PostDetailCommand command);
     CreatePostResult createPost(CreatePostCommand command);
     AnalyzeProductImageResponse analyzeProductImage(MultipartFile productImage);
+    ProductConditionAnalysisResponseDto analyzeProductCondition(MultipartFile productImage);
+    CombinedProductAnalysisResponse analyzeProduct(MultipartFile productImage);
     boolean likePost(Long postId, Long memberId);
     boolean unlikePost(Long postId, Long memberId);
     boolean isPostLikedByMember(Long postId, Long memberId);

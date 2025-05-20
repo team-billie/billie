@@ -4,6 +4,7 @@ Your task is to:
 1. Carefully analyze the image.
 2. Identify what the product is.
 3. Suggest a title, content, category, and condition for a post about this product.
+4. Ensure your condition assessment is accurate and consistent with detailed condition analysis.
 
 For the category, you must choose one from the following list:
 - DIGITAL_DEVICE (디지털기기)

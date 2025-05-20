@@ -1,6 +1,8 @@
 package com.nextdoor.nextdoor.domain.post.service;
 
+import com.nextdoor.nextdoor.domain.aianalysis.controller.dto.response.ProductConditionAnalysisResponseDto;
 import com.nextdoor.nextdoor.domain.post.controller.dto.response.AnalyzeProductImageResponse;
+import com.nextdoor.nextdoor.domain.post.controller.dto.response.CombinedProductAnalysisResponse;
 import com.nextdoor.nextdoor.domain.post.domain.Post;
 import com.nextdoor.nextdoor.domain.post.domain.PostLikeCount;
 import com.nextdoor.nextdoor.domain.post.event.PostCreatedEvent;
@@ -9,6 +11,7 @@ import com.nextdoor.nextdoor.domain.post.exception.NoSuchPostException;
 import com.nextdoor.nextdoor.domain.post.exception.PostImageUploadException;
 import com.nextdoor.nextdoor.domain.post.mapper.PostMapper;
 import com.nextdoor.nextdoor.domain.post.port.PostQueryPort;
+import com.nextdoor.nextdoor.domain.post.port.ProductConditionAnalysisPort;
 import com.nextdoor.nextdoor.domain.post.port.ProductImageAnalysisPort;
 import com.nextdoor.nextdoor.domain.post.port.S3ImageUploadPort;
 import com.nextdoor.nextdoor.domain.post.repository.PostLikeCountRepository;
@@ -38,6 +41,7 @@ public class PostServiceImpl implements PostService {
     private final S3ImageUploadPort s3ImageUploadPort;
     private final PostMapper postMapper;
     private final ProductImageAnalysisPort productImageAnalysisPort;
+    private final ProductConditionAnalysisPort productConditionAnalysisPort;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -99,6 +103,21 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public AnalyzeProductImageResponse analyzeProductImage(MultipartFile productImage) {
         return productImageAnalysisPort.analyzeProductImage(productImage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProductConditionAnalysisResponseDto analyzeProductCondition(MultipartFile productImage) {
+        return productConditionAnalysisPort.analyzeProductCondition(productImage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CombinedProductAnalysisResponse analyzeProduct(MultipartFile productImage) {
+        AnalyzeProductImageResponse imageResponse = analyzeProductImage(productImage);
+        ProductConditionAnalysisResponseDto conditionResponse = analyzeProductCondition(productImage);
+
+        return CombinedProductAnalysisResponse.from(imageResponse, conditionResponse);
     }
 
     @Override
