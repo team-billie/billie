@@ -27,6 +27,14 @@
     font-weight: 800;
     font-style: normal;
   }
+
+  /* GeekbleMalang2*/
+@font-face {
+  font-family: 'GeekbleMalang2';
+  src: url('/fonts/GeekbleMalang2TTF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
   
   /* 폰트 클래스 */
   .hakgyoansim-font {
@@ -45,4 +53,8 @@
   .oagothic-extrabold {
     font-family: 'OAGothic', sans-serif;
     font-weight: 800;
+  }
+
+  .geekble-malang-font {
+    font-family: 'GeekbleMalang2', sans-serif;
   }
