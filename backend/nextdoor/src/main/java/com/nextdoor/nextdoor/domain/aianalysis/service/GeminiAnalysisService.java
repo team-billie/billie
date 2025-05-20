@@ -84,9 +84,6 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public DamageAnalysisResponseDto analyzeDamage(Long loginUserId, DamageAnalysisRequestDto damageAnalysisRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(damageAnalysisRequestDto.getRentalId());
-        if (rental.getDamageAnalysis() != null) {
-            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
-        }
         List<RentalDto.AiImageDto> aiImages = rental.getAiImages();
         GenerateContentResponse response;
         try {
@@ -114,9 +111,6 @@ public class GeminiAnalysisService implements AiAnalysisService {
     @Override
     public DamageComparisonResponseDto compareDamage(Long loginUserId, DamageComparisonRequestDto inspectDamageRequestDto) {
         RentalDto rental = aiAnalysisRentalQueryPort.findById(inspectDamageRequestDto.getRentalId());
-        if (rental.getComparedAnalysis() != null) {
-            throw new DamageAnalysisPresentException("이미 분석 결과가 존재합니다.");
-        }
 
         // 전 후 이미지 분리
         List<RentalDto.AiImageDto> beforeAiImages = rental.getAiImages().stream()
@@ -158,7 +152,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
                         matchingResult.getPairComparisonResult().getResult().equals("DAMAGE_FOUND"))
                 ? geminiComparatorAsyncPort.generateContent(createSummaryContent(damageDetails)).join()
                         .getCandidates(0).getContent().getParts(0).getText()
-                : "";
+                : null;
 
         // 이벤트 발행 및 API 응답 리턴
         eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(
@@ -169,7 +163,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
         return new DamageComparisonResponseDto(
                 beforeAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
                 afterAiImages.stream().map(RentalDto.AiImageDto::getImageUrl).toList(),
-                summary.isEmpty() ? null : summary,
+                summary,
                 responseMatchingResults);
     }
 
