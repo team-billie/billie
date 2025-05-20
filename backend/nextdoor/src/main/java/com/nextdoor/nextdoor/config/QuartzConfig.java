@@ -1,16 +1,14 @@
 package com.nextdoor.nextdoor.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import javax.annotation.PostConstruct;
+
 import java.util.Properties;
 
 @Configuration
@@ -19,21 +17,6 @@ public class QuartzConfig {
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private Scheduler scheduler;
-
-    @PostConstruct
-    public void init() {
-        try {
-            System.out.println("[DEBUG_LOG] Starting Quartz scheduler...");
-            scheduler.start();
-            System.out.println("[DEBUG_LOG] Quartz scheduler started successfully");
-        } catch (SchedulerException e) {
-            System.out.println("[DEBUG_LOG] Error starting Quartz scheduler: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     @Bean
     public SpringBeanJobFactory springBeanJobFactory() {
