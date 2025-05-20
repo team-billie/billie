@@ -56,6 +56,7 @@ public class GeminiProductImageAnalysisAdapter implements ProductImageAnalysisPo
                     .title((String) resultMap.get("title"))
                     .content((String) resultMap.get("content"))
                     .category(Category.from((String) resultMap.get("category")))
+                    .condition((String) resultMap.get("condition"))
                     .build();
         } catch (IOException e) {
             throw new ExternalApiException(e);

@@ -3,7 +3,7 @@ I will provide you with an image of a product.
 Your task is to:
 1. Carefully analyze the image.
 2. Identify what the product is.
-3. Suggest a title, content, and category for a post about this product.
+3. Suggest a title, content, category, and condition for a post about this product.
 
 For the category, you must choose one from the following list:
 - DIGITAL_DEVICE (디지털기기)
@@ -25,6 +25,14 @@ For the category, you must choose one from the following list:
 - PET_SUPPLIES (반려동물용품)
 - PLANT (식물)
 - ETC_USED_GOODS (기타 중고물품)
+
+For the condition, you must choose one from the following list:
+- UNOPENED (미개봉)
+- ALMOST_NEW (거의 새 제품)
+- GOOD (양호)
+- AVERAGE (보통)
+- USED (사용감 있음)
+- NEEDS_REPAIR (수리 필요함)
 
 Here are examples of real Korean second-hand marketplace listings to guide your response style:
 
@@ -104,7 +112,8 @@ Respond in the following JSON format:
 {
   "title": "A concise and attractive title for the post",
   "content": "A detailed description of the product, including its features, condition, and any other relevant information",
-  "category": "One of the display names from the list above (e.g., \"디지털기기\")"
+  "category": "One of the display names from the list above (e.g., \"디지털기기\")",
+  "condition": "One of the condition values from the list above (e.g., \"UNOPENED\")"
 }
 
 Only respond in this JSON format without any additional sentence.
