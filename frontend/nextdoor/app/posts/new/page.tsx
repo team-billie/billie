@@ -449,7 +449,7 @@ export default function NewPostPage() {
               <div className="w-32 h-3 bg-gray-100 rounded mb-1" />
               <div className="w-24 h-3 bg-gray-100 rounded" />
             </div>
-            <div className="text-center mb-5">
+            <div className="text-center mb-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-2">
                 사진을 등록해주세요
               </h2>
@@ -457,7 +457,7 @@ export default function NewPostPage() {
                 AI가 게시물의 내용을 제안해줍니다!
               </p>
             </div>
-            <div className="flex flex-col gap-3 w-full max-w-xs">
+            <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
               <label className="flex flex-col items-center cursor-pointer select-none">
                 <input
                   type="file"
@@ -466,11 +466,13 @@ export default function NewPostPage() {
                   className="hidden"
                   onChange={handleMainImageSelect}
                 />
-                <div className="relative flex flex-col items-center w-full">
-                  <div className="bg-blue-500 hover:bg-blue-600 transition-all w-full py-3 rounded-xl flex items-center justify-center shadow-lg">
-                    <Camera className="w-6 h-6 text-white mr-2" />
-                    <span className="text-white font-semibold text-base">
-                      카메라로 촬영하기
+                <div className="w-full">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 transition-all w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm active:translate-y-0.5 p-4">
+                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <Camera className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-white font-medium text-sm text-center">
+                      카메라로<br />촬영하기
                     </span>
                   </div>
                 </div>
@@ -482,11 +484,13 @@ export default function NewPostPage() {
                   className="hidden"
                   onChange={handleMainImageSelect}
                 />
-                <div className="relative flex flex-col items-center w-full">
-                  <div className="bg-gray-100 hover:bg-gray-200 transition-all w-full py-3 rounded-xl flex items-center justify-center shadow">
-                    <ImageIcon className="w-6 h-6 text-gray-600 mr-2" />
-                    <span className="text-gray-600 font-semibold text-base">
-                      앨범에서 선택하기
+                <div className="w-full">
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 active:from-gray-200 active:to-gray-300 transition-all w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-2 shadow-md hover:shadow-lg active:shadow-sm active:translate-y-0.5 p-4 border border-gray-200">
+                    <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
+                      <ImageIcon className="w-6 h-6 text-gray-600" />
+                    </div>
+                    <span className="text-gray-700 font-medium text-sm text-center">
+                      앨범에서<br />선택하기
                     </span>
                   </div>
                 </div>
