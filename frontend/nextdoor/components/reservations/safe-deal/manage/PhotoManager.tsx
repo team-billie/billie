@@ -36,7 +36,7 @@ export default function PhotoManager({
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [serverImageUrls, setServerImageUrls] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { showAlert } = useAlertStore();
@@ -109,6 +109,31 @@ export default function PhotoManager({
     e.target.value = "";
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    
+    // 로컬 미리보기에서 이미지 찾기
+    const previewIndex = previews.findIndex(url => url === imageUrl);
+    if (previewIndex !== -1) {
+      // 로컬 이미지를 클릭한 경우
+      setPreviews(prev => {
+        const newPreviews = prev.filter(url => url !== imageUrl);
+        return [imageUrl, ...newPreviews];
+      });
+      return;
+    }
+
+    // 서버 이미지에서 이미지 찾기
+    const serverIndex = serverImageUrls.findIndex(url => url === imageUrl);
+    if (serverIndex !== -1) {
+      // 서버 이미지를 클릭한 경우
+      setServerImageUrls(prev => {
+        const newUrls = prev.filter(url => url !== imageUrl);
+        return [imageUrl, ...newUrls];
+      });
+    }
+  };
+
   const totalImages = serverImageUrls.length + photos.length;
 
   return (
@@ -134,63 +159,68 @@ export default function PhotoManager({
           </div>
 
           <div className="w-full relative mt-4 mb-4">
-            {isLoading ? (
-              <div className="text-center py-4">이미지를 불러오는 중...</div>
-            ) : serverImageUrls.length === 0 && previews.length === 0 ? (
+            {serverImageUrls.length === 0 && previews.length === 0 ? (
               <div className="text-center py-4 text-gray-500">
                 등록된 이미지가 없습니다.
               </div>
             ) : (
-              <Swiper
-                slidesPerView={2.4}
-                spaceBetween={8}
-                freeMode={true}
-                pagination={{ clickable: true }}
-                modules={[FreeMode]}
-                onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
-                className="w-full"
-                style={{ padding: "10px 0" }}
-              >
-                {/* 로컬 미리보기를 먼저 표시 (최신순) */}
-                {previews.map((previewUrl, idx) => (
-                  <SwiperSlide key={`local-${idx}`}>
-                    <div
-                      className="relative w-full h-44 cursor-pointer"
-                      onClick={() => setSelectedImage(previewUrl)}
-                    >
-                      <Image
-                        src={previewUrl}
-                        alt={`New upload ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        onError={() => {
-                          showAlert("이미지를 불러올 수 없습니다.", "error");
-                        }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+              <div className="relative">
+                {isLoading && (
+                  <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-10">
+                    <div className="text-sm text-gray-600">이미지를 불러오는 중...</div>
+                  </div>
+                )}
+                <Swiper
+                  slidesPerView={2.4}
+                  spaceBetween={8}
+                  freeMode={true}
+                  pagination={{ clickable: true }}
+                  modules={[FreeMode]}
+                  onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+                  className="w-full"
+                  style={{ padding: "10px 0" }}
+                >
+                  {/* 로컬 미리보기를 최신순으로 표시 */}
+                  {[...previews].reverse().map((previewUrl, idx) => (
+                    <SwiperSlide key={`local-${idx}`}>
+                      <div
+                        className="relative w-full h-44 cursor-pointer"
+                        onClick={() => handleImageClick(previewUrl)}
+                      >
+                        <Image
+                          src={previewUrl}
+                          alt={`New upload ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                          onError={() => {
+                            showAlert("이미지를 불러올 수 없습니다.", "error");
+                          }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
 
-                {/* 서버 이미지를 그 다음에 표시 */}
-                {serverImageUrls.map((image, idx) => (
-                  <SwiperSlide key={`server-${idx}`}>
-                    <div
-                      className="relative w-full h-44 cursor-pointer"
-                      onClick={() => setSelectedImage(image)}
-                    >
-                      <Image
-                        src={image}
-                        alt={`Product ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        onError={() => {
-                          showAlert("이미지를 불러올 수 없습니다.", "error");
-                        }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                  {/* 서버 이미지를 그 다음에 표시 */}
+                  {serverImageUrls.map((image, idx) => (
+                    <SwiperSlide key={`server-${idx}`}>
+                      <div
+                        className="relative w-full h-44 cursor-pointer"
+                        onClick={() => handleImageClick(image)}
+                      >
+                        <Image
+                          src={image}
+                          alt={`Product ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                          onError={() => {
+                            showAlert("이미지를 불러올 수 없습니다.", "error");
+                          }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
             )}
           </div>
         </div>
