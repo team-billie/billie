@@ -8,7 +8,7 @@ import MainHeader from "@/components/common/Header/ReservationHeader";
 import { ChatRoomUI } from "@/types/chats/chat";
 import { getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
-import { useChatListWebSocket } from "@/lib/hooks/chats/useChatListWebSocket";
+// import { useChatListWebSocket } from "@/lib/hooks/chats/useChatListWebSocket";
 
 export default function ChatPage() {
   const router = useRouter();

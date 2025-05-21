@@ -30,6 +30,11 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   
   // props로 전달받은 username이 없으면 스토어에서 가져온 값 사용
   const displayName = username || storeUsername || '사용자';
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSendMessage(value);
+  };
   
   return (
     <div className={`flex flex-col h-screen bg-gray-100 ${className}`}>
@@ -46,7 +51,10 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       </div>
       
       {/* 메시지 입력 */}
-      <ChatInput onSendMessage={onSendMessage} value={value} onChange={onChange} />
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={value} onChange={onChange} placeholder="메시지를 입력해 주세요" />
+      </form>
+        {/* <ChatInput onSendMessage={onSendMessage} value={value} onChange={onChange} /> */}
     </div>
   );
 };

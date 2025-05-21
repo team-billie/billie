@@ -75,6 +75,7 @@ export default function ChatDetailPage() {
 
       setMessages((prevMessages) => {
         // 중복 메시지 체크
+        // console.log("중복체크", prevMessages);
         const isDuplicate = prevMessages.some(
           (m) =>
             m.text === newMessage.text &&
@@ -148,7 +149,7 @@ export default function ChatDetailPage() {
         console.log(`메시지 이력 조회: roomId=${roomId}`);
 
         // getChatMessageHistory로 변경 (0페이지, 50개)
-        const historyPage = await getChatMessageHistory(roomId, 0, 50);
+        const historyPage = await getChatMessageHistory(roomId, 0, 50)
         const chatMessages = historyPage.content;
 
         const formattedMessages = chatMessages.map((msg) => ({
@@ -159,7 +160,7 @@ export default function ChatDetailPage() {
           read: false,
         }));
 
-        setMessages(formattedMessages as Message[]);
+        setMessages(formattedMessages as unknown as Message[]);
         setError(null);
       } catch (err) {
         console.error("메시지 조회 오류:", err);
@@ -196,25 +197,12 @@ export default function ChatDetailPage() {
 
     //B안: 메시지 전송 후, onMessage 콜백이 오기 전에 optimistic하게 UI에 바로 추가
     //(즉, 메시지 전송 성공 시 바로 setMessages로 추가)
-    const sent = sendMessage(content);
-    if (sent) {
-      // optimistic update
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `local_${Date.now()}`,
-          text: content,
-          sender: "user",
-          timestamp: new Date(),
-          read: false,
-        },
-      ]);
-      setValue("");
-    }
+    sendMessage(content);
+    setValue("");
   };
 
   const handleBackClick = () => {
-    router.push("/chats");
+    router.push("/chat");
   };
 
   return (

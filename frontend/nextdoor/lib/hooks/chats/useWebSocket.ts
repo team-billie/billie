@@ -18,7 +18,7 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
   const [error, setError] = useState<string | null>(null);
   const stompClientRef = useRef<Client | null>(null);
 
-  const WS_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://k12e205.p.ssafy.io:8081';
+  const WS_BASE_URL = 'http://k12e205.p.ssafy.io:8082';
 
   // 토큰 가져오기
   const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
@@ -52,7 +52,7 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
       onConnect: () => { /* … */ },
       onStompError: (frame) => { /* … */ },
       onWebSocketClose: (evt) => {
-        console.warn('WebSocket 연결 종료:', evt);
+        // console.warn('WebSocket 연결 종료:', evt);
         setIsConnected(false);
         // reconnectDelay>0 이면 STOMP.js 가 자동으로 connect()를 호출합니다
       },
@@ -69,6 +69,8 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
         try {
           const data = JSON.parse(message.body);
           console.log('메시지 수신:', data);
+
+          // console.log("onMessage 호출 여부", onMessage);
 
           if (onMessage) {
             const chatMessage: ChatMessageDto = {
@@ -116,6 +118,7 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
   }, []);
 
   const sendMessage = useCallback((content: string) => {
+
     if (!userId) {
       setError('사용자 정보가 없습니다');
       return false;
@@ -125,18 +128,21 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
       return false;
     }
     try {
+      console.log(`try 호출, ${userId}, ${roomId}, ${content}`);
       const message = {
         roomId,
         senderId: userId,
         content,
         sentAt: new Date().toISOString(),
       };
+      console.log("connected 여부", stompClientRef.current.connected);
       stompClientRef.current.publish({
         destination: '/app/chat.send',
         body: JSON.stringify(message)
       });
       return true;
     } catch (err) {
+      console.log("catch 호출", err);
       setError('메시지를 전송할 수 없습니다');
       return false;
     }

@@ -15,7 +15,7 @@ const WidgetProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem("accessToken");
-      console.log("TOKEN CHECK:", !!token, token, "Current URL:", pathname);
+      // console.log("TOKEN CHECK:", !!token, token, "Current URL:", pathname);
       setShowWidget(!!token);
     };
 

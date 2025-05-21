@@ -109,13 +109,17 @@ export const getChatMessageHistory = async (
   page: number = 0,
   size: number = 50
 ): Promise<ChatMessageHistoryPage> => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  // const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  // const headers = token ? { Authorization: `Bearer ${token}` } : {};
   const response = await axiosInstance.get(`/api/v1/chats/rooms/${roomId}/messages`, {
     params: { page, size },
-    headers,
+    // headers,
+  }).then((res) => {
+    // console.log("getChatMessageHistory 호출", res.data);
+    return res.data;
   });
-  return response.data;
+
+  return response;
 };
 
 // 메시지 전송
