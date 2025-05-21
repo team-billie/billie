@@ -35,8 +35,8 @@ export default function PhotoManager({
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [serverImageUrls, setServerImageUrls] = useState<string[]>(serverImages);
-  const [isLoading, setIsLoading] = useState(true);
+  const [serverImageUrls, setServerImageUrls] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { showAlert } = useAlertStore();
@@ -57,7 +57,6 @@ export default function PhotoManager({
 
       setServerImageUrls(images);
 
-      // 서버 이미지 로드가 완료되면 상위 컴포넌트에 알림
       if (onServerImagesLoaded && images.length > 0) {
         onServerImagesLoaded(images);
       }
@@ -69,24 +68,14 @@ export default function PhotoManager({
     }
   };
 
-  // serverImages prop이 변경될 때마다 serverImageUrls 상태 업데이트
-  useEffect(() => {
-    setServerImageUrls(serverImages);
-    setIsLoading(false);
-  }, [serverImages]);
-
-  // 초기 데이터 로드
+  // 초기 데이터 로드 및 새로고침 시 데이터 로드
   useEffect(() => {
     if (!userId || !rentalId) return;
-    
-    if (serverImages.length === 0) {
-      fetchImages();
-    }
+    fetchImages();
   }, [rentalId, uploadType, userId]);
 
   // 미리보기 URL 생성
   useEffect(() => {
-    // 기존 URL 해제
     previews.forEach((url) => URL.revokeObjectURL(url));
 
     if (!photos || photos.length === 0) {
@@ -104,13 +93,11 @@ export default function PhotoManager({
 
   if (!userId) return null;
 
-  // 파일 선택 핸들러
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const filesArray = Array.from(files);
-    // 실제 총 이미지 수는 서버에 있는 이미지와 현재 대기 중인 이미지(photos)의 합
     const totalCount = serverImageUrls.length + photos.length;
 
     if (totalCount + filesArray.length > 10) {
@@ -118,45 +105,35 @@ export default function PhotoManager({
       return;
     }
 
-    try {
-      setUploading(true);
+    onPhotoChange?.(filesArray);
+    e.target.value = "";
+  };
 
-      // 상위 컴포넌트에 파일 전달 (상태 관리용)
-      onPhotoChange?.(filesArray);
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    
+    // 로컬 미리보기에서 이미지 찾기
+    const previewIndex = previews.findIndex(url => url === imageUrl);
+    if (previewIndex !== -1) {
+      // 로컬 이미지를 클릭한 경우
+      setPreviews(prev => {
+        const newPreviews = prev.filter(url => url !== imageUrl);
+        return [imageUrl, ...newPreviews];
+      });
+      return;
+    }
 
-      // 서버에 업로드
-      const result = await uploadPhotos(filesArray);
-
-      setUploadSuccess(true);
-      // 업로드 성공 후 서버 이미지 목록 새로고침
-      await fetchImages();
-
-      setTimeout(() => setUploadSuccess(false), 3000);
-    } catch (error) {
-      console.error("사진 업로드 오류:", error);
-      showAlert("사진 업로드에 실패했습니다.", "error");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
+    // 서버 이미지에서 이미지 찾기
+    const serverIndex = serverImageUrls.findIndex(url => url === imageUrl);
+    if (serverIndex !== -1) {
+      // 서버 이미지를 클릭한 경우
+      setServerImageUrls(prev => {
+        const newUrls = prev.filter(url => url !== imageUrl);
+        return [imageUrl, ...newUrls];
+      });
     }
   };
 
-  // 업로드 API 요청
-  const uploadPhotos = async (files: File[]) => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
-
-    const response = await axiosInstance.post(
-      `/api/v1/rentals/${rentalId}/${uploadType}/photos`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-    return response.data;
-  };
-
-  // 실제 총 이미지 수는 서버에 있는 이미지와 대기 중인 로컬 이미지의 합
   const totalImages = serverImageUrls.length + photos.length;
 
   return (
@@ -182,61 +159,68 @@ export default function PhotoManager({
           </div>
 
           <div className="w-full relative mt-4 mb-4">
-            {isLoading ? (
-              <div className="text-center py-4">이미지를 불러오는 중...</div>
-            ) : serverImageUrls.length === 0 && previews.length === 0 ? (
+            {serverImageUrls.length === 0 && previews.length === 0 ? (
               <div className="text-center py-4 text-gray-500">
                 등록된 이미지가 없습니다.
               </div>
             ) : (
-              <Swiper
-                slidesPerView={2.4}
-                spaceBetween={8}
-                freeMode={true}
-                pagination={{ clickable: true }}
-                modules={[FreeMode]}
-                onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
-                className="w-full"
-                style={{ padding: "10px 0" }}
-              >
-                {serverImageUrls.map((image, idx) => (
-                  <SwiperSlide key={`server-${idx}`}>
-                    <div
-                      className="relative w-full h-44 cursor-pointer"
-                      onClick={() => setSelectedImage(image)}
-                    >
-                      <Image
-                        src={image}
-                        alt={`Product ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        onError={() => {
-                          showAlert("이미지를 불러올 수 없습니다.", "error");
-                        }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+              <div className="relative">
+                {isLoading && (
+                  <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-10">
+                    <div className="text-sm text-gray-600">이미지를 불러오는 중...</div>
+                  </div>
+                )}
+                <Swiper
+                  slidesPerView={2.4}
+                  spaceBetween={8}
+                  freeMode={true}
+                  pagination={{ clickable: true }}
+                  modules={[FreeMode]}
+                  onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+                  className="w-full"
+                  style={{ padding: "10px 0" }}
+                >
+                  {/* 로컬 미리보기를 최신순으로 표시 */}
+                  {[...previews].reverse().map((previewUrl, idx) => (
+                    <SwiperSlide key={`local-${idx}`}>
+                      <div
+                        className="relative w-full h-44 cursor-pointer"
+                        onClick={() => handleImageClick(previewUrl)}
+                      >
+                        <Image
+                          src={previewUrl}
+                          alt={`New upload ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                          onError={() => {
+                            showAlert("이미지를 불러올 수 없습니다.", "error");
+                          }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
 
-                {previews.map((previewUrl, idx) => (
-                  <SwiperSlide key={`local-${idx}`}>
-                    <div
-                      className="relative w-full h-44 cursor-pointer"
-                      onClick={() => setSelectedImage(previewUrl)}
-                    >
-                      <Image
-                        src={previewUrl}
-                        alt={`New upload ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        onError={() => {
-                          showAlert("이미지를 불러올 수 없습니다.", "error");
-                        }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                  {/* 서버 이미지를 그 다음에 표시 */}
+                  {serverImageUrls.map((image, idx) => (
+                    <SwiperSlide key={`server-${idx}`}>
+                      <div
+                        className="relative w-full h-44 cursor-pointer"
+                        onClick={() => handleImageClick(image)}
+                      >
+                        <Image
+                          src={image}
+                          alt={`Product ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                          onError={() => {
+                            showAlert("이미지를 불러올 수 없습니다.", "error");
+                          }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
             )}
           </div>
         </div>

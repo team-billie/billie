@@ -1,5 +1,30 @@
 import { AiAnalysisGetRequestDTO } from "@/types/ai-analysis/response";
 import axiosInstance from "../../instance";
+
+//사진 등록 
+export const PhotosUploadRequest = async (rentalId: number, uploadType: string, files: File[]) => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('file', file);
+    });
+
+    const response = await axiosInstance.post(
+      `/api/v1/rentals/${rentalId}/${uploadType}/photos`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch(error:any) {
+    console.error("사진 등록 실패:", error);
+    throw error;
+  }
+}
+
 //대여 전 사진 분석
 export const AiBeforePhotosPostRequest = async (rentalId: number) => {
   try {
