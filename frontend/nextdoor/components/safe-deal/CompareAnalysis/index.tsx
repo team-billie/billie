@@ -58,7 +58,7 @@ export default function CompareAnalysis() {
               result:
                 match.pairComparisonResult.result === "DAMAGE_FOUND"
                   ? "DAMAGE_FOUND"
-                  : "NO_DAMAGE",
+                  : "NO_DAMAGE_FOUND",
               damages: match.pairComparisonResult.damages,
             })
           );

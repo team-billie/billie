@@ -46,7 +46,7 @@ export default function HandleDepositModal({
       .catch((err) => {
         showAlert("보증금 처리 실패하였습니다.", "error");
       });
-    router.push("/home");
+    router.push("/profile");
     setIsModalOpen(false);
   };
 

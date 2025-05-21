@@ -42,6 +42,7 @@ export type AiAnalysisResponse = {
   afterImages: string[];
   overallComparisonResult: string | null;
   matchingResults: MatchingResult[];
+  analysisResult: DamageAnalysis;
 };
 
 export type AiAnalysisGetRequestDTO = {
@@ -49,4 +50,5 @@ export type AiAnalysisGetRequestDTO = {
   afterImages: string[];
   overallComparisonResult: string | null;
   matchingResults: MatchingResult[];
+  analysisResult: DamageAnalysis;
 };
