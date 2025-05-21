@@ -29,7 +29,7 @@ public class GeminiProductConditionAnalysisAdapter implements ProductConditionAn
     private final ObjectMapper objectMapper;
 
     public GeminiProductConditionAnalysisAdapter(
-            @Qualifier("geminiPro")
+            @Qualifier("geminiFlashHigh")
             GenerativeModel generativeModel,
             @Qualifier("productConditionAnalyzerPromptPart") Part productConditionAnalyzerPromptPart,
             ObjectMapper objectMapper

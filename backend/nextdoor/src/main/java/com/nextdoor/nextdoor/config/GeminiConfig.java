@@ -3,6 +3,7 @@ package com.nextdoor.nextdoor.config;
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.Part;
 import com.google.cloud.vertexai.generativeai.GenerativeModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,9 @@ public class GeminiConfig {
 
     @Value("${custom.google.ai.gemini.model.pro}")
     private String geminiPro;
+
+    @Value("${custom.google.ai.gemini.model.flashHigh}")
+    private String geminiFlashHigh;
 
     @Value("${custom.google.ai.gemini.location}")
     private String geminiLocation;
@@ -55,6 +59,12 @@ public class GeminiConfig {
     @Bean(name = "geminiPro")
     public GenerativeModel geminiComparisonModel(VertexAI vertexAI) {
         return new GenerativeModel(geminiPro, vertexAI);
+    }
+
+    @Bean
+    @Qualifier("geminiFlashHigh")
+    public GenerativeModel geminiFlashHigh(VertexAI vertexAI) {
+        return new GenerativeModel(geminiFlashHigh, vertexAI);
     }
 
     @Bean(name = "damageAnalyzerPromptPart")
