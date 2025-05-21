@@ -58,7 +58,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
     public GeminiAnalysisService(
             ObjectMapper objectMapper,
             ApplicationEventPublisher eventPublisher,
-            @Qualifier("geminiPro")
+            @Qualifier("geminiFlash")
             GenerativeModel geminiAnalysisModel,
             @Qualifier("damageAnalyzerPromptPart")
             Part damageAnalyzerPromptPart,
