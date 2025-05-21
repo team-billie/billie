@@ -1,7 +1,9 @@
 package com.nextdoor.nextdoor.domain.chat.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.*;
 
 /**
@@ -30,7 +32,16 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/app");  // @MessageMapping prefix
-        registry.enableSimpleBroker("/topic");               // 구독(prefix) 브로커
+        registry.enableSimpleBroker("/topic").setHeartbeatValue(new long[] { 10_000, 10_000 })
+                .setTaskScheduler(heartBeatScheduler());
+        registry.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Bean(name = "ChatHeartBeatScheduler")
+    public ThreadPoolTaskScheduler heartBeatScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setThreadNamePrefix("ws-heartbeat-thread-");
+        scheduler.initialize();
+        return scheduler;
     }
 }
