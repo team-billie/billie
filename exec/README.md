@@ -286,3 +286,7 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=[Google Maps API key]
 #### 카카오 로그인
 
 - 카카오 소셜 로그인을 위해 카카오 로그인 신청 필요
+
+#### Google Maps
+
+- 지도 표시를 위해 Google Maps API key 발급 필요
