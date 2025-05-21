@@ -457,23 +457,41 @@ export default function NewPostPage() {
                 AI가 게시물의 내용을 제안해줍니다!
               </p>
             </div>
-            <label className="flex flex-col items-center cursor-pointer select-none mb-2">
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handleMainImageSelect}
-              />
-              <div className="relative flex flex-col items-center">
-                <div className="bg-blue-500 hover:bg-blue-600 transition-all w-20 h-20 rounded-full flex items-center justify-center shadow-2xl animate-pulse ring-4 ring-blue-100">
-                  <Camera className="w-10 h-10 text-white" />
+            <div className="flex flex-col gap-3 w-full max-w-xs">
+              <label className="flex flex-col items-center cursor-pointer select-none">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleMainImageSelect}
+                />
+                <div className="relative flex flex-col items-center w-full">
+                  <div className="bg-blue-500 hover:bg-blue-600 transition-all w-full py-3 rounded-xl flex items-center justify-center shadow-lg">
+                    <Camera className="w-6 h-6 text-white mr-2" />
+                    <span className="text-white font-semibold text-base">
+                      카메라로 촬영하기
+                    </span>
+                  </div>
                 </div>
-                <span className="mt-2 text-blue-500 font-semibold text-base">
-                  사진 추가
-                </span>
-              </div>
-            </label>
+              </label>
+              <label className="flex flex-col items-center cursor-pointer select-none">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleMainImageSelect}
+                />
+                <div className="relative flex flex-col items-center w-full">
+                  <div className="bg-gray-100 hover:bg-gray-200 transition-all w-full py-3 rounded-xl flex items-center justify-center shadow">
+                    <ImageIcon className="w-6 h-6 text-gray-600 mr-2" />
+                    <span className="text-gray-600 font-semibold text-base">
+                      앨범에서 선택하기
+                    </span>
+                  </div>
+                </div>
+              </label>
+            </div>
             {previewUrls[0] && (
               <div className="relative aspect-square w-full max-w-xs mx-auto mt-8 mb-4">
                 <Image
