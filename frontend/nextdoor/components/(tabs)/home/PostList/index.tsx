@@ -2,20 +2,32 @@
 
 import { GetPostListRequest } from "@/lib/api/posts";
 import { PostListItemDto } from "@/types/posts/response/index";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import useUserStore from "@/lib/store/useUserStore";
 import PostListItem from "../PostListItem";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Category from "../Category";
 
 export default function PostList() {
   const { userId, address } = useUserStore();
-  const [postList, setPostList] = useState<PostListItemDto[] | null>(null);
+  const [postList, setPostList] = useState<PostListItemDto[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const pageSize = 10;
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastPostElementRef = useCallback((node: HTMLAnchorElement | null) => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+    
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setCurrentPage(prevPage => prevPage + 1);
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
 
   const fetchPosts = async (page: number) => {
     if (!userId) return;
@@ -23,8 +35,12 @@ export default function PostList() {
     setIsLoading(true);
     try {
       const response = await GetPostListRequest(String(userId), page, pageSize);
-      setPostList(response.content);
-      setTotalPages(response.totalPages);
+      if (page === 0) {
+        setPostList(response.content);
+      } else {
+        setPostList(prev => [...prev, ...response.content]);
+      }
+      setHasMore(response.content.length === pageSize);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
     } finally {
@@ -38,70 +54,34 @@ export default function PostList() {
     }
   }, [userId, address, currentPage]);
 
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
   return (
     <>
-    {/* 카테고리 */}
-    <Category />
-    <div className="mt-2 flex flex-col gap-4">
-      {isLoading ? (
-        <div className="py-8 text-center text-gray-500">로딩 중...</div>
-      ) : postList && postList.length > 0 ? (
-        <>
+      {/* 카테고리 */}
+      <Category />
+      <div className="mt-2 flex flex-col gap-4">
+        {postList.length > 0 ? (
           <div className="flex flex-col gap-3 text-gray900">
-            {postList.map((post: PostListItemDto) => (
-              <Link href={`/posts/${post.postId}`} key={post.postId}>
+            {postList.map((post: PostListItemDto, index: number) => (
+              <Link 
+                href={`/posts/${post.postId}`} 
+                key={post.postId}
+                ref={index === postList.length - 1 ? lastPostElementRef : null}
+              >
                 <PostListItem post={post} />
               </Link>
             ))}
           </div>
+        ) : !isLoading ? (
+          <div className="py-8 text-center text-gray-500">게시글이 없습니다.</div>
+        ) : null}
 
-          {/* Pagination Controls */}
-          <div className="flex justify-center items-center mt-6 gap-4">
-            <button
-              onClick={handlePrevPage}
-              disabled={currentPage === 0}
-              className={`p-2 rounded-full ${
-                currentPage === 0
-                  ? "text-gray-400"
-                  : "text-gray900 hover:bg-gray-100"
-              }`}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <span className="text-sm font-medium">
-              {currentPage + 1} / {totalPages || 1}
-            </span>
-
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage >= totalPages - 1}
-              className={`p-2 rounded-full ${
-                currentPage >= totalPages - 1
-                  ? "text-gray-400"
-                  : "text-gray900 hover:bg-gray-100"
-              }`}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+        {/* 로딩 인디케이터 */}
+        {isLoading && (
+          <div className="py-4 text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
           </div>
-        </>
-      ) : (
-        <div className="py-8 text-center text-gray-500">게시글이 없습니다.</div>
-      )}
-    </div>
+        )}
+      </div>
     </>
   );
 }

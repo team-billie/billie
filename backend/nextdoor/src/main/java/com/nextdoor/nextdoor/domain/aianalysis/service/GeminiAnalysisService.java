@@ -152,7 +152,7 @@ public class GeminiAnalysisService implements AiAnalysisService {
                         matchingResult.getPairComparisonResult().getResult().equals("DAMAGE_FOUND"))
                 ? geminiComparatorAsyncPort.generateContent(createSummaryContent(damageDetails)).join()
                         .getCandidates(0).getContent().getParts(0).getText()
-                : null;
+                : "";
 
         // 이벤트 발행 및 API 응답 리턴
         eventPublisher.publishEvent(new AiCompareAnalysisCompletedEvent(
