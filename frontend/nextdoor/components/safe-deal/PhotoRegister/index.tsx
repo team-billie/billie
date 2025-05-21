@@ -32,7 +32,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const [serverData, setServerData] = useState<ServerData | null>(null);
   const { showAlert } = useAlertStore();
   const [hasPhotos, setHasPhotos] = useState(false);
-  
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   // 서버 데이터 가져오기
   const fetchServerData = async () => {
     try {
@@ -62,10 +62,10 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
         const img = new Image();
         img.src = event.target?.result as string;
         img.onload = () => {
-          const canvas = document.createElement('canvas');
+          const canvas = document.createElement("canvas");
           let width = img.width;
           let height = img.height;
-          
+
           // 이미지 크기가 1200px를 초과하면 비율에 맞게 축소
           const MAX_SIZE = 1200;
           if (width > height && width > MAX_SIZE) {
@@ -78,30 +78,30 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
 
           canvas.width = width;
           canvas.height = height;
-          
-          const ctx = canvas.getContext('2d');
+
+          const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
-          
+
           // 압축된 이미지를 Blob으로 변환
           canvas.toBlob(
             (blob) => {
               if (blob) {
                 const compressedFile = new File([blob], file.name, {
-                  type: 'image/jpeg',
+                  type: "image/jpeg",
                   lastModified: Date.now(),
                 });
                 resolve(compressedFile);
               } else {
-                reject(new Error('이미지 압축 실패'));
+                reject(new Error("이미지 압축 실패"));
               }
             },
-            'image/jpeg',
+            "image/jpeg",
             0.7 // 품질 70%
           );
         };
-        img.onerror = () => reject(new Error('이미지 로드 실패'));
+        img.onerror = () => reject(new Error("이미지 로드 실패"));
       };
-      reader.onerror = () => reject(new Error('파일 읽기 실패'));
+      reader.onerror = () => reject(new Error("파일 읽기 실패"));
     });
   };
 
@@ -109,8 +109,9 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     try {
       if (!id) return;
       const rentalId = Number(id);
-
+      setIsAnalyzing(true);
       if (status === "before") {
+        AiBeforePhotosPostRequest(Number(id));
         router.push(`/safe-deal/${rentalId}/before/analysis`);
       } else {
         AiAfterPhotosPostRequest(Number(id));
@@ -118,6 +119,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
       }
     } catch (error) {
       showAlert("AI 분석 중 오류가 발생했습니다.", "error");
+      setIsAnalyzing(false);
     }
   };
 
@@ -130,8 +132,10 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
 
       // 파일 크기 체크 (각 파일 5MB 제한)
       const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-      const oversizedFiles = rentalPhotos.filter(file => file.size > MAX_FILE_SIZE);
-      
+      const oversizedFiles = rentalPhotos.filter(
+        (file) => file.size > MAX_FILE_SIZE
+      );
+
       if (oversizedFiles.length > 0) {
         showAlert("파일 크기는 5MB를 초과할 수 없습니다.", "error");
         return;
@@ -150,23 +154,26 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
     } catch (error: any) {
       console.error("사진 업로드 중 오류 발생:", error);
       if (error.response?.status === 413) {
-        showAlert("파일 크기가 너무 큽니다. 각 파일은 5MB 이하여야 합니다.", "error");
+        showAlert(
+          "파일 크기가 너무 큽니다. 각 파일은 5MB 이하여야 합니다.",
+          "error"
+        );
       } else {
         showAlert("사진 업로드 중 오류가 발생했습니다.", "error");
       }
     }
-  }
+  };
 
   // 사진 변경 시 로컬 상태 업데이트
   const handlePhotoChange = async (files: File[]) => {
     try {
       const compressedFiles = await Promise.all(
-        files.map(file => compressImage(file))
+        files.map((file) => compressImage(file))
       );
       setRentalPhotos((prevPhotos) => [...prevPhotos, ...compressedFiles]);
     } catch (error) {
-      console.error('이미지 압축 중 오류:', error);
-      showAlert('이미지 압축 중 오류가 발생했습니다.', 'error');
+      console.error("이미지 압축 중 오류:", error);
+      showAlert("이미지 압축 중 오류가 발생했습니다.", "error");
     }
   };
 
@@ -188,6 +195,7 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
             rentalId={Number(id)}
             status={status}
             uploadType={status}
+            hasPhotos={hasPhotos}
             onPhotoChange={handlePhotoChange}
             onServerImagesLoaded={handleServerImagesLoaded}
             photos={rentalPhotos}
@@ -196,14 +204,25 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
         </div>
       </div>
       <div className="w-full p-4 mt-auto">
-        {hasPhotos? <div className="max-w-md mx-auto flex gap-4">
-          <GrayButton txt="사진 추가 업로드" onClick={()=>{setHasPhotos(false)}} />
-          <GrayButton txt="AI 물품 상태 확인" onClick={handleAnalysis} />
-        </div>:
-        <div className="max-w-md mx-auto">
-          <GrayButton txt="물품 사진 업로드" onClick={handleUpload} />
-        </div>}
-        
+        {hasPhotos ? (
+          <div className="max-w-md mx-auto flex gap-4">
+            <GrayButton
+              txt="사진 추가 업로드"
+              onClick={() => {
+                setHasPhotos(false);
+              }}
+            />
+            <GrayButton
+              txt="AI 물품 상태 확인"
+              onClick={handleAnalysis}
+              disabled={isAnalyzing}
+            />
+          </div>
+        ) : (
+          <div className="max-w-md mx-auto">
+            <GrayButton txt="물품 사진 업로드" onClick={handleUpload} />
+          </div>
+        )}
       </div>
     </div>
   );

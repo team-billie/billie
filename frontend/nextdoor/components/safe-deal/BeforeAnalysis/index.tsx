@@ -1,49 +1,89 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ResultItem from "./ResultItem";
-import { DamageAnalysis } from "@/types/ai-analysis/response";
-import { AiBeforePhotosPostRequest } from "@/lib/api/ai-analysis/request";
+import { DamageAnalysisItem } from "@/types/ai-analysis/response";
+import { AiAnalysisGetRequest } from "@/lib/api/ai-analysis/request";
 import { useParams, useRouter } from "next/navigation";
 import AILoading from "../AILoading";
 import { motion } from "framer-motion";
 import { useAlertStore } from "@/lib/store/useAlertStore";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import PhotoBox from "../CompareAnalysis/AllPhotos/PhotoBox";
 
 export default function BeforeAnalysis() {
-  const [damageAnalysis, setDamageAnalysis] = useState<DamageAnalysis | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
+  const [beforePhotos, setBeforePhotos] = useState<string[] | null>(null);
+  const [damageAnalysisItems, setDamageAnalysisItems] = useState<
+    DamageAnalysisItem[] | null
+  >(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasAnalysis, setHasAnalysis] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { showAlert } = useAlertStore();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const res = await AiBeforePhotosPostRequest(Number(id));
-        if (res?.damageAnalysisResult) {
-          try {
-            const parsedData = JSON.parse(res.damageAnalysisResult);
-            setDamageAnalysis(parsedData);
-          } catch (parseError) {
-            console.error("Error parsing damage analysis:", parseError);
-          }
-        }
-      } catch (err) {
-        showAlert("데이터를 불러오는 중 오류가 발생했습니다.", "error");
-        console.error("Error fetching damage analysis:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // useCallback을 사용하여 함수를 메모이제이션
+  const fetchAiAnalysis = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await AiAnalysisGetRequest(Number(id));
 
-    if (id) {
-      fetchData();
+      if (res) {
+        // API 응답에서 beforeImages 배열 설정
+        setBeforePhotos(res.beforeImages);
+
+        // 유효한 분석 결과가 있는지 확인
+        if (res.analysisResult && res.analysisResult.length > 0) {
+          try {
+            const parsedAnalysisResult = JSON.parse(res.analysisResult);
+            setDamageAnalysisItems(parsedAnalysisResult);
+
+            // 분석 결과가 있으면 hasAnalysis를 true로 설정
+            setHasAnalysis(true);
+          } catch (parseErr) {
+            console.error("Error parsing analysis result:", parseErr);
+            setError("분석 결과를 처리하는 중 오류가 발생했습니다.");
+          }
+        } else {
+          // 분석 결과가 없으면 null로 설정
+          setDamageAnalysisItems(null);
+        }
+      }
+    } catch (err) {
+      showAlert("데이터를 불러오는 중 오류가 발생했습니다.", "error");
+      console.error("Error fetching damage analysis:", err);
+      setError("데이터를 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [id]);
+  }, [id, showAlert]); // id와 showAlert만 의존성으로 추가
+
+  useEffect(() => {
+    if (!id) return;
+
+    // 초기 요청
+    fetchAiAnalysis();
+
+    // 분석 결과가 없을 때만 주기적으로 확인 (5초마다)
+    const intervalId = setInterval(() => {
+      if (!hasAnalysis) {
+        fetchAiAnalysis();
+      } else {
+        // 이미 분석 결과가 있으면 인터벌 정지
+        clearInterval(intervalId);
+      }
+    }, 5000); // 50000(50초)에서 5000(5초)로 변경
+
+    return () => clearInterval(intervalId);
+  }, [id, fetchAiAnalysis, hasAnalysis]);
+
+  // 손상이 발견되었는지 확인하는 함수
+  const hasDamageFound = () => {
+    if (!damageAnalysisItems || damageAnalysisItems.length === 0) return false;
+
+    // 배열 내 하나라도 DAMAGE_FOUND가 있으면 손상 있음
+    return damageAnalysisItems.some((item) => item.result === "DAMAGE_FOUND");
+  };
 
   return (
     <div className="relative flex flex-col p-5">
@@ -55,7 +95,7 @@ export default function BeforeAnalysis() {
         <div className="flex flex-col items-center justify-center mt-4">
           {error && <ErrorMessage message={error} />}
         </div>
-      ) : damageAnalysis && damageAnalysis.length > 0 ? (
+      ) : damageAnalysisItems && hasDamageFound() ? (
         <>
           {/* Header for damage found */}
           <div className="mb-6">
@@ -68,33 +108,18 @@ export default function BeforeAnalysis() {
           </div>
 
           {/* Damage Results */}
+          {beforePhotos && <PhotoBox images={beforePhotos} status={null} />}
           <div className="space-y-4 mb-6">
-            {damageAnalysis.flatMap((item) =>
-              item.damages.map((damage, damageIndex) => (
-                <ResultItem
-                  key={`${item.imageIndex}-${damageIndex}`}
-                  damage={damage}
-                />
-              ))
+            {damageAnalysisItems.map(
+              (item, itemIndex) =>
+                item.result === "DAMAGE_FOUND" &&
+                item.damages.map((damage, damageIndex) => (
+                  <ResultItem
+                    key={`${item.imageIndex}-${damageIndex}`}
+                    damage={damage}
+                  />
+                ))
             )}
-          </div>
-
-          {/* Action buttons within the content area */}
-          <div className="flex gap-3 mb-8">
-            <button
-              onClick={() => window.location.reload()}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 rounded-xl py-3 text-semibold font-lg text-gray-700 transition-colors duration-200 text-sm"
-            >
-              분석 재시도
-            </button>
-            <button
-              onClick={() =>
-                router.push(`/safe-deal/${id}/before/photos-register`)
-              }
-              className="flex-1 bg-blue200 hover:bg-blue300 rounded-xl  text-semibold font-lg text-white transition-colors duration-200 text-sm"
-            >
-              사진 재등록
-            </button>
           </div>
         </>
       ) : (
@@ -143,22 +168,7 @@ export default function BeforeAnalysis() {
           </div>
           {/* Action buttons fixed at bottom */}
           <div className="fixed bottom-24 left-0 right-0 px-4  z-40">
-            <div className="flex gap-3 max-w-md mx-auto ">
-              <button
-                onClick={() => window.location.reload()}
-                className="flex-1 font-semibold bg-gray-100 hover:bg-gray-200 rounded-xl py-4 text-gray-700 transition-colors duration-200"
-              >
-                분석 재시도
-              </button>
-              <button
-                onClick={() =>
-                  router.push(`/safe-deal/${id}/before/photos-register`)
-                }
-                className="flex-1 bg-blue200 font-semibold hover:bg-blue300 rounded-xl py-4 text-white transition-colors duration-200"
-              >
-                사진 재등록
-              </button>
-            </div>
+            <div className="flex gap-3 max-w-md mx-auto "></div>
           </div>
         </div>
       )}

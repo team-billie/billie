@@ -15,14 +15,14 @@ export type Damage = {
 
 export type DamageAnalysisItem = {
   imageIndex: number;
-  result: "DAMAGE_FOUND" | "NO_DAMAGE";
+  result: "DAMAGE_FOUND" | "NO_DAMAGE_FOUND";
   damages: Damage[];
 };
 
 export type DamageAnalysis = DamageAnalysisItem[];
 
 export type AnalysisState = {
-  damageAnalysis: DamageAnalysis | null;
+  damageAnalysis: DamageAnalysis;
   setDamageAnalysis: (dataString: string) => void;
 };
 
@@ -42,6 +42,7 @@ export type AiAnalysisResponse = {
   afterImages: string[];
   overallComparisonResult: string | null;
   matchingResults: MatchingResult[];
+  analysisResult: string;
 };
 
 export type AiAnalysisGetRequestDTO = {
@@ -49,4 +50,5 @@ export type AiAnalysisGetRequestDTO = {
   afterImages: string[];
   overallComparisonResult: string | null;
   matchingResults: MatchingResult[];
+  analysisResult: string;
 };

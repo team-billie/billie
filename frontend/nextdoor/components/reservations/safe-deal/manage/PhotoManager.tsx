@@ -15,6 +15,7 @@ import { useAlertStore } from "@/lib/store/useAlertStore";
 interface PhotoManagerProps {
   status: string;
   rentalId: number;
+  hasPhotos: boolean;
   uploadType: "before" | "after";
   onPhotoChange?: (files: File[]) => void;
   onServerImagesLoaded?: (urls: string[]) => void;
@@ -29,6 +30,7 @@ export default function PhotoManager({
   onServerImagesLoaded,
   uploadType,
   photos = [],
+  hasPhotos,
   serverImages = [],
 }: PhotoManagerProps) {
   const { userId } = useUserStore();
@@ -111,24 +113,24 @@ export default function PhotoManager({
 
   const handleImageClick = (imageUrl: string) => {
     setSelectedImage(imageUrl);
-    
+
     // 로컬 미리보기에서 이미지 찾기
-    const previewIndex = previews.findIndex(url => url === imageUrl);
+    const previewIndex = previews.findIndex((url) => url === imageUrl);
     if (previewIndex !== -1) {
       // 로컬 이미지를 클릭한 경우
-      setPreviews(prev => {
-        const newPreviews = prev.filter(url => url !== imageUrl);
+      setPreviews((prev) => {
+        const newPreviews = prev.filter((url) => url !== imageUrl);
         return [imageUrl, ...newPreviews];
       });
       return;
     }
 
     // 서버 이미지에서 이미지 찾기
-    const serverIndex = serverImageUrls.findIndex(url => url === imageUrl);
+    const serverIndex = serverImageUrls.findIndex((url) => url === imageUrl);
     if (serverIndex !== -1) {
       // 서버 이미지를 클릭한 경우
-      setServerImageUrls(prev => {
-        const newUrls = prev.filter(url => url !== imageUrl);
+      setServerImageUrls((prev) => {
+        const newUrls = prev.filter((url) => url !== imageUrl);
         return [imageUrl, ...newUrls];
       });
     }
@@ -141,12 +143,14 @@ export default function PhotoManager({
       <div className="w-full max-w-screen-sm px-4">
         <div className="w-full flex flex-col">
           <div className="flex justify-center">
-            {totalImages < 10 ? (
+            {!hasPhotos && totalImages < 10 ? (
               <FileUpload
                 onChange={handleFileChange}
                 multiple
                 disabled={uploading}
               />
+            ) : hasPhotos ? (
+              <div></div>
             ) : (
               <ErrorMessage message="최대 업로드 수(10장)에 도달했습니다." />
             )}
@@ -167,7 +171,9 @@ export default function PhotoManager({
               <div className="relative">
                 {isLoading && (
                   <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-10">
-                    <div className="text-sm text-gray-600">이미지를 불러오는 중...</div>
+                    <div className="text-sm text-gray-600">
+                      이미지를 불러오는 중...
+                    </div>
                   </div>
                 )}
                 <Swiper
@@ -176,7 +182,9 @@ export default function PhotoManager({
                   freeMode={true}
                   pagination={{ clickable: true }}
                   modules={[FreeMode]}
-                  onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+                  onSlideChange={(swiper) =>
+                    setCurrentIndex(swiper.activeIndex)
+                  }
                   className="w-full"
                   style={{ padding: "10px 0" }}
                 >
