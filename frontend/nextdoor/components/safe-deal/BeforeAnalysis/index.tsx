@@ -24,8 +24,9 @@ export default function BeforeAnalysis() {
   // useCallback을 사용하여 함수를 메모이제이션
   const fetchAiAnalysis = useCallback(async () => {
     try {
-      setIsLoading(true);
-      setError(null);
+      if (isLoading) {
+        setError(null);
+      }
       const res = await AiAnalysisGetRequest(Number(id));
 
       if (res) {
@@ -40,23 +41,26 @@ export default function BeforeAnalysis() {
 
             // 분석 결과가 있으면 hasAnalysis를 true로 설정
             setHasAnalysis(true);
+            setIsLoading(false);
           } catch (parseErr) {
             console.error("Error parsing analysis result:", parseErr);
             setError("분석 결과를 처리하는 중 오류가 발생했습니다.");
+            setIsLoading(false);
           }
         } else {
-          // 분석 결과가 없으면 null로 설정
+          // 분석 결과가 없으면 null로 설정하고 로딩 상태는 유지
+          // 여기서 변경: isLoading을 false로 설정하지 않음
           setDamageAnalysisItems(null);
+          // API는 응답했지만 분석이 진행 중일 때는 hasAnalysis는 여전히 false
         }
       }
     } catch (err) {
       showAlert("데이터를 불러오는 중 오류가 발생했습니다.", "error");
       console.error("Error fetching damage analysis:", err);
       setError("데이터를 불러오는 중 오류가 발생했습니다.");
-    } finally {
       setIsLoading(false);
     }
-  }, [id, showAlert]); // id와 showAlert만 의존성으로 추가
+  }, [id, showAlert, isLoading]); // isLoading 의존성 추가
 
   useEffect(() => {
     if (!id) return;
@@ -72,7 +76,7 @@ export default function BeforeAnalysis() {
         // 이미 분석 결과가 있으면 인터벌 정지
         clearInterval(intervalId);
       }
-    }, 5000); // 50000(50초)에서 5000(5초)로 변경
+    }, 5000); // 5초마다 확인
 
     return () => clearInterval(intervalId);
   }, [id, fetchAiAnalysis, hasAnalysis]);
@@ -87,7 +91,8 @@ export default function BeforeAnalysis() {
 
   return (
     <div className="relative flex flex-col p-5">
-      {isLoading ? (
+      {isLoading || !hasAnalysis ? (
+        // isLoading 또는 분석이 아직 완료되지 않은 경우 로딩 UI 표시
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <AILoading status="before" />
         </div>
@@ -123,6 +128,7 @@ export default function BeforeAnalysis() {
           </div>
         </>
       ) : (
+        // 분석이 완료되고 손상이 없는 경우에만 표시
         <div className="relative">
           <div className="text-center mt-24 mb-4 ">
             <div className="text-3xl font-bold text-white  mb-1">
