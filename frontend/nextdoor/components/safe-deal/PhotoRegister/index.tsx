@@ -31,23 +31,6 @@ export default function PhotoRegister({ status }: PhotoRegisterProps) {
   const [serverData, setServerData] = useState<ServerData | null>(null);
   const { showAlert } = useAlertStore();
 
-  useEffect(() => {
-    if (!userId || !id) return;
-
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.get(
-          `/api/v1/rentals/${id}/ai-analysis`
-        );
-        setServerData(response.data);
-      } catch (error) {
-        console.error("데이터 로드 오류:", error);
-      }
-    };
-
-    fetchData();
-  }, [id, userId]);
-
   const handleAnalysis = async () => {
     try {
       if (!id) return;

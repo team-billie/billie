@@ -35,7 +35,7 @@ export default function PhotoManager({
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [serverImageUrls, setServerImageUrls] = useState<string[]>(serverImages);
+  const [serverImageUrls, setServerImageUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -57,7 +57,6 @@ export default function PhotoManager({
 
       setServerImageUrls(images);
 
-      // 서버 이미지 로드가 완료되면 상위 컴포넌트에 알림
       if (onServerImagesLoaded && images.length > 0) {
         onServerImagesLoaded(images);
       }
@@ -69,24 +68,14 @@ export default function PhotoManager({
     }
   };
 
-  // serverImages prop이 변경될 때마다 serverImageUrls 상태 업데이트
-  useEffect(() => {
-    setServerImageUrls(serverImages);
-    setIsLoading(false);
-  }, [serverImages]);
-
-  // 초기 데이터 로드
+  // 초기 데이터 로드 및 새로고침 시 데이터 로드
   useEffect(() => {
     if (!userId || !rentalId) return;
-    
-    if (serverImages.length === 0) {
-      fetchImages();
-    }
+    fetchImages();
   }, [rentalId, uploadType, userId]);
 
   // 미리보기 URL 생성
   useEffect(() => {
-    // 기존 URL 해제
     previews.forEach((url) => URL.revokeObjectURL(url));
 
     if (!photos || photos.length === 0) {
@@ -104,13 +93,11 @@ export default function PhotoManager({
 
   if (!userId) return null;
 
-  // 파일 선택 핸들러
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const filesArray = Array.from(files);
-    // 실제 총 이미지 수는 서버에 있는 이미지와 현재 대기 중인 이미지(photos)의 합
     const totalCount = serverImageUrls.length + photos.length;
 
     if (totalCount + filesArray.length > 10) {
@@ -118,45 +105,10 @@ export default function PhotoManager({
       return;
     }
 
-    try {
-      setUploading(true);
-
-      // 상위 컴포넌트에 파일 전달 (상태 관리용)
-      onPhotoChange?.(filesArray);
-
-      // 서버에 업로드
-      const result = await uploadPhotos(filesArray);
-
-      setUploadSuccess(true);
-      // 업로드 성공 후 서버 이미지 목록 새로고침
-      await fetchImages();
-
-      setTimeout(() => setUploadSuccess(false), 3000);
-    } catch (error) {
-      console.error("사진 업로드 오류:", error);
-      showAlert("사진 업로드에 실패했습니다.", "error");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
+    onPhotoChange?.(filesArray);
+    e.target.value = "";
   };
 
-  // 업로드 API 요청
-  const uploadPhotos = async (files: File[]) => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
-
-    const response = await axiosInstance.post(
-      `/api/v1/rentals/${rentalId}/${uploadType}/photos`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-    return response.data;
-  };
-
-  // 실제 총 이미지 수는 서버에 있는 이미지와 대기 중인 로컬 이미지의 합
   const totalImages = serverImageUrls.length + photos.length;
 
   return (
@@ -199,15 +151,16 @@ export default function PhotoManager({
                 className="w-full"
                 style={{ padding: "10px 0" }}
               >
-                {serverImageUrls.map((image, idx) => (
-                  <SwiperSlide key={`server-${idx}`}>
+                {/* 로컬 미리보기를 먼저 표시 (최신순) */}
+                {previews.map((previewUrl, idx) => (
+                  <SwiperSlide key={`local-${idx}`}>
                     <div
                       className="relative w-full h-44 cursor-pointer"
-                      onClick={() => setSelectedImage(image)}
+                      onClick={() => setSelectedImage(previewUrl)}
                     >
                       <Image
-                        src={image}
-                        alt={`Product ${idx + 1}`}
+                        src={previewUrl}
+                        alt={`New upload ${idx + 1}`}
                         fill
                         className="object-cover"
                         onError={() => {
@@ -218,15 +171,16 @@ export default function PhotoManager({
                   </SwiperSlide>
                 ))}
 
-                {previews.map((previewUrl, idx) => (
-                  <SwiperSlide key={`local-${idx}`}>
+                {/* 서버 이미지를 그 다음에 표시 */}
+                {serverImageUrls.map((image, idx) => (
+                  <SwiperSlide key={`server-${idx}`}>
                     <div
                       className="relative w-full h-44 cursor-pointer"
-                      onClick={() => setSelectedImage(previewUrl)}
+                      onClick={() => setSelectedImage(image)}
                     >
                       <Image
-                        src={previewUrl}
-                        alt={`New upload ${idx + 1}`}
+                        src={image}
+                        alt={`Product ${idx + 1}`}
                         fill
                         className="object-cover"
                         onError={() => {
