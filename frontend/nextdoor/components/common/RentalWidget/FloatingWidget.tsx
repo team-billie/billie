@@ -138,7 +138,7 @@ const FloatingWidget: React.FC = () => {
         console.log("새 항목 감지: ", newShiningItems);
         setShiningItems(newShiningItems);
 
-        // 10초 
+        // 10초
         setTimeout(() => {
           setShiningItems([]);
         }, 10000);
@@ -298,9 +298,17 @@ const FloatingWidget: React.FC = () => {
     const { process, detailStatus } = rental;
     const isOwner = userId === rental.rentalDetail?.ownerId;
 
+    const start = new Date(rental.startDate);
+    const end = new Date(rental.endDate);
+    const diffDays =
+      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
     if (isOwner && process === "BEFORE_RENTAL" && detailStatus === "CREATED") {
+      const baseCharge = rental.rentalDetail?.charge || 0;
+      const totalCharge = baseCharge * diffDays;
+
       setSelectedRental({
-        charge: rental.rentalDetail?.charge || 0,
+        charge: totalCharge,
         rentalId: rental.rentalId.toString(),
       });
       setIsModalOpen(true);

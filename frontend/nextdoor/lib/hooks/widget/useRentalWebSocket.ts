@@ -13,6 +13,8 @@ import { fetchRentals } from "@/lib/api/rental/request";
 
 // 렌탈 상태
 export interface RentalStatusMessage {
+  startDate: string;
+  endDate: string;
   rentalId: number;
   process: RentalProcess;
   detailStatus: RentalStatus;
@@ -100,8 +102,9 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       const allRentals = [...ownerRentals, ...renterRentals].map(
         (rental: any) => {
           // console.log("[대여-API] 렌탈 매핑 - rentalId:", rental.rentalId);
-
           return {
+            startDate: rental.startDate,
+            endDate: rental.endDate,
             rentalId: rental.rentalId,
             process: rental.rentalProcess,
             detailStatus: rental.rentalStatus,
