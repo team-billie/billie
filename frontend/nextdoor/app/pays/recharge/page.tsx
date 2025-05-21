@@ -9,12 +9,14 @@ import useUserStore from "@/lib/store/useUserStore";
 import { TransferAccountRequestDto } from "@/types/pays/request/index";
 import { AddAccountResponseDto } from "@/types/pays/response";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { TransferAccountRequest } from "@/lib/api/pays";
 import { useAlertStore } from "@/lib/store/useAlertStore";
+import { formatNumberWithCommas } from "@/lib/utils/money";
+import Loading from "@/components/pays/common/Loading";
 
 type FormValues = TransferAccountRequestDto;
 
@@ -25,6 +27,8 @@ export default function RechargePage() {
     const router = useRouter();
     const rechargeAccount = selectedAccount ?? mainAccount;
     const { showAlert } = useAlertStore();
+
+    const [status, setStatus] = useState<'loading' | 'success' | 'error' | null>(null);
 
     const rechargeForm = useForm<FormValues>({
         defaultValues: {
@@ -37,26 +41,76 @@ export default function RechargePage() {
     });
 
     const onSubmit = (data: FormValues) => {
+        const transactionBalance = rechargeForm.getValues("transactionBalance");
+        if (!data.transactionBalance || data.transactionBalance === 0) {
+            showAlert("송금 금액을 입력해주세요.", "error");
+            return;
+        }
+        //0500같이 0으로 숫자가 시작할 경우 return 하고 값 리셋
+        if (data.transactionBalance.toString().startsWith("0")) {
+            rechargeForm.setValue("transactionBalance", 0);
+            showAlert("올바른 금액을 입력해주세요.", "error");
+            return;
+        }
+
+        const rawValue = String(data.transactionBalance).replace(/,/g, '');
+        const balance = Number(rawValue);
+        //1000원 단위로 송금하도록 return 가장 근접한 천 단위로 바꿔주고
+        if (balance % 1000 !== 0) {
+            data.transactionBalance = Math.round(balance / 1000) * 1000;
+            rechargeForm.setValue("transactionBalance", data.transactionBalance);
+            showAlert("1000원 단위로 송금해주세요.", "error");
+            return;
+        }
+
+
         rechargeForm.setValue("withdrawalAccountNo", rechargeAccount?.accountNo ?? "");
-        console.log(rechargeForm.getValues());
-        TransferAccountRequest(rechargeForm.getValues()).then((res) => {
-            showAlert("빌리페이 충전 완료", "success");
-            router.push("/profile");
-        }).catch(() => {
-            showAlert("빌리페이 충전 실패", "error");
-        });
+        setStatus('loading');
+        TransferAccountRequest(rechargeForm.getValues())
+            .then((res) => {
+                setTimeout(() => {
+                    setStatus('success');
+                    showAlert("빌리페이 충전 완료", "success");
+                }, 1500);
+            })
+            .catch((err) => {
+                setTimeout(() => {
+                    setStatus('error');
+                    if (err.code === "A1014") {
+                        showAlert("계좌 잔액 부족으로 충전 불가", "error");
+                    } else {
+                        showAlert("빌리페이 충전 실패", "error");
+                    }
+                }, 1500);
+            });
     }
 
     const handleAmountChange = (amount: number) => {
         const currentBalance = rechargeForm.getValues("transactionBalance") ?? 0;
-        rechargeForm.setValue("transactionBalance", currentBalance + amount);
+        rechargeForm.setValue("transactionBalance", Number(currentBalance) + amount);
     }
+
+    const watchedAmount = useWatch({
+        control: rechargeForm.control,
+        name: "transactionBalance",
+    });
+
+    useEffect(() => {
+        //최대 200만원 송금 가능
+        if (watchedAmount > 2000000) {
+            showAlert("최대 200만원 송금 가능합니다.", "error");
+            rechargeForm.setValue("transactionBalance", 2000000);
+        }
+    }, [watchedAmount]);
 
     return (
         <div className="relative flex flex-col min-h-[100dvh]">
-            <Header txt="충전" />
-            <FormProvider {...rechargeForm}>
-                <div className="flex-1 flex flex-col items-center">
+            {status
+                ? <Loading type="recharge" status={status} headerTxt="충전" />
+                : <>
+                    <Header txt="충전" />
+                    <FormProvider {...rechargeForm}>
+                        <div className="flex-1 flex flex-col items-center">
                     <div className="flex flex-col items-center mb-10 mt-20 text-gray600">
                         <div className="flex gap-2 items-center justify-center" onClick={() => setIsAccountListModalOpen(true)}>
                             <img
@@ -72,7 +126,7 @@ export default function RechargePage() {
 
                     <div className="flex flex-col items-center">
                         <AmountInput placeholderTxt="얼마를 충전할까요?" />
-                        <div className="text-xs text-gray600">빌리페이 잔액 <span>{billyAccount?.balance}</span>원</div>
+                        <div className="text-xs text-gray600">빌리페이 잔액 <span>{formatNumberWithCommas(billyAccount?.balance ?? 0)}원</span></div>
                     </div>
 
                     <div className="flex text-gray900 text-sm mt-5 py-5 gap-3">
@@ -90,6 +144,8 @@ export default function RechargePage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60">
                     <MyAccountListModal setIsModalOpen={setIsAccountListModalOpen} setSelectedAccount={setSelectedAccount} />
                 </div>
+            }
+            </>
             }
         </div>
     );

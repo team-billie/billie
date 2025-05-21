@@ -13,10 +13,19 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws-chat")
+                .setAllowedOriginPatterns(
+                        "http://k12e205.p.ssafy.io",
+                        "http://localhost:3000"
+                );
         registry
                 .addEndpoint("/ws-chat")                   // 클라이언트가 연결할 엔드포인트
-                .setAllowedOriginPatterns("*")             // CORS 허용 (운영 시 도메인 제한 권장)
-                .withSockJS();                             // SockJS fallback 지원
+                .setAllowedOriginPatterns(
+                        "http://k12e205.p.ssafy.io",
+                        "http://localhost:3000"
+                )
+                .withSockJS();             // SockJS fallback 지원
+
     }
 
     @Override

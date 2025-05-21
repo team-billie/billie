@@ -5,8 +5,7 @@ import Payment from "@/components/safe-deal/Payment";
 
 export default function SafeDealBefore() {
   return (
-    <main className="relative h-full flex flex-col">
-      <Header txt={"결제하기"} />
+    <main className="relative h-[100dvh] flex flex-col">
       <Payment />
     </main>
   );

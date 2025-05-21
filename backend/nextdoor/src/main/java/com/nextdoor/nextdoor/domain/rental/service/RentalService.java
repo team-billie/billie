@@ -13,8 +13,8 @@ public interface RentalService {
     void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent);
     UploadImageResult registerBeforePhoto(UploadImageCommand command);
     RequestRemittanceResult requestRemittance(RequestRemittanceCommand command);
+    RequestRemittanceResult getRemittanceData(Long rentalId);
     void completeRemittanceProcessing(RemittanceCompletedEvent remittanceCompletedEvent);
-    void completeRentalEndProcessing(Long rentalId);
     UploadImageResult registerAfterPhoto(UploadImageCommand command);
     Page<SearchRentalResult> searchRentals(SearchRentalCommand command);
     void completeDepositProcessing(DepositCompletedEvent depositCompletedEvent);
@@ -27,4 +27,5 @@ public interface RentalService {
     SearchRentalResult getRentalById(Long rentalId);
     DeleteRentalResult deleteRental(DeleteRentalCommand command);
     void createAiImageComparisonPair(Long rentalId, Long beforeImageId, Long afterImageId, String pairComparisonResult);
+    void deleteAiImageComparisonPairByRentalId(Long rentalId);
 }

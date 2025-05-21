@@ -7,41 +7,41 @@ import ChatLayout from "@/components/chats/chatdetail/ChatLayout";
 import ChatList from "@/components/chats/chatdetail/ChatList";
 import ChatAccordion from "@/components/chats/chatdetail/ChatProductInfoCard";
 import { Message } from "@/types/chats/chat";
-import { getChatMessages, getBorrowingChatRooms, convertToChatRoomUI, getLendingChatRooms } from "@/lib/api/chats";
+import { getChatRooms, convertToChatRoomUI, getChatMessageHistory } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
-import { useWebSocket } from "@/lib/hooks/chats/useWebSocket"; // 웹소켓 훅 import
+import { useWebSocket } from "@/lib/hooks/chats/useWebSocket";
 import ProductInfoCard from "@/components/chats/chatdetail/ChatProductInfoCard";
 
 export default function ChatDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const conversationId = params.id as string;
+  const roomId = Number(params.id);
 
   // useUserStore에서 사용자 정보 가져오기
   const { userId, username, profileImageUrl } = useUserStore();
-  
+
   // 상대방 정보 상태
   const [otherUser, setOtherUser] = useState({
     id: 0,
     name: '상대방',
     avatar: '/images/profileimg.png'
   });
-  
+
   // 제품 정보 상태
   const [productInfo, setProductInfo] = useState({
-    conversationId: "",
+    roomId: 0,
+    postId: 0,
+    ownerId: 0,
+    renterId: 0,
     lastMessage: "",
     lastSentAt: "",
     unreadCount: 0,
     otherNickname: "",
     otherProfileImageUrl: "",
     postImageUrl: "/icons/icon72.png",
-    ownerId: 0,
-    renterId: 0,
-    postId: 0,
-    title: "iPhone 15 Pro 대여",
-    rentalFee: 30000,
-    deposit: 300000,
+    title: "",
+    rentalFee: 0,
+    deposit: 0,
     chatStatus: "상태없음"
   });
 
@@ -56,17 +56,17 @@ export default function ChatDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   // useWebSocket 훅 사용하기
-  const { 
-    isConnected, 
-    error: socketError, 
-    sendMessage 
+  const {
+    isConnected,
+    error: socketError,
+    sendMessage
   } = useWebSocket({
-    conversationId,
+    roomId: Number(roomId),
     onMessage: (chatMessage) => {
       console.log("메시지 수신:", chatMessage);
       // 중복 체크 로직
       const newMessage: Message = {
-        id: `${chatMessage.conversationId}_${chatMessage.senderId}_${new Date(chatMessage.sentAt).getTime()}`,
+        id: Number(`${chatMessage.roomId}${chatMessage.senderId}${new Date(chatMessage.sentAt).getTime()}`),
         text: chatMessage.content,
         sender: Number(chatMessage.senderId) === Number(userId) ? "user" : "other",
         timestamp: new Date(chatMessage.sentAt),
@@ -92,46 +92,35 @@ export default function ChatDetailPage() {
   useEffect(() => {
     const fetchChatRoomInfo = async () => {
       if (!userId) return;
-      
+
       try {
-        // 두 API 모두 호출
-        const borrowingRooms = await getBorrowingChatRooms();
-        const lendingRooms = await getLendingChatRooms();
-        
-        // 모든 채팅방 합치기
-        const allRooms = [...borrowingRooms, ...lendingRooms];
-        
-        // 현재 conversationId와 일치하는 채팅방 찾기
-        const currentRoom = allRooms.find(room => room.conversationId === conversationId);
-        
+        const rooms = await getChatRooms();
+        const currentRoom = rooms.find(room => room.roomId === Number(roomId));
+
         if (currentRoom) {
           // 채팅방 UI 데이터로 변환
           const roomUI = convertToChatRoomUI(currentRoom, userId);
-          
+
           // 상대방 찾기 (내 ID가 아닌 참가자)
-          if (Array.isArray(roomUI.participants) && roomUI.participants.length > 0) {
-            const other = roomUI.participants.find(p => p.id !== userId);
-            if (other) {
-              setOtherUser({
-                id: other.id,
-                name: other.name || '상대방',
-                avatar: other.avatar || '/images/profileimg.png'
-              });
-            }
-          }
-          
+          const otherId = userId === currentRoom.ownerId ? currentRoom.renterId : currentRoom.ownerId;
+          setOtherUser({
+            id: otherId,
+            name: currentRoom.otherNickname || '상대방',
+            avatar: currentRoom.otherProfileImageUrl || '/images/profileimg.png'
+          });
+
           // 서버 데이터 그대로 저장
           setProductInfo({
-            conversationId: currentRoom.conversationId,
+            roomId: currentRoom.roomId,
+            postId: currentRoom.postId,
+            ownerId: currentRoom.ownerId,
+            renterId: currentRoom.renterId,
             lastMessage: currentRoom.lastMessage || "",
             lastSentAt: currentRoom.lastSentAt,
             unreadCount: currentRoom.unreadCount,
             otherNickname: currentRoom.otherNickname,
             otherProfileImageUrl: currentRoom.otherProfileImageUrl,
             postImageUrl: currentRoom.postImageUrl,
-            ownerId: currentRoom.ownerId,
-            renterId: currentRoom.renterId,
-            postId: currentRoom.postId,
             title: currentRoom.title,
             rentalFee: currentRoom.rentalFee,
             deposit: currentRoom.deposit,
@@ -142,26 +131,28 @@ export default function ChatDetailPage() {
         console.error("채팅방 정보 조회 오류:", err);
       }
     };
-    
+
     fetchChatRoomInfo();
-  }, [conversationId, userId]);
+  }, [roomId, userId]);
 
   // 메시지 이력 가져오기
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!conversationId || !userId) {
-        console.log("conversationId나 userId가 없어 메시지를 불러올 수 없습니다.");
+      if (!roomId || !userId) {
+        console.log("roomId나 userId가 없어 메시지를 불러올 수 없습니다.");
         return;
       }
 
       try {
         setIsLoading(true);
-        console.log(`메시지 이력 조회: conversationId=${conversationId}`);
+        console.log(`메시지 이력 조회: roomId=${roomId}`);
 
-        const chatMessages = await getChatMessages(conversationId);
+        // getChatMessageHistory로 변경 (0페이지, 50개)
+        const historyPage = await getChatMessageHistory(roomId, 0, 50);
+        const chatMessages = historyPage.content;
 
         const formattedMessages = chatMessages.map((msg) => ({
-          id: `${msg.conversationId}_${msg.senderId}_${new Date(msg.sentAt).getTime()}`,
+          id: `${msg.messageId}`,
           text: msg.content,
           sender: Number(msg.senderId) === Number(userId) ? "user" : "other",
           timestamp: new Date(msg.sentAt),
@@ -178,10 +169,10 @@ export default function ChatDetailPage() {
       }
     };
 
-    if (conversationId && userId) {
+    if (roomId && userId) {
       fetchMessages();
     }
-  }, [conversationId, userId]);
+  }, [roomId, userId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -203,46 +194,50 @@ export default function ChatDetailPage() {
       return;
     }
 
-    try {
-      // useWebSocket 훅의 sendMessage 함수 사용
-      const sent = sendMessage(content);
-      if (sent) {
-        setValue("");
-      } else {
-        console.error("메시지 전송 실패");
-      }
-    } catch (err) {
-      console.error("메시지 전송 오류:", err);
-      alert("메시지 전송에 실패했습니다. 다시 시도해주세요.");
+    //B안: 메시지 전송 후, onMessage 콜백이 오기 전에 optimistic하게 UI에 바로 추가
+    //(즉, 메시지 전송 성공 시 바로 setMessages로 추가)
+    const sent = sendMessage(content);
+    if (sent) {
+      // optimistic update
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `local_${Date.now()}`,
+          text: content,
+          sender: "user",
+          timestamp: new Date(),
+          read: false,
+        },
+      ]);
+      setValue("");
     }
   };
 
   const handleBackClick = () => {
-    router.push("/chat/borrow");
+    router.push("/chats");
   };
 
   return (
     <ChatLayout
-      username={otherUser.name} 
+      username={otherUser.name}
       value={value}
       onChange={handleChange}
       onSendMessage={handleSend}
       onBackClick={handleBackClick}
       profileImage={otherUser.avatar}
-      
     >
       <div className="px-3 mt-2">
-  <ProductInfoCard 
-    productInfo={productInfo}
-    onDetailClick={handleProductDetailClick}
-  />
-</div>
+        <ProductInfoCard
+          productInfo={productInfo}
+          onDetailClick={handleProductDetailClick}
+        />
+      </div>
 
       {/* 채팅 목록 */}
       <ChatList
-        messages={messages} 
-        username={otherUser.name} 
-        userAvatar={otherUser.avatar} 
+        messages={messages}
+        username={otherUser.name}
+        userAvatar={otherUser.avatar}
       />
 
       {/* 연결 상태 표시 */}

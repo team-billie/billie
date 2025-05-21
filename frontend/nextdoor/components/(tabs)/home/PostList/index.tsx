@@ -1,12 +1,13 @@
 "use client";
 
 import { GetPostListRequest } from "@/lib/api/posts";
-import { PostListItemDto } from "@/types/posts/response";
+import { PostListItemDto } from "@/types/posts/response/index";
 import { useState, useEffect } from "react";
 import useUserStore from "@/lib/store/useUserStore";
 import PostListItem from "../PostListItem";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Category from "../Category";
 
 export default function PostList() {
   const { userId, address } = useUserStore();
@@ -50,7 +51,10 @@ export default function PostList() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
+    {/* 카테고리 */}
+    <Category />
+    <div className="mt-2 flex flex-col gap-4">
       {isLoading ? (
         <div className="py-8 text-center text-gray-500">로딩 중...</div>
       ) : postList && postList.length > 0 ? (
@@ -98,5 +102,6 @@ export default function PostList() {
         <div className="py-8 text-center text-gray-500">게시글이 없습니다.</div>
       )}
     </div>
+    </>
   );
 }

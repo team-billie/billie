@@ -51,7 +51,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
   const fetchRentalData = useCallback(async () => {
     const now = Date.now();
     if (now - lastRefreshTimeRef.current < 1000) {
-      console.log("[대여-API] 요청 제한: 이전 요청으로부터 1초가 지나지 않았습니다.");
+      // console.log("[대여-API] 요청 제한: 이전 요청으로부터 1초가 지나지 않았습니다.");
       return;
     }
     lastRefreshTimeRef.current = now;
@@ -62,7 +62,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
     }
 
     setLoading(true);
-    console.log("[대여-API] 렌탈 데이터 요청 시작 - userId:", userId);
+    // console.log("[대여-API] 렌탈 데이터 요청 시작 - userId:", userId);
 
     try {
       const ownerRentals = await fetchRentals({
@@ -77,29 +77,29 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
         condition: "active",
       });
 
-      console.log("[대여-API] 오너 렌탈 데이터 개수:", ownerRentals.length);
-      console.log("[대여-API] 렌터 렌탈 데이터 개수:", renterRentals.length);
-      console.log(
-        "[대여-API] 오너 렌탈 데이터 샘플:",
-        ownerRentals.length > 0 ? ownerRentals[0] : "empty"
-      );
-      console.log(
-        "[대여-API] 렌터 렌탈 데이터 샘플:",
-        renterRentals.length > 0 ? renterRentals[0] : "empty"
-      );
+      // console.log("[대여-API] 오너 렌탈 데이터 개수:", ownerRentals.length);
+      // console.log("[대여-API] 렌터 렌탈 데이터 개수:", renterRentals.length);
+      // console.log(
+      //   "[대여-API] 오너 렌탈 데이터 샘플:",
+      //   ownerRentals.length > 0 ? ownerRentals[0] : "empty"
+      // );
+      // console.log(
+      //   "[대여-API] 렌터 렌탈 데이터 샘플:",
+      //   renterRentals.length > 0 ? renterRentals[0] : "empty"
+      // );
 
-      if (ownerRentals.length > 0) {
-        console.log("[대여-API] 프로필 이미지 필드 확인:", {
-          ownerProfileImageUrl: ownerRentals[0].ownerProfileImageUrl,
-          renterProfileImageUrl: ownerRentals[0].renterProfileImageUrl,
-          productImageUrls: ownerRentals[0].productImageUrls,
-        });
-      }
+      // if (ownerRentals.length > 0) {
+      //   console.log("[대여-API] 프로필 이미지 필드 확인:", {
+      //     ownerProfileImageUrl: ownerRentals[0].ownerProfileImageUrl,
+      //     renterProfileImageUrl: ownerRentals[0].renterProfileImageUrl,
+      //     productImageUrls: ownerRentals[0].productImageUrls,
+      //   });
+      // }
 
       // 합치기
       const allRentals = [...ownerRentals, ...renterRentals].map(
         (rental: any) => {
-          console.log("[대여-API] 렌탈 매핑 - rentalId:", rental.rentalId);
+          // console.log("[대여-API] 렌탈 매핑 - rentalId:", rental.rentalId);
 
           return {
             rentalId: rental.rentalId,
@@ -127,7 +127,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
         }
       );
 
-      console.log("[대여-API] 처리된 렌탈 목록:", allRentals);
+      // console.log("[대여-API] 처리된 렌탈 목록:", allRentals);
 
       setActiveRentals(allRentals);
       setError(null);
@@ -143,16 +143,16 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
     const token = localStorage.getItem("accessToken");
     const uuid = localStorage.getItem("uuid");
 
-    console.log(
-      "[대여-웹소켓] 연결 시도 - token 존재:",
-      !!token,
-      "uuid 존재:",
-      !!uuid,
-      "userId 존재:",
-      !!userId
-    );
+    // console.log(
+    //   "[대여-웹소켓] 연결 시도 - token 존재:",
+    //   !!token,
+    //   "uuid 존재:",
+    //   !!uuid,
+    //   "userId 존재:",
+    //   !!userId
+    // );
 
-    if (!token || !uuid || !userId) {
+    if (!token || !uuid) {
       setLoading(false);
       setIsConnected(false);
       return;
@@ -171,17 +171,17 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       const baseUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://k12e205.p.ssafy.io:8081";
       const socket = new SockJS(`${baseUrl}/ws-rental`);
-      console.log("[대여-웹소켓] 소켓 생성:", `${baseUrl}/ws-rental`);
+      // console.log("[대여-웹소켓] 소켓 생성:", `${baseUrl}/ws-rental`);
 
       // STOMP 클라이언트
       const client = new Client({
         webSocketFactory: () => socket,
         debug: (str) => {
-          console.log("STOMP Rental: " + str);
+          // console.log("STOMP Rental: " + str);
         },
-        reconnectDelay: 5000,
-        heartbeatIncoming: 10000,
-        heartbeatOutgoing: 10000,
+        reconnectDelay: 0,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
         connectHeaders: {
           Authorization: `Bearer ${token}`,
         },
@@ -189,9 +189,9 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
 
       client.onConnect = () => {
         setIsConnected(true);
-        console.log("[대여-웹소켓] 연결 성공");
+        // console.log("[대여-웹소켓] 연결 성공");
 
-        console.log("[대여-웹소켓] 토픽 구독:", `/topic/rental/${uuid}/status`);
+        // console.log("[대여-웹소켓] 토픽 구독:", `/topic/rental/${uuid}/status`);
         client.subscribe(`/topic/rental/${uuid}/status`, (message) => {
           try {
             const rentalStatusData: RentalStatusMessage = JSON.parse(
@@ -210,7 +210,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
             console.log("[대여-웹소켓] 프로필 이미지 정보:", profileInfo);
 
             handleRentalUpdate(rentalStatusData);
-            
+
             setTimeout(() => {
               fetchRentalData();
             }, 500);
@@ -219,7 +219,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
           }
         });
 
-        console.log("[대여-웹소켓] 초기 데이터 로드 시작");
+        // console.log("[대여-웹소켓] 초기 데이터 로드 시작");
         fetchRentalData();
       };
 
@@ -228,7 +228,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
         console.error("[대여-웹소켓] 추가 정보:", frame.body);
         setError("서버 연결에 문제가 발생했습니다.");
         setIsConnected(false);
-        
+
         // 오류 발생 시 5초 후 재연결 시도
         setTimeout(() => {
           console.log("[대여-웹소켓] 연결 오류 후 재시도");
@@ -237,11 +237,11 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       };
 
       client.onWebSocketClose = () => {
-        console.log("[대여-웹소켓] 연결 종료");
+        // console.log("[대여-웹소켓] 연결 종료");
         setIsConnected(false);
-        
+
         setTimeout(() => {
-          console.log("[대여-웹소켓] 연결 종료 후 재시도");
+          // console.log("[대여-웹소켓] 연결 종료 후 재시도");
           setupWebSocketConnection();
         }, 5000);
       };
@@ -249,22 +249,22 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       client.onWebSocketError = (error) => {
         console.error("[대여-웹소켓] 웹소켓 오류:", error);
         setIsConnected(false);
-        
+
         setTimeout(() => {
           console.log("[대여-웹소켓] 웹소켓 오류 후 재시도");
           setupWebSocketConnection();
         }, 5000);
       };
 
-      console.log("[대여-웹소켓] 활성화 중...");
+      // console.log("[대여-웹소켓] 활성화 중...");
       client.activate();
-      
+
       stompClientRef.current = client;
     } catch (e) {
       console.error("[대여-웹소켓] 연결 오류:", e);
       setError("웹소켓 연결에 실패했습니다.");
       setIsConnected(false);
-      
+
       setTimeout(() => {
         console.log("[대여-웹소켓] 예외 후 재연결 시도");
         setupWebSocketConnection();
@@ -296,12 +296,12 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
         try {
           const uuid = localStorage.getItem("uuid");
           if (uuid) {
-            console.log("[대여-웹소켓] 연결 해제 중...");
+            // console.log("[대여-웹소켓] 연결 해제 중...");
             stompClientRef.current?.unsubscribe(`/topic/rental/${uuid}/status`);
             stompClientRef.current.deactivate();
           }
         } catch (e) {
-          console.error("[대여-웹소켓] 종료 오류:", e);
+          // console.error("[대여-웹소켓] 종료 오류:", e);
         }
       }
       window.removeEventListener('online', handleNetworkChange);
@@ -323,10 +323,10 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
 
       if (existingIndex >= 0) {
         const currentItem = prev[existingIndex];
-        const statusChanged = 
-          currentItem.process !== updatedRental.process || 
+        const statusChanged =
+          currentItem.process !== updatedRental.process ||
           currentItem.detailStatus !== updatedRental.detailStatus;
-          
+
         if (statusChanged) {
           console.log("[대여-웹소켓] 상태 변경 감지:", {
             old: {
@@ -339,7 +339,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
             }
           });
         }
-        
+
         // 기존 대여 업데이트한다
         const updated = [...prev];
         updated[existingIndex] = {
@@ -397,7 +397,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
   // 외부에 노출할 새로고침 함수에 강제 웹소켓 재연결 로직 추가
   const refreshRentalsWithReconnect = useCallback(async () => {
     await fetchRentalData();
-    
+
     // 연결이 끊어진 경우 재연결 시도
     if (!isConnected) {
       console.log("[대여-웹소켓] 수동 새로고침 중 연결 다시 시도");

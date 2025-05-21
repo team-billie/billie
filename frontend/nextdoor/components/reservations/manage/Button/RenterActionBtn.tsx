@@ -9,6 +9,7 @@ import {
   RentalStatus,
 } from "@/types/rental";
 import { useRouter } from "next/navigation";
+import { useAlertStore } from "@/lib/store/useAlertStore";
 
 interface RenterActionBtnProps {
   status: RentalStatus;

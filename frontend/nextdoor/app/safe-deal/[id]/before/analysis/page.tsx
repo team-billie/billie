@@ -5,7 +5,6 @@ import GrayButton from "@/components/safe-deal/GrayButton";
 import Header from "@/components/safe-deal/Header";
 import Title from "@/components/safe-deal/Title";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function SafeDealBefore() {
   const { id } = useParams();

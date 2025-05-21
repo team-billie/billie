@@ -1,4 +1,5 @@
 import { getBankInfo } from "@/lib/utils/getBankInfo";
+import { formatNumberWithCommas } from "@/lib/utils/money";
 
 interface HistoryItemProps {
     name: string;
@@ -10,7 +11,7 @@ interface HistoryItemProps {
 
 export default function HistoryItem({ code, name, date, amount, type }: HistoryItemProps) {
     const bankInfo = getBankInfo(code ?? "999");
-    
+
     return (
         <div className="flex gap-2 items-center">
             <img src={bankInfo?.image} className="w-12 h-12 rounded-lg" />
@@ -20,7 +21,7 @@ export default function HistoryItem({ code, name, date, amount, type }: HistoryI
                     <span>{date} {type === "transferMinus" ? "출금" : "입금"}</span>
                 </div>
 
-                <div className={`${type === "transferMinus" ? "text-[#FF637D]" : "text-blue400"} font-bold`} >{type === "transferMinus" ? "-" : "+"}{amount}원</div>
+                <div className={`${type === "transferMinus" ? "text-[#FF637D]" : "text-blue400"} font-bold`} >{type === "transferMinus" ? "-" : "+"}{formatNumberWithCommas(amount)}원</div>
             </div>
         </div>
     )

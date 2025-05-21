@@ -30,82 +30,8 @@ export default function DoneReport() {
     if (!id) return;
 
     try {
-      // const res = await AiAnalysisGetRequest(Number(id));
-      const res = {
-        beforeImages: [
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_1.jpg",
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_2.jpg",
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_3.jpg",
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_4.jpg",
-        ],
-        afterImages: [
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_1.jpg",
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_2.jpg",
-          "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_3.jpg",
-        ],
-        overallComparisonResult:
-          "신발 한 쌍의 흰색 고무 부분(앞코, 옆면)과 신발끈 전체에 걸쳐 이전에는 없던 광범위한 오염 및 마모 흔적이 새로 발견되었습니다.",
-        matchingResults: [
-          {
-            beforeImage:
-              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_1.jpg",
-            afterImage:
-              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_2.jpg",
-            pairComparisonResult: {
-              result: "DAMAGE_FOUND" as const,
-              damages: [
-                {
-                  damageType: "OTHER" as const,
-                  location: "내부 투명 관 입구 위쪽 가장자리",
-                  details:
-                    "내부 투명 관 입구 위쪽 가장자리에서 작은 조각이 떨어져 나간 것으로 보임 (칩).",
-                  boundingBox: {
-                    yMin: 0.458,
-                    xMax: 0.4303,
-                    yMax: 0.4646,
-                    xMin: 0.4246,
-                  },
-                  confidenceScore: 0.65,
-                },
-              ],
-            },
-          },
-          {
-            beforeImage:
-              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_2.jpg",
-            afterImage:
-              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_3.jpg",
-            pairComparisonResult: {
-              result: "DAMAGE_FOUND" as const,
-              damages: [
-                {
-                  damageType: "SCRATCH" as const,
-                  location: "투명 원통 좌측 중상단",
-                  details:
-                    "새로운 흰색의 수평 방향 긁힘 또는 쓸림 자국이 관찰됨.",
-                  boundingBox: {
-                    yMin: 0.47,
-                    xMax: 0.42,
-                    yMax: 0.51,
-                    xMin: 0.32,
-                  },
-                  confidenceScore: 0.85,
-                },
-              ],
-            },
-          },
-          {
-            beforeImage:
-              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%EC%A0%84_3.jpg",
-            afterImage:
-              "https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com/%EB%8B%A4%ED%9D%AC_1_%ED%9B%84_1.jpg",
-            pairComparisonResult: {
-              result: "NO_DAMAGE_FOUND" as const,
-              damages: [],
-            },
-          },
-        ],
-      };
+      const res = await AiAnalysisGetRequest(Number(id));
+
       if (res) {
         setAfterPhotos(res.afterImages);
         setBeforePhotos(res.beforeImages);

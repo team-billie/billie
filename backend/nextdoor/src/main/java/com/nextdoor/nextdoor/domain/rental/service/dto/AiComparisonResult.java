@@ -11,6 +11,7 @@ public class AiComparisonResult {
 
     private List<String> beforeImages;
     private List<String> afterImages;
+    private String analysisResult;
     private String overallComparisonResult;
     private List<MatchingResult> matchingResults;
 

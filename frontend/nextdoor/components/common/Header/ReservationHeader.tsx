@@ -15,8 +15,8 @@ export default function MainHeader({ title }: { title: string }) {
         { label: "빌려주기", href: "/reservations/lend" },
       ]
     : [
-        { label: "빌리기", href: "/chat/borrow" },
-        { label: "빌려주기", href: "/chat/lend" },
+        { label: "", href: "/chat" },
+        { label: "", href: "/chat" },
       ];
 
   return (

@@ -31,7 +31,6 @@ export default function WithdrawPage() {
 
   return (
       <div className="relative flex flex-col h-[100dvh]">
-        <Header txt="계좌송금"/>
         { isPossibleAccount  
           ? <WithdrawAmount verifiedAccount={verifiedAccount}/> 
           : <AccountCheck handleVerifyAccount={handleVerifyAccount} setIsPossibleAccount={setIsPossibleAccount} setSelectedAccount={setSelectedAccount}/>}

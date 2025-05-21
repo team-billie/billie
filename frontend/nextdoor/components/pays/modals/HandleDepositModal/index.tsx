@@ -7,6 +7,7 @@ import { ReturnDepositRequest } from "@/lib/api/pays";
 import { ReturnDepositRequestDto } from "@/types/pays/request";
 import useUserStore from "@/lib/store/useUserStore";
 import { useAlertStore } from "@/lib/store/useAlertStore";
+import { useRouter } from "next/navigation";
 
 interface HandleDepositModalProps {
   charge: number;
@@ -28,7 +29,7 @@ export default function HandleDepositModal({
   const [payCharge, setPayCharge] = useState(charge);
   const { userKey, billyAccount } = useUserStore();
   const { showAlert } = useAlertStore();
-
+  const router = useRouter();
   const handleSubmit = () => {
     const requestBody: ReturnDepositRequestDto = {
       userKey: userKey,
@@ -38,11 +39,13 @@ export default function HandleDepositModal({
       renterId: renterId,
     };
 
-    ReturnDepositRequest(requestBody).then((res) => {
-      showAlert("보증금 처리가 완료되었습니다!", "success");
-    }).catch((err) => {
-      showAlert("보증금 처리 실패하였습니다.", "error");
-    });
+    ReturnDepositRequest(requestBody)
+      .then((res) => {
+        showAlert("보증금 처리가 완료되었습니다!", "success");
+      })
+      .catch((err) => {
+        showAlert("보증금 처리 실패하였습니다.", "error");
+      });
     router.push("/home");
     setIsModalOpen(false);
   };

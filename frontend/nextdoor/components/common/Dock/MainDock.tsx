@@ -23,7 +23,7 @@ export default function MainDock() {
     {
       key: "chat",
       label: "채팅",
-      href: "/chat/borrow",
+      href: "/chat",
       icon: <MessageCircle className="w-6 h-6" />,
     },
     {

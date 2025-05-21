@@ -21,7 +21,9 @@ public class SearchRentalResult {
     private BigDecimal rentalFee; //Per Day
     private BigDecimal deposit;
     private Long ownerId;
+    private String ownerProfileImageUrl;
     private Long renterId;
+    private String renterProfileImageUrl;
     private Long rentalId;
     private String rentalProcess;
     private String rentalStatus;

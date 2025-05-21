@@ -38,6 +38,8 @@ public class RentalQueryAdapter implements RentalQueryPort {
     private final QRental rental = QRental.rental;
     private final QPost post = QPost.post;
     private final QMember member = QMember.member;
+    private final QMember owner = new QMember("owner");
+    private final QMember renter = new QMember("renter");
     private final QProductImage productImage = QProductImage.productImage;
 
     @Override
@@ -66,7 +68,9 @@ public class RentalQueryAdapter implements RentalQueryPort {
                         reservation.rentalFee,
                         reservation.deposit,
                         reservation.ownerId,
+                        owner.profileImageUrl.as("ownerProfileImageUrl"),
                         reservation.renterId,
+                        renter.profileImageUrl.as("renterProfileImageUrl"),
                         rental.rentalId,
                         rental.rentalProcess.stringValue().as("rentalProcess"),
                         rental.rentalStatus.stringValue().as("rentalStatus"),
@@ -75,6 +79,8 @@ public class RentalQueryAdapter implements RentalQueryPort {
                 .from(reservation)
                 .join(rental).on(reservation.id.eq(rental.reservationId))
                 .join(post).on(reservation.postId.eq(post.id))
+                .join(owner).on(reservation.ownerId.eq(owner.id))
+                .join(renter).on(reservation.renterId.eq(renter.id))
                 .where(whereCondition)
                 .distinct()
                 .offset(pageable.getOffset())

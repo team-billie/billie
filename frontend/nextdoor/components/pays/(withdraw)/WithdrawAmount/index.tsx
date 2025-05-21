@@ -4,14 +4,17 @@
 import { ChevronDown } from "lucide-react"
 import Button from "@/components/pays/common/Button";
 import { AmountInput } from "@/components/pays/common/Input";
-import { FormProvider, useForm } from "react-hook-form";
-import { useBankStore } from "@/lib/store/useBankStore";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { TransferAccountRequestDto } from "@/types/pays/request/index";
 import useUserStore from "@/lib/store/useUserStore";
 import { TransferAccountRequest } from "@/lib/api/pays";
 import { useRouter } from "next/navigation";
 import { VerifyAccountResponseDto } from "@/types/pays/response";
 import { getBankInfo } from "@/lib/utils/getBankInfo";
+import { useAlertStore } from "@/lib/store/useAlertStore";
+import { useEffect, useState } from "react";
+import Loading from "@/components/pays/common/Loading";
+import Header from "../../common/Header";
 
 type FormValues = TransferAccountRequestDto;
 
@@ -22,6 +25,10 @@ interface WithdrawAmountProps {
 export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps) {
     const { userKey, billyAccount } = useUserStore();
     const router = useRouter();
+    const { showAlert } = useAlertStore();
+
+    const [status, setStatus] = useState<'loading' | 'success' | 'error' | null>(null);
+    
     const withdrawForm = useForm<FormValues>({
         defaultValues: {
             userKey: userKey,
@@ -33,24 +40,78 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
         },
     });
 
+
     const onSubmit = (data: FormValues) => {
-        console.log(data);
+        if (!data.transactionBalance || data.transactionBalance === 0) {
+            showAlert("송금 금액을 입력해주세요.", "error");
+            return;
+        }
+        //0500같이 0으로 숫자가 시작할 경우 return 하고 값 리셋
+        if (data.transactionBalance.toString().startsWith("0")) {
+            withdrawForm.setValue("transactionBalance", 0);
+            showAlert("올바른 금액을 입력해주세요.", "error");
+            return;
+        }
+
+        const rawValue = String(data.transactionBalance).replace(/,/g, '');
+        const balance = Number(rawValue);
+        //1000원 단위로 송금하도록 return 가장 근접한 천 단위로 바꿔주고
+        if (balance % 1000 !== 0) {
+            data.transactionBalance = Math.round(balance / 1000) * 1000;
+            withdrawForm.setValue("transactionBalance", data.transactionBalance);
+            showAlert("1000원 단위로 송금해주세요.", "error");
+            return;
+        }
+
+        setStatus('loading');
+
         TransferAccountRequest(data).then((res) => {
-            alert("빌리에서 계좌로 이체가 완료되었습니다.");
-            router.push("/profile");
+            setTimeout(() => {
+                setStatus('success');
+                showAlert("빌리에서 계좌로 이체가 완료되었습니다.", "success");
+            }, 1500);
+        }).catch((err) => {
+            setTimeout(() => {
+                setStatus('error');
+                showAlert("빌리에서 계좌로 이체에 실패했습니다.", "error");
+            }, 1500);
         });
     }
 
     const handleAmountChange = (amount: number) => {
         const currentBalance = withdrawForm.getValues("transactionBalance") ?? 0;
-        withdrawForm.setValue("transactionBalance", currentBalance + amount);
+        withdrawForm.setValue("transactionBalance", Number(currentBalance) + amount);
     }
+
+    const watchedAmount = useWatch({
+        control: withdrawForm.control,
+        name: "transactionBalance",
+    });
+
+    useEffect(() => {
+        if (watchedAmount > (billyAccount?.balance ?? 0)) {
+            showAlert("잔액을 초과할 수 없습니다.", "error");
+            withdrawForm.setValue("transactionBalance", billyAccount?.balance ?? 0);
+        }
+
+        //최대 200만원 송금 가능
+        if (watchedAmount > 2000000) {
+            showAlert("최대 200만원 송금 가능합니다.", "error");
+            withdrawForm.setValue("transactionBalance", 2000000);
+        }
+    }, [watchedAmount]);
+
     return (
         <FormProvider {...withdrawForm}>
-            <div className="flex-1 flex flex-col items-center">
-                <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
-                    <div className="text-gray900 text-lg font-semibold">{verifiedAccount?.nickname}에게</div>
-                    <div className="flex gap-2 items-center justify-center">
+            {status
+                ? <Loading type="withdraw" status={status} headerTxt="송금" />
+                : 
+                <>
+                <Header txt="계좌송금"/>
+                <div className="flex-1 flex flex-col items-center">
+                    <div className="flex flex-col items-center mb-10 mt-20 text-gray600 gap-2">
+                        <div className="text-gray900 text-lg font-semibold">{verifiedAccount?.nickname}에게</div>
+                        <div className="flex gap-2 items-center justify-center">
                         <img
                             src={getBankInfo(verifiedAccount?.bankCode ?? "000")?.image}
                             alt={getBankInfo(verifiedAccount?.bankCode ?? "000")?.bankName}
@@ -73,8 +134,10 @@ export default function WithdrawAmount({ verifiedAccount }: WithdrawAmountProps)
 
                 <div className="p-4 w-full flex-1 flex items-end">
                     <Button onClick={withdrawForm.handleSubmit(onSubmit)} txt="송금하기" state={true} />
+                    </div>
                 </div>
-            </div>
+                </>
+            }
         </FormProvider>
     );
 }

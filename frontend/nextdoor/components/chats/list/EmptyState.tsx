@@ -6,11 +6,11 @@ import React from 'react';
 import Link from 'next/link';
 
 interface EmptyStateProps {
-  userRole: 'borrower' | 'lender';
+  userRole: 'borrower' | 'lender' | 'all';
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ userRole }) => {
-  const isBorrower = userRole === 'borrower';
+  const isBorrower = userRole === 'borrower' || userRole === 'all';
   
   return (
     <div className="flex flex-col items-center justify-center py-16">

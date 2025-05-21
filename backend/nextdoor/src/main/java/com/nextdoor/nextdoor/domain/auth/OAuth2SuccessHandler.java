@@ -26,9 +26,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final List<String> allowedRedirectUrls = List.of(
             "http://localhost:3000",
+            "http://localhost:8081",
+            "http://localhost:8082",
             "http://k12e205.p.ssafy.io",
             "http://k12e205.p.ssafy.io:3000",
-            "http://localhost:8081"
+            "http://k12e205.p.ssafy.io:8081",
+            "http://k12e205.p.ssafy.io:8082"
     );
 
     private final OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository;

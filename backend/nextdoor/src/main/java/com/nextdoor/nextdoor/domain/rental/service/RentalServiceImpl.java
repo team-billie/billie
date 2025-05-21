@@ -52,7 +52,7 @@ public class RentalServiceImpl implements RentalService {
     public void createFromReservation(ReservationConfirmedEvent reservationConfirmedEvent) {
         Rental createdRental = Rental.createFromReservation(reservationConfirmedEvent.getReservationId());
         rentalRepository.save(createdRental);
-        rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
+//        rentalScheduleService.scheduleRentalEnd(createdRental.getRentalId(), reservationConfirmedEvent.getEndDate());
 
         eventPublisher.publishEvent(RentalCreatedEvent.builder()
                 .rentalId(createdRental.getRentalId())
@@ -106,6 +106,13 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public RequestRemittanceResult getRemittanceData(Long rentalId) {
+        return rentalQueryPort.findRemittanceRequestViewData(rentalId)
+                .orElseThrow(() -> new NoSuchReservationException("예약 정보가 존재하지 않습니다."));
+    }
+
+    @Override
     @Transactional
     public UploadImageResult registerBeforePhoto(UploadImageCommand command) {
         Rental rental = rentalRepository.findByRentalId(command.getRentalId())
@@ -152,6 +159,9 @@ public class RentalServiceImpl implements RentalService {
 
         rental.processRemittanceCompletion();
 
+        //테스트 용도
+        rentalScheduleService.scheduleRentalEnd(rental.getRentalId());
+
         String ownerUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
                 rental.getRentalId(),
                 "OWNER"
@@ -175,42 +185,6 @@ public class RentalServiceImpl implements RentalService {
                 RentalStatusMessage.builder()
                         .process(RentalProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalStatus.CREATED.name())
-                        .rentalDetail(rentalDetailResult)
-                        .build()
-        );
-    }
-
-    @Override
-    @Transactional
-    public void completeRentalEndProcessing(Long rentalId){
-        Rental rental = rentalRepository.findByRentalId(rentalId)
-                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
-
-        rental.processRentalPeriodEnd();
-
-        String renterUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
-                rental.getRentalId(),
-                "RENTER"
-        );
-
-        RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                rental.getRentalId()
-        );
-
-        messagingTemplate.convertAndSend("/topic/rental/" + renterUuid + "/status"
-                , RentalStatusMessage.builder()
-                        .rentalId(rental.getRentalId())
-                        .process(RentalProcess.RETURNED.name())
-                        .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
-                        .rentalDetail(rentalDetailResult)
-                        .build()
-        );
-
-        messagingTemplate.convertAndSend(
-                "/topic/rental/" + rental.getRentalId() + "/status",
-                RentalStatusMessage.builder()
-                        .process(RentalProcess.RETURNED.name())
-                        .detailStatus(RentalStatus.RENTAL_PERIOD_ENDED.name())
                         .rentalDetail(rentalDetailResult)
                         .build()
         );
@@ -405,5 +379,11 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     public void createAiImageComparisonPair(Long rentalId, Long beforeImageId, Long afterImageId, String pairComparisonResult) {
         aiImageComparisonPairRepository.save(new AiImageComparisonPair(rentalId, beforeImageId, afterImageId, pairComparisonResult));
+    }
+
+    @Override
+    @Transactional
+    public void deleteAiImageComparisonPairByRentalId(Long rentalId) {
+        aiImageComparisonPairRepository.deleteByRentalId(rentalId);
     }
 }
