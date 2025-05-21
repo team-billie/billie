@@ -17,7 +17,7 @@ public class GeminiComparatorAsyncAdapter implements GeminiComparatorAsyncPort {
     private final GenerativeModel geminiComparisonModel;
 
     public GeminiComparatorAsyncAdapter(
-            @Qualifier("geminiFlash")
+            @Qualifier("geminiPro")
             GenerativeModel geminiComparisonModel
     ) {
         this.geminiComparisonModel = geminiComparisonModel;
