@@ -8,6 +8,7 @@ import MainHeader from "@/components/common/Header/ReservationHeader";
 import { ChatRoomUI } from "@/types/chats/chat";
 import { getChatRooms, convertToChatRoomUI } from "@/lib/api/chats";
 import useUserStore from "@/lib/store/useUserStore";
+import { useChatListWebSocket } from "@/lib/hooks/chats/useChatListWebSocket";
 
 export default function ChatPage() {
   const router = useRouter();
@@ -17,6 +18,27 @@ export default function ChatPage() {
   const [mounted, setMounted] = useState(false);
 
   const { userId } = useUserStore();
+
+  // // 웹소켓 연결
+  // const { isConnected, error: socketError } = useChatListWebSocket({
+  //   onChatRoomUpdate: (updatedRoom) => {
+  //     setChatRooms((prevRooms) => {
+  //       const roomIndex = prevRooms.findIndex((room) => room.roomId === updatedRoom.roomId);
+  //       if (roomIndex === -1) {
+  //         // 새로운 채팅방인 경우
+  //         return [updatedRoom, ...prevRooms];
+  //       } else {
+  //         // 기존 채팅방 업데이트
+  //         const newRooms = [...prevRooms];
+  //         newRooms[roomIndex] = updatedRoom;
+  //         // 최신 메시지 순으로 정렬
+  //         return newRooms.sort((a, b) =>
+  //           new Date(b.lastSentAt).getTime() - new Date(a.lastSentAt).getTime()
+  //         );
+  //       }
+  //     });
+  //   },
+  // });
 
   useEffect(() => {
     setMounted(true);
@@ -67,8 +89,18 @@ export default function ChatPage() {
       <ChatRoomList
         chatRooms={chatRooms}
         isLoading={isLoading}
-        userRole="all" // userRole이 all일 때 처리하도록 ChatRoomList 컴포넌트 수정 필요
+        userRole="all"
       />
+      {/* {!isConnected && !isLoading && (
+        <div className="bg-yellow-100 p-2 text-sm text-center rounded-md mt-2">
+          채팅 서버와 연결이 끊어졌습니다. 자동으로 재연결을 시도하고 있습니다.
+        </div>
+      )}
+      {socketError && (
+        <div className="bg-red-100 p-2 text-sm text-center rounded-md mt-2">
+          {socketError}
+        </div>
+      )} */}
     </main>
   );
 }

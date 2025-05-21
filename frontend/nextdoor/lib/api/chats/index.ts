@@ -68,7 +68,7 @@ export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
   const otherId = currentUserId === room.ownerId ? room.renterId : room.ownerId;
 
   return {
-    conversationId: String(room.roomId),
+    roomId: room.roomId,
     lastMessage: {
       text: room.lastMessage || "",
       timestamp: new Date(room.lastSentAt),
@@ -105,7 +105,7 @@ export const convertToChatRoomUI = (room: ChatRoom, currentUserId: number) => {
 
 // 메시지 이력 조회 (페이징)
 export const getChatMessageHistory = async (
-  roomId: string | number,
+  roomId: number,
   page: number = 0,
   size: number = 50
 ): Promise<ChatMessageHistoryPage> => {
@@ -120,7 +120,7 @@ export const getChatMessageHistory = async (
 
 // 메시지 전송
 export const sendChatMessage = async (
-  roomId: string | number,
+  roomId: number,
   data: SendChatMessageRequest
 ): Promise<SendChatMessageResponse> => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;

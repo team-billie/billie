@@ -1,6 +1,6 @@
 // 프론트  UI용 메시지 타입
 export interface Message {
-  id: string;
+  id: number;
   text: string;
   sender: "user" | "other";
   timestamp: Date;
@@ -9,7 +9,7 @@ export interface Message {
 
 // UI 전용 채팅방 타입
 export interface ChatRoomUI {
-  roomId: string;
+  roomId: number;
   lastMessage?: {
     text: string;
     timestamp: Date;
@@ -47,7 +47,7 @@ export interface Product {
 
 // ChatMessageDto
 export interface ChatMessageDto {
-  roomId: string;
+  roomId: number;
   senderId: number;
   content: string;
   sentAt: string;

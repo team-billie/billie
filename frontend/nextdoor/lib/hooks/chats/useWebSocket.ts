@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { ChatMessageDto } from '@/types/chats/chat';
+import { ChatMessageDto, Message } from '@/types/chats/chat';
 import useUserStore from '@/lib/store/useUserStore';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
 interface UseWebSocketProps {
-  roomId: string;
+  roomId: number;
   onMessage?: (message: ChatMessageDto) => void;
 }
 
@@ -18,7 +18,10 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
   const [error, setError] = useState<string | null>(null);
   const stompClientRef = useRef<Client | null>(null);
 
-  const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://k12e205.p.ssafy.io:8081';
+  const WS_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://k12e205.p.ssafy.io:8081';
+
+  // 토큰 가져오기
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
 
   const connect = useCallback(() => {
     if (!userId || !roomId) {
@@ -26,28 +29,36 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
       return;
     }
 
-    // 기존 연결이 있다면 해제
+    // 이미 연결되어 있으면 재연결하지 않음
+    if (stompClientRef.current && stompClientRef.current.connected) {
+      return;
+    }
+
+    // 기존 연결 해제
     if (stompClientRef.current) {
       stompClientRef.current.deactivate();
       stompClientRef.current = null;
     }
 
-    // SockJS 클라이언트 생성
-    const socket = new SockJS(`${WS_BASE_URL}/ws-chat`);
-
-    // STOMP 클라이언트 생성
     const stompClient = new Client({
-      webSocketFactory: () => socket,
-      connectHeaders: {},
-      debug: (str) => {
-        console.log('STOMP Debug:', str);
-      },
+      webSocketFactory: () => new SockJS(`${WS_BASE_URL}/ws-chat`),
+      connectHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+      debug: (str) => console.log('STOMP Debug:', str),
+      // ← 0이 아니라 5초 정도 여유를 두세요
       reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
+      // 서버쪽 heartbeat 값(10s)과 맞추거나 default로 두셔도 무방합니다
+      heartbeatIncoming: 10000,
+      heartbeatOutgoing: 10000,
+      onConnect: () => { /* … */ },
+      onStompError: (frame) => { /* … */ },
+      onWebSocketClose: (evt) => {
+        console.warn('WebSocket 연결 종료:', evt);
+        setIsConnected(false);
+        // reconnectDelay>0 이면 STOMP.js 가 자동으로 connect()를 호출합니다
+      },
     });
+    stompClient.activate();
 
-    // 연결 성공 시
     stompClient.onConnect = () => {
       console.log('STOMP 연결 성공');
       setIsConnected(true);
@@ -66,6 +77,13 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
               content: data.content || '',
               sentAt: data.sentAt || new Date().toISOString()
             };
+            const newMessage: Message = {
+              id: Number(`${chatMessage.roomId}${chatMessage.senderId}${new Date(chatMessage.sentAt).getTime()}`),
+              text: chatMessage.content,
+              sender: Number(chatMessage.senderId) === Number(userId) ? "user" : "other",
+              timestamp: new Date(chatMessage.sentAt),
+              read: false,
+            };
             onMessage(chatMessage);
           }
         } catch (err) {
@@ -74,23 +92,21 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
       });
     };
 
-    // 연결 실패 시
     stompClient.onStompError = (frame) => {
       console.error('STOMP 오류:', frame);
       setError('연결에 실패했습니다. 다시 시도 중...');
       setIsConnected(false);
     };
 
-    // 연결 해제 시
     stompClient.onWebSocketClose = () => {
       console.log('WebSocket 연결 종료');
+      setTimeout(() => connect(), 3000);
       setIsConnected(false);
     };
 
-    // 연결 시작
     stompClient.activate();
     stompClientRef.current = stompClient;
-  }, [userId, roomId, onMessage, WS_BASE_URL]);
+  }, [userId, roomId, onMessage, WS_BASE_URL, token]);
 
   const disconnect = useCallback(() => {
     if (stompClientRef.current) {
@@ -101,17 +117,13 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
 
   const sendMessage = useCallback((content: string) => {
     if (!userId) {
-      console.error('userId가 없습니다.');
       setError('사용자 정보가 없습니다');
       return false;
     }
-
     if (!stompClientRef.current || !stompClientRef.current.connected) {
-      console.error('STOMP 연결 상태:', stompClientRef.current?.connected);
       setError('연결이 활성화되지 않았습니다');
       return false;
     }
-
     try {
       const message = {
         roomId,
@@ -119,15 +131,12 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
         content,
         sentAt: new Date().toISOString(),
       };
-
-      console.log('메시지 전송:', message);
       stompClientRef.current.publish({
         destination: '/app/chat.send',
         body: JSON.stringify(message)
       });
       return true;
     } catch (err) {
-      console.error('메시지 전송 오류:', err);
       setError('메시지를 전송할 수 없습니다');
       return false;
     }
@@ -149,7 +158,7 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
         window.removeEventListener('online', handleOnline);
       };
     }
-  }, [connect, disconnect, userId, roomId]);
+  }, [userId, roomId]);
 
   return {
     isConnected,

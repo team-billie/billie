@@ -15,7 +15,7 @@ import ProductInfoCard from "@/components/chats/chatdetail/ChatProductInfoCard";
 export default function ChatDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const roomId = params.id as string;
+  const roomId = Number(params.id);
 
   // useUserStore에서 사용자 정보 가져오기
   const { userId, username, profileImageUrl } = useUserStore();
@@ -61,12 +61,12 @@ export default function ChatDetailPage() {
     error: socketError,
     sendMessage
   } = useWebSocket({
-    roomId,
+    roomId: Number(roomId),
     onMessage: (chatMessage) => {
       console.log("메시지 수신:", chatMessage);
       // 중복 체크 로직
       const newMessage: Message = {
-        id: `${chatMessage.roomId}_${chatMessage.senderId}_${new Date(chatMessage.sentAt).getTime()}`,
+        id: Number(`${chatMessage.roomId}${chatMessage.senderId}${new Date(chatMessage.sentAt).getTime()}`),
         text: chatMessage.content,
         sender: Number(chatMessage.senderId) === Number(userId) ? "user" : "other",
         timestamp: new Date(chatMessage.sentAt),
@@ -194,17 +194,22 @@ export default function ChatDetailPage() {
       return;
     }
 
-    try {
-      // useWebSocket 훅의 sendMessage 함수 사용
-      const sent = sendMessage(content);
-      if (sent) {
-        setValue("");
-      } else {
-        console.error("메시지 전송 실패");
-      }
-    } catch (err) {
-      console.error("메시지 전송 오류:", err);
-      alert("메시지 전송에 실패했습니다. 다시 시도해주세요.");
+    //B안: 메시지 전송 후, onMessage 콜백이 오기 전에 optimistic하게 UI에 바로 추가
+    //(즉, 메시지 전송 성공 시 바로 setMessages로 추가)
+    const sent = sendMessage(content);
+    if (sent) {
+      // optimistic update
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `local_${Date.now()}`,
+          text: content,
+          sender: "user",
+          timestamp: new Date(),
+          read: false,
+        },
+      ]);
+      setValue("");
     }
   };
 
