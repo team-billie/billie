@@ -15,11 +15,11 @@ public class ChatWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-chat")
-                .setAllowedOriginPatterns(
-                        "http://k12e205.p.ssafy.io",
-                        "http://localhost:3000"
-                );
+//        registry.addEndpoint("/ws-chat")
+//                .setAllowedOriginPatterns(
+//                        "http://k12e205.p.ssafy.io",
+//                        "http://localhost:3000"
+//                );
         registry
                 .addEndpoint("/ws-chat")                   // 클라이언트가 연결할 엔드포인트
                 .setAllowedOriginPatterns(
