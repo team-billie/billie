@@ -106,7 +106,7 @@ export const useWebSocket = ({ roomId, onMessage }: UseWebSocketProps) => {
       setIsConnected(false);
     };
 
-    stompClient.activate();
+    // stompClient.activate();
     stompClientRef.current = stompClient;
   }, [userId, roomId, onMessage, WS_BASE_URL, token]);
 
