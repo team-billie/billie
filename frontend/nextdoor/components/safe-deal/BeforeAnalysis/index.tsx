@@ -55,7 +55,7 @@ export default function BeforeAnalysis() {
         <div className="flex flex-col items-center justify-center mt-4">
           {error && <ErrorMessage message={error} />}
         </div>
-      ) : damageAnalysis && damageAnalysis.length > 0 ? (
+      ) : damageAnalysis && !damageAnalysis.result === "NO_DAMAGE_FOUND" ? (
         <>
           {/* Header for damage found */}
           <div className="mb-6">
@@ -80,7 +80,7 @@ export default function BeforeAnalysis() {
           </div>
 
           {/* Action buttons within the content area */}
-          <div className="flex gap-3 mb-8">
+          {/* <div className="flex gap-3 mb-8">
             <button
               onClick={() => window.location.reload()}
               className="flex-1 bg-gray-100 hover:bg-gray-200 rounded-xl py-3 text-semibold font-lg text-gray-700 transition-colors duration-200 text-sm"
@@ -95,7 +95,7 @@ export default function BeforeAnalysis() {
             >
               사진 재등록
             </button>
-          </div>
+          </div> */}
         </>
       ) : (
         <div className="relative">
@@ -144,7 +144,7 @@ export default function BeforeAnalysis() {
           {/* Action buttons fixed at bottom */}
           <div className="fixed bottom-24 left-0 right-0 px-4  z-40">
             <div className="flex gap-3 max-w-md mx-auto ">
-              <button
+              {/* <button
                 onClick={() => window.location.reload()}
                 className="flex-1 font-semibold bg-gray-100 hover:bg-gray-200 rounded-xl py-4 text-gray-700 transition-colors duration-200"
               >
@@ -157,7 +157,7 @@ export default function BeforeAnalysis() {
                 className="flex-1 bg-blue200 font-semibold hover:bg-blue300 rounded-xl py-4 text-white transition-colors duration-200"
               >
                 사진 재등록
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
