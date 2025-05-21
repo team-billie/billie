@@ -10,6 +10,7 @@ import { SelectOwnerAccountRequestDto } from "@/types/pays/request/index";
 import MyAccountListModal from "@/components/pays/modals/MyAccountListModal";
 import { AddAccountResponseDto } from "@/types/pays/response";
 import { useAlertStore } from "@/lib/store/useAlertStore";
+import { formatNumberWithCommas } from "@/lib/utils/money";
 
 type SelectAccountProps = {
   payCharge: number;
@@ -29,8 +30,12 @@ export default function SelectAccount({
   const [billySelected, setBillySelected] = useState(true);
 
   const { mainAccount, billyAccount } = useUserStore();
-  const btnClickHandler = () => {
-    setBillySelected(!billySelected);
+  const btnClickHandler = (type: "billy" | "myAccount") => {
+    if (type === "billy") {
+      setBillySelected(true);
+    } else {
+      setBillySelected(false);
+    }
   };
 
   const [selectedAccount, setSelectedAccount] = useState<AddAccountResponseDto | null>(null);
@@ -78,9 +83,9 @@ export default function SelectAccount({
   return (
     <>
       <div className="flex justify-between items-center">
-        <div className="mt-5 font-bold text-xl flex flex-col items-start">
+        <div className="font-bold text-xl flex flex-col items-start">
           <div>
-            <span className="text-blue400">{payCharge}원</span>을
+            <span className="text-blue400">{formatNumberWithCommas(payCharge)}원</span>을
           </div>
           <div>어디로 받을까요?</div>
         </div>
@@ -94,8 +99,8 @@ export default function SelectAccount({
 
       <div className=" flex-1 flex flex-col gap-3 justify-end">
         <button
-          onClick={btnClickHandler}
-          className={` ${billySelected ? "border-blue200" : "border-gray400"
+          onClick={() => btnClickHandler("billy")}
+          className={` ${billySelected ? "border-blue200 bg-blue100" : "border-gray400"
             } flex items-center gap-2 p-3 border rounded-lg`}
         >
           <img
@@ -112,8 +117,8 @@ export default function SelectAccount({
         </button>
 
         <button
-          onClick={btnClickHandler}
-          className={`${billySelected ? "border-gray400" : "border-blue200"
+          onClick={() => btnClickHandler("myAccount")}
+          className={`${billySelected ? "border-gray400" : "border-blue200 bg-blue100"
             } flex items-center gap-2 p-3 border rounded-lg`}
         >
           <img
