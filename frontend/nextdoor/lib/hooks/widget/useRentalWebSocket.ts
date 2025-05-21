@@ -100,6 +100,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       const allRentals = [...ownerRentals, ...renterRentals].map(
         (rental: any) => {
           // console.log("[대여-API] 렌탈 매핑 - rentalId:", rental.rentalId);
+
           return {
             rentalId: rental.rentalId,
             process: rental.rentalProcess,
