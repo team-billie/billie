@@ -108,10 +108,11 @@ When creating content, mimic the style of these examples by:
 5. Highlighting specific features or benefits of the product
 6. Adding personal notes or reasons for selling when it makes sense
 7. Using short, direct sentences similar to the examples
+8. For titles, create natural, sentence-like expressions that incorporate the product name and condition in a flowing manner (e.g., "아이폰 16 거의 새 제품 판매합니다") instead of using parentheses for condition information (e.g., avoid "아이폰 16(거의 새것)")
 
 Respond in the following JSON format:
 {
-  "title": "A concise and attractive title for the post",
+  "title": "A natural, sentence-like title for the post that includes the product name and condition as part of a flowing sentence (e.g., '아이폰 16 거의 새 제품 판매합니다') without using parentheses for condition information",
   "content": "A detailed description of the product, including its features, condition, and any other relevant information",
   "category": "One of the Korean display names from the list above (e.g., \"디지털기기\") - you must use the Korean name in parentheses, not the English code",
   "condition": "One of the condition values from the list above (e.g., \"UNOPENED\")"
