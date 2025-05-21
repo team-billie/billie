@@ -100,7 +100,6 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       const allRentals = [...ownerRentals, ...renterRentals].map(
         (rental: any) => {
           // console.log("[대여-API] 렌탈 매핑 - rentalId:", rental.rentalId);
-
           return {
             rentalId: rental.rentalId,
             process: rental.rentalProcess,
@@ -282,7 +281,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       }
     };
 
-    window.addEventListener('online', handleNetworkChange);
+    window.addEventListener("online", handleNetworkChange);
 
     const connectionCheckInterval = setInterval(() => {
       if (!isConnected) {
@@ -304,7 +303,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
           // console.error("[대여-웹소켓] 종료 오류:", e);
         }
       }
-      window.removeEventListener('online', handleNetworkChange);
+      window.removeEventListener("online", handleNetworkChange);
       clearInterval(connectionCheckInterval);
     };
   }, [userId, setupWebSocketConnection, isConnected]);
@@ -331,12 +330,12 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
           console.log("[대여-웹소켓] 상태 변경 감지:", {
             old: {
               process: currentItem.process,
-              detailStatus: currentItem.detailStatus
+              detailStatus: currentItem.detailStatus,
             },
             new: {
               process: updatedRental.process,
-              detailStatus: updatedRental.detailStatus
-            }
+              detailStatus: updatedRental.detailStatus,
+            },
           });
         }
 
@@ -349,12 +348,30 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
           rentalDetail: {
             ...updated[existingIndex].rentalDetail,
             ...updatedRental.rentalDetail,
-            title: updatedRental.rentalDetail?.title || updated[existingIndex].rentalDetail?.title || '',
-            rentalId: updatedRental.rentalDetail?.rentalId || updated[existingIndex].rentalDetail?.rentalId || 0,
-            charge: updatedRental.rentalDetail?.charge || updated[existingIndex].rentalDetail?.charge || 0,
-            deposit: updatedRental.rentalDetail?.deposit || updated[existingIndex].rentalDetail?.deposit || 0,
-            renterId: updatedRental.rentalDetail?.renterId || updated[existingIndex].rentalDetail?.renterId || 0,
-            ownerId: updatedRental.rentalDetail?.ownerId || updated[existingIndex].rentalDetail?.ownerId || 0,
+            title:
+              updatedRental.rentalDetail?.title ||
+              updated[existingIndex].rentalDetail?.title ||
+              "",
+            rentalId:
+              updatedRental.rentalDetail?.rentalId ||
+              updated[existingIndex].rentalDetail?.rentalId ||
+              0,
+            charge:
+              updatedRental.rentalDetail?.charge ||
+              updated[existingIndex].rentalDetail?.charge ||
+              0,
+            deposit:
+              updatedRental.rentalDetail?.deposit ||
+              updated[existingIndex].rentalDetail?.deposit ||
+              0,
+            renterId:
+              updatedRental.rentalDetail?.renterId ||
+              updated[existingIndex].rentalDetail?.renterId ||
+              0,
+            ownerId:
+              updatedRental.rentalDetail?.ownerId ||
+              updated[existingIndex].rentalDetail?.ownerId ||
+              0,
             ownerProfileImageUrl:
               updatedRental.rentalDetail?.ownerProfileImageUrl ||
               updated[existingIndex].rentalDetail?.ownerProfileImageUrl ||
@@ -363,7 +380,10 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
               updatedRental.rentalDetail?.renterProfileImageUrl ||
               updated[existingIndex].rentalDetail?.renterProfileImageUrl ||
               "/images/profileimg.png",
-            productImageUrl: updatedRental.rentalDetail?.productImageUrl || updated[existingIndex].rentalDetail?.productImageUrl || ''
+            productImageUrl:
+              updatedRental.rentalDetail?.productImageUrl ||
+              updated[existingIndex].rentalDetail?.productImageUrl ||
+              "",
           },
         };
         console.log("[대여-웹소켓] 업데이트된 렌탈:", updated[existingIndex]);
@@ -373,7 +393,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
         const newRental = {
           ...updatedRental,
           rentalDetail: {
-            title: updatedRental.rentalDetail?.title || '',
+            title: updatedRental.rentalDetail?.title || "",
             rentalId: updatedRental.rentalDetail?.rentalId || 0,
             charge: updatedRental.rentalDetail?.charge || 0,
             deposit: updatedRental.rentalDetail?.deposit || 0,
@@ -385,7 +405,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
             renterProfileImageUrl:
               updatedRental.rentalDetail?.renterProfileImageUrl ||
               "/images/profileimg.png",
-            productImageUrl: updatedRental.rentalDetail?.productImageUrl || ''
+            productImageUrl: updatedRental.rentalDetail?.productImageUrl || "",
           },
         };
         console.log("[대여-웹소켓] 새 렌탈 추가:", newRental);
