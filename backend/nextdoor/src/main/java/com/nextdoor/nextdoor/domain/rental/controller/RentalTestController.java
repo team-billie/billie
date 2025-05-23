@@ -5,7 +5,7 @@ import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rental.service.RentalEndService;
 import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
 import jakarta.transaction.Transactional;
-import jnr.constants.platform.Local;
+//import jnr.constants.platform.Local;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
