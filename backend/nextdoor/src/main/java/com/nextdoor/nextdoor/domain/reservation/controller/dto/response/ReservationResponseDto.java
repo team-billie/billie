@@ -1,6 +1,6 @@
 package com.nextdoor.nextdoor.domain.reservation.controller.dto.response;
 
-import com.nextdoor.nextdoor.domain.reservation.domain.Reservation;
+import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservation;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationMemberQueryDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
@@ -8,7 +8,6 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 public class ReservationResponseDto {
@@ -26,16 +25,16 @@ public class ReservationResponseDto {
     private String renterName;
     private String renterProfileImageUrl;
 
-    public static ReservationResponseDto from(Reservation reservation, PostDto post, ReservationMemberQueryDto renter) {
+    public static ReservationResponseDto from(RentalReservation rentalReservation, PostDto post, ReservationMemberQueryDto renter) {
         ReservationResponseDto response = new ReservationResponseDto();
-        response.reservationId = reservation.getId();
+        response.reservationId = rentalReservation.getId();
         response.postTitle = post.getTitle();
         response.postProductImage = post.getProductImage();
-        response.startDate = reservation.getStartDate();
-        response.endDate = reservation.getEndDate();
-        response.rentalFee = reservation.getRentalFee();
-        response.deposit = reservation.getDeposit();
-        response.status = reservation.getStatus().name();
+        response.startDate = rentalReservation.getStartDate();
+        response.endDate = rentalReservation.getEndDate();
+        response.rentalFee = rentalReservation.getRentalFee();
+        response.deposit = rentalReservation.getDeposit();
+        response.status = rentalReservation.getRentalReservationStatus().name();
         response.ownerName = post.getAuthorName();
         response.ownerProfileImageUrl = post.getAuthorProfileImageUrl();
         response.renterName = renter.getNickname();

@@ -12,7 +12,7 @@ import com.nextdoor.nextdoor.domain.reservation.exception.IllegalStatusException
 import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
 import com.nextdoor.nextdoor.domain.reservation.exception.UnauthorizedException;
 import com.nextdoor.nextdoor.domain.reservation.port.ReservationMemberQueryPort;
-import com.nextdoor.nextdoor.domain.reservation.port.ReservationPostQueryPort;
+import com.nextdoor.nextdoor.domain.rentalreservation.port.RentalReservationPostQueryPort;
 import com.nextdoor.nextdoor.domain.reservation.repository.ReservationRepository;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
 import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationMemberQueryDto;
@@ -32,12 +32,12 @@ public class ReservationServiceImpl implements ReservationService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final ReservationRepository reservationRepository;
-    private final ReservationPostQueryPort reservationPostQueryPort;
+    private final RentalReservationPostQueryPort rentalReservationPostQueryPort;
     private final ReservationMemberQueryPort reservationMemberQueryPort;
 
     @Override
     public ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto) {
-        PostDto post = reservationPostQueryPort.findById(reservationSaveRequestDto.getPostId()).orElseThrow();
+        PostDto post = rentalReservationPostQueryPort.findById(reservationSaveRequestDto.getPostId()).orElseThrow();
         Reservation reservation = reservationRepository.save(Reservation.builder()
                 .startDate(reservationSaveRequestDto.getStartDate())
                 .endDate(reservationSaveRequestDto.getEndDate())
@@ -64,7 +64,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.updateDeposit(reservationUpdateRequestDto.getDeposit());
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow(),
+                rentalReservationPostQueryPort.findById(reservation.getPostId()).orElseThrow(),
                 reservationMemberQueryPort.findById(loginUserId).orElseThrow());
     }
 
@@ -80,7 +80,7 @@ public class ReservationServiceImpl implements ReservationService {
         applicationEventPublisher.publishEvent(new ReservationConfirmedEvent(reservation.getId(), reservation.getEndDate()));
         return ReservationResponseDto.from(
                 reservation,
-                reservationPostQueryPort.findById(reservation.getPostId()).orElseThrow(),
+                rentalReservationPostQueryPort.findById(reservation.getPostId()).orElseThrow(),
                 reservationMemberQueryPort.findById(loginUserId).orElseThrow());
     }
 

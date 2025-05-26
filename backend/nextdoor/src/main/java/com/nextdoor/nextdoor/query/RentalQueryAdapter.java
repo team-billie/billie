@@ -4,13 +4,13 @@ import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.member.domain.QMember;
 import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
-import com.nextdoor.nextdoor.domain.rental.domain.QRental;
-import com.nextdoor.nextdoor.domain.rental.domain.RentalProcess;
-import com.nextdoor.nextdoor.domain.rental.port.RentalQueryPort;
-import com.nextdoor.nextdoor.domain.rental.service.dto.ManagedRentalCountResult;
-import com.nextdoor.nextdoor.domain.rental.service.dto.RequestRemittanceResult;
-import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalCommand;
-import com.nextdoor.nextdoor.domain.rental.service.dto.SearchRentalResult;
+import com.nextdoor.nextdoor.domain.rentalreservation.domain.QRental;
+import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationProcess;
+import com.nextdoor.nextdoor.domain.rentalreservation.port.RentalQueryPort;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.ManagedRentalCountResult;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.RequestRemittanceResult;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.SearchRentalCommand;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.SearchRentalResult;
 import com.nextdoor.nextdoor.domain.reservation.domain.QReservation;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -165,9 +165,9 @@ public class RentalQueryAdapter implements RentalQueryPort {
         }
 
         if (condition.contains("ACTIVE")) {
-            return rental.rentalProcess.ne(RentalProcess.RENTAL_COMPLETED);
+            return rental.rentalProcess.ne(RentalReservationProcess.RENTAL_COMPLETED);
         } else if (condition.contains("COMPLETED")) {
-            return rental.rentalProcess.eq(RentalProcess.RENTAL_COMPLETED);
+            return rental.rentalProcess.eq(RentalReservationProcess.RENTAL_COMPLETED);
         }
 
         return null;
@@ -181,7 +181,7 @@ public class RentalQueryAdapter implements RentalQueryPort {
                 .join(reservation).on(rental.reservationId.eq(reservation.id))
                 .where(
                     reservation.ownerId.eq(ownerId),
-                    rental.rentalProcess.ne(RentalProcess.RENTAL_COMPLETED)
+                    rental.rentalProcess.ne(RentalReservationProcess.RENTAL_COMPLETED)
                 )
                 .fetchOne();
 
