@@ -73,7 +73,7 @@
 ### 💸 결제 서비스
 
 <div>
-  <img src="readme/images/결제_슬라이드_4 (1).png" alt="실시간 위젯" width="1000px">
+  <img src="readme/images/결제_슬라이드_4 (1).png" alt="실시간 위젯" width="600px">
 </div>
 <div>
   <img src="readme/images/결제_슬라이드_5(선택).png" alt="실시간 위젯" width="1000px">
@@ -201,12 +201,13 @@ npx run dev
 ## 시스템 아키텍처
 
 <div>
-  <img src="readme/images/아키텍처.png" alt="시스템 아키텍쳐" width="600px">
+  <img src="readme/images/아키텍처.png" alt="시스템 아키텍쳐" width="800px">
 </div>
 
 ## 프로젝트 구조
 
-### Backend
+<details>
+<summary>Backend</summary>
 
 ```
 com.nextdoor.nextdoor
@@ -310,7 +311,11 @@ com.nextdoor.nextdoor
 
 ```
 
-### Frontend
+</details>
+
+
+<details>
+<summary>Frontend</summary>
 
 ```
 nextdoor/
@@ -365,6 +370,9 @@ nextdoor/
 
 ```
 
+</details>
+
+
 ## CI/CD
 
 - 🔄 Jenkins를 활용해서 지속적 통합 및 배포
@@ -374,7 +382,7 @@ nextdoor/
 ## ERD
 
 <div>
-  <img src="readme/images/ERD.png" alt="erd" width="600px">
+  <img src="readme/images/ERD.png" alt="erd" width="800px">
 </div>
 
 ## 팀 멤버 및 역할
