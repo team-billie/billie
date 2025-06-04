@@ -3,8 +3,8 @@ package com.nextdoor.nextdoor.domain.rentalreservation.service;
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationProcess;
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationStatus;
 import com.nextdoor.nextdoor.domain.rentalreservation.message.RentalStatusMessage;
-import com.nextdoor.nextdoor.domain.rentalreservation.repository.RentalRepository;
-import com.nextdoor.nextdoor.domain.rentalreservation.domain.Rental;
+import com.nextdoor.nextdoor.domain.rentalreservation.repository.RentalReservationRepository;
+import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservation;
 import com.nextdoor.nextdoor.domain.rentalreservation.exception.NoSuchRentalException;
 import com.nextdoor.nextdoor.domain.rentalreservation.port.RentalDetailQueryPort;
 import com.nextdoor.nextdoor.domain.rentalreservation.port.MemberUuidQueryPort;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RentalEndService {
 
-    private final RentalRepository rentalRepository;
+    private final RentalReservationRepository rentalRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final MemberUuidQueryPort memberUuidQueryPort;
     private final RentalDetailQueryPort rentalDetailQueryPort;
@@ -26,23 +26,23 @@ public class RentalEndService {
     public void rentalEnd(Long rentalId) {
         System.out.println("[DEBUG_LOG] RentalEndService.rentalEnd called for rental ID: " + rentalId);
         try {
-            Rental rental = rentalRepository.findByRentalId(rentalId)
+            RentalReservation rental = rentalRepository.findById(rentalId)
                     .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
 
             rental.processRentalPeriodEnd();
 
             String renterUuid = memberUuidQueryPort.getMemberUuidByRentalIdAndRole(
-                    rental.getRentalId(),
+                    rental.getId(),
                     "RENTER"
             );
 
             RentalStatusMessage.RentalDetailResult rentalDetailResult = rentalDetailQueryPort.getRentalDetailByRentalIdAndRole(
-                    rental.getRentalId()
+                    rental.getId()
             );
 
-            messagingTemplate.convertAndSend("/topic/rental/" + renterUuid + "/status"
+            messagingTemplate.convertAndSend("/topic/rental-reservation/" + renterUuid + "/status"
                     , RentalStatusMessage.builder()
-                            .rentalId(rental.getRentalId())
+                            .rentalId(rental.getId())
                             .process(RentalReservationProcess.RETURNED.name())
                             .detailStatus(RentalReservationStatus.RENTAL_PERIOD_ENDED.name())
                             .rentalDetail(rentalDetailResult)
@@ -50,7 +50,7 @@ public class RentalEndService {
             );
 
             messagingTemplate.convertAndSend(
-                    "/topic/rental/" + rental.getRentalId() + "/status",
+                    "/topic/rental-reservation/" + rental.getId() + "/status",
                     RentalStatusMessage.builder()
                             .process(RentalReservationProcess.RETURNED.name())
                             .detailStatus(RentalReservationStatus.RENTAL_PERIOD_ENDED.name())

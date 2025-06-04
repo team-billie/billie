@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.reservation.controller.dto.request;
+package com.nextdoor.nextdoor.domain.rentalreservation.controller.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

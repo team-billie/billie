@@ -3,7 +3,7 @@ package com.nextdoor.nextdoor.domain.rentalreservation.controller;
 import com.nextdoor.nextdoor.domain.fintech.event.DepositCompletedEvent;
 import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rentalreservation.service.RentalEndService;
-import com.nextdoor.nextdoor.domain.reservation.event.ReservationConfirmedEvent;
+import com.nextdoor.nextdoor.domain.rentalreservation.event.RentalReservationConfirmedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,14 +29,13 @@ public class RentalTestController {
     public ResponseEntity<Void> simulateReservationConfirmed(
             @RequestParam Long reservationId,
             @RequestParam LocalDate endDate) {
-        
-        ReservationConfirmedEvent event = ReservationConfirmedEvent.builder()
-                .reservationId(reservationId)
-                .endDate(endDate)
+
+        RentalReservationConfirmedEvent event = RentalReservationConfirmedEvent.builder()
+                .rentalReservationId(reservationId)
                 .build();
-        
+
         eventPublisher.publishEvent(event);
-        
+
         return ResponseEntity.ok().build();
     }
 
@@ -47,9 +46,9 @@ public class RentalTestController {
         RemittanceCompletedEvent event = RemittanceCompletedEvent.builder()
                 .rentalId(rentalId)
                 .build();
-        
+
         eventPublisher.publishEvent(event);
-        
+
         return ResponseEntity.ok().build();
     }
 
@@ -59,16 +58,16 @@ public class RentalTestController {
         DepositCompletedEvent event = DepositCompletedEvent.builder()
                 .rentalId(rentalId)
                 .build();
-        
+
         eventPublisher.publishEvent(event);
-        
+
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{rentalId}/rental-end")
     public ResponseEntity<Void> simulateRentalEnd(@PathVariable Long rentalId) {
         rentalEndService.rentalEnd(rentalId);
-        
+
         return ResponseEntity.ok().build();
     }
 }

@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.reservation.service.dto;
+package com.nextdoor.nextdoor.domain.rentalreservation.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

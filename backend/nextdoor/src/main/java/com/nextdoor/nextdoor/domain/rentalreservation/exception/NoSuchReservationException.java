@@ -1,4 +1,4 @@
-package com.nextdoor.nextdoor.domain.reservation.exception;
+package com.nextdoor.nextdoor.domain.rentalreservation.exception;
 
 import lombok.Getter;
 

@@ -3,7 +3,6 @@ package com.nextdoor.nextdoor.domain.rentalreservation.domain;
 import com.nextdoor.nextdoor.domain.rentalreservation.exception.InvalidAmountException;
 import com.nextdoor.nextdoor.domain.rentalreservation.exception.InvalidRentalStatusException;
 import com.nextdoor.nextdoor.domain.rentalreservation.exception.RentalImageUploadException;
-import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -36,10 +35,6 @@ public class RentalReservation {
     private RentalReservationStatus rentalReservationStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "reservation_status", nullable = false, length = 50)
-    private ReservationStatus reservationStatus;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "rental_process", nullable = false, length = 50)
     private RentalReservationProcess rentalReservationProcess;
 
@@ -70,34 +65,40 @@ public class RentalReservation {
     private LocalDateTime createdAt;
 
     @NotNull
+    @Column(name = "start_date")
     private LocalDate startDate;
 
     @NotNull
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @NotNull
+    @Column(name = "rental_fee")
     private BigDecimal rentalFee;
 
     @NotNull
+    @Column(name = "deposit")
     private BigDecimal deposit;
 
     @NotNull
+    @Column(name = "owner_id")
     private Long ownerId;
 
     @NotNull
+    @Column(name = "renter_id")
     private Long renterId;
 
     @NotNull
+    @Column(name = "post_id")
     private Long postId;
 
     @Builder
-    public RentalReservation(List<AiImage> aiImages, RentalReservationStatus rentalReservationStatus, ReservationStatus reservationStatus, RentalReservationProcess rentalReservationProcess,
+    public RentalReservation(List<AiImage> aiImages, RentalReservationStatus rentalReservationStatus, RentalReservationProcess rentalReservationProcess,
                              String damageAnalysis, LocalDateTime createdAt, String accountNo, String bankCode, Long depositId,
                              LocalDate startDate, LocalDate endDate, BigDecimal rentalFee, BigDecimal deposit,
                              Long ownerId, Long renterId, Long postId) {
         this.aiImages = aiImages;
         this.rentalReservationStatus = rentalReservationStatus;
-        this.reservationStatus = reservationStatus;
         this.rentalReservationProcess = rentalReservationProcess != null ? rentalReservationProcess : getRentalProcessForStatus(rentalReservationStatus);
         this.damageAnalysis = damageAnalysis;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
@@ -112,16 +113,6 @@ public class RentalReservation {
         this.ownerId = ownerId;
         this.renterId = renterId;
         this.postId = postId;
-    }
-
-    public static RentalReservation createNew() {
-        return RentalReservation.builder()
-                .rentalStatus(RentalReservationStatus.CREATED)
-                .reservationStatus(ReservationStatus.PENDING)
-                .createdAt(LocalDateTime.now())
-                .accountNo("")
-                .bankCode("")
-                .build();
     }
 
     public void processRemittanceRequest() {
@@ -237,10 +228,6 @@ public class RentalReservation {
         this.deposit = deposit;
     }
 
-    public void updateReservationStatus(ReservationStatus reservationStatus) {
-        this.reservationStatus = reservationStatus;
-    }
-
     private void validateNotBlank(String value, String fieldName) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(fieldName + "는 필수 값입니다.");
@@ -267,7 +254,8 @@ public class RentalReservation {
         }
 
         switch (status) {
-            case CREATED:
+            case PENDING:
+            case CONFIRMED:
             case BEFORE_PHOTO_ANALYZED:
             case REMITTANCE_REQUESTED:
             case CANCELLED:

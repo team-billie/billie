@@ -23,7 +23,7 @@ public class ChatRentalQueryAdapter implements ChatRentalQueryPort {
                         Projections.constructor(
                                 RentalDto.class,
                                 qRental.id,
-                                qRental.rentalProcess
+                                qRental.rentalReservationProcess
                         ))
                 .from(qRental)
                 .where(qRental.id.eq(rentalId))

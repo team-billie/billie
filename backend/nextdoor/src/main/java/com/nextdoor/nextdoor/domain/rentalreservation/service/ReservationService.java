@@ -40,20 +40,20 @@ public class ReservationService {
     public ReservationResponseDto createReservation(Long loginUserId, ReservationSaveRequestDto reservationSaveRequestDto) {
         PostDto post = rentalReservationPostQueryPort.findById(reservationSaveRequestDto.getPostId()).orElseThrow();
 
-         RentalReservation rentalReservation = rentalReservationRepository.save(RentalReservation.builder()
-                .startDate(reservationSaveRequestDto.getStartDate())
-                .endDate(reservationSaveRequestDto.getEndDate())
-                .rentalFee(post.getRentalFee())
-                .deposit(post.getDeposit())
-                .rentalReservationStatus(RentalReservationStatus.PENDING)
-                .ownerId(post.getAuthorId())
-                .renterId(loginUserId)
-                .postId(post.getPostId())
-                .build());
+        RentalReservation rentalReservation = rentalReservationRepository.save(RentalReservation.builder()
+            .startDate(reservationSaveRequestDto.getStartDate())
+            .endDate(reservationSaveRequestDto.getEndDate())
+            .rentalFee(post.getRentalFee())
+            .deposit(post.getDeposit())
+            .rentalReservationStatus(RentalReservationStatus.PENDING)
+            .ownerId(post.getAuthorId())
+            .renterId(loginUserId)
+            .postId(post.getPostId())
+            .build());
 
         ReservationMemberQueryDto member = reservationMemberQueryPort.findById(loginUserId).orElseThrow();
         ReservationResponseDto response = ReservationResponseDto.from(rentalReservation, post, member);
-        messagingTemplate.convertAndSend("/topic/reservation/" + post.getAuthorUuid(), response);
+        messagingTemplate.convertAndSend("/topic/rental-reservation/" + post.getAuthorUuid() + "/status", response);
         return response;
     }
 
@@ -90,7 +90,7 @@ public class ReservationService {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + ownerUuid + "/status",
+                "/topic/rental-reservation/" + ownerUuid + "/status",
                 RequestRemittanceStatusMessage.builder()
                         .rentalId(rentalReservation.getId())
                         .process(RentalReservationProcess.BEFORE_RENTAL.name())
@@ -100,7 +100,7 @@ public class ReservationService {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + rentalReservation.getId() + "/status",
+                "/topic/rental-reservation/" + rentalReservation.getId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalReservationStatus.CONFIRMED.name())

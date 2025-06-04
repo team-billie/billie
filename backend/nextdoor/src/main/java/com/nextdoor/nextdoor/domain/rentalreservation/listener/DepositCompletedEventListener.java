@@ -25,7 +25,7 @@ public class DepositCompletedEventListener {
         rentalService.completeDepositProcessing(event);
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + event.getRentalId() + "/status",
+                "/topic/rental-reservation/" + event.getRentalId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.RENTAL_COMPLETED.name())
                         .detailStatus(RentalReservationStatus.RENTAL_COMPLETED.name())

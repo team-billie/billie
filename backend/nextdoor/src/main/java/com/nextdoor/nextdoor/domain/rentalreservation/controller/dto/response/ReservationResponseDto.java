@@ -1,9 +1,9 @@
-package com.nextdoor.nextdoor.domain.reservation.controller.dto.response;
+package com.nextdoor.nextdoor.domain.rentalreservation.controller.dto.response;
 
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservation;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.PostDto;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationMemberQueryDto;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationQueryDto;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.PostDto;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.ReservationMemberQueryDto;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.ReservationQueryDto;
 import lombok.Getter;
 
 import java.math.BigDecimal;

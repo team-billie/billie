@@ -1,19 +1,22 @@
-package com.nextdoor.nextdoor.domain.reservation.controller;
+package com.nextdoor.nextdoor.domain.rentalreservation.controller;
 
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.request.*;
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationCalendarResponseDto;
-import com.nextdoor.nextdoor.domain.reservation.controller.dto.response.ReservationResponseDto;
-import com.nextdoor.nextdoor.domain.reservation.service.ReservationQueryService;
-import com.nextdoor.nextdoor.domain.reservation.service.ReservationService;
+import com.nextdoor.nextdoor.domain.rentalreservation.controller.dto.request.*;
+import com.nextdoor.nextdoor.domain.rentalreservation.controller.dto.response.ReservationResponseDto;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.ReservationService;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.RentalService;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.SearchRentalCommand;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -22,7 +25,7 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final ReservationQueryService reservationQueryService;
+    private final RentalService rentalService;
 
     @PostMapping
     public ResponseEntity<ReservationResponseDto> createReservation(
@@ -50,8 +53,8 @@ public class ReservationController {
             @PathVariable Long reservationId,
             @RequestBody ReservationStatusUpdateRequestDto reservationStatusUpdateRequestDto
     ) {
-        ReservationResponseDto reservationResponseDto = reservationService.updateReservationStatus(loginUserId, reservationId, reservationStatusUpdateRequestDto);
-        return ResponseEntity.ok(reservationResponseDto);
+        reservationService.confirmReservation(loginUserId, reservationId, reservationStatusUpdateRequestDto);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{reservationId}")
@@ -64,26 +67,32 @@ public class ReservationController {
     }
 
     @GetMapping("/sent")
-    public ResponseEntity<List<ReservationResponseDto>> retrieveSentReservations(
+    public ResponseEntity<Page<?>> retrieveSentReservations(
             @AuthenticationPrincipal Long loginUserId,
-            @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(reservationQueryService.retrieveSentReservations(loginUserId, reservationRetrieveRequestDto));
+        SearchRentalCommand command = SearchRentalCommand.builder()
+                .userId(loginUserId)
+                .userRole("RENTER")
+                .condition("ACTIVE")
+                .pageable(pageable)
+                .build();
+        
+        return ResponseEntity.ok(rentalService.searchRentals(command));
     }
 
     @GetMapping("/received")
-    public ResponseEntity<List<ReservationResponseDto>> retrieveReceivedReservations(
+    public ResponseEntity<Page<?>> retrieveReceivedReservations(
             @AuthenticationPrincipal Long loginUserId,
-            @ModelAttribute ReservationRetrieveRequestDto reservationRetrieveRequestDto
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(reservationQueryService.retrieveReceivedReservations(loginUserId, reservationRetrieveRequestDto));
-    }
-
-    @GetMapping("/calendar")
-    public ResponseEntity<ReservationCalendarResponseDto> retrieveReservationCalendar(
-            @AuthenticationPrincipal Long loginUserId,
-            @ModelAttribute ReservationCalendarRetrieveRequestDto reservationCalendarRetrieveRequestDto
-    ) {
-        return ResponseEntity.ok(reservationQueryService.retrieveReservationCalendar(loginUserId, reservationCalendarRetrieveRequestDto));
+        SearchRentalCommand command = SearchRentalCommand.builder()
+                .userId(loginUserId)
+                .userRole("OWNER")
+                .condition("ACTIVE")
+                .pageable(pageable)
+                .build();
+        
+        return ResponseEntity.ok(rentalService.searchRentals(command));
     }
 }

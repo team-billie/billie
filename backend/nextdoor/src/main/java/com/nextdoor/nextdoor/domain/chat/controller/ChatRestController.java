@@ -11,7 +11,7 @@ import com.nextdoor.nextdoor.domain.chat.service.ChatRoomService;
 import com.nextdoor.nextdoor.domain.chat.service.MessageService;
 import com.nextdoor.nextdoor.domain.chat.service.UnreadCounterService;
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationProcess;
-import com.nextdoor.nextdoor.domain.reservation.enums.ReservationStatus;
+import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationStatus;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -100,7 +100,7 @@ public class ChatRestController {
         }
 
         // 예약 상태가 PENDING이면 "예약중"
-        if (reservation.getStatus() == ReservationStatus.PENDING) {
+        if (reservation.getStatus() == RentalReservationStatus.PENDING) {
             return "예약중";
         }
 

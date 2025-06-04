@@ -36,7 +36,7 @@ public class AiImageComparedProcessingEventListener {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + renterUuid + "/status",
+                "/topic/rental-reservation/" + renterUuid + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.RENTAL_COMPLETED.name())
                         .detailStatus(RentalReservationStatus.RENTAL_COMPLETED.name())
@@ -45,7 +45,7 @@ public class AiImageComparedProcessingEventListener {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + event.getRentalId() + "/status",
+                "/topic/rental-reservation/" + event.getRentalId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.RENTAL_COMPLETED.name())
                         .detailStatus(RentalReservationStatus.RENTAL_COMPLETED.name())
@@ -58,7 +58,7 @@ public class AiImageComparedProcessingEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDepositProcessingRequestEvent(DepositProcessingRequestEvent event) {
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + event.getRentalId() + "/status",
+                "/topic/rental-reservation/" + event.getRentalId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.RETURNED.name())
                         .detailStatus(RentalReservationStatus.BEFORE_AND_AFTER_COMPARED.name())

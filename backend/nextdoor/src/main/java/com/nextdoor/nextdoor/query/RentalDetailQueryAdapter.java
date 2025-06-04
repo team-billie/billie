@@ -55,15 +55,15 @@ public class RentalDetailQueryAdapter implements RentalDetailQueryPort {
 
 
         Long renterId = queryFactory
-                .select(reservation.renterId)
-                .from(reservation)
-                .where(reservation.id.eq(reservationId))
+                .select(rentalReservation.renterId)
+                .from(rentalReservation)
+                .where(rentalReservation.id.eq(rentalId))
                 .fetchOne();
 
         Long ownerId = queryFactory
-                .select(reservation.ownerId)
-                .from(reservation)
-                .where(reservation.id.eq(reservationId))
+                .select(rentalReservation.ownerId)
+                .from(rentalReservation)
+                .where(rentalReservation.id.eq(rentalId))
                 .fetchOne();
 
 

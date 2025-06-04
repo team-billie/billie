@@ -1,13 +1,11 @@
-package com.nextdoor.nextdoor.domain.reservation.service.dto;
+package com.nextdoor.nextdoor.domain.rentalreservation.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @AllArgsConstructor
 @Builder

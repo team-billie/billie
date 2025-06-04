@@ -5,6 +5,7 @@ import com.nextdoor.nextdoor.domain.fintech.event.RemittanceCompletedEvent;
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.*;
 import com.nextdoor.nextdoor.domain.rentalreservation.domainservice.RentalDomainService;
 import com.nextdoor.nextdoor.domain.rentalreservation.domainservice.RentalImageDomainService;
+import com.nextdoor.nextdoor.domain.rentalreservation.event.RentalReservationConfirmedEvent;
 import com.nextdoor.nextdoor.domain.rentalreservation.event.out.DepositProcessingRequestEvent;
 import com.nextdoor.nextdoor.domain.rentalreservation.event.out.RentalCompletedEvent;
 import com.nextdoor.nextdoor.domain.rentalreservation.exception.InvalidRenterIdException;
@@ -14,7 +15,7 @@ import com.nextdoor.nextdoor.domain.rentalreservation.port.*;
 import com.nextdoor.nextdoor.domain.rentalreservation.repository.AiImageComparisonPairRepository;
 import com.nextdoor.nextdoor.domain.rentalreservation.repository.RentalReservationRepository;
 import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.*;
-import com.nextdoor.nextdoor.domain.reservation.exception.NoSuchReservationException;
+import com.nextdoor.nextdoor.domain.rentalreservation.exception.NoSuchReservationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -127,7 +128,7 @@ public class RentalServiceImpl implements RentalService {
                 rentalReservation.getId()
         );
 
-        messagingTemplate.convertAndSend("/topic/rental/" + ownerUuid + "/status",
+        messagingTemplate.convertAndSend("/topic/rental-reservation/" + ownerUuid + "/status",
                 RentalStatusMessage.builder()
                         .rentalId(rentalReservation.getId())
                         .process(RentalReservationProcess.RENTAL_IN_ACTIVE.name())
@@ -137,7 +138,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + rentalReservation.getId() + "/status",
+                "/topic/rental-reservation/" + rentalReservation.getId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.RENTAL_IN_ACTIVE.name())
                         .detailStatus(RentalReservationStatus.REMITTANCE_COMPLETED.name())
@@ -264,7 +265,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + renterUuid + "/status",
+                "/topic/rental-reservation/" + renterUuid + "/status",
                 RentalStatusMessage.builder()
                         .rentalId(rentalReservation.getId())
                         .process(RentalReservationProcess.BEFORE_RENTAL.name())
@@ -274,7 +275,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/rental/" + rentalReservation.getId() + "/status",
+                "/topic/rental-reservation/" + rentalReservation.getId() + "/status",
                 RentalStatusMessage.builder()
                         .process(RentalReservationProcess.BEFORE_RENTAL.name())
                         .detailStatus(RentalReservationStatus.REMITTANCE_REQUESTED.name())
@@ -341,5 +342,17 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     public void deleteAiImageComparisonPairByRentalId(Long rentalId) {
         aiImageComparisonPairRepository.deleteByRentalId(rentalId);
+    }
+
+    @Override
+    @Transactional
+    public void createFromRentalReservation(RentalReservationConfirmedEvent event) {
+        // Implementation for handling RentalReservationConfirmedEvent
+        // This method replaces the old createFromReservation method
+        RentalReservation rentalReservation = rentalReservationRepository.findById(event.getRentalReservationId())
+                .orElseThrow(() -> new NoSuchRentalException("대여 정보가 존재하지 않습니다."));
+
+        // Add any necessary logic here to handle the confirmed event
+        // For now, just a placeholder implementation
     }
 }

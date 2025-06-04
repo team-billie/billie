@@ -2,8 +2,8 @@ package com.nextdoor.nextdoor.query;
 
 import com.nextdoor.nextdoor.common.Adapter;
 import com.nextdoor.nextdoor.domain.member.domain.QMember;
-import com.nextdoor.nextdoor.domain.reservation.port.ReservationMemberQueryPort;
-import com.nextdoor.nextdoor.domain.reservation.service.dto.ReservationMemberQueryDto;
+import com.nextdoor.nextdoor.domain.rentalreservation.port.ReservationMemberQueryPort;
+import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.ReservationMemberQueryDto;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Adapter
-public class ReservationMemberQueryAdapter implements ReservationMemberQueryPort {
+public class RentalReservationMemberQueryAdapter implements ReservationMemberQueryPort {
 
     private final JPAQueryFactory jpaQueryFactory;
 
