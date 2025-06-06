@@ -6,6 +6,7 @@ import com.nextdoor.nextdoor.domain.post.domain.QPost;
 import com.nextdoor.nextdoor.domain.post.domain.QProductImage;
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.QRentalReservation;
 import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationProcess;
+import com.nextdoor.nextdoor.domain.rentalreservation.domain.RentalReservationStatus;
 import com.nextdoor.nextdoor.domain.rentalreservation.port.RentalQueryPort;
 import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.ManagedRentalCountResult;
 import com.nextdoor.nextdoor.domain.rentalreservation.service.dto.RequestRemittanceResult;
@@ -160,7 +161,8 @@ public class RentalQueryAdapter implements RentalQueryPort {
         }
 
         if (condition.contains("ACTIVE")) {
-            return rentalReservation.rentalReservationProcess.ne(RentalReservationProcess.RENTAL_COMPLETED);
+            return rentalReservation.rentalReservationProcess.ne(RentalReservationProcess.RENTAL_COMPLETED)
+                    .and(rentalReservation.rentalReservationStatus.ne(RentalReservationStatus.PENDING));
         } else if (condition.contains("COMPLETED")) {
             return rentalReservation.rentalReservationProcess.eq(RentalReservationProcess.RENTAL_COMPLETED);
         }
