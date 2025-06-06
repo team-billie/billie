@@ -43,7 +43,8 @@ export default function useReservationWebSocket() {
       const response = await fetchOwnerReservations(userId);
 
       // API 응답 데이터 형식 변환
-      const formattedReservations = response.map((reservation: any) => ({
+      const reservations = Array.isArray(response) ? response : response.content || [];
+      const formattedReservations = reservations.map((reservation: any) => ({
         reservationId: reservation.reservationId,
         postTitle: reservation.title || reservation.postTitle,
         postProductImage: reservation.productImageUrl || reservation.postProductImage,
@@ -84,7 +85,7 @@ export default function useReservationWebSocket() {
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      const socket = new SockJS(`${baseUrl}/ws-reservation`);
+      const socket = new SockJS(`${baseUrl}/ws-rental`);
 
       // STOMP 클라이언트 생성
       client = new Client({
