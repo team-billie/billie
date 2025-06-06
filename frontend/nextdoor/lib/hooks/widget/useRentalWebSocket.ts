@@ -101,7 +101,12 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
       // 합치기
       const allRentals = [...ownerRentals, ...renterRentals].map(
         (rental: any) => {
-          // console.log("[대여-API] 렌탈 매핑 - rentalId:", rental.rentalId);
+          console.log("[대여-API] 렌탈 상태 정보:", {
+            rentalId: rental.rentalId,
+            process: rental.rentalProcess,
+            status: rental.rentalStatus,
+            title: rental.title
+          });
           return {
             startDate: rental.startDate,
             endDate: rental.endDate,
@@ -163,7 +168,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
 
     if (stompClientRef.current && stompClientRef.current.connected) {
       try {
-        stompClientRef.current.unsubscribe(`/topic/rental/${uuid}/status`);
+        stompClientRef.current.unsubscribe(`/topic/rental-reservation/${uuid}/status`);
         stompClientRef.current.deactivate();
       } catch (e) {
         console.error("[대여-웹소켓] 기존 연결 해제 오류:", e);
@@ -193,8 +198,8 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
         setIsConnected(true);
         // console.log("[대여-웹소켓] 연결 성공");
 
-        // console.log("[대여-웹소켓] 토픽 구독:", `/topic/rental/${uuid}/status`);
-        client.subscribe(`/topic/rental/${uuid}/status`, (message) => {
+        // console.log("[대여-웹소켓] 토픽 구독:", `/topic/rental-reservation/${uuid}/status`);
+        client.subscribe(`/topic/rental-reservation/${uuid}/status`, (message) => {
           try {
             const rentalStatusData: RentalStatusMessage = JSON.parse(
               message.body
@@ -299,7 +304,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
           const uuid = localStorage.getItem("uuid");
           if (uuid) {
             // console.log("[대여-웹소켓] 연결 해제 중...");
-            stompClientRef.current?.unsubscribe(`/topic/rental/${uuid}/status`);
+            stompClientRef.current?.unsubscribe(`/topic/rental-reservation/${uuid}/status`);
             stompClientRef.current.deactivate();
           }
         } catch (e) {
