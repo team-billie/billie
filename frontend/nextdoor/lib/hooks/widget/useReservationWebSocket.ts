@@ -83,7 +83,7 @@ export default function useReservationWebSocket() {
     let client: Client | null = null;
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://k12e205.p.ssafy.io:8081';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
       const socket = new SockJS(`${baseUrl}/ws-reservation`);
 
       // STOMP 클라이언트 생성

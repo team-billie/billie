@@ -171,8 +171,7 @@ export default function useRentalWebSocket(): UseRentalWebSocketReturn {
     }
 
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://k12e205.p.ssafy.io:8081";
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
       const socket = new SockJS(`${baseUrl}/ws-rental`);
       // console.log("[대여-웹소켓] 소켓 생성:", `${baseUrl}/ws-rental`);
 
