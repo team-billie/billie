@@ -77,7 +77,7 @@ const nextConfig = {
               https://oneders.s3.ap-northeast-2.amazonaws.com
               https://ssafy-nextdoor.s3.ap-northeast-2.amazonaws.com;
             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-            font-src 'self' https://fonts.gstatic.com;
+            font-src 'self' https://fonts.gstatic.com data:;
           `
                 .replace(/\s{2,}/g, " ")
                 .trim() + ";",
