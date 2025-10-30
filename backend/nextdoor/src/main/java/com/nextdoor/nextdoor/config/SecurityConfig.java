@@ -1,12 +1,13 @@
 package com.nextdoor.nextdoor.config;
 
-import com.nextdoor.nextdoor.domain.auth.OAuth2AuthorizationRequestBasedOnCookieRepository;
-import com.nextdoor.nextdoor.domain.auth.OAuth2SuccessHandler;
+import com.nextdoor.nextdoor.domain.auth.oauth2.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.nextdoor.nextdoor.domain.auth.oauth2.OAuth2SuccessHandler;
 import com.nextdoor.nextdoor.domain.auth.filter.JwtAuthenticationFilter;
 import com.nextdoor.nextdoor.domain.auth.filter.RedirectUrlCookieFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,15 +39,27 @@ public class SecurityConfig {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .formLogin(formLogin -> formLogin.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(httpRequest -> httpRequest
                         .requestMatchers(
-                                "/api/v1/auth"
-                        ).permitAll()
-                        // TODO OAuth2 구현 후 아래 줄 수정
-                        .anyRequest().permitAll())
+                                "/api/v1/auth",
+                                "/social-login",
+                                "/social-login.html")
+                        .permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/posts",
+                                "/api/v1/posts/*/like")
+                        .permitAll()
+                        .requestMatchers(
+                                "/api/v1/posts/*/like",
+                                "/api/v1/posts/liked")
+                        .authenticated()
+                        .anyRequest()
+                        .authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .redirectionEndpoint(redirection -> redirection
                                 .baseUri("/api/v1/auth/oauth2/code/*"))
